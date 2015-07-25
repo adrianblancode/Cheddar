@@ -1,2 +1,2 @@
 # Cheddar
-WIP Android client for Hacker News
+Hacker News reader for Android. WIP, a lot will change the coming weeks.

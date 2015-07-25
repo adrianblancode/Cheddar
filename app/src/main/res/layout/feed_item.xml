@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1"
+    android:padding="10dp">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:layout_weight="1">
+
+            <TextView
+                android:id="@+id/feed_item_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Godzilla sighted in New York City, evacuate everyone immediately!"
+                style="@style/Base.TextAppearance.AppCompat.Subhead"/>
+
+        <TextView
+            android:id="@+id/feed_item_subtitle1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="8 hrs + dailymail.com"
+            style="@style/Base.TextAppearance.AppCompat.Body1"/>
+
+        <TextView
+            android:id="@+id/feed_item_subtitle2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="143 points + 38 comments"
+            style="@style/Base.TextAppearance.AppCompat.Body1"/>
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/feed_item_thumbnail"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="right"
+        android:src="@mipmap/ic_launcher"/>
+</LinearLayout>
