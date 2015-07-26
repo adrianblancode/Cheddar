@@ -1,5 +1,7 @@
 package co.adrianblan.cheddar;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.media.Image;
 
 /**
@@ -10,16 +12,17 @@ public class FeedItem {
     private String title;
     private String subtitle1;
     private String subtitle2;
-    private Image thumbnail;
+    private Bitmap thumbnail;
+    private Bitmap favicon;
+    private String letter;
 
-    public FeedItem(){}
-
-    //TODO image
-    public FeedItem(String title, String subtitle1, String subtitle2){
-        this.title = title;
-        this.subtitle1 = subtitle1;
-        this.subtitle2 = subtitle2;
-        this.thumbnail = thumbnail;
+    public FeedItem(){
+        this.title = null;
+        this.subtitle1 = null;
+        this.subtitle2 = null;
+        this.thumbnail = null;
+        this.favicon = null;
+        letter = "?";
     }
 
     public String getTitle() {
@@ -46,11 +49,27 @@ public class FeedItem {
         this.subtitle2 = subtitle;
     }
 
-    public Image getThumbnail() {
+    public Bitmap getThumbnail() {
         return thumbnail;
     }
 
-    public void setThumbnail(Image thumbnail) {
+    public void setThumbnail(Bitmap thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public Bitmap getFavicon() {
+        return favicon;
+    }
+
+    public void setFavicon(Bitmap favicon) {
+        this.favicon = favicon;
+    }
+
+    public String getLetter() {
+        return letter;
+    }
+
+    public void setLetter(String letter) {
+        this.letter = letter;
     }
 }
