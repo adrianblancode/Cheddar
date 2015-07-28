@@ -34,8 +34,6 @@ public class ThumbnailExtractor {
         Pattern pattern = Pattern.compile("https?:\\/\\/[^&]*\\.png");
         Matcher matcher = pattern.matcher(doc.toString());
 
-        System.out.println("Found: " + site);
-
         if (matcher.find()) {
             return matcher.group(0);
         }

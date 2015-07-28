@@ -2,12 +2,15 @@ package co.adrianblan.cheddar;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.os.Bundle;
 import android.support.v7.graphics.Palette;
 import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -66,7 +69,7 @@ public class FeedAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
-        FeedItem item = feedItems.get(position);
+        final FeedItem item = feedItems.get(position);
 
         //TODO get context in constructor
         LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);;
@@ -123,6 +126,20 @@ public class FeedAdapter extends BaseAdapter {
             item.setTextDrawable(drawable);
             thumbnail.setImageDrawable(drawable);
         }
+
+        // If we click the thumbnail, get to the content
+        thumbnail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), WebViewActivity.class);
+                Bundle b = new Bundle();
+                b.putString("title", item.getTitle());
+                b.putString("shortUrl", item.getShortUrl());
+                b.putString("longUrl", item.getLongUrl());
+                intent.putExtras(b); //Put your id to your next Intent
+                v.getContext().startActivity(intent);
+            }
+        });
 
         return feed_item;
     }

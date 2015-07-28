@@ -8,6 +8,7 @@ import java.util.List;
  */
 
 // Stores Hacker News submissions from Json
+// Not currently used
 public class Submission {
 
     private String by;

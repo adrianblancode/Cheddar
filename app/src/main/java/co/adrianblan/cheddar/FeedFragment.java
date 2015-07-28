@@ -1,5 +1,6 @@
 package co.adrianblan.cheddar;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -8,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import com.firebase.client.DataSnapshot;
@@ -59,6 +62,7 @@ public class FeedFragment extends Fragment {
         storiesUrl = baseUrl.child(getArguments().getString("url"));
 
         feedAdapter = new FeedAdapter();
+
         // Gets all the submissions and populates the list with them
         updateSubmissions();
     }
@@ -190,12 +194,21 @@ public class FeedFragment extends Fragment {
         Date now = new Date();
         String time = getPrettyDate(past, now);
 
+        String comments = "";
+        ArrayList<Long> kids = (ArrayList<Long>) ret.get("kids");
+        if(kids != null) {
+            comments = " \u2022 " + String.valueOf(kids.size()) + " comments ";
+        }
+
         // Set titles and other data
         f.setTitle((String) ret.get("title"));
-        f.setSubtitle2(Long.toString((Long) ret.get("score")) + " points \u2022 0 comments \u2022 " + time);
+        f.setSubtitle2(Long.toString((Long) ret.get("score")) + " points" + comments  + " \u2022 " + time);
 
         String domain = site.getHost().replace("www.", "");
+        f.setShortUrl(domain);
         f.setSubtitle1(domain);
+
+        f.setLongUrl(site.toString());
 
         // We show the first letter of the url on the thumbnail
         if(domain.equals("hackernews.com")){

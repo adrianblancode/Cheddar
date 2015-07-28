@@ -2,7 +2,6 @@ package co.adrianblan.cheddar;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.media.Image;
 
 /**
  * Created by Adrian on 2015-07-25.
@@ -17,6 +16,9 @@ public class FeedItem {
     private Drawable textDrawable;
     private String letter;
 
+    private String shortUrl;
+    private String longUrl;
+
     public FeedItem(){
         this.title = null;
         this.subtitle1 = null;
@@ -24,7 +26,9 @@ public class FeedItem {
         this.thumbnail = null;
         this.favicon = null;
         this.textDrawable = null;
-        letter = "?";
+        this.letter = "?";
+        this.shortUrl = null;
+        this.longUrl = null;
     }
 
     public String getTitle() {
@@ -81,5 +85,21 @@ public class FeedItem {
 
     public void setLetter(String letter) {
         this.letter = letter;
+    }
+
+    public String getShortUrl() {
+        return shortUrl;
+    }
+
+    public void setShortUrl(String shortUrl) {
+        this.shortUrl = shortUrl;
+    }
+
+    public String getLongUrl() {
+        return longUrl;
+    }
+
+    public void setLongUrl(String longUrl) {
+        this.longUrl = longUrl;
     }
 }
