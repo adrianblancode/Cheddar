@@ -4,8 +4,8 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -35,7 +35,8 @@ public class FeedFragment extends Fragment {
     private FeedAdapter feedAdapter;
     private ArrayList<Long> submissionIDs;
     private Firebase baseUrl;
-    private Firebase topStoriesUrl;
+    private Firebase storiesUrl;
+    private ArrayList<AsyncTask> asyncTasks = new ArrayList<AsyncTask>();
 
     public static FeedFragment newInstance() {
         FeedFragment f = new FeedFragment();
@@ -47,16 +48,17 @@ public class FeedFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
 
         setRetainInstance(true);
-
         initImageLoader();
+
+        // Init API stuff
         Firebase.setAndroidContext(getActivity());
         baseUrl = new Firebase("https://hacker-news.firebaseio.com/v0/");
-        topStoriesUrl = baseUrl.child("/topstories");
+        storiesUrl = baseUrl.child(getArguments().getString("url"));
 
         feedAdapter = new FeedAdapter();
-
         // Gets all the submissions and populates the list with them
         updateSubmissions();
     }
@@ -78,8 +80,28 @@ public class FeedFragment extends Fragment {
 
     // Sometimes we just might want to reset all submissions
     public void resetSubmissions(){
-        submissionIDs = null;
-        updateSubmissions();
+
+        //We dont want to be able to spam resets
+        if(!feedAdapter.isEmpty()) {
+
+            //First we need to cancel all asynctasks
+            while(!asyncTasks.isEmpty()){
+
+                if(asyncTasks.get(0).getStatus().equals(AsyncTask.Status.RUNNING)){
+                    asyncTasks.get(0).cancel(true);
+                }
+
+                asyncTasks.remove(0);
+            }
+
+            // We also cancel all image fetching
+            ImageLoader.getInstance().stop();
+
+            submissionIDs = null;
+            feedAdapter.clear();
+            feedAdapter.notifyDataSetChanged();
+            updateSubmissions();
+        }
     }
 
     // Fetches a large number of submissions, and updates them individually
@@ -89,7 +111,7 @@ public class FeedFragment extends Fragment {
         if(submissionIDs == null) {
 
             // Updates the list of 500 submission IDs
-            topStoriesUrl.addListenerForSingleValueEvent(new ValueEventListener() {
+            storiesUrl.addListenerForSingleValueEvent(new ValueEventListener() {
 
                 @Override
                 public void onDataChange(DataSnapshot snapshot) {
@@ -125,9 +147,16 @@ public class FeedFragment extends Fragment {
                 // We retrieve all objects into a hashmap
                 Map<String, Object> ret = (Map<String, Object>) snapshot.getValue();
 
+                if(ret == null){
+                    return;
+                }
+
+                String url = (String) ret.get("url");
+                if(url == ""){url = "http://hackernews.com";}
+
                 URL site = null;
                 try {
-                    site = new URL((String) ret.get("url"));
+                    site = new URL(url);
                 } catch (MalformedURLException e) {
                     System.err.println(e);
                     return;
@@ -137,9 +166,11 @@ public class FeedFragment extends Fragment {
                 feedAdapter.add(f);
                 feedAdapter.notifyDataSetChanged();
 
-                // Asynchronously updates images for the feed item
-                updateSubmissionThumbnail(site.getHost(), f);
-                updateSubmissionFavicon(site.getHost(), f);
+                if(!url.contains("hackernews.com")) {
+                    // Asynchronously updates images for the feed item
+                    updateSubmissionThumbnail(site.getHost(), f);
+                    updateSubmissionFavicon(site.getHost(), f);
+                }
             }
 
             @Override
@@ -167,26 +198,27 @@ public class FeedFragment extends Fragment {
         f.setSubtitle1(domain);
 
         // We show the first letter of the url on the thumbnail
-        f.setLetter(Character.toString(domain.charAt(0)));
+        if(domain.equals("hackernews.com")){
+            f.setLetter("HN");
+        } else {
+            f.setLetter(domain.substring(0, 1));
+        }
 
         return f;
     }
 
     // Recieves a host url, and the position of the feed item
-    // Updates a high resolution thumbnail for that submission
-    // Warning: using only the host url and not the full url
+    // Fetches a remote server for the url to the best thumbnail to use
     public void updateSubmissionThumbnail(String url, FeedItem f){
 
         final FeedItem fi = f;
 
-        class DownloadFilesTask extends AsyncTask<String, Integer, String> {
+        class ThumbnailUrlTask extends AsyncTask<String, Integer, String> {
 
             @Override
             protected String doInBackground(String... url) {
-                System.out.println("Loading!");
-
                 // Gets url to a good thumbnail from a site
-                ThumbnailSearcher ts = new ThumbnailSearcher();
+                ThumbnailExtractor ts = new ThumbnailExtractor();
                 return ts.getThumbnailUrl(url[0]);
             }
             @Override
@@ -223,7 +255,9 @@ public class FeedFragment extends Fragment {
 
         // Asynchronously fetches the URL to the thumbnail
         // We cannot use execute() since it only allows one thread at a time
-        new DownloadFilesTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "http://icons.better-idea.org/api/icons?url=" + url);
+        ThumbnailUrlTask task = new ThumbnailUrlTask();
+        asyncTasks.add(task);
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "http://icons.better-idea.org/api/icons?url=" + url);
     }
 
     // Recieves a host url, and the position of the feed item
@@ -245,7 +279,7 @@ public class FeedFragment extends Fragment {
 
                 int position = feedAdapter.getPosition(fi);
 
-                if(position == -1){
+                if (position == -1) {
                     return;
                 }
 
@@ -299,5 +333,24 @@ public class FeedFragment extends Fragment {
 
         // Initialize ImageLoader with configuration.
         ImageLoader.getInstance().init(config.build());
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        if (id == R.id.refresh) {
+            resetSubmissions();
+        }
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }

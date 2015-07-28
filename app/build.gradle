@@ -37,4 +37,5 @@ dependencies {
     compile 'com.android.support:palette-v7:+'
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
     compile 'org.jsoup:jsoup:1.7.3'
+    compile 'com.jpardogo.materialtabstrip:library:1.1.0'
 }

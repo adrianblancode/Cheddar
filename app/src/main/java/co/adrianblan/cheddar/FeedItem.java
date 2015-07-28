@@ -14,6 +14,7 @@ public class FeedItem {
     private String subtitle2;
     private Bitmap thumbnail;
     private Bitmap favicon;
+    private Drawable textDrawable;
     private String letter;
 
     public FeedItem(){
@@ -22,6 +23,7 @@ public class FeedItem {
         this.subtitle2 = null;
         this.thumbnail = null;
         this.favicon = null;
+        this.textDrawable = null;
         letter = "?";
     }
 
@@ -63,6 +65,14 @@ public class FeedItem {
 
     public void setFavicon(Bitmap favicon) {
         this.favicon = favicon;
+    }
+
+    public Drawable getTextDrawable() {
+        return textDrawable;
+    }
+
+    public void setTextDrawable(Drawable textDrawable) {
+        this.textDrawable = textDrawable;
     }
 
     public String getLetter() {

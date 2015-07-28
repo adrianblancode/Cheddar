@@ -17,13 +17,11 @@ import java.util.regex.Pattern;
  */
 
 // This class takes an URL to a site and extracts an thumbnail url
-public class ThumbnailSearcher {
+public class ThumbnailExtractor {
 
     public String getThumbnailUrl(String site) {
 
         Document doc = null;
-
-        System.out.println("Started: " + site);
 
         try {
             doc = Jsoup.connect(site).ignoreContentType(true).get();

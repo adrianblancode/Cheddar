@@ -33,6 +33,10 @@ public class FeedAdapter extends BaseAdapter {
         feedItems.add(f);
     }
 
+    public void clear() {
+        feedItems.clear();
+    }
+
     public int getPosition(FeedItem f) {
 
         for(int i = 0; i < getCount(); i++) {
@@ -85,9 +89,15 @@ public class FeedAdapter extends BaseAdapter {
 
             thumbnail.setImageBitmap(item.getThumbnail());
 
-            // If we only have a low resolution favicon, get the dominant color
+        } else if (item.getTextDrawable() != null) {
+
+            // If we already have a TextDrawable, use it
+            // Otherwise, we must generate one
+            thumbnail.setImageDrawable(item.getTextDrawable());
+
         } else if(item.getFavicon() != null) {
 
+            // If we only have a low resolution favicon, get the dominant color
             // Generate lots of palettes from the favicon
             Palette myPalette = Palette.generate(item.getFavicon());
             List<Palette.Swatch> swatches = myPalette.getSwatches();
@@ -98,17 +108,19 @@ public class FeedAdapter extends BaseAdapter {
             // We want the vibrant palette, if possible, ortherwise darker palettes
             if (swatch != null){
                 drawable = builder.buildRect(item.getLetter(), swatch.getRgb());
-            } else if(swatches.size() > 1) {
-                drawable = builder.buildRect(item.getLetter(), swatches.get(1).getRgb());
+            } else if(!swatches.isEmpty()) {
+                drawable = builder.buildRect(item.getLetter(), swatches.get(0).getRgb());
             } else {
-                drawable = builder.buildRect(item.getLetter(), R.color.colorPrimary);
+                drawable = builder.buildRect(item.getLetter(), parent.getContext().getResources().getColor(R.color.colorPrimary));
             }
 
+            item.setTextDrawable(drawable);
             thumbnail.setImageDrawable(drawable);
         } else {
 
             // Otherwise we  just display default colour
-            TextDrawable drawable = builder.buildRect(item.getLetter(), R.color.colorPrimary);
+            TextDrawable drawable = builder.buildRect(item.getLetter(), parent.getContext().getResources().getColor(R.color.colorPrimary));
+            item.setTextDrawable(drawable);
             thumbnail.setImageDrawable(drawable);
         }
 
