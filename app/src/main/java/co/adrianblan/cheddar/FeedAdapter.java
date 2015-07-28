@@ -33,10 +33,6 @@ public class FeedAdapter extends BaseAdapter {
         feedItems.add(f);
     }
 
-    public FeedItem get (int i){
-        return feedItems.get(i);
-    }
-
     public int getPosition(FeedItem f) {
 
         for(int i = 0; i < getCount(); i++) {
@@ -54,8 +50,8 @@ public class FeedAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
-        return null;
+    public FeedItem getItem(int position) {
+        return feedItems.get(position);
     }
 
     @Override
@@ -73,13 +69,13 @@ public class FeedAdapter extends BaseAdapter {
         View feed_item = inflater.inflate(R.layout.feed_item, parent, false);
 
         TextView title = (TextView) feed_item.findViewById(R.id.feed_item_title);
-        title.setText(feedItems.get(position).getTitle());
+        title.setText(item.getTitle());
 
         TextView subtitle1 = (TextView) feed_item.findViewById(R.id.feed_item_subtitle1);
-        subtitle1.setText(feedItems.get(position).getSubtitle1());
+        subtitle1.setText(item.getSubtitle1());
 
         TextView subtitle2 = (TextView) feed_item.findViewById(R.id.feed_item_subtitle2);
-        subtitle2.setText(feedItems.get(position).getSubtitle2());
+        subtitle2.setText(item.getSubtitle2());
 
         ImageView thumbnail = (ImageView) feed_item.findViewById(R.id.feed_item_thumbnail);
         TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
@@ -87,7 +83,7 @@ public class FeedAdapter extends BaseAdapter {
         // If we have a high resolution thumbnail, display it
         if(item.getThumbnail() != null){
 
-            thumbnail.setImageBitmap(feedItems.get(position).getThumbnail());
+            thumbnail.setImageBitmap(item.getThumbnail());
 
             // If we only have a low resolution favicon, get the dominant color
         } else if(item.getFavicon() != null) {
@@ -105,14 +101,14 @@ public class FeedAdapter extends BaseAdapter {
             } else if(swatches.size() > 1) {
                 drawable = builder.buildRect(item.getLetter(), swatches.get(1).getRgb());
             } else {
-                drawable = builder.buildRect(item.getLetter(), Color.DKGRAY);
+                drawable = builder.buildRect(item.getLetter(), R.color.colorPrimary);
             }
 
             thumbnail.setImageDrawable(drawable);
         } else {
 
-            // Otherwise we  just display a gray square
-            TextDrawable drawable = builder.buildRect(item.getLetter(), Color.DKGRAY);
+            // Otherwise we  just display default colour
+            TextDrawable drawable = builder.buildRect(item.getLetter(), R.color.colorPrimary);
             thumbnail.setImageDrawable(drawable);
         }
 

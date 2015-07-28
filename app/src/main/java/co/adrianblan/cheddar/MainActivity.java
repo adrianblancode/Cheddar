@@ -36,21 +36,28 @@ public class MainActivity extends AppCompatActivity {
     private FeedAdapter feedAdapter = new FeedAdapter();
     private Firebase baseUrl;
     private Firebase topStoriesUrl;
+    private boolean initialized = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initImageLoader();
-        Firebase.setAndroidContext(this);
-        baseUrl = new Firebase("https://hacker-news.firebaseio.com/v0/");
-        topStoriesUrl = baseUrl.child("/topstories");
+        if(!initialized) {
+            initialized = true;
+            initImageLoader();
+            Firebase.setAndroidContext(this);
+            baseUrl = new Firebase("https://hacker-news.firebaseio.com/v0/");
+            topStoriesUrl = baseUrl.child("/topstories");
+        }
 
         ListView listView = (ListView) findViewById(R.id.feed);
         listView.setAdapter(feedAdapter);
 
-        updateSubmissions();
+        // Gets all the submissions and populates the list with them
+        if(feedAdapter.getCount() == 0) {
+            updateSubmissions();
+        }
     }
 
     // Fetches a large number of submissions, and updates them individually
@@ -59,10 +66,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
 
+                // List of submission IDs
                 ArrayList<Long> ret = (ArrayList<Long>) snapshot.getValue();
 
                 // From the top 500 submissions, we only display a few
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 25; i++) {
 
                     // But we must first add each submission to the view manually
                     updateSingleSubmission(baseUrl.child("/item/" + ret.get(i)));
@@ -165,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
                             return;
                         }
 
-                        feedAdapter.get(position).setThumbnail(loadedImage);
+                        feedAdapter.getItem(position).setThumbnail(loadedImage);
                         feedAdapter.notifyDataSetChanged();
                     }
                 });
@@ -193,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
-                feedAdapter.get(position).setFavicon(loadedImage);
+                feedAdapter.getItem(position).setFavicon(loadedImage);
                 feedAdapter.notifyDataSetChanged();
             }
         });
