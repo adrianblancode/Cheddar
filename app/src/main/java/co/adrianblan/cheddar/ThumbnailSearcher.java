@@ -19,9 +19,11 @@ import java.util.regex.Pattern;
 // This class takes an URL to a site and extracts an thumbnail url
 public class ThumbnailSearcher {
 
-    public static String getThumbnailUrl(String site) {
+    public String getThumbnailUrl(String site) {
 
         Document doc = null;
+
+        System.out.println("Started: " + site);
 
         try {
             doc = Jsoup.connect(site).ignoreContentType(true).get();
@@ -33,6 +35,8 @@ public class ThumbnailSearcher {
         //Really lazy regex to extract image url from JSON
         Pattern pattern = Pattern.compile("https?:\\/\\/[^&]*\\.png");
         Matcher matcher = pattern.matcher(doc.toString());
+
+        System.out.println("Found: " + site);
 
         if (matcher.find()) {
             return matcher.group(0);
