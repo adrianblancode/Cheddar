@@ -317,7 +317,7 @@ public class FeedFragment extends Fragment {
         }
     }
 
-    //This is the shittiest hash ever, but we only need one image so
+    //This is the shittiest hash ever, but we only need it for one image so
     public long hashBitmap(Bitmap bmp){
 
         long hash = 0;
