@@ -78,11 +78,17 @@ public class FeedAdapter extends BaseAdapter {
         TextView title = (TextView) feed_item.findViewById(R.id.feed_item_title);
         title.setText(item.getTitle());
 
-        TextView subtitle1 = (TextView) feed_item.findViewById(R.id.feed_item_subtitle1);
-        subtitle1.setText(item.getSubtitle1());
+        TextView subtitle = (TextView) feed_item.findViewById(R.id.feed_item_subtitle);
+        subtitle.setText(item.getSubtitle());
 
-        TextView subtitle2 = (TextView) feed_item.findViewById(R.id.feed_item_subtitle2);
-        subtitle2.setText(item.getSubtitle2());
+        TextView score = (TextView) feed_item.findViewById(R.id.feed_item_score);
+        score.setText(item.getScore());
+
+        TextView comments = (TextView) feed_item.findViewById(R.id.feed_item_comments);
+        comments.setText(item.getComments());
+
+        TextView time = (TextView) feed_item.findViewById(R.id.feed_item_time);
+        time.setText(item.getTime());
 
         ImageView thumbnail = (ImageView) feed_item.findViewById(R.id.feed_item_thumbnail);
         TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();

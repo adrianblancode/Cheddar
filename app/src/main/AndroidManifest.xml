@@ -24,6 +24,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="co.adrianblan.cheddar.MainActivity"/>
         </activity>
+        <activity
+            android:name=".CommentActivity"
+            android:label="Comment"
+            android:parentActivityName=".MainActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="co.adrianblan.cheddar.MainActivity"/>
+        </activity>
     </application>
 
 </manifest>

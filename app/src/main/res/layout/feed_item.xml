@@ -23,20 +23,69 @@
             android:textSize="17dp"/>
 
         <TextView
-            android:id="@+id/feed_item_subtitle1"
+            android:id="@+id/feed_item_subtitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="8 hrs &#8226; dailymail.com"
+            android:text="dailymail.com"
             style="@style/Base.TextAppearance.AppCompat.Body1"
             android:textColor="@color/abc_secondary_text_material_light"/>
 
-        <TextView
-            android:id="@+id/feed_item_subtitle2"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="143 points &#8226; 38 comments"
-            style="@style/Base.TextAppearance.AppCompat.Body1"
-            android:textColor="@color/abc_secondary_text_material_light"/>
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginTop="2.3dp"
+                android:layout_marginLeft="-3dp"
+                android:layout_marginRight="@dimen/feed_item_subtitle_icon_marginRight"
+                android:rotation="-90"
+                android:src="@drawable/ic_play_arrow_black_18dp"
+                android:tint="@color/primary_dark_material_light"/>
+            <TextView
+                android:id="@+id/feed_item_score"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="143 points"
+                style="@style/Base.TextAppearance.AppCompat.Body1"
+                android:textColor="@color/abc_secondary_text_material_light"/>
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginTop="2dp"
+                android:padding="1.5dp"
+                android:layout_marginLeft="@dimen/feed_item_subtitle_icon_marginLeft"
+                android:layout_marginRight="@dimen/feed_item_subtitle_icon_marginRight"
+                android:src="@drawable/ic_chat_bubble_outline_black_18dp"
+                android:tint="@color/primary_dark_material_light"/>
+            <TextView
+                android:id="@+id/feed_item_comments"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="40 comments"
+                style="@style/Base.TextAppearance.AppCompat.Body1"
+                android:textColor="@color/abc_secondary_text_material_light"/>
+
+            <ImageView
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:layout_marginTop="1dp"
+                android:padding="2dp"
+                android:layout_marginLeft="@dimen/feed_item_subtitle_icon_marginLeft"
+                android:layout_marginRight="@dimen/feed_item_subtitle_icon_marginRight"
+                android:src="@drawable/ic_access_time_black_18dp"
+                android:tint="@color/primary_dark_material_light"/>
+            <TextView
+                android:id="@+id/feed_item_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="8h"
+                style="@style/Base.TextAppearance.AppCompat.Body1"
+                android:textColor="@color/abc_secondary_text_material_light"/>
+        </LinearLayout>
     </LinearLayout>
 
     <ImageView

@@ -1,17 +1,18 @@
 package co.adrianblan.cheddar;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ImageView;
+import android.widget.AbsListView;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -21,8 +22,11 @@ import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.nostra13.universalimageloader.core.download.ImageDownloader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -36,10 +40,23 @@ import java.util.concurrent.TimeUnit;
 public class FeedFragment extends Fragment {
 
     private FeedAdapter feedAdapter;
+
+    // Stores the submission IDs used for the API
     private ArrayList<Long> submissionIDs;
+
+    // Base URL for the hacker news API
     private Firebase baseUrl;
+
+    // Sub URL used for different stories
     private Firebase storiesUrl;
+
+    // Collection of AsyncTasks we use to keep them from overflowing
     private ArrayList<AsyncTask> asyncTasks = new ArrayList<AsyncTask>();
+
+    //Throttle submissions
+    private Date lastSubmissionUpdate = new Date();
+    private final int submissionUpdateTime = 3;
+    private final int submissionUpdateNum = 20;
 
     public static FeedFragment newInstance() {
         FeedFragment f = new FeedFragment();
@@ -74,10 +91,46 @@ public class FeedFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
+
         View rootView = inflater.inflate(R.layout.fragment_feed, container,false);
 
         ListView listView = (ListView) rootView.findViewById(R.id.feed_list);
         listView.setAdapter(feedAdapter);
+
+        //If we scroll to the end, we simply fetch more submissions
+        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+
+            private int preLast;
+
+            @Override
+            public void onScrollStateChanged(AbsListView view, int scrollState) {}
+
+            @Override
+            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+
+                if (view.getId() == R.id.feed_list) {
+                    final int lastItem = firstVisibleItem + visibleItemCount;
+                    if (lastItem == totalItemCount) {
+
+                        Date d = new Date();
+                        long seconds = (d.getTime() - lastSubmissionUpdate.getTime()) / 1000;
+
+                        //to avoid multiple calls for last item
+                        if (preLast != lastItem && lastItem >= submissionUpdateNum && seconds >= submissionUpdateTime) {
+                            updateSubmissions();
+                            preLast = lastItem;
+                            lastSubmissionUpdate = d;
+                        }
+                    }
+                }
+            }
+        });
+
+        ProgressBar circle = new ProgressBar(getActivity());
+        circle.setPadding(0, 80, 0, 80);
+        circle.setIndeterminate(true);
+        listView.addFooterView(circle);
 
         return rootView;
     }
@@ -85,13 +138,17 @@ public class FeedFragment extends Fragment {
     // Sometimes we just might want to reset all submissions
     public void resetSubmissions(){
 
+        Date d = new Date();
+        long seconds = (d.getTime() - lastSubmissionUpdate.getTime()) / 1000;
+
         //We dont want to be able to spam resets
-        if(!feedAdapter.isEmpty()) {
+        if(feedAdapter.getCount() > 0 && seconds >= submissionUpdateTime) {
 
             //First we need to cancel all asynctasks
             while(!asyncTasks.isEmpty()){
 
-                if(asyncTasks.get(0).getStatus().equals(AsyncTask.Status.RUNNING)){
+                // Cancel all not finished tasks
+                if(!asyncTasks.get(0).getStatus().equals(AsyncTask.Status.FINISHED)){
                     asyncTasks.get(0).cancel(true);
                 }
 
@@ -105,6 +162,8 @@ public class FeedFragment extends Fragment {
             feedAdapter.clear();
             feedAdapter.notifyDataSetChanged();
             updateSubmissions();
+
+            lastSubmissionUpdate = d;
         }
     }
 
@@ -133,7 +192,7 @@ public class FeedFragment extends Fragment {
         } else {
 
             // From the top 500 submissions, we only load a few at a time
-            for (int i = feedAdapter.getCount(); i < feedAdapter.getCount() + 25 && i < submissionIDs.size(); i++) {
+            for (int i = feedAdapter.getCount(); i < feedAdapter.getCount() + submissionUpdateNum && i < submissionIDs.size(); i++) {
 
                 // But we must first add each submission to the view manually
                 updateSingleSubmission(baseUrl.child("/item/" + submissionIDs.get(i)));
@@ -194,19 +253,21 @@ public class FeedFragment extends Fragment {
         Date now = new Date();
         String time = getPrettyDate(past, now);
 
-        String comments = "";
+        int comments = 0;
         ArrayList<Long> kids = (ArrayList<Long>) ret.get("kids");
         if(kids != null) {
-            comments = " \u2022 " + String.valueOf(kids.size()) + " comments ";
+            comments = kids.size();
         }
 
         // Set titles and other data
         f.setTitle((String) ret.get("title"));
-        f.setSubtitle2(Long.toString((Long) ret.get("score")) + " points" + comments  + " \u2022 " + time);
+        f.setScore(Long.toString((Long) ret.get("score")) + " points");
+        f.setComments(Integer.toString(comments) + " comments");
+        f.setTime(time);
 
         String domain = site.getHost().replace("www.", "");
         f.setShortUrl(domain);
-        f.setSubtitle1(domain);
+        f.setSubtitle(domain);
 
         f.setLongUrl(site.toString());
 
@@ -270,6 +331,8 @@ public class FeedFragment extends Fragment {
         // We cannot use execute() since it only allows one thread at a time
         ThumbnailUrlTask task = new ThumbnailUrlTask();
         asyncTasks.add(task);
+
+        // TODO use threadpoolexecutor?
         task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "http://icons.better-idea.org/api/icons?url=" + url);
     }
 
@@ -307,13 +370,13 @@ public class FeedFragment extends Fragment {
     public String getPrettyDate(Date past, Date now){
 
         if(TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) > 0){
-            return TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) + " days";
+            return TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) + "d";
         } else if(TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) > 0){
-            return TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) + " hrs";
+            return TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) + "h";
         } if(TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime()) > 0){
-            return TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime()) + " mins";
+            return TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime()) + "m";
         } else {
-            return TimeUnit.MILLISECONDS.toSeconds(now.getTime() - past.getTime()) + " sec";
+            return TimeUnit.MILLISECONDS.toSeconds(now.getTime() - past.getTime()) + "s";
         }
     }
 
@@ -346,6 +409,15 @@ public class FeedFragment extends Fragment {
 
         // Initialize ImageLoader with configuration.
         ImageLoader.getInstance().init(config.build());
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+
+        // We let each fragment create their own options menu
+        // That way we can refresh the feeds individually
+        inflater.inflate(R.menu.menu_main, menu);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override

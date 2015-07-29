@@ -9,20 +9,23 @@ import android.graphics.drawable.Drawable;
 public class FeedItem {
 
     private String title;
-    private String subtitle1;
-    private String subtitle2;
+    private String subtitle;
+    private String score;
+    private String comments;
+    private String time;
     private Bitmap thumbnail;
     private Bitmap favicon;
     private Drawable textDrawable;
     private String letter;
-
     private String shortUrl;
     private String longUrl;
 
     public FeedItem(){
         this.title = null;
-        this.subtitle1 = null;
-        this.subtitle2 = null;
+        this.subtitle = null;
+        this.score = null;
+        this.comments = null;
+        this.time = null;
         this.thumbnail = null;
         this.favicon = null;
         this.textDrawable = null;
@@ -39,20 +42,36 @@ public class FeedItem {
         this.title = title;
     }
 
-    public String getSubtitle1() {
-        return subtitle1;
+    public String getSubtitle() {
+        return subtitle;
     }
 
-    public void setSubtitle1(String subtitle) {
-        this.subtitle1 = subtitle;
+    public void setSubtitle(String subtitle) {
+        this.subtitle = subtitle;
     }
 
-    public String getSubtitle2() {
-        return subtitle2;
+    public String getScore() {
+        return score;
     }
 
-    public void setSubtitle2(String subtitle) {
-        this.subtitle2 = subtitle;
+    public void setScore(String score) {
+        this.score = score;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
     }
 
     public Bitmap getThumbnail() {
