@@ -108,6 +108,7 @@ public class FeedAdapter extends BaseAdapter {
 
             // If we only have a low resolution favicon, get the dominant color
             // Generate lots of palettes from the favicon
+            //TODO calculate palettes somewhere else?
             Palette myPalette = Palette.generate(item.getFavicon());
             List<Palette.Swatch> swatches = myPalette.getSwatches();
             Palette.Swatch swatch = myPalette.getVibrantSwatch();

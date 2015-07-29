@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
     public class PagerAdapter extends FragmentPagerAdapter {
 
-        private final String[] TITLES = {"TOP", "NEW", "ASK", "SHOW"};
+        private final String[] TITLES = {"TOP", "ASK", "SHOW", "NEW"};
 
         public PagerAdapter(FragmentManager fm) {
             super(fm);
@@ -59,11 +59,11 @@ public class MainActivity extends AppCompatActivity {
             if(position == 0){
                 b.putString("url", "/topstories");
             } else if (position == 1) {
-                b.putString("url", "/newstories");
-            } else if (position == 2) {
                 b.putString("url", "/askstories");
-            } else if (position == 3) {
+            } else if (position == 2) {
                 b.putString("url", "/showstories");
+            } else if (position == 3) {
+                b.putString("url", "/newstories");
             } else {
                 b.putString("url", "/topstories");
             }

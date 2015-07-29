@@ -261,8 +261,8 @@ public class FeedFragment extends Fragment {
 
         // Set titles and other data
         f.setTitle((String) ret.get("title"));
-        f.setScore(Long.toString((Long) ret.get("score")) + " points");
-        f.setComments(Integer.toString(comments) + " comments");
+        f.setScore(Long.toString((Long) ret.get("score")));
+        f.setComments(Integer.toString(comments));
         f.setTime(time);
 
         String domain = site.getHost().replace("www.", "");
