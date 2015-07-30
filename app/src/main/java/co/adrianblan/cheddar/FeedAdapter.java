@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -26,7 +27,6 @@ import java.util.List;
 public class FeedAdapter extends BaseAdapter {
 
     private ArrayList<FeedItem> feedItems = new ArrayList<FeedItem>();
-    private Activity myContext;
 
     public FeedAdapter() {
         //feedItems.add(new FeedItem("Godzilla sighted in New York City, evacuate everyone immediately!", "8hrs + dailymail.com", "143 pts + 87 comments"));
@@ -134,7 +134,21 @@ public class FeedAdapter extends BaseAdapter {
             thumbnail.setImageDrawable(drawable);
         }
 
-        // If we click the thumbnail, get to the content
+        // If we click the body, get to the comments
+        LinearLayout text = (LinearLayout) feed_item.findViewById(R.id.feed_item_text);
+        text.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), CommentActivity.class);
+                Bundle b = new Bundle();
+                b.putString("title", item.getTitle());
+                b.putSerializable("kids", item.getKids());
+                intent.putExtras(b);
+                v.getContext().startActivity(intent);
+            }
+        });
+
+        // If we click the thumbnail, get to the webview
         thumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -143,7 +157,7 @@ public class FeedAdapter extends BaseAdapter {
                 b.putString("title", item.getTitle());
                 b.putString("shortUrl", item.getShortUrl());
                 b.putString("longUrl", item.getLongUrl());
-                intent.putExtras(b); //Put your id to your next Intent
+                intent.putExtras(b);
                 v.getContext().startActivity(intent);
             }
         });

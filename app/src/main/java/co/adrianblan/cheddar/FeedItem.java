@@ -3,6 +3,8 @@ package co.adrianblan.cheddar;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
+import java.util.ArrayList;
+
 /**
  * Created by Adrian on 2015-07-25.
  */
@@ -19,6 +21,7 @@ public class FeedItem {
     private String letter;
     private String shortUrl;
     private String longUrl;
+    private ArrayList<Long> kids;
 
     public FeedItem(){
         this.title = null;
@@ -120,5 +123,13 @@ public class FeedItem {
 
     public void setLongUrl(String longUrl) {
         this.longUrl = longUrl;
+    }
+
+    public ArrayList<Long> getKids() {
+        return kids;
+    }
+
+    public void setKids(ArrayList<Long> kids) {
+        this.kids = kids;
     }
 }

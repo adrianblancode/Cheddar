@@ -2,15 +2,39 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="10dp">
+    android:padding="10dp"
+    android:background="@color/white">
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
     <TextView
+        android:id="@+id/comment_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Base.TextAppearance.AppCompat.Body2"
-        android:text="Commenter \u2022 8hrs"/>
+        android:text="Commenter"/>
+
+        <ImageView
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_marginTop="1dp"
+            android:padding="2.3dp"
+            android:layout_marginLeft="3.5dp"
+            android:layout_marginRight="0.3dp"
+            android:src="@drawable/ic_access_time_black_18dp"
+            android:tint="@color/primary_dark_material_light"/>
+        <TextView
+            android:id="@+id/comment_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="8h"
+            style="@style/Base.TextAppearance.AppCompat.Body1"
+            android:textColor="@color/abc_secondary_text_material_light"/>
+    </LinearLayout>
 
     <TextView
+        android:id="@+id/comment_body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         style="@style/Base.TextAppearance.AppCompat.Body1"

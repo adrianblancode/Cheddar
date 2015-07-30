@@ -35,7 +35,7 @@ public class WebViewActivity extends AppCompatActivity {
             System.err.println("Passed null arguments into WebViewActivity!");
         }
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar2);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_webview);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(title);
