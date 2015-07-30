@@ -55,35 +55,55 @@ public class CommentActivity extends AppCompatActivity {
         ListView lv = (ListView) findViewById(R.id.activity_comment_list);
         lv.setAdapter(commentAdapter);
 
-        for(int i = 0; i < kids.size(); i++){
-            updateComment(baseUrl.child(Long.toString(kids.get(i))));
+        if(kids != null) {
+            for (int i = 0; i < kids.size(); i++) {
+                updateComment(kids.get(i), null);
+            }
         }
     }
 
     // Gets an url to a single comment
-    public void updateComment(Firebase submission){
+    public void updateComment(Long id, Comment parent){
 
-        submission.addListenerForSingleValueEvent(new ValueEventListener() {
+        final Comment par = parent;
+
+        baseUrl.child(Long.toString(id)).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
 
                 // We retrieve all objects into a hashmap
                 Map<String, Object> ret = (Map<String, Object>) snapshot.getValue();
 
-                if(ret == null){
+                if (ret == null || ret.get("text") == null) {
                     return;
                 }
 
-                Comment c = new Comment();
-                c.setTitle((String) ret.get("by"));
-                c.setBody((String) ret.get("text"));
+                Comment com = new Comment();
+                com.setTitle((String) ret.get("by"));
+                com.setBody((String) ret.get("text"));
 
                 Date past = new Date((Long) ret.get("time") * 1000);
                 Date now = new Date();
-                c.setTime(getPrettyDate(past, now));
+                com.setTime(getPrettyDate(past, now));
 
-                commentAdapter.add(c);
+                // Check if top level comment
+                if(par == null) {
+                    com.setHierarchy(0);
+                    commentAdapter.add(com);
+                } else {
+                    com.setHierarchy(par.getHierarchy() + 1);
+                    commentAdapter.add(commentAdapter.getPosition(par) + 1, com);
+                }
                 commentAdapter.notifyDataSetChanged();
+
+                ArrayList<Long> kids = (ArrayList<Long>) ret.get("kids");
+
+                // Update child comments
+                if (kids != null) {
+                    for (int i = 0; i < kids.size(); i++) {
+                        updateComment(kids.get(i), com);
+                    }
+                }
             }
 
             @Override

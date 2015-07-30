@@ -4,9 +4,12 @@ package co.adrianblan.cheddar;
  * Created by Adrian on 2015-07-30.
  */
 public class Comment {
-    public String title;
-    public String body;
-    public String time;
+    private String title;
+    private String body;
+    private String time;
+
+    // At what level the comment should be shown
+    private int hierarchy;
 
     public Comment(){
         this.title = null;
@@ -40,5 +43,13 @@ public class Comment {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public int getHierarchy() {
+        return hierarchy;
+    }
+
+    public void setHierarchy(int hierarchy) {
+        this.hierarchy = hierarchy;
     }
 }
