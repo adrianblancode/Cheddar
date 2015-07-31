@@ -48,14 +48,19 @@ public class CommentActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(b.getString("title"));
 
-        // TODO put menu items in toolbar
-        //inflater.inflate(R.menu.menu_main, menu);
-
         commentAdapter = new CommentAdapter();
         ListView lv = (ListView) findViewById(R.id.activity_comment_list);
         lv.setAdapter(commentAdapter);
 
+        updateComments();
+    }
+
+    //TODO implement refresh
+
+    // Starts updating the comments from the top level
+    public void updateComments(){
         if(kids != null) {
+            //TODO fix race condition
             for (int i = 0; i < kids.size(); i++) {
                 updateComment(kids.get(i), null);
             }
@@ -100,8 +105,11 @@ public class CommentActivity extends AppCompatActivity {
 
                 // Update child comments
                 if (kids != null) {
-                    for (int i = 0; i < kids.size(); i++) {
-                        updateComment(kids.get(i), com);
+
+                    // We're counting backwards since we are too lazy to fix a race condition
+                    //TODO fix race condition
+                    for (int i = 1; i <= kids.size(); i++) {
+                        updateComment(kids.get(kids.size() - i), com);
                     }
                 }
             }
@@ -129,6 +137,13 @@ public class CommentActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater menuInflater = getMenuInflater();
+        menuInflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -136,6 +151,7 @@ public class CommentActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.refresh) {
+
         }
 
         //noinspection SimplifiableIfStatement

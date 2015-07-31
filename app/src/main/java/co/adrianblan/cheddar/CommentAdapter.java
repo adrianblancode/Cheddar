@@ -20,12 +20,11 @@ import java.util.ArrayList;
 public class CommentAdapter extends BaseAdapter {
 
     private ArrayList<Comment> comments;
-    private ArrayList<Color> colors;
+    private ArrayList<Integer> colors;
 
     public CommentAdapter() {
         comments = new ArrayList<Comment>();
-        colors = new ArrayList<Color>();
-        //colors.add(Color.parseColor())
+        colors = null;
     }
 
     public void add (Comment c){
@@ -69,6 +68,10 @@ public class CommentAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
+        if(colors == null){
+            colors = initColors(parent.getContext());
+        }
+
         final Comment com = comments.get(position);
 
         LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);;
@@ -90,13 +93,31 @@ public class CommentAdapter extends BaseAdapter {
         // Adds padding based on hierarchy, and adds indicator
         if(com.getHierarchy() > 0){
             LinearLayout container = (LinearLayout) comment_view.findViewById(R.id.comment);
-            container.setPadding((int) dpToPixels(5, parent.getContext()) * (com.getHierarchy() - 1), 0, 0, 0);
+            container.setPadding((int) dpToPixels(4, parent.getContext()) * (com.getHierarchy() - 1), 0, 0, 0);
 
             LinearLayout indicator = (LinearLayout) comment_view.findViewById(R.id.comment_indicator);
             indicator.setVisibility(View.VISIBLE);
+
+            // Use modulo to get the appropriate color
+            int color = colors.get((com.getHierarchy() - 1) % colors.size());
+            indicator.setBackgroundColor(color);
         }
 
         return comment_view;
+    }
+
+    // Initializes the list of colours which will be used to display comment hierarchy
+    public ArrayList<Integer> initColors(Context context){
+        ArrayList<Integer> colors = new ArrayList<Integer>();
+        colors.add(context.getResources().getColor(R.color.colorPrimary));
+        colors.add(context.getResources().getColor(R.color.materialPink));
+        colors.add(context.getResources().getColor(R.color.materialDeepPurple));
+        colors.add(context.getResources().getColor(R.color.materialBlue)); // Not really material blue but who cares
+        colors.add(context.getResources().getColor(R.color.materialGreen));
+        colors.add(context.getResources().getColor(R.color.materialAmber));
+
+
+        return colors;
     }
 
     public static float dpToPixels(float dp, Context context){

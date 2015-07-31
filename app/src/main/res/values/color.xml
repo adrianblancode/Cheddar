@@ -4,4 +4,17 @@
     <color name="colorPrimaryDark">#DD5800</color>
     <color name="white">#FFFFFF</color>
     <color name="grey">#888</color>
+
+    <color name="materialRed">#F44336</color>
+    <color name="materialPink">#E91E63</color>
+    <color name="materialPurple">#9C27B0</color>
+    <color name="materialDeepPurple">#673AB7</color>
+    <color name="materialIndigo">#3F51B5</color>
+    <color name="materialBlue">#2176E3</color>
+    <color name="materialTeal">#009688</color>
+    <color name="materialGreen">#4CAF50</color>
+    <color name="materialLightGreen">#8BC34A</color>
+    <color name="materialLime">#CDDC39</color>
+    <color name="materialAmber">#FFC107</color>
+
 </resources>

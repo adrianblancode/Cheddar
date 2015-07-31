@@ -1,16 +1,12 @@
 package co.adrianblan.cheddar;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.graphics.Palette;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -82,10 +78,10 @@ public class FeedAdapter extends BaseAdapter {
         subtitle.setText(item.getSubtitle());
 
         TextView score = (TextView) feed_item.findViewById(R.id.feed_item_score);
-        score.setText(item.getScore());
+        score.setText(Long.toString(item.getScore()));
 
         TextView comments = (TextView) feed_item.findViewById(R.id.feed_item_comments);
-        comments.setText(item.getComments());
+        comments.setText(Long.toString(item.getCommentCount()));
 
         TextView time = (TextView) feed_item.findViewById(R.id.feed_item_time);
         time.setText(item.getTime());
@@ -95,43 +91,11 @@ public class FeedAdapter extends BaseAdapter {
 
         // If we have a high resolution thumbnail, display it
         if(item.getThumbnail() != null){
-
             thumbnail.setImageBitmap(item.getThumbnail());
-
         } else if (item.getTextDrawable() != null) {
 
-            // If we already have a TextDrawable, use it
-            // Otherwise, we must generate one
+            // Otherwise, just use the TextDrawable
             thumbnail.setImageDrawable(item.getTextDrawable());
-
-        } else if(item.getFavicon() != null) {
-
-            // If we only have a low resolution favicon, get the dominant color
-            // Generate lots of palettes from the favicon
-            //TODO calculate palettes somewhere else?
-            Palette myPalette = Palette.generate(item.getFavicon());
-            List<Palette.Swatch> swatches = myPalette.getSwatches();
-            Palette.Swatch swatch = myPalette.getVibrantSwatch();
-
-            TextDrawable drawable;
-
-            // We want the vibrant palette, if possible, ortherwise darker palettes
-            if (swatch != null){
-                drawable = builder.buildRect(item.getLetter(), swatch.getRgb());
-            } else if(!swatches.isEmpty()) {
-                drawable = builder.buildRect(item.getLetter(), swatches.get(0).getRgb());
-            } else {
-                drawable = builder.buildRect(item.getLetter(), parent.getContext().getResources().getColor(R.color.colorPrimary));
-            }
-
-            item.setTextDrawable(drawable);
-            thumbnail.setImageDrawable(drawable);
-        } else {
-
-            // Otherwise we  just display default colour
-            TextDrawable drawable = builder.buildRect(item.getLetter(), parent.getContext().getResources().getColor(R.color.colorPrimary));
-            item.setTextDrawable(drawable);
-            thumbnail.setImageDrawable(drawable);
         }
 
         // If we click the body, get to the comments

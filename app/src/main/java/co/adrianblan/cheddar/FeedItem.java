@@ -12,11 +12,10 @@ public class FeedItem {
 
     private String title;
     private String subtitle;
-    private String score;
-    private String comments;
+    private long score;
+    private long commentCount;
     private String time;
     private Bitmap thumbnail;
-    private Bitmap favicon;
     private Drawable textDrawable;
     private String letter;
     private String shortUrl;
@@ -26,11 +25,10 @@ public class FeedItem {
     public FeedItem(){
         this.title = null;
         this.subtitle = null;
-        this.score = null;
-        this.comments = null;
+        this.score = 0;
+        this.commentCount = 0;
         this.time = null;
         this.thumbnail = null;
-        this.favicon = null;
         this.textDrawable = null;
         this.letter = "?";
         this.shortUrl = null;
@@ -53,11 +51,11 @@ public class FeedItem {
         this.subtitle = subtitle;
     }
 
-    public String getScore() {
+    public long getScore() {
         return score;
     }
 
-    public void setScore(String score) {
+    public void setScore(long score) {
         this.score = score;
     }
 
@@ -69,12 +67,16 @@ public class FeedItem {
         this.time = time;
     }
 
-    public String getComments() {
-        return comments;
+    public long getCommentCount() {
+        return commentCount;
     }
 
-    public void setComments(String comments) {
-        this.comments = comments;
+    public void setCommentCount(int commentCount) {
+        this.commentCount = commentCount;
+    }
+
+    public void addCommentCount(int comments) {
+        this.commentCount += comments;
     }
 
     public Bitmap getThumbnail() {
@@ -83,14 +85,6 @@ public class FeedItem {
 
     public void setThumbnail(Bitmap thumbnail) {
         this.thumbnail = thumbnail;
-    }
-
-    public Bitmap getFavicon() {
-        return favicon;
-    }
-
-    public void setFavicon(Bitmap favicon) {
-        this.favicon = favicon;
     }
 
     public Drawable getTextDrawable() {

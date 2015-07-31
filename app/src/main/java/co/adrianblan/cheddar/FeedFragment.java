@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.graphics.Palette;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +15,7 @@ import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.amulyakhare.textdrawable.TextDrawable;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -21,16 +23,15 @@ import com.firebase.client.ValueEventListener;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
-import com.nostra13.universalimageloader.core.download.ImageDownloader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -47,14 +48,17 @@ public class FeedFragment extends Fragment {
     // Base URL for the hacker news API
     private Firebase baseUrl;
 
+    // Sub URL used for gathering comments
+    private Firebase itemUrl;
+
     // Sub URL used for different stories
     private Firebase storiesUrl;
 
     // Collection of AsyncTasks we use to keep them from overflowing
-    private ArrayList<AsyncTask> asyncTasks = new ArrayList<AsyncTask>();
+    private ArrayList<AsyncTask> asyncTasks;
 
     //Throttle submissions
-    private Date lastSubmissionUpdate = new Date();
+    private Date lastSubmissionUpdate;
     private final int submissionUpdateTime = 3;
     private final int submissionUpdateNum = 20;
 
@@ -76,9 +80,12 @@ public class FeedFragment extends Fragment {
         // Init API stuff
         Firebase.setAndroidContext(getActivity());
         baseUrl = new Firebase("https://hacker-news.firebaseio.com/v0/");
+        itemUrl = baseUrl.child("/item/");
         storiesUrl = baseUrl.child(getArguments().getString("url"));
 
         feedAdapter = new FeedAdapter();
+        asyncTasks = new ArrayList<AsyncTask>();
+        lastSubmissionUpdate = new Date();
 
         // Gets all the submissions and populates the list with them
         updateSubmissions();
@@ -256,20 +263,19 @@ public class FeedFragment extends Fragment {
         int comments = 0;
         ArrayList<Long> kids = (ArrayList<Long>) ret.get("kids");
         f.setKids(kids);
+
         if(kids != null) {
-            comments = kids.size();
+            setCommentCount(f, kids);
         }
 
         // Set titles and other data
         f.setTitle((String) ret.get("title"));
-        f.setScore(Long.toString((Long) ret.get("score")));
-        f.setComments(Integer.toString(comments));
+        f.setScore((Long) ret.get("score"));
         f.setTime(time);
 
         String domain = site.getHost().replace("www.", "");
         f.setShortUrl(domain);
         f.setSubtitle(domain);
-
         f.setLongUrl(site.toString());
 
         // We show the first letter of the url on the thumbnail
@@ -279,7 +285,61 @@ public class FeedFragment extends Fragment {
             f.setLetter(domain.substring(0, 1));
         }
 
+        // Generate TextDrawable thumbnail
+        TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
+        TextDrawable drawable = builder.buildRect(f.getLetter(), getActivity().getResources().getColor(R.color.colorPrimary));
+        f.setTextDrawable(drawable);
+
         return f;
+    }
+
+    // Goes through each comment for children and adds them to the count
+    public void setCommentCount(FeedItem f, ArrayList<Long> kids){
+
+        f.addCommentCount(kids.size());
+        feedAdapter.notifyDataSetChanged();
+
+        // We skip getting an accurate comment count since we have to traverse every comment for every submission
+        // Which lags too much
+        /*
+        for(Long comment : kids) {
+            setCommentCount(f, comment);
+        }
+        */
+    }
+
+    // Recursively update comment count
+    public void setCommentCount(FeedItem f, Long id){
+
+        final FeedItem fi = f;
+
+        itemUrl.child(Long.toString(id)).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+
+                if (snapshot.getValue() == null) {
+                    return;
+                }
+
+                ArrayList<Long> kids = (ArrayList<Long>) ((Map<String, Object>) snapshot.getValue()).get("kids");
+
+                // Update child comments
+                if (kids != null) {
+
+                    fi.addCommentCount(kids.size());
+                    feedAdapter.notifyDataSetChanged();
+
+                    for (int i = 0; i < kids.size(); i++) {
+                        setCommentCount(fi, kids.get(i));
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.err.println("Could not retrieve post! " + firebaseError);
+            }
+        });
     }
 
     // Recieves a host url, and the position of the feed item
@@ -354,14 +414,41 @@ public class FeedFragment extends Fragment {
                     return;
                 }
 
-                int position = feedAdapter.getPosition(fi);
+                // Return if we already have a high resolution thumbnail
+                if(fi.getThumbnail() != null){
+                    return;
+                }
 
+                // It's possible the list has changed during the async task
+                // So we make sure the item still exists
+                int position = feedAdapter.getPosition(fi);
                 if (position == -1) {
                     return;
                 }
 
-                feedAdapter.getItem(position).setFavicon(loadedImage);
-                feedAdapter.notifyDataSetChanged();
+                // Generate lots of palettes from the favicon asynchronously
+                Palette.from(loadedImage).generate(new Palette.PaletteAsyncListener() {
+                    public void onGenerated(Palette p) {
+
+                        List<Palette.Swatch> swatches = p.getSwatches();
+                        Palette.Swatch vibrantSwatch = p.getVibrantSwatch();
+
+                        TextDrawable drawable;
+                        TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
+
+                        // We want the vibrant palette, if possible, ortherwise darker palettes
+                        if (vibrantSwatch != null) {
+                            drawable = builder.buildRect(fi.getLetter(), vibrantSwatch.getRgb());
+                        } else if (!swatches.isEmpty()) {
+                            drawable = builder.buildRect(fi.getLetter(), swatches.get(0).getRgb());
+                        } else {
+                            return;
+                        }
+
+                        fi.setTextDrawable(drawable);
+                        feedAdapter.notifyDataSetChanged();
+                    }
+                });
             }
         });
     }
