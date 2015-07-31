@@ -6,7 +6,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -27,6 +30,7 @@ public class CommentActivity extends AppCompatActivity {
 
     CommentAdapter commentAdapter;
     ArrayList<Long> kids;
+    int comments;
 
     // Base URL for the hacker news API
     private Firebase baseUrl;
@@ -51,6 +55,27 @@ public class CommentActivity extends AppCompatActivity {
         commentAdapter = new CommentAdapter();
         ListView lv = (ListView) findViewById(R.id.activity_comment_list);
         lv.setAdapter(commentAdapter);
+
+        View header = View.inflate(getApplicationContext(), R.layout.feed_item, null);
+
+        TextView title = (TextView) header.findViewById(R.id.feed_item_title);
+        title.setText(b.getString("title"));
+
+        TextView subtitle = (TextView) header.findViewById(R.id.feed_item_subtitle);
+        subtitle.setText(b.getString("subtitle"));
+
+        TextView score = (TextView) header.findViewById(R.id.feed_item_score);
+        score.setText(Long.toString(b.getLong("score")));
+
+        if(kids != null) {
+            TextView comments = (TextView) header.findViewById(R.id.feed_item_comments);
+            comments.setText(Integer.toString(kids.size()));
+        }
+
+        TextView time = (TextView) header.findViewById(R.id.feed_item_time);
+        time.setText(b.getString("time"));
+
+        lv.addHeaderView(header);
 
         updateComments();
     }

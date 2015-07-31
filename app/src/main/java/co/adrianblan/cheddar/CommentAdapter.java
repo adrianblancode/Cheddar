@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -84,7 +85,10 @@ public class CommentAdapter extends BaseAdapter {
             TextView body = (TextView) comment_view.findViewById(R.id.comment_body);
 
             // We can't show the text as is, but have to parse it as html
-            body.setText(Html.fromHtml(com.getBody()));
+            body.setText(trimTrailingWhitespace(Html.fromHtml(com.getBody())));
+
+            // We make links clickable
+            body.setMovementMethod(LinkMovementMethod.getInstance());
         }
 
         TextView time = (TextView) comment_view.findViewById(R.id.comment_time);
@@ -124,5 +128,20 @@ public class CommentAdapter extends BaseAdapter {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
         return px;
+    }
+
+    // Trims trailing whitespace.
+    public static CharSequence trimTrailingWhitespace(CharSequence source) {
+
+        if(source == null)
+            return "";
+
+        int i = source.length();
+
+        // loop back to the first non-whitespace character
+        while(--i >= 0 && Character.isWhitespace(source.charAt(i))) {
+        }
+
+        return source.subSequence(0, i+1);
     }
 }

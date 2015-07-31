@@ -75,7 +75,6 @@ public class FeedFragment extends Fragment {
         setHasOptionsMenu(true);
 
         setRetainInstance(true);
-        initImageLoader();
 
         // Init API stuff
         Firebase.setAndroidContext(getActivity());
@@ -478,25 +477,6 @@ public class FeedFragment extends Fragment {
             }
         }
         return hash;
-    }
-
-    // Initializes the image loader with what is probably reasonable values
-    public void initImageLoader(){
-
-        // Returns if we have already initialized the ImageLoader
-        if(ImageLoader.getInstance().isInited()){
-            return;
-        }
-
-        ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(getActivity());
-        config.threadPriority(Thread.NORM_PRIORITY - 2);
-        config.denyCacheImageMultipleSizesInMemory();
-        config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
-        config.diskCacheSize(5 * 1024 * 1024); // 5 MiB
-        config.tasksProcessingOrder(QueueProcessingType.FIFO);
-
-        // Initialize ImageLoader with configuration.
-        ImageLoader.getInstance().init(config.build());
     }
 
     @Override

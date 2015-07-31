@@ -106,6 +106,9 @@ public class FeedAdapter extends BaseAdapter {
                 Intent intent = new Intent(v.getContext(), CommentActivity.class);
                 Bundle b = new Bundle();
                 b.putString("title", item.getTitle());
+                b.putString("subtitle", item.getSubtitle());
+                b.putLong("score", item.getScore());
+                b.putString("time", item.getTime());
                 b.putSerializable("kids", item.getKids());
                 intent.putExtras(b);
                 v.getContext().startActivity(intent);

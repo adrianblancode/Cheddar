@@ -11,6 +11,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.astuetz.PagerSlidingTabStrip;
+import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -30,6 +36,9 @@ public class MainActivity extends AppCompatActivity {
         PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
         tabs.setShouldExpand(true);
         tabs.setViewPager(pager);
+
+        enableHttpResponseCache();
+        initImageLoader();
     }
 
     public class PagerAdapter extends FragmentPagerAdapter {
@@ -71,6 +80,38 @@ public class MainActivity extends AppCompatActivity {
             ff.setArguments(b);
             return ff;
         }
+    }
+
+    // Caches our HTTP responses for up to 1 MB
+    // Since each response is less than 1KB we have a lot to spare
+    private void enableHttpResponseCache() {
+        try {
+            long httpCacheSize = 1 * 1024 * 1024; // 1 MiB
+            File httpCacheDir = new File(getCacheDir(), "http");
+            Class.forName("android.net.http.HttpResponseCache")
+                    .getMethod("install", File.class, long.class)
+                    .invoke(null, httpCacheDir, httpCacheSize);
+        } catch (Exception httpResponseCacheNotAvailable) {
+        }
+    }
+
+    // Initializes the image loader with what is probably reasonable values
+    public void initImageLoader(){
+
+        // Returns if we have already initialized the ImageLoader
+        if(ImageLoader.getInstance().isInited()){
+            return;
+        }
+
+        ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(getApplication());
+        config.threadPriority(Thread.NORM_PRIORITY - 2);
+        config.denyCacheImageMultipleSizesInMemory();
+        config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
+        config.diskCacheSize(5 * 1024 * 1024); // 5 MiB
+        config.tasksProcessingOrder(QueueProcessingType.FIFO);
+
+        // Initialize ImageLoader with configuration.
+        ImageLoader.getInstance().init(config.build());
     }
 
     @Override

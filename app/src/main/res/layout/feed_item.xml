@@ -3,7 +3,8 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:background="@color/white">
 
     <LinearLayout
         android:id="@+id/feed_item_text"
@@ -21,6 +22,7 @@
             android:layout_height="wrap_content"
             android:text="Godzilla sighted in New York City, evacuate everyone immediately!"
             style="@style/Base.TextAppearance.AppCompat.Body1"
+            android:textColor="@color/abc_primary_text_material_light"
             android:textSize="17dp"/>
 
         <LinearLayout
@@ -56,7 +58,7 @@
                 android:id="@+id/feed_item_score"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="143"
+                android:text="0"
                 style="@style/Base.TextAppearance.AppCompat.Body1"
                 android:textColor="@color/abc_secondary_text_material_light"/>
 
@@ -73,7 +75,7 @@
                 android:id="@+id/feed_item_comments"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="40"
+                android:text="0"
                 style="@style/Base.TextAppearance.AppCompat.Body1"
                 android:textColor="@color/abc_secondary_text_material_light"/>
 
@@ -90,7 +92,7 @@
                 android:id="@+id/feed_item_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="8h"
+                android:text="-1"
                 style="@style/Base.TextAppearance.AppCompat.Body1"
                 android:textColor="@color/abc_secondary_text_material_light"/>
         </LinearLayout>

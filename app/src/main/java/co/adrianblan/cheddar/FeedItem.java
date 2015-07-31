@@ -3,12 +3,13 @@ package co.adrianblan.cheddar;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Created by Adrian on 2015-07-25.
  */
-public class FeedItem {
+public class FeedItem implements Serializable {
 
     private String title;
     private String subtitle;
