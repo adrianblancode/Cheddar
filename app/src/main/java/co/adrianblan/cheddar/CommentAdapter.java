@@ -116,18 +116,19 @@ public class CommentAdapter extends BaseAdapter {
             holder.body.setMovementMethod(LinkMovementMethod.getInstance());
         }
 
-
         holder.time.setText(com.getTime());
 
         // Adds padding based on hierarchy, and adds indicator
-        if(com.getHierarchy() > 0){
+        holder.container.setPadding((int) dpToPixels(4, parent.getContext()) * (com.getHierarchy() - 1), 0, 0, 0);
 
-            holder.container.setPadding((int) dpToPixels(4, parent.getContext()) * (com.getHierarchy() - 1), 0, 0, 0);
-            holder.indicator.setVisibility(View.VISIBLE);
-
+        // We don't need the indicator for top level comments
+        if(com.getHierarchy() == 0){
+            holder.indicator.setVisibility(View.GONE);
+        } else {
             // Use modulo to get the appropriate color
             int color = colors.get((com.getHierarchy() - 1) % colors.size());
             holder.indicator.setBackgroundColor(color);
+            holder.indicator.setVisibility(View.VISIBLE);
         }
 
         return convertView;

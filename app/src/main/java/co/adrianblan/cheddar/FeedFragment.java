@@ -20,11 +20,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
-import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
 import java.net.MalformedURLException;
@@ -60,7 +56,7 @@ public class FeedFragment extends Fragment {
     //Throttle submissions
     private Date lastSubmissionUpdate;
     private final int submissionUpdateTime = 3;
-    private final int submissionUpdateNum = 20;
+    private final int submissionUpdateNum = 15;
 
     public static FeedFragment newInstance() {
         FeedFragment f = new FeedFragment();
@@ -117,13 +113,13 @@ public class FeedFragment extends Fragment {
 
                 if (view.getId() == R.id.feed_list) {
                     final int lastItem = firstVisibleItem + visibleItemCount;
-                    if (lastItem == totalItemCount) {
+                    if (lastItem >= totalItemCount) {
 
                         Date d = new Date();
                         long seconds = (d.getTime() - lastSubmissionUpdate.getTime()) / 1000;
 
                         //to avoid multiple calls for last item
-                        if (preLast != lastItem && lastItem >= submissionUpdateNum && seconds >= submissionUpdateTime) {
+                        if (lastItem != preLast && lastItem >= submissionUpdateNum && seconds >= submissionUpdateTime) {
                             updateSubmissions();
                             preLast = lastItem;
                             lastSubmissionUpdate = d;
@@ -264,7 +260,7 @@ public class FeedFragment extends Fragment {
         f.setKids(kids);
 
         if(kids != null) {
-            setCommentCount(f, kids);
+            updateCommentCount(f, kids);
         }
 
         // Set titles and other data
@@ -293,22 +289,42 @@ public class FeedFragment extends Fragment {
     }
 
     // Goes through each comment for children and adds them to the count
-    public void setCommentCount(FeedItem f, ArrayList<Long> kids){
+    // Since traversing all comments takes a lot of work, we do it in a separate task
+    public void updateCommentCount(FeedItem feedItem, ArrayList<Long> kids){
 
-        f.addCommentCount(kids.size());
+        final FeedItem f = feedItem;
+        final ArrayList<Long> k = kids;
+
+        feedItem.addCommentCount(kids.size());
         feedAdapter.notifyDataSetChanged();
 
-        // We skip getting an accurate comment count since we have to traverse every comment for every submission
-        // Which lags too much
+        class commentUpdateTask extends AsyncTask<String, Integer, String> {
 
-        for(Long comment : kids) {
-            setCommentCount(f, comment);
+            @Override
+            protected String doInBackground(String... url) {
+                for(Long comment : k) {
+                    updateSingleCommentCount(f, comment);
+                }
+                return null;
+            }
+            @Override
+            protected void onProgressUpdate(Integer... i) {}
+
+            @Override
+            protected void onPostExecute(String thumbnailUrl) {
+                //feedAdapter.notifyDataSetChanged();
+            }
         }
 
+        commentUpdateTask task = new commentUpdateTask();
+        asyncTasks.add(task);
+
+        // TODO use threadpoolexecutor?
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
     }
 
     // Recursively update comment count
-    public void setCommentCount(FeedItem f, Long id){
+    public void updateSingleCommentCount(FeedItem f, Long id){
 
         final FeedItem fi = f;
 
@@ -326,10 +342,10 @@ public class FeedFragment extends Fragment {
                 if (kids != null) {
 
                     fi.addCommentCount(kids.size());
-                    feedAdapter.notifyDataSetChanged();
+                    //feedAdapter.notifyDataSetChanged();
 
                     for (int i = 0; i < kids.size(); i++) {
-                        setCommentCount(fi, kids.get(i));
+                        updateSingleCommentCount(fi, kids.get(i));
                     }
                 }
             }
