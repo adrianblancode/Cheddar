@@ -2,6 +2,7 @@ package co.adrianblan.cheddar;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.graphics.Palette;
 import android.view.LayoutInflater;
@@ -65,42 +66,63 @@ public class FeedAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
+        class ViewHolder {
+            TextView title;
+            TextView subtitle;
+            TextView score;
+            TextView comments;
+            TextView time;
+            ImageView thumbnail;
+            LinearLayout body;
+        }
+
         final FeedItem item = feedItems.get(position);
 
-        //TODO get context in constructor
-        LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);;
-        View feed_item = inflater.inflate(R.layout.feed_item, parent, false);
+        ViewHolder holder;
 
-        TextView title = (TextView) feed_item.findViewById(R.id.feed_item_title);
-        title.setText(item.getTitle());
+        if(convertView == null){
+            LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.feed_item, parent, false);
 
-        TextView subtitle = (TextView) feed_item.findViewById(R.id.feed_item_subtitle);
-        subtitle.setText(item.getSubtitle());
+            holder = new ViewHolder();
+            holder.title = (TextView) convertView.findViewById(R.id.feed_item_title);
+            holder.subtitle = (TextView) convertView.findViewById(R.id.feed_item_subtitle);
+            holder.score = (TextView) convertView.findViewById(R.id.feed_item_score);
+            holder.comments = (TextView) convertView.findViewById(R.id.feed_item_comments);
+            holder.time = (TextView) convertView.findViewById(R.id.feed_item_time);
+            holder.thumbnail = (ImageView) convertView.findViewById(R.id.feed_item_thumbnail);
+            holder.body = (LinearLayout) convertView.findViewById(R.id.feed_item_text);
 
-        TextView score = (TextView) feed_item.findViewById(R.id.feed_item_score);
-        score.setText(Long.toString(item.getScore()));
+            // Store the holder with the view.
+            convertView.setTag(holder);
 
-        TextView comments = (TextView) feed_item.findViewById(R.id.feed_item_comments);
-        comments.setText(Long.toString(item.getCommentCount()));
+        } else {
+            holder = (ViewHolder) convertView.getTag();
+        }
 
-        TextView time = (TextView) feed_item.findViewById(R.id.feed_item_time);
-        time.setText(item.getTime());
+        //TODO get context in constructor?
 
-        ImageView thumbnail = (ImageView) feed_item.findViewById(R.id.feed_item_thumbnail);
+
+        holder.title.setText(item.getTitle());
+        holder.subtitle.setText(item.getSubtitle());
+        holder.score.setText(Long.toString(item.getScore()));
+        holder.comments.setText(Long.toString(item.getCommentCount()));
+        holder.time.setText(item.getTime());
         TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
 
         // If we have a high resolution thumbnail, display it
         if(item.getThumbnail() != null){
-            thumbnail.setImageBitmap(item.getThumbnail());
+            holder.thumbnail.setImageBitmap(item.getThumbnail());
         } else if (item.getTextDrawable() != null) {
 
             // Otherwise, just use the TextDrawable
-            thumbnail.setImageDrawable(item.getTextDrawable());
+            holder.thumbnail.setImageDrawable(item.getTextDrawable());
         }
 
+
+        // TODO move onclick listeners to somewhere that makes sense?
         // If we click the body, get to the comments
-        LinearLayout text = (LinearLayout) feed_item.findViewById(R.id.feed_item_text);
-        text.setOnClickListener(new View.OnClickListener() {
+        holder.body.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), CommentActivity.class);
@@ -110,13 +132,19 @@ public class FeedAdapter extends BaseAdapter {
                 b.putLong("score", item.getScore());
                 b.putString("time", item.getTime());
                 b.putSerializable("kids", item.getKids());
+
+                // TODO don't pass bitmap through bundle, it's terrible
+                if (item.getThumbnail() != null) {
+                    intent.putExtra("thumbnail", item.getThumbnail());
+                }
+
                 intent.putExtras(b);
                 v.getContext().startActivity(intent);
             }
         });
 
         // If we click the thumbnail, get to the webview
-        thumbnail.setOnClickListener(new View.OnClickListener() {
+        holder.thumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), WebViewActivity.class);
@@ -129,6 +157,6 @@ public class FeedAdapter extends BaseAdapter {
             }
         });
 
-        return feed_item;
+        return convertView;
     }
 }

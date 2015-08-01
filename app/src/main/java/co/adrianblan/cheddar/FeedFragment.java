@@ -300,11 +300,11 @@ public class FeedFragment extends Fragment {
 
         // We skip getting an accurate comment count since we have to traverse every comment for every submission
         // Which lags too much
-        /*
+
         for(Long comment : kids) {
             setCommentCount(f, comment);
         }
-        */
+
     }
 
     // Recursively update comment count

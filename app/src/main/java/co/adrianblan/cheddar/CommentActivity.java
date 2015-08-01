@@ -1,5 +1,8 @@
 package co.adrianblan.cheddar;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -16,8 +19,6 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
@@ -74,6 +75,14 @@ public class CommentActivity extends AppCompatActivity {
 
         TextView time = (TextView) header.findViewById(R.id.feed_item_time);
         time.setText(b.getString("time"));
+
+        Intent intent = getIntent();
+        Bitmap thumbnail = (Bitmap) intent.getParcelableExtra("thumbnail");
+
+        if(thumbnail != null){
+            ImageView im = (ImageView) header.findViewById(R.id.feed_item_thumbnail);
+            im.setImageBitmap(thumbnail);
+        }
 
         lv.addHeaderView(header);
 

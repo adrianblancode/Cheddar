@@ -69,45 +69,68 @@ public class CommentAdapter extends BaseAdapter {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
+        class ViewHolder {
+            TextView title;
+            TextView body;
+            TextView time;
+            LinearLayout container;
+            LinearLayout indicator;
+        }
+
         if(colors == null){
             colors = initColors(parent.getContext());
         }
 
         final Comment com = comments.get(position);
 
-        LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);;
-        View comment_view = inflater.inflate(R.layout.comment, parent, false);
+        ViewHolder holder;
 
-        TextView title = (TextView) comment_view.findViewById(R.id.comment_title);
-        title.setText(com.getTitle());
+        if(convertView == null) {
 
-        if(com.getBody() != null) {
-            TextView body = (TextView) comment_view.findViewById(R.id.comment_body);
+            holder = new ViewHolder();
 
-            // We can't show the text as is, but have to parse it as html
-            body.setText(trimTrailingWhitespace(Html.fromHtml(com.getBody())));
+            // TODO get passed context?
+            LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = inflater.inflate(R.layout.comment, parent, false);
+            holder.title = (TextView) convertView.findViewById(R.id.comment_title);
+            holder.body = (TextView) convertView.findViewById(R.id.comment_body);
+            holder.time = (TextView) convertView.findViewById(R.id.comment_time);
+            holder.container = (LinearLayout) convertView.findViewById(R.id.comment);
+            holder.indicator = (LinearLayout) convertView.findViewById(R.id.comment_indicator);
 
-            // We make links clickable
-            body.setMovementMethod(LinkMovementMethod.getInstance());
+            // Store the holder with the view.
+            convertView.setTag(holder);
+
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
 
-        TextView time = (TextView) comment_view.findViewById(R.id.comment_time);
-        time.setText(com.getTime());
+
+        holder.title.setText(com.getTitle());
+
+        if(com.getBody() != null) {
+            // We can't show the text as is, but have to parse it as html
+            holder.body.setText(trimTrailingWhitespace(Html.fromHtml(com.getBody())));
+
+            // We make links clickable
+            holder.body.setMovementMethod(LinkMovementMethod.getInstance());
+        }
+
+
+        holder.time.setText(com.getTime());
 
         // Adds padding based on hierarchy, and adds indicator
         if(com.getHierarchy() > 0){
-            LinearLayout container = (LinearLayout) comment_view.findViewById(R.id.comment);
-            container.setPadding((int) dpToPixels(4, parent.getContext()) * (com.getHierarchy() - 1), 0, 0, 0);
 
-            LinearLayout indicator = (LinearLayout) comment_view.findViewById(R.id.comment_indicator);
-            indicator.setVisibility(View.VISIBLE);
+            holder.container.setPadding((int) dpToPixels(4, parent.getContext()) * (com.getHierarchy() - 1), 0, 0, 0);
+            holder.indicator.setVisibility(View.VISIBLE);
 
             // Use modulo to get the appropriate color
             int color = colors.get((com.getHierarchy() - 1) % colors.size());
-            indicator.setBackgroundColor(color);
+            holder.indicator.setBackgroundColor(color);
         }
 
-        return comment_view;
+        return convertView;
     }
 
     // Initializes the list of colours which will be used to display comment hierarchy
