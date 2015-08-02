@@ -2,6 +2,7 @@ package co.adrianblan.cheddar;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -21,6 +22,7 @@ public class WebViewActivity extends AppCompatActivity {
     WebView myWebView;
     ProgressBar progressBar;
     FeedItem feedItem;
+    Bitmap thumbnail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,6 +31,7 @@ public class WebViewActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         feedItem = (FeedItem) b.getSerializable("feedItem");
+        thumbnail = (Bitmap) getIntent().getParcelableExtra("thumbnail");
 
         if(feedItem == null){
             System.err.println("Passed null arguments into WebViewActivity!");
@@ -45,6 +48,13 @@ public class WebViewActivity extends AppCompatActivity {
         progressBar.setMax(100);
 
         myWebView = (WebView) findViewById(R.id.webview);
+        initWebView(myWebView);
+        myWebView.loadUrl(feedItem.getLongUrl());
+
+    }
+
+    // Initializes the WebView with settings, onclick etc
+    public void initWebView(WebView myWebView){
         myWebView.getSettings().setJavaScriptEnabled(true);
 
         // We want to start the page zoomed out
@@ -76,9 +86,6 @@ public class WebViewActivity extends AppCompatActivity {
                 return true;
             }
         });
-
-        myWebView.loadUrl(feedItem.getLongUrl());
-
     }
 
     @Override
@@ -108,6 +115,7 @@ public class WebViewActivity extends AppCompatActivity {
             Intent intent = new Intent(getApplicationContext(), CommentActivity.class);
             Bundle b = new Bundle();
             b.putSerializable("feedItem", feedItem);
+            intent.putExtra("thumbnail", thumbnail);
             intent.putExtras(b);
             startActivity(intent);
         }

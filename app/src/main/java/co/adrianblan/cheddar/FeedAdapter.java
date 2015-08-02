@@ -121,17 +121,7 @@ public class FeedAdapter extends BaseAdapter {
                 Intent intent = new Intent(v.getContext(), CommentActivity.class);
                 Bundle b = new Bundle();
                 b.putSerializable("feedItem", item);
-
-                // TODO don't pass bitmap through bundle, it's terrible
-                if (item.getThumbnail() != null) {
-
-                    // We can't pass through too much data
-                    if (item.getThumbnail().getHeight() > 100 || item.getThumbnail().getWidth() > 100) {
-                        intent.putExtra("thumbnail", Bitmap.createScaledBitmap(item.getThumbnail(), 100, 100, false));
-                    } else {
-                        intent.putExtra("thumbnail", item.getThumbnail());
-                    }
-                }
+                intent.putExtra("thumbnail", item.getThumbnail());
 
                 intent.putExtras(b);
                 v.getContext().startActivity(intent);
@@ -154,6 +144,7 @@ public class FeedAdapter extends BaseAdapter {
                     Intent intent = new Intent(v.getContext(), WebViewActivity.class);
                     Bundle b = new Bundle();
                     b.putSerializable("feedItem", item);
+                    intent.putExtra("thumbnail", item.getThumbnail());
                     intent.putExtras(b);
                     v.getContext().startActivity(intent);
                 }

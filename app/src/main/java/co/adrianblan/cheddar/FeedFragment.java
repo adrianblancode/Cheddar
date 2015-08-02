@@ -398,7 +398,13 @@ public class FeedFragment extends Fragment {
                             return;
                         }
 
-                        feedAdapter.getItem(position).setThumbnail(loadedImage);
+                        // We can't pass through too much data through intents (terrible)
+                        if (loadedImage.getHeight() > 100 || loadedImage.getWidth() > 100) {
+                            feedAdapter.getItem(position).setThumbnail(Bitmap.createScaledBitmap(loadedImage, 100, 100, false));
+                        } else {
+                            feedAdapter.getItem(position).setThumbnail(loadedImage);
+                        }
+
                         feedAdapter.notifyDataSetChanged();
                     }
                 });
@@ -451,8 +457,10 @@ public class FeedFragment extends Fragment {
                         // We want the vibrant palette, if possible, ortherwise darker palettes
                         if (vibrantSwatch != null) {
                             drawable = builder.buildRect(fi.getLetter(), vibrantSwatch.getRgb());
+                            fi.setColor(vibrantSwatch.getRgb());
                         } else if (!swatches.isEmpty()) {
                             drawable = builder.buildRect(fi.getLetter(), swatches.get(0).getRgb());
+                            fi.setColor(swatches.get(0).getRgb());
                         } else {
                             return;
                         }

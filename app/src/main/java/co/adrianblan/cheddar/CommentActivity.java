@@ -36,6 +36,7 @@ public class CommentActivity extends AppCompatActivity {
 
     FeedItem feedItem;
     Long newCommentCount;
+    Bitmap thumbnail;
 
     View header;
 
@@ -92,8 +93,7 @@ public class CommentActivity extends AppCompatActivity {
         TextView time = (TextView) header.findViewById(R.id.feed_item_time);
         time.setText(feedItem.getTime());
 
-        Intent intent = getIntent();
-        Bitmap thumbnail = (Bitmap) intent.getParcelableExtra("thumbnail");
+        thumbnail = (Bitmap) getIntent().getParcelableExtra("thumbnail");
 
         // Generate new TextDrawable
         ImageView im = (ImageView) header.findViewById(R.id.feed_item_thumbnail);
@@ -101,7 +101,7 @@ public class CommentActivity extends AppCompatActivity {
             im.setImageBitmap(thumbnail);
         } else {
             TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
-            TextDrawable drawable = builder.buildRect(feedItem.getLetter(), getApplicationContext().getResources().getColor(R.color.colorPrimary));
+            TextDrawable drawable = builder.buildRect(feedItem.getLetter(), feedItem.getColor());
             im.setImageDrawable(drawable);
         }
 
@@ -113,6 +113,7 @@ public class CommentActivity extends AppCompatActivity {
                     Intent intent = new Intent(v.getContext(), WebViewActivity.class);
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("feedItem", feedItem);
+                    intent.putExtra("thumbnail", thumbnail);
                     intent.putExtras(bundle);
                     startActivity(intent);
                 }
@@ -260,7 +261,7 @@ public class CommentActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu_main, menu);
+        menuInflater.inflate(R.menu.menu_comments, menu);
         return true;
     }
 
@@ -279,6 +280,7 @@ public class CommentActivity extends AppCompatActivity {
             Intent intent = new Intent(getApplicationContext(), WebViewActivity.class);
             Bundle b = new Bundle();
             b.putSerializable("feedItem", feedItem);
+            intent.putExtra("thumbnail", thumbnail);
             intent.putExtras(b);
             startActivity(intent);
         }
