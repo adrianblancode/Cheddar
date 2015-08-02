@@ -1,6 +1,7 @@
 package co.adrianblan.cheddar;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -118,5 +119,13 @@ public class WebViewActivity extends AppCompatActivity {
             view.loadUrl(url);
             return super.shouldOverrideUrlLoading(view, url);
         }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // We do nothing here. We're only handling this to keep orientation
+        // or keyboard hiding from causing the WebView activity to restart.
+        // Yes, this is terrible
     }
 }

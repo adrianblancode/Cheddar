@@ -19,6 +19,7 @@
         <activity
             android:name=".WebViewActivity"
             android:label="WebView"
+            android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -27,6 +28,7 @@
         <activity
             android:name=".CommentActivity"
             android:label="Comment"
+            android:configChanges="orientation|screenSize"
             android:parentActivityName=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

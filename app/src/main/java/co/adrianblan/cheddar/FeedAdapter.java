@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.v7.graphics.Palette;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +15,6 @@ import android.widget.TextView;
 import com.amulyakhare.textdrawable.TextDrawable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by Adrian on 2015-07-25.
@@ -24,9 +22,10 @@ import java.util.List;
 public class FeedAdapter extends BaseAdapter {
 
     private ArrayList<FeedItem> feedItems = new ArrayList<FeedItem>();
+    private final Context context;
 
-    public FeedAdapter() {
-        //feedItems.add(new FeedItem("Godzilla sighted in New York City, evacuate everyone immediately!", "8hrs + dailymail.com", "143 pts + 87 comments"));
+    public FeedAdapter(Context c) {
+        context = c;
     }
 
     public void add (FeedItem f){
@@ -68,7 +67,7 @@ public class FeedAdapter extends BaseAdapter {
 
         class ViewHolder {
             TextView title;
-            TextView subtitle;
+            TextView shortUrl;
             TextView score;
             TextView comments;
             TextView time;
@@ -81,12 +80,12 @@ public class FeedAdapter extends BaseAdapter {
         ViewHolder holder;
 
         if(convertView == null){
-            LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.feed_item, parent, false);
 
             holder = new ViewHolder();
             holder.title = (TextView) convertView.findViewById(R.id.feed_item_title);
-            holder.subtitle = (TextView) convertView.findViewById(R.id.feed_item_subtitle);
+            holder.shortUrl = (TextView) convertView.findViewById(R.id.feed_item_shortUrl);
             holder.score = (TextView) convertView.findViewById(R.id.feed_item_score);
             holder.comments = (TextView) convertView.findViewById(R.id.feed_item_comments);
             holder.time = (TextView) convertView.findViewById(R.id.feed_item_time);
@@ -100,11 +99,8 @@ public class FeedAdapter extends BaseAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        //TODO get context in constructor?
-
-
         holder.title.setText(item.getTitle());
-        holder.subtitle.setText(item.getSubtitle());
+        holder.shortUrl.setText(item.getShortUrl());
         holder.score.setText(Long.toString(item.getScore()));
         holder.comments.setText(Long.toString(item.getCommentCount()));
         holder.time.setText(item.getTime());
@@ -128,14 +124,22 @@ public class FeedAdapter extends BaseAdapter {
                 Intent intent = new Intent(v.getContext(), CommentActivity.class);
                 Bundle b = new Bundle();
                 b.putString("title", item.getTitle());
-                b.putString("subtitle", item.getSubtitle());
                 b.putLong("score", item.getScore());
                 b.putString("time", item.getTime());
+                b.putString("shortUrl", item.getShortUrl());
+                b.putString("longUrl", item.getLongUrl());
+                b.putString("letter", item.getLetter());
                 b.putSerializable("kids", item.getKids());
 
                 // TODO don't pass bitmap through bundle, it's terrible
                 if (item.getThumbnail() != null) {
-                    intent.putExtra("thumbnail", item.getThumbnail());
+
+                    // We can't pass through too much data
+                    if(item.getThumbnail().getHeight() > 100 || item.getThumbnail().getWidth() > 100){
+                        intent.putExtra("thumbnail", Bitmap.createScaledBitmap(item.getThumbnail(), 100, 100, false));
+                    } else {
+                        intent.putExtra("thumbnail", item.getThumbnail());
+                    }
                 }
 
                 intent.putExtras(b);

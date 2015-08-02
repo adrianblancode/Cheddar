@@ -1,6 +1,7 @@
 package co.adrianblan.cheddar;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.media.Image;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.amulyakhare.textdrawable.TextDrawable;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -53,17 +55,25 @@ public class CommentActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(b.getString("title"));
 
-        commentAdapter = new CommentAdapter();
+        commentAdapter = new CommentAdapter(getApplicationContext());
         ListView lv = (ListView) findViewById(R.id.activity_comment_list);
         lv.setAdapter(commentAdapter);
+        lv.addHeaderView(initHeader(b));
+
+        updateComments();
+    }
+
+    public View initHeader(Bundle bundle){
+
+        final Bundle b = bundle;
 
         View header = View.inflate(getApplicationContext(), R.layout.feed_item, null);
 
         TextView title = (TextView) header.findViewById(R.id.feed_item_title);
         title.setText(b.getString("title"));
 
-        TextView subtitle = (TextView) header.findViewById(R.id.feed_item_subtitle);
-        subtitle.setText(b.getString("subtitle"));
+        TextView subtitle = (TextView) header.findViewById(R.id.feed_item_shortUrl);
+        subtitle.setText(b.getString("shortUrl"));
 
         TextView score = (TextView) header.findViewById(R.id.feed_item_score);
         score.setText(Long.toString(b.getLong("score")));
@@ -79,14 +89,27 @@ public class CommentActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bitmap thumbnail = (Bitmap) intent.getParcelableExtra("thumbnail");
 
+        // Generate new TextDrawable
+        ImageView im = (ImageView) header.findViewById(R.id.feed_item_thumbnail);
         if(thumbnail != null){
-            ImageView im = (ImageView) header.findViewById(R.id.feed_item_thumbnail);
             im.setImageBitmap(thumbnail);
+        } else {
+            TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
+            TextDrawable drawable = builder.buildRect(b.getString("letter"), getApplicationContext().getResources().getColor(R.color.colorPrimary));
+            im.setImageDrawable(drawable);
         }
 
-        lv.addHeaderView(header);
+        // If we click the thumbnail, get to the webview
+        im.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), WebViewActivity.class);
+                intent.putExtras(b);
+                startActivity(intent);
+            }
+        });
 
-        updateComments();
+        return header;
     }
 
     //TODO implement refresh
@@ -199,5 +222,13 @@ public class CommentActivity extends AppCompatActivity {
     @Override
     public void onSaveInstanceState(Bundle savedState) {
         super.onSaveInstanceState(savedState);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // We do nothing here. We're only handling this to keep orientation
+        // or keyboard hiding from causing the WebView activity to restart.
+        // Yes, this is terrible
     }
 }

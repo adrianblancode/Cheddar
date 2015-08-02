@@ -4,7 +4,11 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.text.Html;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,10 +26,12 @@ public class CommentAdapter extends BaseAdapter {
 
     private ArrayList<Comment> comments;
     private ArrayList<Integer> colors;
+    private final Context context;
 
-    public CommentAdapter() {
+    public CommentAdapter(Context c) {
         comments = new ArrayList<Comment>();
         colors = null;
+        context = c;
     }
 
     public void add (Comment c){
@@ -89,8 +95,7 @@ public class CommentAdapter extends BaseAdapter {
 
             holder = new ViewHolder();
 
-            // TODO get passed context?
-            LayoutInflater inflater = (LayoutInflater) parent.getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.comment, parent, false);
             holder.title = (TextView) convertView.findViewById(R.id.comment_title);
             holder.body = (TextView) convertView.findViewById(R.id.comment_body);
@@ -110,7 +115,7 @@ public class CommentAdapter extends BaseAdapter {
 
         if(com.getBody() != null) {
             // We can't show the text as is, but have to parse it as html
-            holder.body.setText(trimTrailingWhitespace(Html.fromHtml(com.getBody())));
+            holder.body.setText(trimWhitespace(Html.fromHtml(com.getBody())));
 
             // We make links clickable
             holder.body.setMovementMethod(LinkMovementMethod.getInstance());
@@ -154,11 +159,8 @@ public class CommentAdapter extends BaseAdapter {
         return px;
     }
 
-    // Trims trailing whitespace.
-    public static CharSequence trimTrailingWhitespace(CharSequence source) {
-
-        if(source == null)
-            return "";
+    // Removes trailing double whitespace, reduces the size of other double whitespace
+    public static SpannableStringBuilder trimWhitespace(CharSequence source) {
 
         int i = source.length();
 
@@ -166,6 +168,20 @@ public class CommentAdapter extends BaseAdapter {
         while(--i >= 0 && Character.isWhitespace(source.charAt(i))) {
         }
 
-        return source.subSequence(0, i+1);
+        // Removes two trailing newlines
+        source = source.subSequence(0, i + 1);
+
+        SpannableStringBuilder ssb = new SpannableStringBuilder(source);
+
+        for(i = 0; i + 1 < source.length(); i++){
+            if(Character.isWhitespace(source.charAt(i)) && Character.isWhitespace(source.charAt(i + 1))) {
+
+                // Reduces the size of double whitespace
+                ssb.setSpan(new RelativeSizeSpan(0.4f), i, i + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                i++;
+            }
+        }
+
+        return ssb;
     }
 }

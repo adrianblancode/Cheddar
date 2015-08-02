@@ -1,6 +1,7 @@
 package co.adrianblan.cheddar;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 
 import java.io.Serializable;
@@ -12,28 +13,28 @@ import java.util.ArrayList;
 public class FeedItem implements Serializable {
 
     private String title;
-    private String subtitle;
     private long score;
     private long commentCount;
     private String time;
+    private String shortUrl;
+    private String longUrl;
     private Bitmap thumbnail;
     private Drawable textDrawable;
     private String letter;
-    private String shortUrl;
-    private String longUrl;
+    private int color;
     private ArrayList<Long> kids;
 
     public FeedItem(){
         this.title = null;
-        this.subtitle = null;
         this.score = 0;
         this.commentCount = 0;
         this.time = null;
+        this.shortUrl = null;
+        this.longUrl = null;
         this.thumbnail = null;
         this.textDrawable = null;
         this.letter = "?";
-        this.shortUrl = null;
-        this.longUrl = null;
+        this.color = Color.DKGRAY;
     }
 
     public String getTitle() {
@@ -42,14 +43,6 @@ public class FeedItem implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
-    }
-
-    public String getSubtitle() {
-        return subtitle;
-    }
-
-    public void setSubtitle(String subtitle) {
-        this.subtitle = subtitle;
     }
 
     public long getScore() {
@@ -66,6 +59,22 @@ public class FeedItem implements Serializable {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public String getShortUrl() {
+        return shortUrl;
+    }
+
+    public void setShortUrl(String shortUrl) {
+        this.shortUrl = shortUrl;
+    }
+
+    public String getLongUrl() {
+        return longUrl;
+    }
+
+    public void setLongUrl(String longUrl) {
+        this.longUrl = longUrl;
     }
 
     public long getCommentCount() {
@@ -104,20 +113,12 @@ public class FeedItem implements Serializable {
         this.letter = letter;
     }
 
-    public String getShortUrl() {
-        return shortUrl;
+    public int getColor() {
+        return color;
     }
 
-    public void setShortUrl(String shortUrl) {
-        this.shortUrl = shortUrl;
-    }
-
-    public String getLongUrl() {
-        return longUrl;
-    }
-
-    public void setLongUrl(String longUrl) {
-        this.longUrl = longUrl;
+    public void setColor(int color) {
+        this.color = color;
     }
 
     public ArrayList<Long> getKids() {

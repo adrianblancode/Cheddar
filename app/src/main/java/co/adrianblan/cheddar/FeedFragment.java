@@ -69,7 +69,6 @@ public class FeedFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
         setRetainInstance(true);
 
         // Init API stuff
@@ -78,7 +77,7 @@ public class FeedFragment extends Fragment {
         itemUrl = baseUrl.child("/item/");
         storiesUrl = baseUrl.child(getArguments().getString("url"));
 
-        feedAdapter = new FeedAdapter();
+        feedAdapter = new FeedAdapter(getActivity());
         asyncTasks = new ArrayList<AsyncTask>();
         lastSubmissionUpdate = new Date();
 
@@ -270,7 +269,6 @@ public class FeedFragment extends Fragment {
 
         String domain = site.getHost().replace("www.", "");
         f.setShortUrl(domain);
-        f.setSubtitle(domain);
         f.setLongUrl(site.toString());
 
         // We show the first letter of the url on the thumbnail
@@ -284,6 +282,7 @@ public class FeedFragment extends Fragment {
         TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
         TextDrawable drawable = builder.buildRect(f.getLetter(), getActivity().getResources().getColor(R.color.colorPrimary));
         f.setTextDrawable(drawable);
+        f.setColor(getActivity().getResources().getColor(R.color.colorPrimary));
 
         return f;
     }
@@ -312,7 +311,7 @@ public class FeedFragment extends Fragment {
 
             @Override
             protected void onPostExecute(String thumbnailUrl) {
-                //feedAdapter.notifyDataSetChanged();
+                feedAdapter.notifyDataSetChanged();
             }
         }
 
@@ -320,7 +319,7 @@ public class FeedFragment extends Fragment {
         asyncTasks.add(task);
 
         // TODO use threadpoolexecutor?
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, null);
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     // Recursively update comment count
