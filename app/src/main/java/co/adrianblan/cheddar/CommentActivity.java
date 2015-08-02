@@ -271,13 +271,16 @@ public class CommentActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.refresh) {
+        if (id == R.id.menu_refresh) {
             updateComments();
         }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if(id == R.id.menu_webview){
+            Intent intent = new Intent(getApplicationContext(), WebViewActivity.class);
+            Bundle b = new Bundle();
+            b.putSerializable("feedItem", feedItem);
+            intent.putExtras(b);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);

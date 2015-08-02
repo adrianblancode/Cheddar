@@ -1,6 +1,6 @@
 package co.adrianblan.cheddar;
 
-import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -8,7 +8,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -85,7 +84,7 @@ public class WebViewActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_webview, menu);
         return true;
     }
 
@@ -101,13 +100,16 @@ public class WebViewActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.refresh) {
+        if(id == R.id.menu_refresh) {
             myWebView.reload();
         }
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if(id == R.id.menu_comments){
+            Intent intent = new Intent(getApplicationContext(), CommentActivity.class);
+            Bundle b = new Bundle();
+            b.putSerializable("feedItem", feedItem);
+            intent.putExtras(b);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
