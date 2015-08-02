@@ -34,12 +34,8 @@ public class CommentActivity extends AppCompatActivity {
     ArrayList<Long> kids;
     Date lastSubmissionUpdate;
 
-    //TODO put all these in feeditem
-    Long submissionId;
-    Long points;
-    Long commentCount;
+    FeedItem feedItem;
     Long newCommentCount;
-    Long time;
 
     View header;
 
@@ -56,42 +52,45 @@ public class CommentActivity extends AppCompatActivity {
         baseUrl = new Firebase("https://hacker-news.firebaseio.com/v0/item/");
 
         Bundle b = getIntent().getExtras();
-        submissionId = b.getLong("submissionId");
-        commentCount = b.getLong("commentCount");
+        feedItem = (FeedItem) b.getSerializable("feedItem");
+
+        if(feedItem == null){
+            System.err.println("Passed null arguments into CommentActivity!");
+            return;
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_comment);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(b.getString("title"));
+        getSupportActionBar().setTitle(feedItem.getTitle());
 
-        commentAdapter = new CommentAdapter(getApplicationContext(), b.getString("by"));
+        commentAdapter = new CommentAdapter(getApplicationContext(), feedItem.getBy());
         ListView lv = (ListView) findViewById(R.id.activity_comment_list);
         lv.setAdapter(commentAdapter);
-        lv.addHeaderView(initHeader(b));
+        lv.addHeaderView(initHeader(feedItem));
 
         updateComments();
     }
 
-    public View initHeader(Bundle bundle){
-
-        final Bundle b = bundle;
+    // Initializes the submission header with data
+    public View initHeader(final FeedItem feedItem){
 
         header = View.inflate(getApplicationContext(), R.layout.feed_item, null);
 
         TextView title = (TextView) header.findViewById(R.id.feed_item_title);
-        title.setText(b.getString("title"));
+        title.setText(feedItem.getTitle());
 
         TextView subtitle = (TextView) header.findViewById(R.id.feed_item_shortUrl);
-        subtitle.setText(b.getString("shortUrl"));
+        subtitle.setText(feedItem.getShortUrl());
 
         TextView score = (TextView) header.findViewById(R.id.feed_item_score);
-        score.setText(Long.toString(b.getLong("score")));
+        score.setText(Long.toString(feedItem.getScore()));
 
         TextView comments = (TextView) header.findViewById(R.id.feed_item_comments);
-        comments.setText(Long.toString(b.getLong("commentCount")));
+        comments.setText(Long.toString(feedItem.getCommentCount()));
 
         TextView time = (TextView) header.findViewById(R.id.feed_item_time);
-        time.setText(b.getString("time"));
+        time.setText(feedItem.getTime());
 
         Intent intent = getIntent();
         Bitmap thumbnail = (Bitmap) intent.getParcelableExtra("thumbnail");
@@ -102,19 +101,23 @@ public class CommentActivity extends AppCompatActivity {
             im.setImageBitmap(thumbnail);
         } else {
             TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
-            TextDrawable drawable = builder.buildRect(b.getString("letter"), getApplicationContext().getResources().getColor(R.color.colorPrimary));
+            TextDrawable drawable = builder.buildRect(feedItem.getLetter(), getApplicationContext().getResources().getColor(R.color.colorPrimary));
             im.setImageDrawable(drawable);
         }
 
-        // If we click the thumbnail, get to the webview
-        im.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), WebViewActivity.class);
-                intent.putExtras(b);
-                startActivity(intent);
-            }
-        });
+        if(feedItem.getShortUrl() != null){
+            // If we click the thumbnail, get to the webview
+            im.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), WebViewActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("feedItem", feedItem);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+            });
+        }
 
         return header;
     }
@@ -138,7 +141,7 @@ public class CommentActivity extends AppCompatActivity {
         commentAdapter.clear();
         commentAdapter.notifyDataSetChanged();
 
-        baseUrl.child(Long.toString(submissionId)).addListenerForSingleValueEvent(new ValueEventListener() {
+        baseUrl.child(Long.toString(feedItem.getSubmissionId())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
 
@@ -146,8 +149,8 @@ public class CommentActivity extends AppCompatActivity {
                 Map<String, Object> ret = (Map<String, Object>) snapshot.getValue();
                 kids = (ArrayList<Long>) ret.get("kids");
 
-                time = (Long) ret.get("time");
-                points = (Long) ret.get("score");
+                feedItem.setTime(getPrettyDate((long) ret.get("time")));
+                feedItem.setScore((Long) ret.get("score"));
 
                 if (kids != null) {
 
@@ -190,7 +193,7 @@ public class CommentActivity extends AppCompatActivity {
                 com.setTime(getPrettyDate((Long) ret.get("time")));
 
                 // Check if top level comment
-                if(par == null) {
+                if (par == null) {
                     com.setHierarchy(0);
                     commentAdapter.add(com);
                 } else {
@@ -224,13 +227,16 @@ public class CommentActivity extends AppCompatActivity {
     // Updates the header with new data
     public void updateHeader(){
         TextView scoreView = (TextView) header.findViewById(R.id.feed_item_score);
-        scoreView.setText(Long.toString(points));
+        scoreView.setText(Long.toString(feedItem.getScore()));
 
-        TextView commentView = (TextView) header.findViewById(R.id.feed_item_comments);
-        commentView.setText(Long.toString(newCommentCount));
+        if(newCommentCount > feedItem.getCommentCount()) {
+            TextView commentView = (TextView) header.findViewById(R.id.feed_item_comments);
+            commentView.setText(Long.toString(newCommentCount));
+            feedItem.setCommentCount(newCommentCount);
+        }
 
         TextView timeView = (TextView) header.findViewById(R.id.feed_item_time);
-        timeView.setText(getPrettyDate(time));
+        timeView.setText(feedItem.getTime());
     }
 
     // Converts the difference between two dates into a pretty date

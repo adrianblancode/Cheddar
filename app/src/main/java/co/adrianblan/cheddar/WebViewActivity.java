@@ -21,6 +21,7 @@ public class WebViewActivity extends AppCompatActivity {
 
     WebView myWebView;
     ProgressBar progressBar;
+    FeedItem feedItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,19 +29,18 @@ public class WebViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_webview);
 
         Bundle b = getIntent().getExtras();
-        String title = b.getString("title");
-        String shortUrl = b.getString("shortUrl");
-        String longUrl = b.getString("longUrl");
+        feedItem = (FeedItem) b.getSerializable("feedItem");
 
-        if(title == null || shortUrl == null || longUrl == null){
+        if(feedItem == null){
             System.err.println("Passed null arguments into WebViewActivity!");
+            return;
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_webview);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(title);
-        getSupportActionBar().setSubtitle(shortUrl);
+        getSupportActionBar().setTitle(feedItem.getTitle());
+        getSupportActionBar().setSubtitle(feedItem.getShortUrl());
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
         progressBar.setMax(100);
@@ -78,7 +78,7 @@ public class WebViewActivity extends AppCompatActivity {
             }
         });
 
-        myWebView.loadUrl(longUrl);
+        myWebView.loadUrl(feedItem.getLongUrl());
 
     }
 

@@ -120,15 +120,7 @@ public class FeedAdapter extends BaseAdapter {
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), CommentActivity.class);
                 Bundle b = new Bundle();
-                b.putLong("submissionId", item.getSubmissionId());
-                b.putString("title", item.getTitle());
-                b.putLong("score", item.getScore());
-                b.putString("time", item.getTime());
-                b.putString("by", item.getBy());
-                b.putString("shortUrl", item.getShortUrl());
-                b.putString("longUrl", item.getLongUrl());
-                b.putString("letter", item.getLetter());
-                b.putLong("commentCount", item.getCommentCount());
+                b.putSerializable("feedItem", item);
 
                 // TODO don't pass bitmap through bundle, it's terrible
                 if (item.getThumbnail() != null) {
@@ -161,9 +153,7 @@ public class FeedAdapter extends BaseAdapter {
                 public void onClick(View v) {
                     Intent intent = new Intent(v.getContext(), WebViewActivity.class);
                     Bundle b = new Bundle();
-                    b.putString("title", item.getTitle());
-                    b.putString("shortUrl", item.getShortUrl());
-                    b.putString("longUrl", item.getLongUrl());
+                    b.putSerializable("feedItem", item);
                     intent.putExtras(b);
                     v.getContext().startActivity(intent);
                 }

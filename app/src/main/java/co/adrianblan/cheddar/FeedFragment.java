@@ -259,7 +259,6 @@ public class FeedFragment extends Fragment {
 
         int comments = 0;
         ArrayList<Long> kids = (ArrayList<Long>) ret.get("kids");
-        f.setKids(kids);
 
         if(kids != null) {
             updateCommentCount(f, kids);

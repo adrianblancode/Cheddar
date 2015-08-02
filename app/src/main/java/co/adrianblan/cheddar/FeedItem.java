@@ -20,11 +20,13 @@ public class FeedItem implements Serializable {
     private String time;
     private String shortUrl;
     private String longUrl;
-    private Bitmap thumbnail;
-    private Drawable textDrawable;
+
+    // Marked transient so they won't get included in the bundle
+    private transient Bitmap thumbnail;
+    private transient Drawable textDrawable;
+
     private String letter;
     private int color;
-    private ArrayList<Long> kids;
 
     public FeedItem(){
         this.submissionId = 0L;
@@ -100,7 +102,7 @@ public class FeedItem implements Serializable {
         return commentCount;
     }
 
-    public void setCommentCount(int commentCount) {
+    public void setCommentCount(long commentCount) {
         this.commentCount = commentCount;
     }
 
@@ -138,13 +140,5 @@ public class FeedItem implements Serializable {
 
     public void setColor(int color) {
         this.color = color;
-    }
-
-    public ArrayList<Long> getKids() {
-        return kids;
-    }
-
-    public void setKids(ArrayList<Long> kids) {
-        this.kids = kids;
     }
 }
