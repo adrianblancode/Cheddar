@@ -1,10 +1,13 @@
 package co.adrianblan.cheddar;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBar;
 import android.support.v7.graphics.Palette;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,7 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.ListView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -20,6 +23,9 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.github.ksoichiro.android.observablescrollview.ObservableListView;
+import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
+import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
@@ -34,7 +40,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Adrian on 2015-07-28.
  */
-public class FeedFragment extends Fragment {
+public class FeedFragment extends Fragment implements ObservableScrollViewCallbacks {
 
     private FeedAdapter feedAdapter;
 
@@ -57,6 +63,11 @@ public class FeedFragment extends Fragment {
     private Date lastSubmissionUpdate;
     private final int submissionUpdateTime = 3;
     private final int submissionUpdateNum = 15;
+
+    // Used to fill the space when viewpager minimizes
+    View empty;
+
+    public FeedFragment() {}
 
     public static FeedFragment newInstance() {
         FeedFragment f = new FeedFragment();
@@ -96,8 +107,13 @@ public class FeedFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.fragment_feed, container,false);
 
-        ListView listView = (ListView) rootView.findViewById(R.id.feed_list);
+        ObservableListView listView = (ObservableListView) rootView.findViewById(R.id.feed_list);
+        listView.setScrollViewCallbacks(this);
         listView.setAdapter(feedAdapter);
+
+        empty = inflater.inflate(R.layout.empty, container,false);
+        empty.setPadding(0, (int) dpToPixels(105, getActivity()), 0, 0);
+        listView.addHeaderView(empty);
 
         //If we scroll to the end, we simply fetch more submissions
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -105,7 +121,8 @@ public class FeedFragment extends Fragment {
             private int preLast;
 
             @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {}
+            public void onScrollStateChanged(AbsListView view, int scrollState) {
+            }
 
             @Override
             public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
@@ -129,7 +146,7 @@ public class FeedFragment extends Fragment {
         });
 
         ProgressBar circle = new ProgressBar(getActivity());
-        circle.setPadding(0, 80, 0, 80);
+        circle.setPadding(0, 65, 0, 65);
         circle.setIndeterminate(true);
         listView.addFooterView(circle);
 
@@ -213,14 +230,14 @@ public class FeedFragment extends Fragment {
                 // We retrieve all objects into a hashmap
                 Map<String, Object> ret = (Map<String, Object>) snapshot.getValue();
 
-                if(ret == null){
+                if (ret == null) {
                     return;
                 }
 
                 String url = (String) ret.get("url");
                 URL site = null;
 
-                if(url != null){
+                if (url != null) {
                     try {
                         site = new URL(url);
                     } catch (MalformedURLException e) {
@@ -233,7 +250,7 @@ public class FeedFragment extends Fragment {
                 feedAdapter.add(f);
                 feedAdapter.notifyDataSetChanged();
 
-                if(url != null) {
+                if (url != null) {
                     // Asynchronously updates images for the feed item
                     updateSubmissionThumbnail(site.getHost(), f);
                     updateSubmissionFavicon(site.getHost(), f);
@@ -524,5 +541,33 @@ public class FeedFragment extends Fragment {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {}
+
+    @Override
+    public void onDownMotionEvent() {}
+
+    @Override
+    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
+        ActionBar ab = ((MainActivity)getActivity()).getSupportActionBar();
+        if (scrollState == ScrollState.UP) {
+            if (ab.isShowing()) {
+                ab.hide();
+                empty.setPadding(0, (int) dpToPixels(50, getActivity()), 0, 0);
+            }
+        } else if (scrollState == ScrollState.DOWN) {
+            if (!ab.isShowing()) {
+                ab.show();
+                empty.setPadding(0, (int) dpToPixels(105, getActivity()), 0, 0);
+            }
+        }
+    }
+
+    public static float dpToPixels(float dp, Context context){
+        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+        return px;
     }
 }
