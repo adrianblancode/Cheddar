@@ -4,7 +4,7 @@ package co.adrianblan.cheddar;
  * Created by Adrian on 2015-07-30.
  */
 public class Comment {
-    private String title;
+    private String by;
     private String body;
     private String time;
 
@@ -12,21 +12,21 @@ public class Comment {
     private int hierarchy;
 
     public Comment(){
-        this.title = null;
+        this.by = null;
         this.body = null;
     }
 
-    public Comment(String title, String body){
-        this.title = title;
+    public Comment(String by, String body){
+        this.by = by;
         this.body = body;
     }
 
-    public String getTitle() {
-        return title;
+    public String getBy() {
+        return by;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public void setBy(String by) {
+        this.by = by;
     }
 
     public String getBody() {

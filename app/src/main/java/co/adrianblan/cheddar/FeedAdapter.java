@@ -124,6 +124,7 @@ public class FeedAdapter extends BaseAdapter {
                 b.putString("title", item.getTitle());
                 b.putLong("score", item.getScore());
                 b.putString("time", item.getTime());
+                b.putString("by", item.getBy());
                 b.putString("shortUrl", item.getShortUrl());
                 b.putString("longUrl", item.getLongUrl());
                 b.putString("letter", item.getLetter());

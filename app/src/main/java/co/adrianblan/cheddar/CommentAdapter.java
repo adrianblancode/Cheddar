@@ -1,13 +1,10 @@
 package co.adrianblan.cheddar;
 
 import android.content.Context;
-import android.content.res.Resources;
-import android.graphics.Color;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.method.LinkMovementMethod;
-import android.text.style.AbsoluteSizeSpan;
 import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -27,11 +24,13 @@ public class CommentAdapter extends BaseAdapter {
     private ArrayList<Comment> comments;
     private ArrayList<Integer> colors;
     private final Context context;
+    private String author;
 
-    public CommentAdapter(Context c) {
+    public CommentAdapter(Context c, String author) {
         comments = new ArrayList<Comment>();
         colors = null;
         context = c;
+        this.author = author;
     }
 
     public void add (Comment c){
@@ -111,7 +110,15 @@ public class CommentAdapter extends BaseAdapter {
         }
 
 
-        holder.title.setText(com.getTitle());
+        holder.title.setText(com.getBy());
+
+        // If the writer of the comment is also the author of the submission
+        if(com.getBy().equals(author)){
+            holder.title.setTextColor(context.getResources().getColor(R.color.colorPrimary));
+            holder.title.setText(holder.title.getText() + " [OP]");
+        } else {
+            holder.title.setTextColor(context.getResources().getColor(R.color.abc_primary_text_material_light));
+        }
 
         if(com.getBody() != null) {
             // We can't show the text as is, but have to parse it as html

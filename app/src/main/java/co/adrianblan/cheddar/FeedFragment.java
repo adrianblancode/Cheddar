@@ -255,9 +255,7 @@ public class FeedFragment extends Fragment {
         f.setSubmissionId(submissionId);
 
         // Gets readable date
-        Date past = new Date((Long) ret.get("time") * 1000);
-        Date now = new Date();
-        String time = getPrettyDate(past, now);
+        String time = getPrettyDate((Long) ret.get("time"));
 
         int comments = 0;
         ArrayList<Long> kids = (ArrayList<Long>) ret.get("kids");
@@ -269,6 +267,7 @@ public class FeedFragment extends Fragment {
 
         // Set titles and other data
         f.setTitle((String) ret.get("title"));
+        f.setBy((String) ret.get("by"));
         f.setScore((Long) ret.get("score"));
         f.setTime(time);
 
@@ -433,11 +432,6 @@ public class FeedFragment extends Fragment {
                     return;
                 }
 
-                // Return if we already have a high resolution thumbnail
-                if(fi.getThumbnail() != null){
-                    return;
-                }
-
                 // It's possible the list has changed during the async task
                 // So we make sure the item still exists
                 int position = feedAdapter.getPosition(fi);
@@ -474,7 +468,10 @@ public class FeedFragment extends Fragment {
 
     // Converts the difference between two dates into a pretty date
     // There's probably a joke in there somewhere
-    public String getPrettyDate(Date past, Date now){
+    public String getPrettyDate(Long time){
+
+        Date past = new Date(time * 1000);
+        Date now = new Date();
 
         if(TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) > 0){
             return TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) + "d";

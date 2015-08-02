@@ -32,12 +32,16 @@ public class CommentActivity extends AppCompatActivity {
 
     CommentAdapter commentAdapter;
     ArrayList<Long> kids;
-    ListView lv;
+    Date lastSubmissionUpdate;
 
+    //TODO put all these in feeditem
     Long submissionId;
     Long points;
     Long commentCount;
     Long newCommentCount;
+    Long time;
+
+    View header;
 
     // Base URL for the hacker news API
     private Firebase baseUrl;
@@ -60,8 +64,8 @@ public class CommentActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(b.getString("title"));
 
-        commentAdapter = new CommentAdapter(getApplicationContext());
-        lv = (ListView) findViewById(R.id.activity_comment_list);
+        commentAdapter = new CommentAdapter(getApplicationContext(), b.getString("by"));
+        ListView lv = (ListView) findViewById(R.id.activity_comment_list);
         lv.setAdapter(commentAdapter);
         lv.addHeaderView(initHeader(b));
 
@@ -72,7 +76,7 @@ public class CommentActivity extends AppCompatActivity {
 
         final Bundle b = bundle;
 
-        View header = View.inflate(getApplicationContext(), R.layout.feed_item, null);
+        header = View.inflate(getApplicationContext(), R.layout.feed_item, null);
 
         TextView title = (TextView) header.findViewById(R.id.feed_item_title);
         title.setText(b.getString("title"));
@@ -115,21 +119,24 @@ public class CommentActivity extends AppCompatActivity {
         return header;
     }
 
-    public void addCommentCount(int count){
-        newCommentCount += (long) count;
-
-        if(newCommentCount > commentCount){
-            commentCount = newCommentCount;
-
-            //Update header
-        }
-    }
-
     // Starts updating the commentCount from the top level
     public void updateComments(){
 
+        if(lastSubmissionUpdate != null) {
+            Date d = new Date();
+            long seconds = (d.getTime() - lastSubmissionUpdate.getTime()) / 1000;
+
+            // We want to throttle repeated refreshes
+            if (seconds < 2) {
+                return;
+            }
+        }
+
+        lastSubmissionUpdate = new Date();
+
         newCommentCount = 0L;
         commentAdapter.clear();
+        commentAdapter.notifyDataSetChanged();
 
         baseUrl.child(Long.toString(submissionId)).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -139,13 +146,17 @@ public class CommentActivity extends AppCompatActivity {
                 Map<String, Object> ret = (Map<String, Object>) snapshot.getValue();
                 kids = (ArrayList<Long>) ret.get("kids");
 
+                time = (Long) ret.get("time");
+                points = (Long) ret.get("score");
+
                 if (kids != null) {
 
-                    addCommentCount(kids.size());
+                    newCommentCount += kids.size();
+                    updateHeader();
 
                     //TODO fix race condition
                     for (int i = 0; i < kids.size(); i++) {
-                        updateComment(kids.get(i), null);
+                        updateSingleComment(kids.get(i), null);
                     }
                 }
             }
@@ -158,7 +169,7 @@ public class CommentActivity extends AppCompatActivity {
     }
 
     // Gets an url to a single comment
-    public void updateComment(Long id, Comment parent){
+    public void updateSingleComment(Long id, Comment parent){
 
         final Comment par = parent;
 
@@ -174,12 +185,9 @@ public class CommentActivity extends AppCompatActivity {
                 }
 
                 Comment com = new Comment();
-                com.setTitle((String) ret.get("by"));
+                com.setBy((String) ret.get("by"));
                 com.setBody((String) ret.get("text"));
-
-                Date past = new Date((Long) ret.get("time") * 1000);
-                Date now = new Date();
-                com.setTime(getPrettyDate(past, now));
+                com.setTime(getPrettyDate((Long) ret.get("time")));
 
                 // Check if top level comment
                 if(par == null) {
@@ -190,18 +198,18 @@ public class CommentActivity extends AppCompatActivity {
                     commentAdapter.add(commentAdapter.getPosition(par) + 1, com);
                 }
                 commentAdapter.notifyDataSetChanged();
-
                 ArrayList<Long> kids = (ArrayList<Long>) ret.get("kids");
 
                 // Update child commentCount
                 if (kids != null) {
 
-                    addCommentCount(kids.size());
+                    newCommentCount += kids.size();
+                    updateHeader();
 
                     // We're counting backwards since we are too lazy to fix a race condition
                     //TODO fix race condition
                     for (int i = 1; i <= kids.size(); i++) {
-                        updateComment(kids.get(kids.size() - i), com);
+                        updateSingleComment(kids.get(kids.size() - i), com);
                     }
                 }
             }
@@ -213,9 +221,24 @@ public class CommentActivity extends AppCompatActivity {
         });
     }
 
+    // Updates the header with new data
+    public void updateHeader(){
+        TextView scoreView = (TextView) header.findViewById(R.id.feed_item_score);
+        scoreView.setText(Long.toString(points));
+
+        TextView commentView = (TextView) header.findViewById(R.id.feed_item_comments);
+        commentView.setText(Long.toString(newCommentCount));
+
+        TextView timeView = (TextView) header.findViewById(R.id.feed_item_time);
+        timeView.setText(getPrettyDate(time));
+    }
+
     // Converts the difference between two dates into a pretty date
     // There's probably a joke in there somewhere
-    public String getPrettyDate(Date past, Date now){
+    public String getPrettyDate(Long time){
+
+        Date past = new Date(time * 1000);
+        Date now = new Date();
 
         if(TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) > 0){
             return TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) + "d";

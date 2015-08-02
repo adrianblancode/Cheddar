@@ -14,6 +14,7 @@ public class FeedItem implements Serializable {
 
     private Long submissionId;
     private String title;
+    private String by;
     private long score;
     private long commentCount;
     private String time;
@@ -53,6 +54,14 @@ public class FeedItem implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getBy() {
+        return by;
+    }
+
+    public void setBy(String by) {
+        this.by = by;
     }
 
     public long getScore() {

@@ -34,7 +34,7 @@
                 android:layout_height="wrap_content"
                 style="@style/Base.TextAppearance.AppCompat.Body2"
                 android:textSize="13dp"
-                android:textColor="@color/abc_secondary_text_material_light"
+                android:textColor="@color/abc_primary_text_material_light"
                 android:text="Commenter"/>
 
                 <ImageView
