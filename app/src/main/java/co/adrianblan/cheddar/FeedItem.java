@@ -12,6 +12,7 @@ import java.util.ArrayList;
  */
 public class FeedItem implements Serializable {
 
+    private Long submissionId;
     private String title;
     private long score;
     private long commentCount;
@@ -25,6 +26,7 @@ public class FeedItem implements Serializable {
     private ArrayList<Long> kids;
 
     public FeedItem(){
+        this.submissionId = 0L;
         this.title = null;
         this.score = 0;
         this.commentCount = 0;
@@ -35,6 +37,14 @@ public class FeedItem implements Serializable {
         this.textDrawable = null;
         this.letter = "?";
         this.color = Color.DKGRAY;
+    }
+
+    public Long getSubmissionId() {
+        return submissionId;
+    }
+
+    public void setSubmissionId(Long submissionId) {
+        this.submissionId = submissionId;
     }
 
     public String getTitle() {

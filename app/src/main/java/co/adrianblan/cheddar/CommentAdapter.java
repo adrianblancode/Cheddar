@@ -126,7 +126,7 @@ public class CommentAdapter extends BaseAdapter {
         // Adds padding based on hierarchy, and adds indicator
         holder.container.setPadding((int) dpToPixels(4, parent.getContext()) * (com.getHierarchy() - 1), 0, 0, 0);
 
-        // We don't need the indicator for top level comments
+        // We don't need the indicator for top level commentCount
         if(com.getHierarchy() == 0){
             holder.indicator.setVisibility(View.GONE);
         } else {

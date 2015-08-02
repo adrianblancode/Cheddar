@@ -104,7 +104,6 @@ public class FeedAdapter extends BaseAdapter {
         holder.score.setText(Long.toString(item.getScore()));
         holder.comments.setText(Long.toString(item.getCommentCount()));
         holder.time.setText(item.getTime());
-        TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
 
         // If we have a high resolution thumbnail, display it
         if(item.getThumbnail() != null){
@@ -116,26 +115,25 @@ public class FeedAdapter extends BaseAdapter {
         }
 
 
-        // TODO move onclick listeners to somewhere that makes sense?
-        // If we click the body, get to the comments
-        holder.body.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener commentOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(v.getContext(), CommentActivity.class);
                 Bundle b = new Bundle();
+                b.putLong("submissionId", item.getSubmissionId());
                 b.putString("title", item.getTitle());
                 b.putLong("score", item.getScore());
                 b.putString("time", item.getTime());
                 b.putString("shortUrl", item.getShortUrl());
                 b.putString("longUrl", item.getLongUrl());
                 b.putString("letter", item.getLetter());
-                b.putSerializable("kids", item.getKids());
+                b.putLong("commentCount", item.getCommentCount());
 
                 // TODO don't pass bitmap through bundle, it's terrible
                 if (item.getThumbnail() != null) {
 
                     // We can't pass through too much data
-                    if(item.getThumbnail().getHeight() > 100 || item.getThumbnail().getWidth() > 100){
+                    if (item.getThumbnail().getHeight() > 100 || item.getThumbnail().getWidth() > 100) {
                         intent.putExtra("thumbnail", Bitmap.createScaledBitmap(item.getThumbnail(), 100, 100, false));
                     } else {
                         intent.putExtra("thumbnail", item.getThumbnail());
@@ -145,21 +143,31 @@ public class FeedAdapter extends BaseAdapter {
                 intent.putExtras(b);
                 v.getContext().startActivity(intent);
             }
-        });
+        };
+
+        // TODO move onclick listeners to somewhere that makes sense?
+        // If we click the body, get to the commentCount
+        holder.body.setOnClickListener(commentOnClickListener);
 
         // If we click the thumbnail, get to the webview
-        holder.thumbnail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), WebViewActivity.class);
-                Bundle b = new Bundle();
-                b.putString("title", item.getTitle());
-                b.putString("shortUrl", item.getShortUrl());
-                b.putString("longUrl", item.getLongUrl());
-                intent.putExtras(b);
-                v.getContext().startActivity(intent);
-            }
-        });
+        if(item.getShortUrl().equals(context.getResources().getString(R.string.hacker_news_url_placeholder))){
+
+            // If it points to hacker news, we need to go to the commentCount instead
+            holder.thumbnail.setOnClickListener(commentOnClickListener);
+        } else {
+            holder.thumbnail.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(v.getContext(), WebViewActivity.class);
+                    Bundle b = new Bundle();
+                    b.putString("title", item.getTitle());
+                    b.putString("shortUrl", item.getShortUrl());
+                    b.putString("longUrl", item.getLongUrl());
+                    intent.putExtras(b);
+                    v.getContext().startActivity(intent);
+                }
+            });
+        }
 
         return convertView;
     }

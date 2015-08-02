@@ -44,7 +44,7 @@ public class FeedFragment extends Fragment {
     // Base URL for the hacker news API
     private Firebase baseUrl;
 
-    // Sub URL used for gathering comments
+    // Sub URL used for gathering commentCount
     private Firebase itemUrl;
 
     // Sub URL used for different stories
@@ -196,13 +196,15 @@ public class FeedFragment extends Fragment {
             for (int i = feedAdapter.getCount(); i < feedAdapter.getCount() + submissionUpdateNum && i < submissionIDs.size(); i++) {
 
                 // But we must first add each submission to the view manually
-                updateSingleSubmission(baseUrl.child("/item/" + submissionIDs.get(i)));
+                updateSingleSubmission(submissionIDs.get(i));
             }
         }
     }
 
     // Gets an url to a single submission and updates it in the feedadapter
-    public void updateSingleSubmission(Firebase submission){
+    public void updateSingleSubmission(final Long submissionId){
+
+        Firebase submission = baseUrl.child("/item/" + submissionId);
 
         submission.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -216,21 +218,22 @@ public class FeedFragment extends Fragment {
                 }
 
                 String url = (String) ret.get("url");
-                if(url == ""){url = "http://hackernews.com";}
-
                 URL site = null;
-                try {
-                    site = new URL(url);
-                } catch (MalformedURLException e) {
-                    System.err.println(e);
-                    return;
+
+                if(url != null){
+                    try {
+                        site = new URL(url);
+                    } catch (MalformedURLException e) {
+                        System.err.println(e);
+                        return;
+                    }
                 }
 
-                FeedItem f = initNewFeedItem(ret, site);
+                FeedItem f = initNewFeedItem(submissionId, ret, site);
                 feedAdapter.add(f);
                 feedAdapter.notifyDataSetChanged();
 
-                if(!url.contains("hackernews.com")) {
+                if(url != null) {
                     // Asynchronously updates images for the feed item
                     updateSubmissionThumbnail(site.getHost(), f);
                     updateSubmissionFavicon(site.getHost(), f);
@@ -245,9 +248,11 @@ public class FeedFragment extends Fragment {
     }
 
     // Takes the raw API data and the URL, returns a new feed item
-    public FeedItem initNewFeedItem(Map<String, Object> ret, URL site){
+    public FeedItem initNewFeedItem(Long submissionId, Map<String, Object> ret, URL site){
 
         FeedItem f = new FeedItem();
+
+        f.setSubmissionId(submissionId);
 
         // Gets readable date
         Date past = new Date((Long) ret.get("time") * 1000);
@@ -267,15 +272,15 @@ public class FeedFragment extends Fragment {
         f.setScore((Long) ret.get("score"));
         f.setTime(time);
 
-        String domain = site.getHost().replace("www.", "");
-        f.setShortUrl(domain);
-        f.setLongUrl(site.toString());
-
-        // We show the first letter of the url on the thumbnail
-        if(domain.equals("hackernews.com")){
-            f.setLetter("HN");
-        } else {
+        if(site != null) {
+            String domain = site.getHost().replace("www.", "");
+            f.setShortUrl(domain);
+            f.setLongUrl(site.toString());
             f.setLetter(domain.substring(0, 1));
+        } else {
+            // The hacker news submissions don't technically have an url, so we cheat
+            f.setShortUrl(getString(R.string.hacker_news_url_placeholder));
+            f.setLetter("HN");
         }
 
         // Generate TextDrawable thumbnail
@@ -288,7 +293,7 @@ public class FeedFragment extends Fragment {
     }
 
     // Goes through each comment for children and adds them to the count
-    // Since traversing all comments takes a lot of work, we do it in a separate task
+    // Since traversing all commentCount takes a lot of work, we do it in a separate task
     public void updateCommentCount(FeedItem feedItem, ArrayList<Long> kids){
 
         final FeedItem f = feedItem;
@@ -337,7 +342,7 @@ public class FeedFragment extends Fragment {
 
                 ArrayList<Long> kids = (ArrayList<Long>) ((Map<String, Object>) snapshot.getValue()).get("kids");
 
-                // Update child comments
+                // Update child commentCount
                 if (kids != null) {
 
                     fi.addCommentCount(kids.size());

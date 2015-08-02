@@ -3,7 +3,6 @@ package co.adrianblan.cheddar;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -33,7 +32,12 @@ public class CommentActivity extends AppCompatActivity {
 
     CommentAdapter commentAdapter;
     ArrayList<Long> kids;
-    int comments;
+    ListView lv;
+
+    Long submissionId;
+    Long points;
+    Long commentCount;
+    Long newCommentCount;
 
     // Base URL for the hacker news API
     private Firebase baseUrl;
@@ -48,7 +52,8 @@ public class CommentActivity extends AppCompatActivity {
         baseUrl = new Firebase("https://hacker-news.firebaseio.com/v0/item/");
 
         Bundle b = getIntent().getExtras();
-        kids = (ArrayList<Long>) b.getSerializable("kids");
+        submissionId = b.getLong("submissionId");
+        commentCount = b.getLong("commentCount");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_comment);
         setSupportActionBar(toolbar);
@@ -56,7 +61,7 @@ public class CommentActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(b.getString("title"));
 
         commentAdapter = new CommentAdapter(getApplicationContext());
-        ListView lv = (ListView) findViewById(R.id.activity_comment_list);
+        lv = (ListView) findViewById(R.id.activity_comment_list);
         lv.setAdapter(commentAdapter);
         lv.addHeaderView(initHeader(b));
 
@@ -78,10 +83,8 @@ public class CommentActivity extends AppCompatActivity {
         TextView score = (TextView) header.findViewById(R.id.feed_item_score);
         score.setText(Long.toString(b.getLong("score")));
 
-        if(kids != null) {
-            TextView comments = (TextView) header.findViewById(R.id.feed_item_comments);
-            comments.setText(Integer.toString(kids.size()));
-        }
+        TextView comments = (TextView) header.findViewById(R.id.feed_item_comments);
+        comments.setText(Long.toString(b.getLong("commentCount")));
 
         TextView time = (TextView) header.findViewById(R.id.feed_item_time);
         time.setText(b.getString("time"));
@@ -112,16 +115,46 @@ public class CommentActivity extends AppCompatActivity {
         return header;
     }
 
-    //TODO implement refresh
+    public void addCommentCount(int count){
+        newCommentCount += (long) count;
 
-    // Starts updating the comments from the top level
-    public void updateComments(){
-        if(kids != null) {
-            //TODO fix race condition
-            for (int i = 0; i < kids.size(); i++) {
-                updateComment(kids.get(i), null);
-            }
+        if(newCommentCount > commentCount){
+            commentCount = newCommentCount;
+
+            //Update header
         }
+    }
+
+    // Starts updating the commentCount from the top level
+    public void updateComments(){
+
+        newCommentCount = 0L;
+        commentAdapter.clear();
+
+        baseUrl.child(Long.toString(submissionId)).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+
+                // We retrieve all objects into a hashmap
+                Map<String, Object> ret = (Map<String, Object>) snapshot.getValue();
+                kids = (ArrayList<Long>) ret.get("kids");
+
+                if (kids != null) {
+
+                    addCommentCount(kids.size());
+
+                    //TODO fix race condition
+                    for (int i = 0; i < kids.size(); i++) {
+                        updateComment(kids.get(i), null);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                System.err.println("Could not retrieve post! " + firebaseError);
+            }
+        });
     }
 
     // Gets an url to a single comment
@@ -160,8 +193,10 @@ public class CommentActivity extends AppCompatActivity {
 
                 ArrayList<Long> kids = (ArrayList<Long>) ret.get("kids");
 
-                // Update child comments
+                // Update child commentCount
                 if (kids != null) {
+
+                    addCommentCount(kids.size());
 
                     // We're counting backwards since we are too lazy to fix a race condition
                     //TODO fix race condition
@@ -208,7 +243,7 @@ public class CommentActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.refresh) {
-
+            updateComments();
         }
 
         //noinspection SimplifiableIfStatement
