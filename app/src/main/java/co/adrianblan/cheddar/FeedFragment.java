@@ -65,10 +65,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     // Used to fill the space when viewpager minimizes
     View empty;
 
-    public Menu mToolbar;
-
-    public FeedFragment() {}
-
     public static FeedFragment newInstance() {
         FeedFragment f = new FeedFragment();
         Bundle b = new Bundle();
@@ -111,7 +107,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         listView.setScrollViewCallbacks(this);
 
         empty = inflater.inflate(R.layout.empty, listView, false);
-        updateHeaderPadding(((MainActivity)getActivity()).getSupportActionBar().isShowing());
+        updateHeaderPadding(true);
         listView.addHeaderView(empty);
 
         listView.setAdapter(feedAdapter);
@@ -527,7 +523,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         // We let each fragment create their own options menu
         // That way we can refresh the feeds individually
         inflater.inflate(R.menu.menu_main, menu);
-        mToolbar = menu;
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -571,16 +566,18 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     public void updateHeaderPadding(boolean show){
 
         if(empty == null) {
+            System.err.println("Can't update padding for empty view!");
             return;
         }
 
         if (show) {
             // Padding equivalent to both the toolabr and viewpager
-            empty.setPadding(0, (int) getResources().getDimension(R.dimen.toolbar_viewpager_combined_height), 0, 0);
+            int height = (int) getResources().getDimension(R.dimen.toolbar_height);
+            height += (int) getResources().getDimension(R.dimen.viewpager_height);
+            empty.setPadding(0, height, 0, 0);
         } else {
             // If we hide the toolbar, we need to reduce the padding to compensate
-            int height = (int) getResources().getDimension(R.dimen.toolbar_viewpager_combined_height);
-            height -= (int) getResources().getDimension(R.dimen.toolbar_height);
+            int height = (int) getActivity().getResources().getDimension(R.dimen.viewpager_height);
             empty.setPadding(0, height, 0, 0);
         }
     }

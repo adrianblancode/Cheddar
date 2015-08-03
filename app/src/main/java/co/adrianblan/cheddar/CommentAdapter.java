@@ -97,7 +97,7 @@ public class CommentAdapter extends BaseAdapter {
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.comment, parent, false);
             holder.title = (TextView) convertView.findViewById(R.id.comment_title);
-            holder.body = (TextView) convertView.findViewById(R.id.comment_body);
+            holder.body = (JellyBeanCompatTextView) convertView.findViewById(R.id.comment_body);
             holder.time = (TextView) convertView.findViewById(R.id.comment_time);
             holder.container = (LinearLayout) convertView.findViewById(R.id.comment);
             holder.indicator = (LinearLayout) convertView.findViewById(R.id.comment_indicator);

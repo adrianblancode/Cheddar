@@ -113,7 +113,8 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
             imageView.setImageDrawable(drawable);
         }
 
-        if(feedItem.getShortUrl() != null){
+        // If the url doesn't go to hacker news
+        if(feedItem.getLongUrl() != null){
             LinearLayout image_container = (LinearLayout) header.findViewById(R.id.feed_item_thumbnail_container);
             // If we click the thumbnail, get to the webview
             image_container.setOnClickListener(new View.OnClickListener() {
@@ -273,7 +274,13 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
-        menuInflater.inflate(R.menu.menu_comments, menu);
+
+        // If we don't have an Url, we make sure you can't go to the webview
+        if(feedItem.getLongUrl() != null) {
+            menuInflater.inflate(R.menu.menu_comments, menu);
+        } else {
+            menuInflater.inflate(R.menu.menu_main, menu);
+        }
         return true;
     }
 
