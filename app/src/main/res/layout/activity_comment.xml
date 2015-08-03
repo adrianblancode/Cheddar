@@ -13,6 +13,17 @@
         android:layout_height="wrap_content">
     </com.github.ksoichiro.android.observablescrollview.ObservableListView>
 
+    <TextView
+        android:id="@+id/activity_comment_none"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:gravity="center_horizontal"
+        style="@style/Base.TextAppearance.AppCompat.Body1"
+        android:textColor="@color/abc_primary_text_material_light"
+        android:text="There are no comments to load."/>
+
     <android.support.v7.widget.Toolbar
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/toolbar_comment"

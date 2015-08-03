@@ -1,5 +1,6 @@
 package co.adrianblan.cheddar;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -79,7 +80,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         setHasOptionsMenu(true);
 
         // Init API stuff
-        Firebase.setAndroidContext(getActivity());
+        Firebase.setAndroidContext(getActivity().getApplicationContext());
         baseUrl = new Firebase("https://hacker-news.firebaseio.com/v0/");
         itemUrl = baseUrl.child("/item/");
         storiesUrl = baseUrl.child(getArguments().getString("url"));
@@ -92,7 +93,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         } else {
             // Restore saved data
             ArrayList<FeedItem> feedItems = (ArrayList<FeedItem>) savedInstanceState.getSerializable("feedItems");
-            feedAdapter = new FeedAdapter(feedItems, getActivity());
+            feedAdapter = new FeedAdapter(feedItems, getActivity().getApplicationContext());
         }
 
         // Gets all the submissions and populates the list with them
@@ -144,7 +145,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             }
         });
 
-        ProgressBar circle = new ProgressBar(getActivity());
+        ProgressBar circle = new ProgressBar(getActivity().getApplicationContext());
         circle.setPadding(0, 65, 0, 65);
         circle.setIndeterminate(true);
         listView.addFooterView(circle);
@@ -299,9 +300,9 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
 
         // Generate TextDrawable thumbnail
         TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
-        TextDrawable drawable = builder.buildRect(f.getLetter(), getActivity().getResources().getColor(R.color.colorPrimary));
+        TextDrawable drawable = builder.buildRect(f.getLetter(), getActivity().getApplicationContext().getResources().getColor(R.color.colorPrimary));
         f.setTextDrawable(drawable);
-        f.setColor(getActivity().getResources().getColor(R.color.colorPrimary));
+        f.setColor(getActivity().getApplicationContext().getResources().getColor(R.color.colorPrimary));
 
         return f;
     }
@@ -414,13 +415,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
                             return;
                         }
 
-                        // We can't pass through too much data through intents (terrible)
-                        if (loadedImage.getHeight() > 100 || loadedImage.getWidth() > 100) {
-                            feedAdapter.getItem(position).setThumbnail(Bitmap.createScaledBitmap(loadedImage, 100, 100, false));
-                        } else {
-                            feedAdapter.getItem(position).setThumbnail(loadedImage);
-                        }
-
+                        feedAdapter.getItem(position).setThumbnail(loadedImage);
                         feedAdapter.notifyDataSetChanged();
                     }
                 });
@@ -550,7 +545,13 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
 
     @Override
     public void onUpOrCancelMotionEvent(ScrollState scrollState) {
-        ActionBar ab = ((MainActivity)getActivity()).getSupportActionBar();
+        MainActivity main = (MainActivity)getActivity();
+        if(main == null){
+            return;
+        }
+
+        ActionBar ab = main.getSupportActionBar();
+
         if (scrollState == ScrollState.UP) {
             if (ab.isShowing()) {
                 ab.hide();
@@ -579,7 +580,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             empty.setPadding(0, height, 0, 0);
         } else {
             // If we hide the toolbar, we need to reduce the padding to compensate
-            int height = (int) getActivity().getResources().getDimension(R.dimen.viewpager_height);
+            int height = (int) getActivity().getApplicationContext().getResources().getDimension(R.dimen.viewpager_height);
             empty.setPadding(0, height, 0, 0);
         }
     }
@@ -601,13 +602,13 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
 
     private boolean toolbarIsShown() {
         // Toolbar is 0 in Y-axis, so we can say it's shown.
-        return ((MainActivity)getActivity()).findViewById(R.id.toolbar_main).getTranslationY() == 0;
+        return ((MainActivity)getActivity().getApplicationContext()).findViewById(R.id.toolbar_main).getTranslationY() == 0;
     }
 
     private boolean toolbarIsHidden() {
         // Toolbar is outside of the screen and absolute Y matches the height of it.
         // So we can say it's hidden.
-        View mToolbar = ((MainActivity)getActivity()).findViewById(R.id.toolbar_main);
+        View mToolbar = ((MainActivity)getActivity().getApplicationContext()).findViewById(R.id.toolbar_main);
         return mToolbar.getTranslationY() == -mToolbar.getHeight();
     }
 

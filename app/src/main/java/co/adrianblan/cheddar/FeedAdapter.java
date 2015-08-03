@@ -119,9 +119,13 @@ public class FeedAdapter extends BaseAdapter {
         if(item.getThumbnail() != null){
             holder.thumbnail.setImageBitmap(item.getThumbnail());
         } else if (item.getTextDrawable() != null) {
-
             // Otherwise, just use the TextDrawable
             holder.thumbnail.setImageDrawable(item.getTextDrawable());
+        } else {
+            // Generate TextDrawable thumbnail
+            TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
+            TextDrawable drawable = builder.buildRect(item.getLetter(), item.getColor());
+            item.setTextDrawable(drawable);
         }
 
 
@@ -129,10 +133,21 @@ public class FeedAdapter extends BaseAdapter {
         View.OnClickListener commentOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Bitmap thumbnail = item.getThumbnail();
+
+                if(thumbnail != null) {
+
+                    // We can't pass through too much data through intents (terrible)
+                    if (thumbnail.getHeight() > 100 || thumbnail.getWidth() > 100) {
+                        thumbnail = Bitmap.createScaledBitmap(thumbnail, 100, 100, false);
+                    }
+                }
+
                 Intent intent = new Intent(v.getContext(), CommentActivity.class);
                 Bundle b = new Bundle();
                 b.putSerializable("feedItem", item);
-                intent.putExtra("thumbnail", item.getThumbnail());
+                intent.putExtra("thumbnail", thumbnail);
                 intent.putExtras(b);
                 v.getContext().startActivity(intent);
             }
@@ -151,10 +166,17 @@ public class FeedAdapter extends BaseAdapter {
             holder.thumbnail.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
+                    Bitmap thumbnail = item.getThumbnail();
+                    // We can't pass through too much data through intents (terrible)
+                    if (thumbnail.getHeight() > 100 || thumbnail.getWidth() > 100) {
+                        thumbnail = Bitmap.createScaledBitmap(thumbnail, 100, 100, false);
+                    }
+
                     Intent intent = new Intent(v.getContext(), WebViewActivity.class);
                     Bundle b = new Bundle();
                     b.putSerializable("feedItem", item);
-                    intent.putExtra("thumbnail", item.getThumbnail());
+                    intent.putExtra("thumbnail", thumbnail);
                     intent.putExtras(b);
                     v.getContext().startActivity(intent);
                 }

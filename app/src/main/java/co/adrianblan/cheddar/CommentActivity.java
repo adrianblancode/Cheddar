@@ -46,6 +46,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
     Bitmap thumbnail;
 
     View header;
+    View no_comments;
 
     // Base URL for the hacker news API
     private Firebase baseUrl;
@@ -83,6 +84,8 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         lv.addHeaderView(initHeader(feedItem));
         lv.setAdapter(commentAdapter);
 
+        no_comments = (TextView) findViewById(R.id.activity_comment_none);
+
         updateComments();
     }
 
@@ -112,10 +115,17 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         ImageView imageView = (ImageView) header.findViewById(R.id.feed_item_thumbnail);
         if(thumbnail != null){
             imageView.setImageBitmap(thumbnail);
+        } else if (feedItem.getTextDrawable() != null){
+            imageView.setImageDrawable(feedItem.getTextDrawable());
         } else {
+            // Generate TextDrawable if we don't have one
             TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
             TextDrawable drawable = builder.buildRect(feedItem.getLetter(), feedItem.getColor());
             imageView.setImageDrawable(drawable);
+
+            if(feedItem.getTextDrawable() == null){
+                feedItem.setTextDrawable(drawable);
+            }
         }
 
         // If the url doesn't go to hacker news
@@ -173,6 +183,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
 
                 if (kids != null) {
 
+                    no_comments.setVisibility(View.GONE);
                     newCommentCount += kids.size();
                     updateHeader();
 
@@ -180,12 +191,18 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
                     for (int i = 0; i < kids.size(); i++) {
                         updateSingleComment(kids.get(i), null);
                     }
+                } else {
+                    updateHeader();
+
+                    //If we can't load any posts, we show a warning
+                    no_comments.setVisibility(View.VISIBLE);
                 }
             }
 
             @Override
             public void onCancelled(FirebaseError firebaseError) {
                 System.err.println("Could not retrieve post! " + firebaseError);
+                no_comments.setVisibility(View.VISIBLE);
             }
         });
     }
