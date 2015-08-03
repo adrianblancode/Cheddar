@@ -56,7 +56,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         setContentView(R.layout.activity_comment);
 
         // Init API stuff
-        Firebase.setAndroidContext(getApplicationContext());
+        Firebase.setAndroidContext(this);
         baseUrl = new Firebase("https://hacker-news.firebaseio.com/v0/item/");
 
         Bundle b = getIntent().getExtras();
@@ -84,7 +84,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
     // Initializes the submission header with data
     public View initHeader(final FeedItem feedItem){
 
-        header = View.inflate(getApplicationContext(), R.layout.feed_item, null);
+        header = View.inflate(this, R.layout.feed_item, null);
 
         TextView title = (TextView) header.findViewById(R.id.feed_item_title);
         title.setText(feedItem.getTitle());
@@ -289,7 +289,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         }
 
         if(id == R.id.menu_webview){
-            Intent intent = new Intent(getApplicationContext(), WebViewActivity.class);
+            Intent intent = new Intent(this, WebViewActivity.class);
             Bundle b = new Bundle();
             b.putSerializable("feedItem", feedItem);
             intent.putExtra("thumbnail", thumbnail);

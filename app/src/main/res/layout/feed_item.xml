@@ -14,13 +14,14 @@
         android:paddingRight="0dp"
         android:orientation="vertical"
         android:gravity="top"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackground">
 
         <TextView
             android:id="@+id/feed_item_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Godzilla sighted in New York!"
+            android:text="Godzilla sighted in New York! aaaaaaaaaaaaaAAAAAAAAAAAaaaaaaaaaaaaaaa"
             style="@style/Base.TextAppearance.AppCompat.Body1"
             android:textColor="@color/abc_primary_text_material_light"
             android:textSize="17dp"/>
@@ -102,12 +103,13 @@
         android:id="@+id/feed_item_thumbnail_container"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_weight="1">
+        android:padding="10dp"
+        android:layout_weight="1"
+        android:background="?attr/selectableItemBackground">
         <ImageView
             android:id="@+id/feed_item_thumbnail"
-            android:layout_width="92dp"
-            android:layout_height="92dp"
-            android:padding="10dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             android:layout_alignParentRight="true"
             android:layout_gravity="right"
             android:src="@drawable/ic_broken_image_black_24dp"/>
