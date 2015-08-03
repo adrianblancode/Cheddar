@@ -63,6 +63,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     private Date lastSubmissionUpdate;
     private final int submissionUpdateTime = 3;
     private final int submissionUpdateNum = 15;
+    int loadedSubmissions;
 
     // Used to fill the space when viewpager minimizes
     View empty;
@@ -95,6 +96,8 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             ArrayList<FeedItem> feedItems = (ArrayList<FeedItem>) savedInstanceState.getSerializable("feedItems");
             feedAdapter = new FeedAdapter(feedItems, getActivity().getApplicationContext());
         }
+
+        loadedSubmissions = feedAdapter.getCount();
 
         // Gets all the submissions and populates the list with them
         updateSubmissions();
@@ -176,6 +179,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             // We also cancel all image fetching
             ImageLoader.getInstance().stop();
 
+            loadedSubmissions = 0;
             submissionIDs = null;
             feedAdapter.clear();
             feedAdapter.notifyDataSetChanged();
@@ -209,11 +213,13 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             });
         } else {
 
-            // From the top 500 submissions, we only load a few at a time
-            for (int i = feedAdapter.getCount(); i < feedAdapter.getCount() + submissionUpdateNum && i < submissionIDs.size(); i++) {
+            // We cannot use feedAdapter.getCount() directly since that may lead to race conditions
+            int start = loadedSubmissions;
 
+            // From the top 500 submissions, we only load a few at a time
+            for (; loadedSubmissions < start + submissionUpdateNum && loadedSubmissions < submissionIDs.size(); loadedSubmissions++) {
                 // But we must first add each submission to the view manually
-                updateSingleSubmission(submissionIDs.get(i));
+                updateSingleSubmission(submissionIDs.get(loadedSubmissions));
             }
         }
     }
