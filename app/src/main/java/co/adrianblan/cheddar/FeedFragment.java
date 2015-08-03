@@ -1,13 +1,11 @@
 package co.adrianblan.cheddar;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.graphics.Palette;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -26,6 +23,7 @@ import com.firebase.client.ValueEventListener;
 import com.github.ksoichiro.android.observablescrollview.ObservableListView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
+import com.nineoldandroids.view.ViewHelper;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
@@ -66,6 +64,8 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
 
     // Used to fill the space when viewpager minimizes
     View empty;
+
+    public Menu mToolbar;
 
     public FeedFragment() {}
 
@@ -109,11 +109,12 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
 
         ObservableListView listView = (ObservableListView) rootView.findViewById(R.id.feed_list);
         listView.setScrollViewCallbacks(this);
-        listView.setAdapter(feedAdapter);
 
-        empty = inflater.inflate(R.layout.empty, container,false);
+        empty = inflater.inflate(R.layout.empty, listView, false);
         updateHeaderPadding(((MainActivity)getActivity()).getSupportActionBar().isShowing());
         listView.addHeaderView(empty);
+
+        listView.setAdapter(feedAdapter);
 
         //If we scroll to the end, we simply fetch more submissions
         listView.setOnScrollListener(new AbsListView.OnScrollListener() {
@@ -526,6 +527,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         // We let each fragment create their own options menu
         // That way we can refresh the feeds individually
         inflater.inflate(R.menu.menu_main, menu);
+        mToolbar = menu;
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -596,5 +598,17 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
                 updateHeaderPadding(ab.isShowing());
             }
         }
+    }
+
+    private boolean toolbarIsShown() {
+        // Toolbar is 0 in Y-axis, so we can say it's shown.
+        return ((MainActivity)getActivity()).findViewById(R.id.toolbar_main).getTranslationY() == 0;
+    }
+
+    private boolean toolbarIsHidden() {
+        // Toolbar is outside of the screen and absolute Y matches the height of it.
+        // So we can say it's hidden.
+        View mToolbar = ((MainActivity)getActivity()).findViewById(R.id.toolbar_main);
+        return mToolbar.getTranslationY() == -mToolbar.getHeight();
     }
 }

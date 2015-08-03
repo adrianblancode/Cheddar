@@ -7,6 +7,12 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <com.github.ksoichiro.android.observablescrollview.ObservableListView
+        android:id="@+id/activity_comment_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </com.github.ksoichiro.android.observablescrollview.ObservableListView>
+
     <android.support.v7.widget.Toolbar
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/toolbar_comment"
@@ -15,10 +21,4 @@
         android:background="@color/colorPrimary"
         android:theme="@style/ThemeOverlay.AppCompat.Dark"
         android:elevation="4dp"/>
-
-    <com.github.ksoichiro.android.observablescrollview.ObservableListView
-        android:id="@+id/activity_comment_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-    </com.github.ksoichiro.android.observablescrollview.ObservableListView>
 </FrameLayout>

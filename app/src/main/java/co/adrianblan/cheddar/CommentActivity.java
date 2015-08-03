@@ -75,8 +75,8 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         commentAdapter = new CommentAdapter(this, feedItem.getBy());
         ObservableListView lv = (ObservableListView) findViewById(R.id.activity_comment_list);
         lv.setScrollViewCallbacks(this);
-        lv.setAdapter(commentAdapter);
         lv.addHeaderView(initHeader(feedItem));
+        lv.setAdapter(commentAdapter);
 
         updateComments();
     }
@@ -337,7 +337,6 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
 
     // Updates the padding on header to compensate for what is visible on the screen
     public void updateHeaderPadding(boolean show){
-        ActionBar ab = getSupportActionBar();
         if (show) {
             header.setPadding(0, (int) getResources().getDimension(R.dimen.toolbar_height), 0, 0);
         } else {
