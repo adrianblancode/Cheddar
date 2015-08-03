@@ -27,6 +27,7 @@ import com.nineoldandroids.view.ViewHelper;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -76,7 +77,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        setRetainInstance(true);
 
         // Init API stuff
         Firebase.setAndroidContext(getActivity());
@@ -84,17 +84,19 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         itemUrl = baseUrl.child("/item/");
         storiesUrl = baseUrl.child(getArguments().getString("url"));
 
-        feedAdapter = new FeedAdapter(getActivity());
         asyncTasks = new ArrayList<AsyncTask>();
         lastSubmissionUpdate = new Date();
 
+        if(savedInstanceState == null) {
+            feedAdapter = new FeedAdapter(getActivity());
+        } else {
+            // Restore saved data
+            ArrayList<FeedItem> feedItems = (ArrayList<FeedItem>) savedInstanceState.getSerializable("feedItems");
+            feedAdapter = new FeedAdapter(feedItems, getActivity());
+        }
+
         // Gets all the submissions and populates the list with them
         updateSubmissions();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle savedState) {
-        super.onSaveInstanceState(savedState);
     }
 
     @Override
@@ -607,5 +609,13 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         // So we can say it's hidden.
         View mToolbar = ((MainActivity)getActivity()).findViewById(R.id.toolbar_main);
         return mToolbar.getTranslationY() == -mToolbar.getHeight();
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        // Save data
+        savedInstanceState.putSerializable("feedItems", feedAdapter.getFeedItems());
     }
 }

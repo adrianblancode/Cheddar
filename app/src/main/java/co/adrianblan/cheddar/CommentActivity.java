@@ -59,8 +59,13 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         Firebase.setAndroidContext(this);
         baseUrl = new Firebase("https://hacker-news.firebaseio.com/v0/item/");
 
-        Bundle b = getIntent().getExtras();
-        feedItem = (FeedItem) b.getSerializable("feedItem");
+
+        if(savedInstanceState != null){
+            feedItem = (FeedItem) savedInstanceState.getSerializable("feedItem");
+        } else {
+            Bundle b = getIntent().getExtras();
+            feedItem = (FeedItem) b.getSerializable("feedItem");
+        }
 
         if(feedItem == null){
             System.err.println("Passed null arguments into CommentActivity!");
@@ -308,11 +313,6 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedState) {
-        super.onSaveInstanceState(savedState);
-    }
-
-    @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         // We do nothing here. We're only handling this to keep orientation
@@ -350,5 +350,13 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
             // If we hide the toolbar, we need to reduce the padding to compensate
             header.setPadding(0, 0, 0, 0);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        // Save data
+        savedInstanceState.putSerializable("feedItem", feedItem);
     }
 }

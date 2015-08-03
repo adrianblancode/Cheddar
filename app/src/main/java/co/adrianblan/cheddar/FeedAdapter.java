@@ -21,11 +21,21 @@ import java.util.ArrayList;
  */
 public class FeedAdapter extends BaseAdapter {
 
-    private ArrayList<FeedItem> feedItems = new ArrayList<FeedItem>();
+    private ArrayList<FeedItem> feedItems;
     private final Context context;
 
     public FeedAdapter(Context c) {
+        feedItems = new ArrayList<FeedItem>();
         context = c;
+    }
+
+    public FeedAdapter(ArrayList<FeedItem> fi, Context c) {
+        feedItems = fi;
+        context = c;
+    }
+
+    public ArrayList<FeedItem> getFeedItems(){
+        return feedItems;
     }
 
     public void add (FeedItem f){
@@ -115,6 +125,7 @@ public class FeedAdapter extends BaseAdapter {
         }
 
 
+        // Comment listener
         View.OnClickListener commentOnClickListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -122,17 +133,16 @@ public class FeedAdapter extends BaseAdapter {
                 Bundle b = new Bundle();
                 b.putSerializable("feedItem", item);
                 intent.putExtra("thumbnail", item.getThumbnail());
-
                 intent.putExtras(b);
                 v.getContext().startActivity(intent);
             }
         };
 
         // TODO move onclick listeners to somewhere that makes sense?
-        // If we click the body, get to the commentCount
+        // Comment, click on body
         holder.body.setOnClickListener(commentOnClickListener);
 
-        // If we click the thumbnail, get to the webview
+        // Webview, click on thumbnail
         if(item.getShortUrl().equals(context.getResources().getString(R.string.hacker_news_url_placeholder))){
 
             // If it points to hacker news, we need to go to the commentCount instead
