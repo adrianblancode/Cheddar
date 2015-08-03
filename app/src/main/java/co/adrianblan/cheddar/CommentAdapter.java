@@ -117,7 +117,7 @@ public class CommentAdapter extends BaseAdapter {
             holder.title.setTextColor(context.getResources().getColor(R.color.colorPrimary));
             holder.title.setText(holder.title.getText() + " [OP]");
         } else {
-            holder.title.setTextColor(context.getResources().getColor(R.color.abc_primary_text_material_light));
+            holder.title.setTextColor(context.getResources().getColor(R.color.abc_secondary_text_material_light));
         }
 
         if(com.getBody() != null) {
@@ -135,7 +135,7 @@ public class CommentAdapter extends BaseAdapter {
 
         // We don't need the indicator for top level commentCount
         if(com.getHierarchy() == 0){
-            holder.indicator.setVisibility(View.GONE);
+            holder.indicator.setVisibility(View.INVISIBLE);
         } else {
             // Use modulo to get the appropriate color
             int color = colors.get((com.getHierarchy() - 1) % colors.size());

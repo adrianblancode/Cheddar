@@ -112,7 +112,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         listView.setAdapter(feedAdapter);
 
         empty = inflater.inflate(R.layout.empty, container,false);
-        empty.setPadding(0, (int) dpToPixels(105, getActivity()), 0, 0);
+        updateHeaderPadding(((MainActivity)getActivity()).getSupportActionBar().isShowing());
         listView.addHeaderView(empty);
 
         //If we scroll to the end, we simply fetch more submissions
@@ -555,19 +555,46 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         if (scrollState == ScrollState.UP) {
             if (ab.isShowing()) {
                 ab.hide();
-                empty.setPadding(0, (int) dpToPixels(50, getActivity()), 0, 0);
+                updateHeaderPadding(false);
             }
         } else if (scrollState == ScrollState.DOWN) {
             if (!ab.isShowing()) {
                 ab.show();
-                empty.setPadding(0, (int) dpToPixels(105, getActivity()), 0, 0);
+                updateHeaderPadding(true);
             }
         }
     }
 
-    public static float dpToPixels(float dp, Context context){
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
-        return px;
+    // Updates the padding on header to compensate for what is visible on the screen
+    public void updateHeaderPadding(boolean show){
+
+        if(empty == null) {
+            return;
+        }
+
+        if (show) {
+            // Padding equivalent to both the toolabr and viewpager
+            empty.setPadding(0, (int) getResources().getDimension(R.dimen.toolbar_viewpager_combined_height), 0, 0);
+        } else {
+            // If we hide the toolbar, we need to reduce the padding to compensate
+            int height = (int) getResources().getDimension(R.dimen.toolbar_viewpager_combined_height);
+            height -= (int) getResources().getDimension(R.dimen.toolbar_height);
+            empty.setPadding(0, height, 0, 0);
+        }
+    }
+
+    // When we put a fragment into view, we also need to adjust the padding
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+
+        MainActivity m = ((MainActivity)getActivity());
+
+        if(m != null) {
+            ActionBar ab = m.getSupportActionBar();
+            if (ab != null) {
+                updateHeaderPadding(ab.isShowing());
+            }
+        }
     }
 }

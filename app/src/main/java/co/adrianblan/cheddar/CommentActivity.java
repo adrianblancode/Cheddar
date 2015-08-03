@@ -1,16 +1,20 @@
 package co.adrianblan.cheddar;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -19,6 +23,9 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.github.ksoichiro.android.observablescrollview.ObservableListView;
+import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
+import com.github.ksoichiro.android.observablescrollview.ScrollState;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,7 +35,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Adrian on 2015-07-29.
  */
-public class CommentActivity extends AppCompatActivity {
+public class CommentActivity extends AppCompatActivity implements ObservableScrollViewCallbacks {
 
     CommentAdapter commentAdapter;
     ArrayList<Long> kids;
@@ -65,8 +72,9 @@ public class CommentActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(feedItem.getTitle());
 
-        commentAdapter = new CommentAdapter(getApplicationContext(), feedItem.getBy());
-        ListView lv = (ListView) findViewById(R.id.activity_comment_list);
+        commentAdapter = new CommentAdapter(this, feedItem.getBy());
+        ObservableListView lv = (ObservableListView) findViewById(R.id.activity_comment_list);
+        lv.setScrollViewCallbacks(this);
         lv.setAdapter(commentAdapter);
         lv.addHeaderView(initHeader(feedItem));
 
@@ -96,18 +104,19 @@ public class CommentActivity extends AppCompatActivity {
         thumbnail = (Bitmap) getIntent().getParcelableExtra("thumbnail");
 
         // Generate new TextDrawable
-        ImageView im = (ImageView) header.findViewById(R.id.feed_item_thumbnail);
+        ImageView imageView = (ImageView) header.findViewById(R.id.feed_item_thumbnail);
         if(thumbnail != null){
-            im.setImageBitmap(thumbnail);
+            imageView.setImageBitmap(thumbnail);
         } else {
             TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
             TextDrawable drawable = builder.buildRect(feedItem.getLetter(), feedItem.getColor());
-            im.setImageDrawable(drawable);
+            imageView.setImageDrawable(drawable);
         }
 
         if(feedItem.getShortUrl() != null){
+            LinearLayout image_container = (LinearLayout) header.findViewById(R.id.feed_item_thumbnail_container);
             // If we click the thumbnail, get to the webview
-            im.setOnClickListener(new View.OnClickListener() {
+            image_container.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(v.getContext(), WebViewActivity.class);
@@ -119,6 +128,9 @@ public class CommentActivity extends AppCompatActivity {
                 }
             });
         }
+
+        //Add padding so that we compensate for the Toolbar
+        updateHeaderPadding(true);
 
         return header;
     }
@@ -299,5 +311,38 @@ public class CommentActivity extends AppCompatActivity {
         // We do nothing here. We're only handling this to keep orientation
         // or keyboard hiding from causing the WebView activity to restart.
         // Yes, this is terrible
+    }
+
+    @Override
+    public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {}
+
+    @Override
+    public void onDownMotionEvent() {}
+
+    @Override
+    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
+        ActionBar ab = getSupportActionBar();
+        if (scrollState == ScrollState.UP) {
+            if (ab.isShowing()) {
+                ab.hide();
+                updateHeaderPadding(false);
+            }
+        } else if (scrollState == ScrollState.DOWN) {
+            if (!ab.isShowing()) {
+                ab.show();
+                updateHeaderPadding(true);
+            }
+        }
+    }
+
+    // Updates the padding on header to compensate for what is visible on the screen
+    public void updateHeaderPadding(boolean show){
+        ActionBar ab = getSupportActionBar();
+        if (show) {
+            header.setPadding(0, (int) getResources().getDimension(R.dimen.toolbar_height), 0, 0);
+        } else {
+            // If we hide the toolbar, we need to reduce the padding to compensate
+            header.setPadding(0, 0, 0, 0);
+        }
     }
 }
