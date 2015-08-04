@@ -63,7 +63,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     private Date lastSubmissionUpdate;
     private final int submissionUpdateTime = 3;
     private final int submissionUpdateNum = 15;
-    int loadedSubmissions;
+    int loadedSubmissions = -1;
 
     // Used to fill the space when viewpager minimizes
     View empty;
@@ -96,11 +96,12 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             ArrayList<FeedItem> feedItems = (ArrayList<FeedItem>) savedInstanceState.getSerializable("feedItems");
             feedAdapter = new FeedAdapter(feedItems, getActivity());
         }
+    }
 
+    @Override
+    public void onStart(){
+        super.onStart();
         loadedSubmissions = feedAdapter.getCount();
-
-        // Gets all the submissions and populates the list with them
-        updateSubmissions();
     }
 
     @Override
@@ -603,6 +604,12 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             if (ab != null) {
                 updateHeaderPadding(ab.isShowing());
             }
+        }
+
+        // We prevent autoloading from non-visible views
+        if(loadedSubmissions == 0) {
+            // Gets all the submissions and populates the list with them
+            updateSubmissions();
         }
     }
 

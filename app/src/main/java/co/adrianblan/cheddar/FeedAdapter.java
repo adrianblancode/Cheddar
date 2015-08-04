@@ -138,9 +138,12 @@ public class FeedAdapter extends BaseAdapter {
 
                 if(thumbnail != null) {
 
+                    final int maxThumbnailSize = 144;
+
                     // We can't pass through too much data through intents (terrible)
-                    if (thumbnail.getHeight() > 100 || thumbnail.getWidth() > 100) {
-                        thumbnail = Bitmap.createScaledBitmap(thumbnail, 100, 100, false);
+                    // Wordpress has something silly like 512x512 px
+                    if (thumbnail.getHeight() > maxThumbnailSize || thumbnail.getWidth() > maxThumbnailSize) {
+                        thumbnail = Bitmap.createScaledBitmap(thumbnail, maxThumbnailSize, maxThumbnailSize, false);
                     }
                 }
 
