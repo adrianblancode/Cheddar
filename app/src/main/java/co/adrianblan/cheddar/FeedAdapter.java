@@ -149,7 +149,9 @@ public class FeedAdapter extends BaseAdapter {
                 b.putSerializable("feedItem", item);
                 intent.putExtra("thumbnail", thumbnail);
                 intent.putExtras(b);
-                v.getContext().startActivity(intent);
+                context.startActivity(intent);
+                
+                //TODO // FIXME: 2015-08-04 
             }
         };
 
@@ -178,7 +180,7 @@ public class FeedAdapter extends BaseAdapter {
                     b.putSerializable("feedItem", item);
                     intent.putExtra("thumbnail", thumbnail);
                     intent.putExtras(b);
-                    v.getContext().startActivity(intent);
+                    context.startActivity(intent);
                 }
             });
         }

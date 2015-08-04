@@ -94,7 +94,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         } else {
             // Restore saved data
             ArrayList<FeedItem> feedItems = (ArrayList<FeedItem>) savedInstanceState.getSerializable("feedItems");
-            feedAdapter = new FeedAdapter(feedItems, getActivity().getApplicationContext());
+            feedAdapter = new FeedAdapter(feedItems, getActivity());
         }
 
         loadedSubmissions = feedAdapter.getCount();
