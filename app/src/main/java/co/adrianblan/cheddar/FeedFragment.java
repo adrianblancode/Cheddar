@@ -96,12 +96,13 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             ArrayList<FeedItem> feedItems = (ArrayList<FeedItem>) savedInstanceState.getSerializable("feedItems");
             feedAdapter = new FeedAdapter(feedItems, getActivity());
         }
-    }
 
-    @Override
-    public void onStart(){
-        super.onStart();
         loadedSubmissions = feedAdapter.getCount();
+
+        // Only load submissions if the fragment is visible
+        if(getUserVisibleHint() && loadedSubmissions == 0){
+            updateSubmissions();
+        }
     }
 
     @Override
@@ -599,6 +600,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
 
         MainActivity m = ((MainActivity)getActivity());
 
+        // If the fragment comes into view, update padding
         if(m != null) {
             ActionBar ab = m.getSupportActionBar();
             if (ab != null) {
@@ -606,7 +608,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             }
         }
 
-        // We prevent autoloading from non-visible views
+        // If the fragment comes into view, get submissions if empty
         if(loadedSubmissions == 0) {
             // Gets all the submissions and populates the list with them
             updateSubmissions();
