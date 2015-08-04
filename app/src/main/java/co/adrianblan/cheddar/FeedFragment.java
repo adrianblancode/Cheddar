@@ -100,7 +100,8 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         loadedSubmissions = feedAdapter.getCount();
 
         // Only load submissions if the fragment is visible
-        if(getUserVisibleHint() && loadedSubmissions == 0){
+        // Only updates after activity gets set to avoid NullPointerException
+        if(loadedSubmissions == 0){
             updateSubmissions();
         }
     }
@@ -302,15 +303,14 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             f.setLetter(domain.substring(0, 1));
         } else {
             // The hacker news submissions don't technically have an url, so we cheat
-            f.setShortUrl(getString(R.string.hacker_news_url_placeholder));
+            f.setShortUrl("Hacker News");
             f.setLetter("HN");
         }
 
         // Generate TextDrawable thumbnail
         TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
-        TextDrawable drawable = builder.buildRect(f.getLetter(), getActivity().getApplicationContext().getResources().getColor(R.color.colorPrimary));
+        TextDrawable drawable = builder.buildRect(f.getLetter(), f.getColor());
         f.setTextDrawable(drawable);
-        f.setColor(getActivity().getApplicationContext().getResources().getColor(R.color.colorPrimary));
 
         return f;
     }
@@ -611,7 +611,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         // If the fragment comes into view, get submissions if empty
         if(loadedSubmissions == 0) {
             // Gets all the submissions and populates the list with them
-            updateSubmissions();
+            //updateSubmissions();
         }
     }
 

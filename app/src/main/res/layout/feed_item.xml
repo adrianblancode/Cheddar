@@ -22,12 +22,13 @@
             android:id="@+id/feed_item_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Godzilla sighted in New York!"
+            android:text="Title"
             style="@style/Base.TextAppearance.AppCompat.Body2"
             android:textColor="@color/abc_primary_text_material_light"
             android:textSize="17dp"/>
 
         <LinearLayout
+            android:id="@+id/feed_item_shortUrl_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="0.8dp"
@@ -37,12 +38,13 @@
                 android:id="@+id/feed_item_shortUrl"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="dailymail.com"
+                android:text="Hacker News"
                 style="@style/Base.TextAppearance.AppCompat.Body1"
                 android:textColor="@color/abc_secondary_text_material_light"/>
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/feed_icons_container"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal">

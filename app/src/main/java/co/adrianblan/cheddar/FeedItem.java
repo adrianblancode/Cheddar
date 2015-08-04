@@ -39,7 +39,8 @@ public class FeedItem implements Serializable {
         this.thumbnail = null;
         this.textDrawable = null;
         this.letter = "?";
-        this.color = Color.DKGRAY;
+        this.color = -39424;
+        // Our primary color, hax to get around fragment lifecycles
     }
 
     public Long getSubmissionId() {
