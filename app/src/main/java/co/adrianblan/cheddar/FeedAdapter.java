@@ -173,9 +173,11 @@ public class FeedAdapter extends BaseAdapter {
                 public void onClick(View v) {
 
                     Bitmap thumbnail = item.getThumbnail();
-                    // We can't pass through too much data through intents (terrible)
-                    if (thumbnail.getHeight() > 100 || thumbnail.getWidth() > 100) {
-                        thumbnail = Bitmap.createScaledBitmap(thumbnail, 100, 100, false);
+                    if(thumbnail != null) {
+                        // We can't pass through too much data through intents (terrible)
+                        if (thumbnail.getHeight() > 100 || thumbnail.getWidth() > 100) {
+                            thumbnail = Bitmap.createScaledBitmap(thumbnail, 100, 100, false);
+                        }
                     }
 
                     Intent intent = new Intent(v.getContext(), WebViewActivity.class);
