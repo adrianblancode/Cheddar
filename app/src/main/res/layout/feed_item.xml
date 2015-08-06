@@ -23,9 +23,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Title"
-            style="@style/Base.TextAppearance.AppCompat.Body2"
+            style="@style/Base.TextAppearance.AppCompat.Body1"
             android:textColor="@color/abc_primary_text_material_light"
-            android:textSize="17dp"/>
+            android:textSize="18dp"/>
 
         <LinearLayout
             android:id="@+id/feed_item_shortUrl_container"
