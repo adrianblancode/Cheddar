@@ -1,3 +1,4 @@
+![Cheddar logo](http://i.imgur.com/e3c6ExM.png)
 # Cheddar
 Hacker News reader for Android. WIP
 
