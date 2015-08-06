@@ -103,13 +103,15 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     }
 
     @Override
-    public void onStart(){
-        super.onStart();
+    public void onActivityCreated(Bundle savedInstance){
+        super.onActivityCreated(savedInstance);
 
         // We load only onstart since we need to edit view visibility in updateSubmissions()
         if(loadedSubmissions == 0){
             updateSubmissions();
         }
+
+        updateHeaderPadding();
     }
 
     @Override
@@ -220,12 +222,12 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
                 public void onDataChange(DataSnapshot snapshot) {
                     submissionIDs = (ArrayList<Long>) snapshot.getValue();
 
+                    // Because we are doing this asynchronously, it's easier to update submissions directly
+                    updateSubmissions();
+
                     // Hide the progress bar
                     progress.setVisibility(View.GONE);
                     footer.setVisibility(View.VISIBLE);
-
-                    // Because we are doing this asynchronously, it's easier to update submissions directly
-                    updateSubmissions();
                 }
 
                 @Override
@@ -545,6 +547,19 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         }
     }
 
+    // Updates the padding of the header if it's visible
+    public void updateHeaderPadding(){
+        MainActivity m = ((MainActivity)getActivity());
+
+        // If the fragment comes into view, update padding
+        if(m != null) {
+            ActionBar ab = m.getSupportActionBar();
+            if (ab != null) {
+                updateHeaderPadding(ab.isShowing());
+            }
+        }
+    }
+
     // Updates the padding on header to compensate for what is visible on the screen
     public void updateHeaderPadding(boolean show){
 
@@ -570,21 +585,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
 
-        MainActivity m = ((MainActivity)getActivity());
-
-        // If the fragment comes into view, update padding
-        if(m != null) {
-            ActionBar ab = m.getSupportActionBar();
-            if (ab != null) {
-                updateHeaderPadding(ab.isShowing());
-            }
-        }
-
-        // If the fragment comes into view, get submissions if empty
-        if(loadedSubmissions == 0) {
-            // Gets all the submissions and populates the list with them
-            //updateSubmissions();
-        }
+        updateHeaderPadding();
     }
 
     private boolean toolbarIsShown() {
