@@ -16,6 +16,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -47,6 +48,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
 
     View header;
     View no_comments;
+    View progress;
 
     // Base URL for the hacker news API
     private Firebase baseUrl;
@@ -85,6 +87,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         lv.setAdapter(commentAdapter);
 
         no_comments = (TextView) findViewById(R.id.activity_comment_none);
+        progress = (LinearLayout) findViewById(R.id.activity_comment_progress);
 
         updateComments();
     }
@@ -170,14 +173,21 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         commentAdapter.clear();
         commentAdapter.notifyDataSetChanged();
 
+        progress.setVisibility(View.VISIBLE);
+        no_comments.setVisibility(View.GONE);
+
         baseUrl.child(Long.toString(feedItem.getSubmissionId())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
+
+                // Hide the progress bar
+                progress.setVisibility(View.GONE);
 
                 // We retrieve all objects into a hashmap
                 Map<String, Object> ret = (Map<String, Object>) snapshot.getValue();
                 kids = (ArrayList<Long>) ret.get("kids");
 
+                // Update the feed item data
                 feedItem.setTime(getPrettyDate((long) ret.get("time")));
                 feedItem.setScore((Long) ret.get("score"));
 
@@ -203,6 +213,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
             public void onCancelled(FirebaseError firebaseError) {
                 System.err.println("Could not retrieve post! " + firebaseError);
                 no_comments.setVisibility(View.VISIBLE);
+                progress.setVisibility(View.GONE);
             }
         });
     }

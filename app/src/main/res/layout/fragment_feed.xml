@@ -3,10 +3,41 @@
     android:layout_height="match_parent"
     android:id="@+id/fragment_feed">
 
-    <com.github.ksoichiro.android.observablescrollview.ObservableListView
-        android:id="@+id/feed_list"
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-    </com.github.ksoichiro.android.observablescrollview.ObservableListView>
+
+        <com.github.ksoichiro.android.observablescrollview.ObservableListView
+            android:id="@+id/feed_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:id="@+id/activity_main_progress"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal|center_vertical">
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="50dp"
+                android:layout_marginTop="-100dp"
+                android:indeterminate="true"
+                android:id="@+id/marker_progress"
+                style="?android:attr/progressBarStyle"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/activity_main_none"
+            android:visibility="gone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_vertical"
+            android:gravity="center_horizontal"
+            style="@style/Base.TextAppearance.AppCompat.Body1"
+            android:textColor="@color/abc_primary_text_material_light"
+            android:text="Could not load submissions."/>
+    </LinearLayout>
 
 </FrameLayout>

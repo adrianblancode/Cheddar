@@ -13,7 +13,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.firebase.client.DataSnapshot;
@@ -64,6 +66,9 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
 
     // Used to fill the space when viewpager minimizes
     View empty;
+    View no_submissions;
+    View progress;
+    ProgressBar footer;
 
     public static FeedFragment newInstance() {
         FeedFragment f = new FeedFragment();
@@ -95,9 +100,13 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         }
 
         loadedSubmissions = feedAdapter.getCount();
+    }
 
-        // Only load submissions if the fragment is visible
-        // Only updates after activity gets set to avoid NullPointerException
+    @Override
+    public void onStart(){
+        super.onStart();
+
+        // We load only onstart since we need to edit view visibility in updateSubmissions()
         if(loadedSubmissions == 0){
             updateSubmissions();
         }
@@ -107,7 +116,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
 
-        View rootView = inflater.inflate(R.layout.fragment_feed, container,false);
+        View rootView = inflater.inflate(R.layout.fragment_feed, container, false);
 
         ObservableListView listView = (ObservableListView) rootView.findViewById(R.id.feed_list);
         listView.setScrollViewCallbacks(this);
@@ -115,6 +124,9 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         empty = inflater.inflate(R.layout.empty, listView, false);
         updateHeaderPadding(true);
         listView.addHeaderView(empty);
+
+        no_submissions = (TextView) rootView.findViewById(R.id.activity_main_none);
+        progress = (LinearLayout) rootView.findViewById(R.id.activity_main_progress);
 
         listView.setAdapter(feedAdapter);
 
@@ -148,10 +160,11 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             }
         });
 
-        ProgressBar circle = new ProgressBar(getActivity().getApplicationContext());
-        circle.setPadding(0, 65, 0, 65);
-        circle.setIndeterminate(true);
-        listView.addFooterView(circle);
+        footer = new ProgressBar(getActivity().getApplicationContext());
+        footer.setPadding(0, 65, 0, 65);
+        footer.setIndeterminate(true);
+        footer.setVisibility(View.GONE);
+        listView.addFooterView(footer);
 
         return rootView;
     }
@@ -164,6 +177,8 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
 
         //We dont want to be able to spam resets
         if(feedAdapter.getCount() > 0 && seconds >= submissionUpdateTime) {
+
+            lastSubmissionUpdate = d;
 
             //First we need to cancel all asynctasks
             while(!asyncTasks.isEmpty()){
@@ -183,9 +198,12 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             submissionIDs = null;
             feedAdapter.clear();
             feedAdapter.notifyDataSetChanged();
-            updateSubmissions();
 
-            lastSubmissionUpdate = d;
+            progress.setVisibility(View.VISIBLE);
+            footer.setVisibility(View.GONE);
+            no_submissions.setVisibility(View.GONE);
+
+            updateSubmissions();
         }
     }
 
@@ -202,6 +220,10 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
                 public void onDataChange(DataSnapshot snapshot) {
                     submissionIDs = (ArrayList<Long>) snapshot.getValue();
 
+                    // Hide the progress bar
+                    progress.setVisibility(View.GONE);
+                    footer.setVisibility(View.VISIBLE);
+
                     // Because we are doing this asynchronously, it's easier to update submissions directly
                     updateSubmissions();
                 }
@@ -209,6 +231,9 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
                 @Override
                 public void onCancelled(FirebaseError firebaseError) {
                     System.err.println("Could not retrieve posts! " + firebaseError);
+                    no_submissions.setVisibility(View.VISIBLE);
+                    progress.setVisibility(View.GONE);
+                    footer.setVisibility(View.GONE);
                 }
             });
         } else {
@@ -220,6 +245,10 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             for (; loadedSubmissions < start + submissionUpdateNum && loadedSubmissions < submissionIDs.size(); loadedSubmissions++) {
                 // But we must first add each submission to the view manually
                 updateSingleSubmission(submissionIDs.get(loadedSubmissions));
+            }
+
+            if(loadedSubmissions == submissionIDs.size()){
+                no_submissions.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -388,6 +417,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         String thumbnailUrl = "http://icons.better-idea.org/api/icons?url=" + url + "&i_am_feeling_lucky=yes";
 
         // Load image, decode it to Bitmap and return Bitmap to callback
+        // WARNING: For some weird reason, we can't catch FileNotFoundExcaption for invalid URLS
         ImageLoader.getInstance().loadImage(thumbnailUrl, new SimpleImageLoadingListener() {
             @Override
             public void onLoadingComplete(String thumbnailUrl, View view, Bitmap thumbnail) {
@@ -395,6 +425,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
 
                 if (thumbnail == null || position == -1) {
                     System.err.println("Couldn't load: " + thumbnailUrl);
+                    return;
                 }
 
                 // We only display the image if it's large enough
