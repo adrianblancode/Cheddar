@@ -1,6 +1,5 @@
 package co.adrianblan.cheddar;
 
-import android.app.Activity;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -24,11 +23,9 @@ import com.firebase.client.ValueEventListener;
 import com.github.ksoichiro.android.observablescrollview.ObservableListView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
-import com.nineoldandroids.view.ViewHelper;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
-import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -61,8 +58,8 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
 
     //Throttle submissions
     private Date lastSubmissionUpdate;
-    private final int submissionUpdateTime = 3;
-    private final int submissionUpdateNum = 15;
+    private final int submissionUpdateTime = 0;
+    private final int submissionUpdateNum = 20;
     int loadedSubmissions = -1;
 
     // Used to fill the space when viewpager minimizes
@@ -250,7 +247,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
                     try {
                         site = new URL(url);
                     } catch (MalformedURLException e) {
-                        System.err.println(e);
+                        System.err.println(url + e);
                         return;
                     }
                 }
@@ -262,7 +259,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
                 if (url != null) {
                     // Asynchronously updates images for the feed item
                     updateSubmissionThumbnail(site.getHost(), f);
-                    updateSubmissionFavicon(site.getHost(), f);
                 }
             }
 
@@ -389,82 +385,27 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     public void updateSubmissionThumbnail(String url, FeedItem f){
 
         final FeedItem fi = f;
+        String thumbnailUrl = "http://icons.better-idea.org/api/icons?url=" + url + "&i_am_feeling_lucky=yes";
 
-        class ThumbnailUrlTask extends AsyncTask<String, Integer, String> {
-
+        // Load image, decode it to Bitmap and return Bitmap to callback
+        ImageLoader.getInstance().loadImage(thumbnailUrl, new SimpleImageLoadingListener() {
             @Override
-            protected String doInBackground(String... url) {
-                // Gets url to a good thumbnail from a site
-                ThumbnailExtractor ts = new ThumbnailExtractor();
-                return ts.getThumbnailUrl(url[0]);
-            }
-            @Override
-            protected void onProgressUpdate(Integer... i) {
-            }
+            public void onLoadingComplete(String thumbnailUrl, View view, Bitmap thumbnail) {
+                int position = feedAdapter.getPosition(fi);
 
-            @Override
-            protected void onPostExecute(String thumbnailUrl) {
-
-                // Loads high resolution icon
-                ImageLoader imageLoader = ImageLoader.getInstance();
-
-                imageLoader.loadImage(thumbnailUrl, new SimpleImageLoadingListener() {
-                    @Override
-                    public void onLoadingComplete(String url, View view, Bitmap loadedImage) {
-
-                        if(loadedImage == null){
-                            return;
-                        }
-
-                        // It's possible the list has changed during the async task
-                        // So we make sure the item still exists
-                        int position = feedAdapter.getPosition(fi);
-                        if(position == -1){
-                            return;
-                        }
-
-                        feedAdapter.getItem(position).setThumbnail(loadedImage);
-                        feedAdapter.notifyDataSetChanged();
-                    }
-                });
-            }
-        }
-
-        // Asynchronously fetches the URL to the thumbnail
-        // We cannot use execute() since it only allows one thread at a time
-        ThumbnailUrlTask task = new ThumbnailUrlTask();
-        asyncTasks.add(task);
-
-        // TODO use threadpoolexecutor?
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "http://icons.better-idea.org/api/icons?url=" + url);
-    }
-
-    // Recieves a host url, and the position of the feed item
-    // Updates a low resolution thumbnail for that submission
-    public void updateSubmissionFavicon(String url, FeedItem f){
-
-        final FeedItem fi = f;
-        ImageLoader imageLoader = ImageLoader.getInstance();
-
-        // Loads low resolution favicon
-        imageLoader.loadImage("http://www.google.com/s2/favicons?domain=" + url, new SimpleImageLoadingListener() {
-            @Override
-            public void onLoadingComplete(String url, View view, Bitmap loadedImage) {
-
-                //We don't want to show the default image
-                if (hashBitmap(loadedImage) == 56355950541L) {
-                    return;
+                if (thumbnail == null || position == -1) {
+                    System.err.println("Couldn't load: " + thumbnailUrl);
                 }
 
-                // It's possible the list has changed during the async task
-                // So we make sure the item still exists
-                int position = feedAdapter.getPosition(fi);
-                if (position == -1) {
-                    return;
+                // We only display the image if it's large enough
+                // Otherwise we create a TextDrawable for it
+                if (thumbnail.getWidth() > 50 && thumbnail.getHeight() > 50) {
+                    feedAdapter.getItem(position).setThumbnail(thumbnail);
+                    feedAdapter.notifyDataSetChanged();
                 }
 
                 // Generate lots of palettes from the favicon asynchronously
-                Palette.from(loadedImage).generate(new Palette.PaletteAsyncListener() {
+                Palette.from(thumbnail).generate(new Palette.PaletteAsyncListener() {
                     public void onGenerated(Palette p) {
 
                         List<Palette.Swatch> swatches = p.getSwatches();

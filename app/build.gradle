@@ -39,5 +39,4 @@ dependencies {
     compile 'org.jsoup:jsoup:1.7.3'
     compile 'com.jpardogo.materialtabstrip:library:1.1.0'
     compile 'com.github.ksoichiro:android-observablescrollview:1.5.0'
-    compile 'com.nineoldandroids:library:2.4.0'
 }
