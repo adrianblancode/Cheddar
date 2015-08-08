@@ -56,14 +56,33 @@ public class CommentAdapter extends BaseAdapter {
         return -1;
     }
 
+
     @Override
     public int getCount() {
+
         return comments.size();
+        /*
+        int i = 0;
+        for(Comment c : comments){
+            if(!c.isHidden()){
+                i++;
+            }
+        }
+        return i;
+        */
     }
 
     @Override
     public Comment getItem(int position) {
         return comments.get(position);
+        /*
+        int i = 0;
+        for(Comment c : comments){
+            if(i == position){return c;}
+            if(!c.isHidden()){i++;}
+        }
+        return null;
+        */
     }
 
     @Override
@@ -79,7 +98,10 @@ public class CommentAdapter extends BaseAdapter {
             TextView body;
             TextView time;
             LinearLayout container;
+            LinearLayout text_container;
             LinearLayout indicator;
+            LinearLayout indicator_color;
+            TextView hidden_children;
         }
 
         if(colors == null){
@@ -88,9 +110,15 @@ public class CommentAdapter extends BaseAdapter {
 
         final Comment com = comments.get(position);
 
+        if(com.isHidden()){
+            // Inflate and return an empty layout
+            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            return inflater.inflate(R.layout.empty, parent, false);
+        }
+
         ViewHolder holder;
 
-        if(convertView == null) {
+        if(convertView == null || convertView.getTag() == null) {
 
             holder = new ViewHolder();
 
@@ -100,7 +128,10 @@ public class CommentAdapter extends BaseAdapter {
             holder.body = (JellyBeanCompatTextView) convertView.findViewById(R.id.comment_body);
             holder.time = (TextView) convertView.findViewById(R.id.comment_time);
             holder.container = (LinearLayout) convertView.findViewById(R.id.comment);
+            holder.text_container = (LinearLayout) convertView.findViewById(R.id.comment_text_container);
             holder.indicator = (LinearLayout) convertView.findViewById(R.id.comment_indicator);
+            holder.indicator_color = (LinearLayout) convertView.findViewById(R.id.comment_indicator_color);
+            holder.hidden_children = (TextView) convertView.findViewById(R.id.comment_hidden_children);
 
             // Store the holder with the view.
             convertView.setTag(holder);
@@ -108,7 +139,6 @@ public class CommentAdapter extends BaseAdapter {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-
 
         holder.title.setText(com.getBy());
 
@@ -131,23 +161,70 @@ public class CommentAdapter extends BaseAdapter {
         holder.time.setText(com.getTime());
 
         // Adds padding based on hierarchy, and adds indicator
-        holder.container.setPadding((int) dpToPixels(4, parent.getContext()) * (com.getHierarchy() - 1), 0, 0, 0);
+        holder.indicator.setPadding((int) dpToPixels(4, parent.getContext()) * (com.getHierarchy() - 1), 0, 0, 0);
 
         // We don't need the indicator for top level commentCount
         if(com.getHierarchy() == 0){
-            holder.indicator.setVisibility(View.INVISIBLE);
+            holder.indicator.setVisibility(View.GONE);
+            holder.indicator_color.setVisibility(View.GONE);
         } else {
+            holder.indicator.setVisibility(View.VISIBLE);
+            holder.indicator_color.setVisibility(View.VISIBLE);
+
             // Use modulo to get the appropriate color
             int color = colors.get((com.getHierarchy() - 1) % colors.size());
-            holder.indicator.setBackgroundColor(color);
-            holder.indicator.setVisibility(View.VISIBLE);
+            holder.indicator_color.setBackgroundColor(color);
         }
+
+        if(com.hasHideChildren()){
+            holder.hidden_children.setText("+" + Integer.toString(com.getHiddenChildren()));
+            holder.hidden_children.setVisibility(View.VISIBLE);
+        } else {
+            holder.hidden_children.setVisibility(View.GONE);
+        }
+
+        holder.text_container.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                int hierarchy = com.getHierarchy();
+                int position = getPosition(com);
+
+                if(!com.hasHideChildren()){
+                    int i;
+
+                    // Find all child comments with higher hierarchy and hide them
+                    // We do the direct access since we want to be able to access hidden comments
+                    for(i = position + 1; comments.get(i).getHierarchy() > hierarchy && i < comments.size(); i++){
+                        getItem(i).setIsHidden(true);
+                    }
+
+                    int hiddenChildren = i - position - 1;
+                    com.setHiddenChildren(hiddenChildren);
+
+                    if(hiddenChildren > 0){
+                        com.setHideChildren(true);
+                    }
+                } else {
+
+                    com.setHideChildren(false);
+
+                    // Find all child comments with higher hierarchy and show them
+                    for(int i = position + 1; comments.get(i).getHierarchy() > hierarchy && i < comments.size(); i++){
+                        getItem(i).setIsHidden(false);
+
+                    }
+                }
+
+                notifyDataSetChanged();
+            }
+        });
 
         return convertView;
     }
 
     // Initializes the list of colours which will be used to display comment hierarchy
-    public ArrayList<Integer> initColors(Context context){
+    public ArrayList<Integer> initColors(Context context) {
         ArrayList<Integer> colors = new ArrayList<Integer>();
         colors.add(context.getResources().getColor(R.color.colorPrimary));
         colors.add(context.getResources().getColor(R.color.materialPink));
@@ -155,7 +232,6 @@ public class CommentAdapter extends BaseAdapter {
         colors.add(context.getResources().getColor(R.color.materialBlue)); // Not really material blue but who cares
         colors.add(context.getResources().getColor(R.color.materialGreen));
         colors.add(context.getResources().getColor(R.color.materialAmber));
-
 
         return colors;
     }

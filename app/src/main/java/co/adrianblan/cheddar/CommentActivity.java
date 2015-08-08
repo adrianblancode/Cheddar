@@ -247,6 +247,18 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
                     com.setHierarchy(par.getHierarchy() + 1);
                     commentAdapter.add(commentAdapter.getPosition(par) + 1, com);
                 }
+
+                // If we load a comment into a collapsed chain, we must hide it
+                int position = commentAdapter.getPosition(com);
+                if(position > 0){
+
+                    Comment aboveComment = commentAdapter.getItem(position - 1);
+
+                    if(aboveComment.isHidden() || (aboveComment.hasHideChildren() && aboveComment.getHierarchy() > com.getHierarchy())){
+                        com.setIsHidden(true);
+                    }
+                }
+
                 commentAdapter.notifyDataSetChanged();
                 ArrayList<Long> kids = (ArrayList<Long>) ret.get("kids");
 

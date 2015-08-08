@@ -20,9 +20,11 @@ import android.view.ViewGroup;
 import com.astuetz.PagerSlidingTabStrip;
 import com.github.ksoichiro.android.observablescrollview.ObservableListView;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
+import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 
 import java.io.File;
 
@@ -111,15 +113,15 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        ImageLoaderConfiguration.Builder config = new ImageLoaderConfiguration.Builder(getApplication());
-        config.threadPriority(Thread.NORM_PRIORITY - 2);
-        config.denyCacheImageMultipleSizesInMemory();
-        config.diskCacheFileNameGenerator(new Md5FileNameGenerator());
-        config.diskCacheSize(5 * 1024 * 1024); // 5 MiB
-        config.tasksProcessingOrder(QueueProcessingType.FIFO);
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
+                .threadPriority(Thread.NORM_PRIORITY - 2)
+                .memoryCache(new WeakMemoryCache())
+                .threadPoolSize(20)
+                .imageDownloader(new BaseImageDownloader(this))
+                .build();
 
         // Initialize ImageLoader with configuration.
-        ImageLoader.getInstance().init(config.build());
+        ImageLoader.getInstance().init(config);
     }
 
     @Override

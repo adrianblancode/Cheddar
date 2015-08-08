@@ -8,17 +8,18 @@ public class Comment {
     private String body;
     private String time;
 
+    private boolean hideChildren;
+    private boolean isHidden;
+    private boolean toBeHidden;
+    private int hiddenChildren;
+
     // At what level the comment should be shown
     private int hierarchy;
 
     public Comment(){
         this.by = null;
         this.body = null;
-    }
-
-    public Comment(String by, String body){
-        this.by = by;
-        this.body = body;
+        this.hideChildren = false;
     }
 
     public String getBy() {
@@ -51,5 +52,29 @@ public class Comment {
 
     public void setHierarchy(int hierarchy) {
         this.hierarchy = hierarchy;
+    }
+
+    public boolean hasHideChildren() {
+        return hideChildren;
+    }
+
+    public void setHideChildren(boolean hideChildren) {
+        this.hideChildren = hideChildren;
+    }
+
+    public boolean isHidden() {
+        return isHidden;
+    }
+
+    public void setIsHidden(boolean isHidden) {
+        this.isHidden = isHidden;
+    }
+
+    public int getHiddenChildren() {
+        return hiddenChildren;
+    }
+
+    public void setHiddenChildren(int hiddenChildren) {
+        this.hiddenChildren = hiddenChildren;
     }
 }

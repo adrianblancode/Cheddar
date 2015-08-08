@@ -129,6 +129,7 @@ public class FeedAdapter extends BaseAdapter {
         }
 
 
+
         // Comment listener
         View.OnClickListener commentOnClickListener = new View.OnClickListener() {
             @Override
@@ -153,8 +154,6 @@ public class FeedAdapter extends BaseAdapter {
                 intent.putExtra("thumbnail", thumbnail);
                 intent.putExtras(b);
                 context.startActivity(intent);
-                
-                //TODO // FIXME: 2015-08-04 
             }
         };
 

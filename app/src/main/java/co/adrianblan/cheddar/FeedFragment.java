@@ -61,7 +61,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     //Throttle submissions
     private Date lastSubmissionUpdate;
     private final int submissionUpdateTime = 0;
-    private final int submissionUpdateNum = 20;
+    private final int submissionUpdateNum = 3;
     int loadedSubmissions = -1;
 
     // Used to fill the space when viewpager minimizes
@@ -418,11 +418,10 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         final FeedItem fi = f;
         String thumbnailUrl = "http://icons.better-idea.org/api/icons?url=" + url + "&i_am_feeling_lucky=yes";
 
-        // Load image, decode it to Bitmap and return Bitmap to callback
-        // WARNING: For some weird reason, we can't catch FileNotFoundExcaption for invalid URLS
-        ImageLoader.getInstance().loadImage(thumbnailUrl, new SimpleImageLoadingListener() {
+        SimpleImageLoadingListener thumbnailLoader = new SimpleImageLoadingListener() {
             @Override
             public void onLoadingComplete(String thumbnailUrl, View view, Bitmap thumbnail) {
+
                 int position = feedAdapter.getPosition(fi);
 
                 if (thumbnail == null || position == -1) {
@@ -463,7 +462,12 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
                     }
                 });
             }
-        });
+        };
+
+        // Load image, decode it to Bitmap and return Bitmap to callback
+        // WARNING: For some weird reason, we can't catch FileNotFoundExcaption for invalid URLS
+        System.out.println("loading: " + thumbnailUrl);
+        ImageLoader.getInstance().loadImage(thumbnailUrl, thumbnailLoader);
     }
 
     // Converts the difference between two dates into a pretty date
