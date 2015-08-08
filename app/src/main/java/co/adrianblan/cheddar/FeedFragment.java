@@ -1,11 +1,15 @@
 package co.adrianblan.cheddar;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.graphics.Palette;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,8 +31,10 @@ import com.github.ksoichiro.android.observablescrollview.ObservableListView;
 import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
 import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.assist.ImageSize;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
 
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -61,7 +68,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     //Throttle submissions
     private Date lastSubmissionUpdate;
     private final int submissionUpdateTime = 0;
-    private final int submissionUpdateNum = 3;
+    private final int submissionUpdateNum = 20;
     int loadedSubmissions = -1;
 
     // Used to fill the space when viewpager minimizes
@@ -418,58 +425,87 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         final FeedItem fi = f;
         String thumbnailUrl = "http://icons.better-idea.org/api/icons?url=" + url + "&i_am_feeling_lucky=yes";
 
-        SimpleImageLoadingListener thumbnailLoader = new SimpleImageLoadingListener() {
-            @Override
-            public void onLoadingComplete(String thumbnailUrl, View view, Bitmap thumbnail) {
+        class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
-                int position = feedAdapter.getPosition(fi);
+            protected Bitmap doInBackground(String... urls) {
+                Bitmap b = null;
+                try {
+                    InputStream in = new java.net.URL(urls[0]).openStream();
+                    b = BitmapFactory.decodeStream(in);
+                } catch (Exception e) {
+                    Log.e("Image fetching error", e.getMessage());
+                    e.printStackTrace();
+                }
+                return b;
+            }
+            protected void onPostExecute(Bitmap thumbnail) {
+                processThumbnail(thumbnail, fi);
+            }
+        }
 
-                if (thumbnail == null || position == -1) {
-                    System.err.println("Couldn't load: " + thumbnailUrl);
+        // For some weird reason, the ImageLoaderLibrary crashes if run below KitKat
+        // Thus we instead have to do it manually with an AsyncTask
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+
+            SimpleImageLoadingListener thumbnailLoader = new SimpleImageLoadingListener(){
+                @Override
+                public void onLoadingComplete(String imageUri, View view, Bitmap thumbnail) {
+                    processThumbnail(thumbnail, fi);
+                }
+            };
+
+            ImageSize targetSize = new ImageSize(144, 144); // result Bitmap will be fit to this size
+            ImageLoader.getInstance().loadImage(thumbnailUrl, targetSize, thumbnailLoader);
+        } else {
+            DownloadImageTask task = new DownloadImageTask();
+            asyncTasks.add(task);
+            task.execute(thumbnailUrl);
+        }
+    }
+
+    private void processThumbnail(Bitmap thumbnail, FeedItem f) {
+
+        final FeedItem fi = f;
+
+        int position = feedAdapter.getPosition(fi);
+
+        if (thumbnail == null || position == -1) {
+            return;
+        }
+
+        // We only display the image if it's large enough
+        // Otherwise we create a TextDrawable for it
+        if (thumbnail.getWidth() > 50 && thumbnail.getHeight() > 50) {
+            feedAdapter.getItem(position).setThumbnail(thumbnail);
+            feedAdapter.notifyDataSetChanged();
+        }
+
+        // Generate lots of palettes from the favicon asynchronously
+        Palette.from(thumbnail).generate(new Palette.PaletteAsyncListener() {
+            public void onGenerated(Palette p) {
+
+                List<Palette.Swatch> swatches = p.getSwatches();
+                Palette.Swatch vibrantSwatch = p.getVibrantSwatch();
+
+                TextDrawable drawable;
+                TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
+
+                // We want the vibrant palette, if possible, ortherwise darker palettes
+                if (vibrantSwatch != null) {
+                    drawable = builder.buildRect(fi.getLetter(), vibrantSwatch.getRgb());
+                    fi.setColor(vibrantSwatch.getRgb());
+                } else if (!swatches.isEmpty()) {
+                    drawable = builder.buildRect(fi.getLetter(), swatches.get(0).getRgb());
+                    fi.setColor(swatches.get(0).getRgb());
+                } else {
                     return;
                 }
 
-                // We only display the image if it's large enough
-                // Otherwise we create a TextDrawable for it
-                if (thumbnail.getWidth() > 50 && thumbnail.getHeight() > 50) {
-                    feedAdapter.getItem(position).setThumbnail(thumbnail);
-                    feedAdapter.notifyDataSetChanged();
-                }
-
-                // Generate lots of palettes from the favicon asynchronously
-                Palette.from(thumbnail).generate(new Palette.PaletteAsyncListener() {
-                    public void onGenerated(Palette p) {
-
-                        List<Palette.Swatch> swatches = p.getSwatches();
-                        Palette.Swatch vibrantSwatch = p.getVibrantSwatch();
-
-                        TextDrawable drawable;
-                        TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
-
-                        // We want the vibrant palette, if possible, ortherwise darker palettes
-                        if (vibrantSwatch != null) {
-                            drawable = builder.buildRect(fi.getLetter(), vibrantSwatch.getRgb());
-                            fi.setColor(vibrantSwatch.getRgb());
-                        } else if (!swatches.isEmpty()) {
-                            drawable = builder.buildRect(fi.getLetter(), swatches.get(0).getRgb());
-                            fi.setColor(swatches.get(0).getRgb());
-                        } else {
-                            return;
-                        }
-
-                        fi.setTextDrawable(drawable);
-                        feedAdapter.notifyDataSetChanged();
-                    }
-                });
+                fi.setTextDrawable(drawable);
+                feedAdapter.notifyDataSetChanged();
             }
-        };
-
-        // Load image, decode it to Bitmap and return Bitmap to callback
-        // WARNING: For some weird reason, we can't catch FileNotFoundExcaption for invalid URLS
-        System.out.println("loading: " + thumbnailUrl);
-        ImageLoader.getInstance().loadImage(thumbnailUrl, thumbnailLoader);
+        });
     }
-
     // Converts the difference between two dates into a pretty date
     // There's probably a joke in there somewhere
     public String getPrettyDate(Long time){
