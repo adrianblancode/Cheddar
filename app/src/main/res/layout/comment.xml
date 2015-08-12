@@ -92,7 +92,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/Base.TextAppearance.AppCompat.Body1"
-            android:textColor="@color/abc_primary_text_material_light"/>
+            android:textColor="@color/abc_primary_text_material_light"
+            android:text="Text"
+            android:focusable="false"
+            android:focusableInTouchMode="false"/>
     </LinearLayout>
 
     <LinearLayout

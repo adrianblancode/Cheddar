@@ -23,6 +23,7 @@ public class WebViewActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private FeedItem feedItem;
     private Bitmap thumbnail;
+    private boolean hasFeedItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,26 +32,29 @@ public class WebViewActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         feedItem = (FeedItem) b.getSerializable("feedItem");
-        thumbnail = (Bitmap) getIntent().getParcelableExtra("thumbnail");
-
-        if(feedItem == null){
-            System.err.println("Passed null arguments into WebViewActivity!");
-            return;
-        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_webview);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle(feedItem.getTitle());
-        getSupportActionBar().setSubtitle(feedItem.getShortUrl());
-
-        progressBar = (ProgressBar) findViewById(R.id.progressBar);
-        progressBar.setMax(100);
 
         myWebView = (WebView) findViewById(R.id.webview);
         initWebView(myWebView);
-        myWebView.loadUrl(feedItem.getLongUrl());
 
+        // If we have a related feed item, we choose the advanced toolbar
+        if(feedItem != null){
+            hasFeedItem = true;
+            thumbnail = (Bitmap) getIntent().getParcelableExtra("thumbnail");
+            getSupportActionBar().setTitle(feedItem.getTitle());
+            getSupportActionBar().setSubtitle(feedItem.getShortUrl());
+            myWebView.loadUrl(feedItem.getLongUrl());
+        } else {
+            hasFeedItem = false;
+            getSupportActionBar().setTitle(b.getString("url"));
+            myWebView.loadUrl(b.getString("url"));
+        }
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+        progressBar.setMax(100);
     }
 
     // Initializes the WebView with settings, onclick etc
@@ -91,7 +95,12 @@ public class WebViewActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_webview, menu);
+        // We need different menus depending on if we have a related feed item or not
+        if(hasFeedItem) {
+            getMenuInflater().inflate(R.menu.menu_webview, menu);
+        } else {
+            getMenuInflater().inflate(R.menu.menu_main, menu);
+        }
         return true;
     }
 
@@ -111,7 +120,8 @@ public class WebViewActivity extends AppCompatActivity {
             myWebView.reload();
         }
 
-        if(id == R.id.menu_comments){
+        // This button will only appear if we have a feed item
+        if(id == R.id.menu_comments && hasFeedItem){
             Intent intent = new Intent(getApplicationContext(), CommentActivity.class);
             Bundle b = new Bundle();
             b.putSerializable("feedItem", feedItem);

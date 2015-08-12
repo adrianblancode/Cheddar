@@ -7,12 +7,14 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -32,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import static android.widget.AdapterView.*;
 
 /**
  * Created by Adrian on 2015-07-29.
@@ -62,7 +66,6 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         Firebase.setAndroidContext(this);
         baseUrl = new Firebase("https://hacker-news.firebaseio.com/v0/item/");
 
-
         if(savedInstanceState == null){
             Bundle b = getIntent().getExtras();
             feedItem = (FeedItem) b.getSerializable("feedItem");
@@ -84,6 +87,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         lv.setScrollViewCallbacks(this);
         lv.addHeaderView(initHeader(feedItem));
         lv.setAdapter(commentAdapter);
+        addCommentOnClickListeners(lv);
 
         no_comments = (TextView) findViewById(R.id.activity_comment_none);
         progress = (LinearLayout) findViewById(R.id.activity_comment_progress);
@@ -154,6 +158,75 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         updateHeaderPadding(true);
 
         return header;
+    }
+
+    // Adds onClickListeners for hiding and revealing comments
+    public void addCommentOnClickListeners(ListView lv){
+
+        // We listen to long clicks for hiding comments
+        lv.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                System.out.println("onItemClick");
+
+                // If there is no comment data, or we clicked the header, return
+                if (commentAdapter.getComments().size() == 0 || position == 0) {
+                    return false;
+                }
+
+                Comment comment = commentAdapter.getItem(position - 1);
+                int hierarchy = comment.getHierarchy();
+
+                if (!comment.hasHideChildren()) {
+                    int i;
+
+                    // Find all child comments with higher hierarchy and hide them
+                    // We do the direct access since we want to be able to access hidden comments
+                    for (i = position; commentAdapter.getComments().get(i).getHierarchy() > hierarchy && i < commentAdapter.getComments().size(); i++) {
+                        commentAdapter.getItem(i).setIsHidden(true);
+                    }
+
+                    int hiddenChildren = i - position;
+                    comment.setHiddenChildren(hiddenChildren);
+
+                    if (hiddenChildren > 0) {
+                        comment.setHideChildren(true);
+                    }
+
+                    commentAdapter.notifyDataSetChanged();
+                    return true;
+                }
+
+                return false;
+            }
+        });
+
+        // And short clicks for revealing comments
+        lv.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                // If there is no comment data, or we clicked the header, return
+                if (commentAdapter.getComments().size() == 0 || position == 0) {
+                    return;
+                }
+
+                Comment comment = commentAdapter.getItem(position - 1);
+                int hierarchy = comment.getHierarchy();
+
+                if (comment.hasHideChildren()) {
+
+                    comment.setHideChildren(false);
+                    // Find all child comments with higher hierarchy and show them
+                    for (int i = position; commentAdapter.getComments().get(i).getHierarchy() > hierarchy && i < commentAdapter.getComments().size(); i++) {
+                        commentAdapter.getItem(i).setIsHidden(false);
+                    }
+                }
+                commentAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     // Starts updating the commentCount from the top level

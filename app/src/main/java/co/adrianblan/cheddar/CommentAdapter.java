@@ -1,11 +1,23 @@
 package co.adrianblan.cheddar;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.method.MovementMethod;
+import android.text.style.ClickableSpan;
 import android.text.style.RelativeSizeSpan;
+import android.text.style.URLSpan;
+import android.text.util.Linkify;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -148,10 +160,10 @@ public class CommentAdapter extends BaseAdapter {
             holder.body.setVisibility(View.VISIBLE);
 
             // We can't show the text as is, but have to parse it as html
-            holder.body.setText(trimWhitespace(Html.fromHtml(com.getBody())));
+            setTextViewHTML(holder.body, com.getBody());
 
-            // We make links clickable
-            //holder.body.setMovementMethod(LinkMovementMethod.getInstance());
+            //This link movement method only consumes on URL clicks
+            holder.body.setMovementMethod(TextViewFixTouchConsume.LocalLinkMovementMethod.getInstance());
         } else {
             holder.body.setVisibility(View.GONE);
         }
@@ -180,43 +192,6 @@ public class CommentAdapter extends BaseAdapter {
         } else {
             holder.hidden_children.setVisibility(View.GONE);
         }
-
-        holder.text_container.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                int hierarchy = com.getHierarchy();
-                int position = getPosition(com);
-
-                if(!com.hasHideChildren()){
-                    int i;
-
-                    // Find all child comments with higher hierarchy and hide them
-                    // We do the direct access since we want to be able to access hidden comments
-                    for(i = position + 1; comments.get(i).getHierarchy() > hierarchy && i < comments.size(); i++){
-                        getItem(i).setIsHidden(true);
-                    }
-
-                    int hiddenChildren = i - position - 1;
-                    com.setHiddenChildren(hiddenChildren);
-
-                    if(hiddenChildren > 0){
-                        com.setHideChildren(true);
-                    }
-                } else {
-
-                    com.setHideChildren(false);
-
-                    // Find all child comments with higher hierarchy and show them
-                    for(int i = position + 1; comments.get(i).getHierarchy() > hierarchy && i < comments.size(); i++){
-                        getItem(i).setIsHidden(false);
-
-                    }
-                }
-
-                notifyDataSetChanged();
-            }
-        });
 
         return convertView;
     }
@@ -262,7 +237,52 @@ public class CommentAdapter extends BaseAdapter {
                 i++;
             }
         }
-
         return ssb;
+    }
+
+    protected void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span)
+    {
+        int start = strBuilder.getSpanStart(span);
+        int end = strBuilder.getSpanEnd(span);
+        int flags = strBuilder.getSpanFlags(span);
+        ClickableSpan clickable = new ClickableSpan() {
+            public void onClick(View view) {
+
+                final View v = view;
+
+                // We show a dialog if the user wants to open the link
+                new AlertDialog.Builder(context)
+                        .setTitle("Open Link")
+                        .setMessage(span.getURL())
+                        .setPositiveButton("Open", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // If we click links, we go to the webview
+                                System.out.println("Clicked: " + span.getURL());
+                                Intent intent = new Intent(v.getContext(), WebViewActivity.class);
+                                Bundle bundle = new Bundle();
+                                bundle.putString("url", span.getURL());
+                                intent.putExtras(bundle);
+                                context.startActivity(intent);
+                            }
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            }
+        };
+        strBuilder.setSpan(clickable, start, end, flags);
+        strBuilder.removeSpan(span);
+    }
+
+    // Works some magic with converting the html to a proper text view
+    protected void setTextViewHTML(TextView text, String html) {
+        CharSequence sequence = Html.fromHtml(html);
+        SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
+        URLSpan[] urls = strBuilder.getSpans(0, sequence.length(), URLSpan.class);
+        for(URLSpan span : urls) {
+            makeLinkClickable(strBuilder, span);
+        }
+
+        // In the end we trim the whitespace
+        text.setText(trimWhitespace(strBuilder));
     }
 }
