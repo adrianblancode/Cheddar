@@ -1,15 +1,11 @@
 package co.adrianblan.cheddar;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.internal.widget.AdapterViewCompat;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -18,7 +14,6 @@ import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -195,10 +190,9 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
                     }
 
                     commentAdapter.notifyDataSetChanged();
-                    return true;
                 }
 
-                return false;
+                return true;
             }
         });
 
@@ -411,11 +405,16 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if (id == R.id.menu_refresh) {
+        if(id == android.R.id.home){
+            onBackPressed();
+            return true;
+        }
+
+        else if (id == R.id.menu_refresh) {
             updateComments();
         }
 
-        if(id == R.id.menu_webview){
+        else if(id == R.id.menu_webview){
             Intent intent = new Intent(this, WebViewActivity.class);
             Bundle b = new Bundle();
             b.putSerializable("feedItem", feedItem);

@@ -5,7 +5,9 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground">
+    android:background="?android:attr/selectableItemBackground"
+    android:focusable="false"
+    android:focusableInTouchMode="false">
 
     <LinearLayout
         android:id="@+id/comment_indicator"
@@ -75,13 +77,14 @@
 
                 <TextView
                     android:id="@+id/comment_hidden_children"
-                    android:visibility="gone"
+
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:paddingLeft="4dp"
-                    android:paddingRight="4dp"
+                    android:paddingLeft="2.5dp"
+                    android:paddingRight="2.5dp"
                     android:layout_alignParentRight="true"
-                    android:textColor="@color/colorPrimary"
+                    android:background="@drawable/hidden_children_background"
+                    android:textColor="@color/white"
                     style="@style/Base.TextAppearance.AppCompat.Body2"
                     android:textSize="13dp"
                     android:text="+22"/>

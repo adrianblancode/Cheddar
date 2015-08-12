@@ -116,12 +116,17 @@ public class WebViewActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if(id == R.id.menu_refresh) {
+        if(id == android.R.id.home){
+            onBackPressed();
+            return true;
+        }
+
+        else if(id == R.id.menu_refresh) {
             myWebView.reload();
         }
 
         // This button will only appear if we have a feed item
-        if(id == R.id.menu_comments && hasFeedItem){
+        else if(id == R.id.menu_comments && hasFeedItem){
             Intent intent = new Intent(getApplicationContext(), CommentActivity.class);
             Bundle b = new Bundle();
             b.putSerializable("feedItem", feedItem);
