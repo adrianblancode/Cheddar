@@ -423,10 +423,13 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     public void updateSubmissionThumbnail(String url, FeedItem f){
 
         final FeedItem fi = f;
+
+        // Url to an API that automatically fetches the best thumbnail for the site
         String thumbnailUrl = "http://icons.better-idea.org/api/icons?url=" + url + "&i_am_feeling_lucky=yes";
 
         class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
 
+            // Asynctask that fetches a thumbnail
             protected Bitmap doInBackground(String... urls) {
                 Bitmap b = null;
                 try {
@@ -447,6 +450,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         // Thus we instead have to do it manually with an AsyncTask
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
+            // Smarter way to async fetch a thumbnail
             SimpleImageLoadingListener thumbnailLoader = new SimpleImageLoadingListener(){
                 @Override
                 public void onLoadingComplete(String imageUri, View view, Bitmap thumbnail) {
@@ -463,6 +467,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         }
     }
 
+    // Takes a thumbnail, and either places it or a TextDrawable for the item
     private void processThumbnail(Bitmap thumbnail, FeedItem f) {
 
         final FeedItem fi = f;
@@ -522,18 +527,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         } else {
             return TimeUnit.MILLISECONDS.toSeconds(now.getTime() - past.getTime()) + "s";
         }
-    }
-
-    //This is the shittiest hash ever, but we only need it for one image so
-    public long hashBitmap(Bitmap bmp){
-
-        long hash = 0;
-        for(int x = 0; x < bmp.getWidth(); x++){
-            for (int y = 0; y < bmp.getHeight(); y++){
-                hash += Math.abs(bmp.getPixel(x,y));
-            }
-        }
-        return hash;
     }
 
     @Override

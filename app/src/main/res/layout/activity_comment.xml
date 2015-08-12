@@ -8,6 +8,7 @@
     tools:context=".MainActivity">
 
     <LinearLayout
+        android:id="@+id/activity_comment_list_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -15,7 +16,9 @@
         <com.github.ksoichiro.android.observablescrollview.ObservableListView
             android:id="@+id/activity_comment_list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:divider="@null"
+            android:dividerHeight="0dp"/>
 
         <LinearLayout
             android:id="@+id/activity_comment_progress"

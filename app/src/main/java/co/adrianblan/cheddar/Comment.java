@@ -1,9 +1,11 @@
 package co.adrianblan.cheddar;
 
+import java.io.Serializable;
+
 /**
  * Created by Adrian on 2015-07-30.
  */
-public class Comment {
+public class Comment implements Serializable {
     private String by;
     private String body;
     private String time;

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
 import android.text.style.RelativeSizeSpan;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -14,6 +13,7 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -24,13 +24,22 @@ public class CommentAdapter extends BaseAdapter {
     private ArrayList<Comment> comments;
     private ArrayList<Integer> colors;
     private final Context context;
-    private String author;
+    private FeedItem feedItem;
 
-    public CommentAdapter(Context c, String author) {
-        comments = new ArrayList<Comment>();
+    // Constructor which creates new arraylist
+    public CommentAdapter(FeedItem fi, Context c) {
         colors = null;
+        comments = new ArrayList<Comment>();
         context = c;
-        this.author = author;
+        feedItem = fi;
+    }
+
+    // Constructor which copies arraylist
+    public CommentAdapter(ArrayList<Comment> comments, FeedItem fi, Context c) {
+        colors = null;
+        this.comments = comments;
+        context = c;
+        feedItem = fi;
     }
 
     public void add (Comment c){
@@ -56,33 +65,19 @@ public class CommentAdapter extends BaseAdapter {
         return -1;
     }
 
+    public ArrayList<Comment> getComments(){
+        return comments;
+    }
+
 
     @Override
     public int getCount() {
-
         return comments.size();
-        /*
-        int i = 0;
-        for(Comment c : comments){
-            if(!c.isHidden()){
-                i++;
-            }
-        }
-        return i;
-        */
     }
 
     @Override
     public Comment getItem(int position) {
         return comments.get(position);
-        /*
-        int i = 0;
-        for(Comment c : comments){
-            if(i == position){return c;}
-            if(!c.isHidden()){i++;}
-        }
-        return null;
-        */
     }
 
     @Override
@@ -112,8 +107,7 @@ public class CommentAdapter extends BaseAdapter {
 
         if(com.isHidden()){
             // Inflate and return an empty layout
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            return inflater.inflate(R.layout.empty, parent, false);
+            return new View(context);
         }
 
         ViewHolder holder;
@@ -142,20 +136,24 @@ public class CommentAdapter extends BaseAdapter {
 
         holder.title.setText(com.getBy());
 
-        // If the writer of the comment is also the author of the submission
-        if(com.getBy().equals(author)){
+        // If the writer of the comment is also the feedItem of the submission
+        if(com.getBy().equals(feedItem.getBy())){
             holder.title.setTextColor(context.getResources().getColor(R.color.colorPrimary));
             holder.title.setText(holder.title.getText() + " [OP]");
         } else {
             holder.title.setTextColor(context.getResources().getColor(R.color.abc_secondary_text_material_light));
         }
 
-        if(com.getBody() != null) {
+        if(com.getBody() != null && !com.hasHideChildren()) {
+            holder.body.setVisibility(View.VISIBLE);
+
             // We can't show the text as is, but have to parse it as html
             holder.body.setText(trimWhitespace(Html.fromHtml(com.getBody())));
 
             // We make links clickable
-            holder.body.setMovementMethod(LinkMovementMethod.getInstance());
+            //holder.body.setMovementMethod(LinkMovementMethod.getInstance());
+        } else {
+            holder.body.setVisibility(View.GONE);
         }
 
         holder.time.setText(com.getTime());

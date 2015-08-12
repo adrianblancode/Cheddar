@@ -38,17 +38,17 @@ import java.util.concurrent.TimeUnit;
  */
 public class CommentActivity extends AppCompatActivity implements ObservableScrollViewCallbacks {
 
-    CommentAdapter commentAdapter;
-    ArrayList<Long> kids;
-    Date lastSubmissionUpdate;
+    private CommentAdapter commentAdapter;
+    private ArrayList<Long> kids;
+    private Date lastSubmissionUpdate;
 
-    FeedItem feedItem;
-    Long newCommentCount;
-    Bitmap thumbnail;
+    private FeedItem feedItem;
+    private Long newCommentCount;
+    private Bitmap thumbnail;
 
-    View header;
-    View no_comments;
-    View progress;
+    private View header;
+    private View no_comments;
+    private View progress;
 
     // Base URL for the hacker news API
     private Firebase baseUrl;
@@ -63,16 +63,16 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         baseUrl = new Firebase("https://hacker-news.firebaseio.com/v0/item/");
 
 
-        if(savedInstanceState != null){
-            feedItem = (FeedItem) savedInstanceState.getSerializable("feedItem");
-        } else {
+        if(savedInstanceState == null){
             Bundle b = getIntent().getExtras();
             feedItem = (FeedItem) b.getSerializable("feedItem");
-        }
+            commentAdapter = new CommentAdapter(feedItem, this);
+        } else {
 
-        if(feedItem == null){
-            System.err.println("Passed null arguments into CommentActivity!");
-            return;
+            // We retrieve the saved items
+            feedItem = (FeedItem) savedInstanceState.getSerializable("feedItem");
+            ArrayList<Comment> comments = (ArrayList<Comment>) savedInstanceState.getSerializable("comments");
+            commentAdapter = new CommentAdapter(comments, feedItem, this);
         }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_comment);
@@ -80,7 +80,6 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(feedItem.getTitle());
 
-        commentAdapter = new CommentAdapter(this, feedItem.getBy());
         ObservableListView lv = (ObservableListView) findViewById(R.id.activity_comment_list);
         lv.setScrollViewCallbacks(this);
         lv.addHeaderView(initHeader(feedItem));
@@ -89,7 +88,10 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         no_comments = (TextView) findViewById(R.id.activity_comment_none);
         progress = (LinearLayout) findViewById(R.id.activity_comment_progress);
 
-        updateComments();
+        // Don't update if we already have retrieved saved comments
+        if(commentAdapter.getCount() == 0) {
+            updateComments();
+        }
     }
 
     // Initializes the submission header with data
@@ -353,14 +355,6 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        // We do nothing here. We're only handling this to keep orientation
-        // or keyboard hiding from causing the WebView activity to restart.
-        // Yes, this is terrible
-    }
-
-    @Override
     public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {}
 
     @Override
@@ -398,5 +392,6 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
 
         // Save data
         savedInstanceState.putSerializable("feedItem", feedItem);
+        savedInstanceState.putSerializable("comments", commentAdapter.getComments());
     }
 }

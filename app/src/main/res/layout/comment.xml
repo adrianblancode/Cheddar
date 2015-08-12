@@ -27,73 +27,77 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="?android:attr/selectableItemBackground">
+        android:background="@color/white">
 
         <LinearLayout
+            android:id="@+id/comment_text_container2"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="10dp"
-            android:background="@color/white">
+            android:background="?android:attr/selectableItemBackground">
 
-        <RelativeLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <LinearLayout
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content">
-            <TextView
-                android:id="@+id/comment_title"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Base.TextAppearance.AppCompat.Body2"
-                android:textSize="13dp"
-                android:textColor="@color/abc_primary_text_material_light"
-                android:text="Commenter"/>
 
-            <ImageView
-                android:layout_width="12dp"
-                android:layout_height="12dp"
-                android:layout_marginTop="3.3dp"
-                android:padding="0dp"
-                android:layout_marginLeft="5.5dp"
-                android:layout_marginRight="2.5dp"
-                android:src="@drawable/ic_access_time_black_18dp"
-                android:tint="@color/primary_dark_material_light"/>
-            <TextView
-                android:id="@+id/comment_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/Base.TextAppearance.AppCompat.Body1"
-                android:textSize="13dp"
-                android:textColor="@color/abc_secondary_text_material_light"
-                android:text="8h"/>
-            </LinearLayout>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+                <TextView
+                    android:id="@+id/comment_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Base.TextAppearance.AppCompat.Body2"
+                    android:textSize="13dp"
+                    android:textColor="@color/abc_primary_text_material_light"
+                    android:text="Commenter"/>
 
-            <TextView
-                android:id="@+id/comment_hidden_children"
-                android:visibility="gone"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="4dp"
-                android:paddingRight="4dp"
-                android:layout_alignParentRight="true"
-                android:textColor="@color/white"
-                android:background="@color/colorPrimary"
-                style="@style/Base.TextAppearance.AppCompat.Body2"
-                android:textSize="13dp"
-                android:text="+22"/>
-        </RelativeLayout>
+                <ImageView
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginTop="3.3dp"
+                    android:padding="0dp"
+                    android:layout_marginLeft="5.5dp"
+                    android:layout_marginRight="2.5dp"
+                    android:src="@drawable/ic_access_time_black_18dp"
+                    android:tint="@color/primary_dark_material_light"/>
+                <TextView
+                    android:id="@+id/comment_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    style="@style/Base.TextAppearance.AppCompat.Body1"
+                    android:textSize="13dp"
+                    android:textColor="@color/abc_secondary_text_material_light"
+                    android:text="8h"/>
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/comment_hidden_children"
+                    android:visibility="gone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="4dp"
+                    android:layout_alignParentRight="true"
+                    android:textColor="@color/colorPrimary"
+                    style="@style/Base.TextAppearance.AppCompat.Body2"
+                    android:textSize="13dp"
+                    android:text="+22"/>
+            </RelativeLayout>
 
         <co.adrianblan.cheddar.JellyBeanCompatTextView
             android:id="@+id/comment_body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/Base.TextAppearance.AppCompat.Body1"
-            android:textColor="@color/abc_primary_text_material_light"
-            android:text="N/A"/>
+            android:textColor="@color/abc_primary_text_material_light"/>
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="@color/ripple_material_light"/>
     </LinearLayout>
 </LinearLayout>

@@ -19,10 +19,10 @@ import android.widget.ProgressBar;
  */
 public class WebViewActivity extends AppCompatActivity {
 
-    WebView myWebView;
-    ProgressBar progressBar;
-    FeedItem feedItem;
-    Bitmap thumbnail;
+    private WebView myWebView;
+    private ProgressBar progressBar;
+    private FeedItem feedItem;
+    private Bitmap thumbnail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,19 +123,4 @@ public class WebViewActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    class MyWebViewClient extends WebViewClient {
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            view.loadUrl(url);
-            return super.shouldOverrideUrlLoading(view, url);
-        }
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        // We do nothing here. We're only handling this to keep orientation
-        // or keyboard hiding from causing the WebView activity to restart.
-        // Yes, this is terrible
-    }
 }
