@@ -40,6 +40,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
     private CommentAdapter commentAdapter;
     private ArrayList<Long> kids;
     private Date lastSubmissionUpdate;
+    private Date lastOnItemLongClick;
 
     private FeedItem feedItem;
     private Long newCommentCount;
@@ -160,12 +161,44 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
     // Adds onClickListeners for hiding and revealing comments
     public void addCommentOnClickListeners(ListView lv){
 
+        // So, for some weird reason our longClicks are not consumed properly
+        // Thus we need a manual timeout to prevent onItemClick from triggering after onItemLongClick
+        lastOnItemLongClick = new Date();
+
+        // And short clicks for revealing comments
+        lv.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                // If there is no comment data, or we clicked the header, return
+                if (commentAdapter.getComments().size() == 0 || position == 0) {
+                    return;
+                }
+
+                Date d = new Date();
+                long ms = (d.getTime() - lastOnItemLongClick.getTime());
+
+                Comment comment = commentAdapter.getItem(position - 1);
+                int hierarchy = comment.getHierarchy();
+
+                if (comment.hasHideChildren() && ms > 1500) {
+
+                    comment.setHideChildren(false);
+                    // Find all child comments with higher hierarchy and show them
+                    for (int i = position; commentAdapter.getComments().get(i).getHierarchy() > hierarchy && i < commentAdapter.getComments().size(); i++) {
+                        commentAdapter.getItem(i).setIsHidden(false);
+                    }
+                }
+                commentAdapter.notifyDataSetChanged();
+            }
+        });
+
         // We listen to long clicks for hiding comments
         lv.setOnItemLongClickListener(new OnItemLongClickListener() {
 
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                System.out.println("onItemClick");
 
                 // If there is no comment data, or we clicked the header, return
                 if (commentAdapter.getComments().size() == 0 || position == 0) {
@@ -176,6 +209,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
                 int hierarchy = comment.getHierarchy();
 
                 if (!comment.hasHideChildren()) {
+                    lastOnItemLongClick = new Date();
                     int i;
 
                     // Find all child comments with higher hierarchy and hide them
@@ -194,34 +228,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
                     commentAdapter.notifyDataSetChanged();
                 }
 
-                // Nothing happened, don't consume the click
-                return false;
-            }
-        });
-
-        // And short clicks for revealing comments
-        lv.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                // If there is no comment data, or we clicked the header, return
-                if (commentAdapter.getComments().size() == 0 || position == 0) {
-                    return;
-                }
-
-                Comment comment = commentAdapter.getItem(position - 1);
-                int hierarchy = comment.getHierarchy();
-
-                if (comment.hasHideChildren()) {
-
-                    comment.setHideChildren(false);
-                    // Find all child comments with higher hierarchy and show them
-                    for (int i = position; commentAdapter.getComments().get(i).getHierarchy() > hierarchy && i < commentAdapter.getComments().size(); i++) {
-                        commentAdapter.getItem(i).setIsHidden(false);
-                    }
-                }
-                commentAdapter.notifyDataSetChanged();
+                return true;
             }
         });
     }
