@@ -4,6 +4,6 @@ Cheddar is a lightweight reader for Hacker News, so you can read the latest news
 
 [![Get it on Google Play!](https://developer.android.com/images/brand/en_generic_rgb_wo_60.png)](https://play.google.com/store/apps/details?id=co.adrianblan.cheddar)
 
-## Screenshots
+## Images
 
 ![Cheddar image](http://i.imgur.com/q41yH4W.png)
