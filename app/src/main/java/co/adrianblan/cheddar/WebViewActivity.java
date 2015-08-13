@@ -38,6 +38,8 @@ public class WebViewActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         myWebView = (WebView) findViewById(R.id.webview);
+
+        // Load previous state if we have it
         if(savedInstanceState != null){
             myWebView.restoreState(savedInstanceState);
         } else {
@@ -51,6 +53,7 @@ public class WebViewActivity extends AppCompatActivity {
             getSupportActionBar().setTitle(feedItem.getTitle());
             getSupportActionBar().setSubtitle(feedItem.getShortUrl());
 
+            // If we don't have previous state, reload the URL
             if(savedInstanceState == null) {
                 myWebView.loadUrl(feedItem.getLongUrl());
             }
@@ -155,6 +158,8 @@ public class WebViewActivity extends AppCompatActivity {
 
         // This button will only appear if we have a feed item
         else if(id == R.id.menu_comments && hasFeedItem){
+
+            // Go to the comments
             Intent intent = new Intent(getApplicationContext(), CommentActivity.class);
             Bundle b = new Bundle();
             b.putSerializable("feedItem", feedItem);

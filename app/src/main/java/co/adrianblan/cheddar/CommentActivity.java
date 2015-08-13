@@ -73,11 +73,13 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
             commentAdapter = new CommentAdapter(comments, feedItem, this);
         }
 
+        // Init toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_comment);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(feedItem.getTitle());
 
+        // Init list
         ObservableListView lv = (ObservableListView) findViewById(R.id.activity_comment_list);
         lv.setScrollViewCallbacks(this);
         lv.addHeaderView(initHeader(feedItem));

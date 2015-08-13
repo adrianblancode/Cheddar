@@ -6,18 +6,12 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
-import android.text.method.MovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.URLSpan;
-import android.text.util.Linkify;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +19,8 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.lang.reflect.Array;
+import com.devspark.robototextview.widget.RobotoTextView;
+
 import java.util.ArrayList;
 
 /**
@@ -101,7 +96,7 @@ public class CommentAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         class ViewHolder {
-            TextView title;
+            RobotoTextView title;
             TextView body;
             TextView time;
             LinearLayout container;
@@ -130,7 +125,7 @@ public class CommentAdapter extends BaseAdapter {
 
             LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = inflater.inflate(R.layout.comment, parent, false);
-            holder.title = (TextView) convertView.findViewById(R.id.comment_title);
+            holder.title = (RobotoTextView) convertView.findViewById(R.id.comment_title);
             holder.body = (JellyBeanCompatTextView) convertView.findViewById(R.id.comment_body);
             holder.time = (TextView) convertView.findViewById(R.id.comment_time);
             holder.container = (LinearLayout) convertView.findViewById(R.id.comment);
