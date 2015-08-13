@@ -167,7 +167,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
 
                 // If there is no comment data, or we clicked the header, return
                 if (commentAdapter.getComments().size() == 0 || position == 0) {
-                    return false;
+                    return true;
                 }
 
                 Comment comment = commentAdapter.getItem(position - 1);
@@ -192,7 +192,8 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
                     commentAdapter.notifyDataSetChanged();
                 }
 
-                return true;
+                // Nothing happened, don't consume the click
+                return false;
             }
         });
 

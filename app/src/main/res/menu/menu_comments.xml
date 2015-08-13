@@ -9,6 +9,8 @@
         android:title="Refresh"
         android:icon="@drawable/ic_refresh_white_24dp"
         app:showAsAction="collapseActionView|ifRoom"/>
-    <item android:id="@+id/action_settings" android:title="@string/action_settings"
-        android:orderInCategory="100" app:showAsAction="never" />
+    <item android:id="@+id/action_settings"
+        android:title="Refresh"
+        android:icon="@drawable/abc_ic_menu_moreoverflow_mtrl_alpha"
+        app:showAsAction="collapseActionView|ifRoom"/>
 </menu>

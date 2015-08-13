@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,7 +38,11 @@ public class WebViewActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         myWebView = (WebView) findViewById(R.id.webview);
-        initWebView(myWebView);
+        if(savedInstanceState != null){
+            myWebView.restoreState(savedInstanceState);
+        } else {
+            initWebView(myWebView);
+        }
 
         // If we have a related feed item, we choose the advanced toolbar
         if(feedItem != null){
@@ -45,11 +50,17 @@ public class WebViewActivity extends AppCompatActivity {
             thumbnail = (Bitmap) getIntent().getParcelableExtra("thumbnail");
             getSupportActionBar().setTitle(feedItem.getTitle());
             getSupportActionBar().setSubtitle(feedItem.getShortUrl());
-            myWebView.loadUrl(feedItem.getLongUrl());
+
+            if(savedInstanceState == null) {
+                myWebView.loadUrl(feedItem.getLongUrl());
+            }
         } else {
             hasFeedItem = false;
             getSupportActionBar().setTitle(b.getString("url"));
-            myWebView.loadUrl(b.getString("url"));
+
+            if(savedInstanceState == null) {
+                myWebView.loadUrl(b.getString("url"));
+            }
         }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -71,6 +82,21 @@ public class WebViewActivity extends AppCompatActivity {
 
         //Enable progress bar
         myWebView.setWebChromeClient(new WebChromeClient() {
+
+            @Override
+            public void onReceivedTitle(WebView view, String title) {
+
+                if(!hasFeedItem) {
+                    // When the site title loads, we change the view title also
+                    super.onReceivedTitle(view, title);
+                    if (!TextUtils.isEmpty(title)) {
+                        // The old title becomes the new subtitle
+                        getSupportActionBar().setSubtitle(getSupportActionBar().getTitle());
+                        getSupportActionBar().setTitle(title);
+                    }
+                }
+            }
+
             public void onProgressChanged(WebView view, int progress) {
                 progressBar.setProgress(progress);
 
@@ -104,9 +130,11 @@ public class WebViewActivity extends AppCompatActivity {
         return true;
     }
 
+    // Save the state of the web view when the screen is rotated.
     @Override
-    public void onSaveInstanceState(Bundle savedState) {
-        super.onSaveInstanceState(savedState);
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        myWebView.saveState(outState);
     }
 
     @Override
