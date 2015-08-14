@@ -1,22 +1,22 @@
 package co.adrianblan.cheddar;
 
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 
 /**
  * Created by Adrian on 2015-07-25.
  */
 public class FeedItem implements Serializable {
 
+    // For info on these variables, check out the Hacker News FireBase API
     private Long submissionId;
     private String title;
     private String by;
+    private String text;
     private long score;
-    private long commentCount;
+    private long descendants;
     private String time;
     private String shortUrl;
     private String longUrl;
@@ -32,7 +32,7 @@ public class FeedItem implements Serializable {
         this.submissionId = 0L;
         this.title = null;
         this.score = 0;
-        this.commentCount = 0;
+        this.descendants = 0;
         this.time = null;
         this.shortUrl = null;
         this.longUrl = null;
@@ -57,6 +57,14 @@ public class FeedItem implements Serializable {
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
     public String getBy() {
@@ -99,16 +107,12 @@ public class FeedItem implements Serializable {
         this.longUrl = longUrl;
     }
 
-    public long getCommentCount() {
-        return commentCount;
+    public long getDescendants() {
+        return descendants;
     }
 
-    public void setCommentCount(long commentCount) {
-        this.commentCount = commentCount;
-    }
-
-    public void addCommentCount(int comments) {
-        this.commentCount += comments;
+    public void setDescendants(long descendants) {
+        this.descendants = descendants;
     }
 
     public Bitmap getThumbnail() {

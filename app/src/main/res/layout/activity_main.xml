@@ -23,6 +23,7 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:elevation="4dp"
         tools:context=".MainActivity">
     
         <android.support.v7.widget.Toolbar
@@ -31,8 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/toolbar_height"
             android:background="@color/colorPrimary"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark"
-            android:elevation="4dp"/>
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"/>
 
         <com.astuetz.PagerSlidingTabStrip
             android:id="@+id/tabs"
@@ -42,8 +42,6 @@
             app:pstsShouldExpand="true"
             app:pstsTabTextColor="@color/white"
             app:pstsUnderlineColor="@color/white"
-            app:pstsIndicatorColor="@color/white"
-            android:elevation="4dp"
-            />
+            app:pstsIndicatorColor="@color/white"/>
     </LinearLayout>
 </FrameLayout>

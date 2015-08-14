@@ -112,7 +112,7 @@ public class FeedAdapter extends BaseAdapter {
         holder.title.setText(item.getTitle());
         holder.shortUrl.setText(item.getShortUrl());
         holder.score.setText(Long.toString(item.getScore()));
-        holder.comments.setText(Long.toString(item.getCommentCount()));
+        holder.comments.setText(Long.toString(item.getDescendants()));
         holder.time.setText(item.getTime());
 
         // If we have a high resolution thumbnail, display it

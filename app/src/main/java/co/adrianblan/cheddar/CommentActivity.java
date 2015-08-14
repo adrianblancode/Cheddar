@@ -1,11 +1,22 @@
 package co.adrianblan.cheddar;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.method.LinkMovementMethod;
+import android.text.method.MovementMethod;
+import android.text.style.ClickableSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.URLSpan;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,6 +28,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
+import com.devspark.robototextview.widget.RobotoTextView;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -111,7 +123,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         score.setText(Long.toString(feedItem.getScore()));
 
         TextView comments = (TextView) header.findViewById(R.id.feed_item_comments);
-        comments.setText(Long.toString(feedItem.getCommentCount()));
+        comments.setText(Long.toString(feedItem.getDescendants()));
 
         TextView time = (TextView) header.findViewById(R.id.feed_item_time);
         time.setText(feedItem.getTime());
@@ -150,6 +162,31 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
                     startActivity(intent);
                 }
             });
+        }
+
+        LinearLayout comment = (LinearLayout) header.findViewById(R.id.feed_item_comment);
+        LinearLayout comment_divider = (LinearLayout) header.findViewById(R.id.feed_item_comment_divider);
+
+        // If the feeditem has any text, we display it
+        if(feedItem.getText() != null && !feedItem.getText().isEmpty()) {
+            RobotoTextView comment_title = (RobotoTextView) header.findViewById(R.id.feed_item_comment_title);
+            TextView comment_text = (JellyBeanCompatTextView) header.findViewById(R.id.feed_item_comment_text);
+            LinearLayout divider = (LinearLayout) header.findViewById(R.id.feed_item_divider);
+
+            comment_title.setText(feedItem.getBy() + " [OP]");
+
+            // Helper function to do fancy formatting with html
+            // Yes this method sucks, no I didn't find anything better to intercept clicks that actually wokrs
+            comment_text.setText(commentAdapter.trimWhitespace(Html.fromHtml(feedItem.getText())));
+
+            divider.setBackgroundColor(Color.parseColor("#ff6600"));
+            divider.getLayoutParams().height = 3;
+
+            comment.setVisibility(VISIBLE);
+            comment_divider.setVisibility(VISIBLE);
+        } else {
+            comment.setVisibility(GONE);
+            comment_divider.setVisibility(GONE);
         }
 
         //Add padding so that we compensate for the Toolbar
@@ -202,7 +239,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
 
                 // If there is no comment data, or we clicked the header, return
                 if (commentAdapter.getComments().size() == 0 || position == 0) {
-                    return true;
+                    return false;
                 }
 
                 Comment comment = commentAdapter.getItem(position - 1);
@@ -367,10 +404,10 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         TextView scoreView = (TextView) header.findViewById(R.id.feed_item_score);
         scoreView.setText(Long.toString(feedItem.getScore()));
 
-        if(newCommentCount > feedItem.getCommentCount()) {
+        if(newCommentCount > feedItem.getDescendants()) {
             TextView commentView = (TextView) header.findViewById(R.id.feed_item_comments);
             commentView.setText(Long.toString(newCommentCount));
-            feedItem.setCommentCount(newCommentCount);
+            feedItem.setDescendants(newCommentCount);
         }
 
         TextView timeView = (TextView) header.findViewById(R.id.feed_item_time);

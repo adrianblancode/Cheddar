@@ -8,7 +8,7 @@ android {
         applicationId "co.adrianblan.cheddar"
         minSdkVersion 15
         targetSdkVersion 21
-        versionCode 2
+        versionCode 4
         versionName "1.0"
     }
     buildTypes {

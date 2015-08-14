@@ -2,7 +2,6 @@ package co.adrianblan.cheddar;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,7 +16,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -285,8 +283,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
                     try {
                         site = new URL(url);
                     } catch (MalformedURLException e) {
-                        System.err.println(url + e);
-                        return;
+                        System.err.println("Malformed url: " + url);
                     }
                 }
 
@@ -294,7 +291,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
                 feedAdapter.add(f);
                 feedAdapter.notifyDataSetChanged();
 
-                if (url != null) {
+                if (site != null) {
                     // Asynchronously updates images for the feed item
                     updateSubmissionThumbnail(site.getHost(), f);
                 }
@@ -320,15 +317,21 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         int comments = 0;
         ArrayList<Long> kids = (ArrayList<Long>) ret.get("kids");
 
-        if(kids != null) {
-            updateCommentCount(f, kids);
-        }
-
         // Set titles and other data
         f.setTitle((String) ret.get("title"));
+        f.setText((String) ret.get("text"));
         f.setBy((String) ret.get("by"));
         f.setScore((Long) ret.get("score"));
         f.setTime(time);
+
+        // Jobs stories don't have any descendants, we need to take care of that
+        Object descendantObject = ret.get("descendants");
+        if(descendantObject != null) {
+            f.setDescendants((Long) descendantObject);
+        } else {
+            System.err.println("Null descendants: " + (String) ret.get("title"));
+            f.setDescendants(0L);
+        }
 
         if(site != null) {
             String domain = site.getHost().replace("www.", "");
@@ -347,75 +350,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         f.setTextDrawable(drawable);
 
         return f;
-    }
-
-    // Goes through each comment for children and adds them to the count
-    // Since traversing all commentCount takes a lot of work, we do it in a separate task
-    public void updateCommentCount(FeedItem feedItem, ArrayList<Long> kids){
-
-        final FeedItem f = feedItem;
-        final ArrayList<Long> k = kids;
-
-        feedItem.addCommentCount(kids.size());
-        feedAdapter.notifyDataSetChanged();
-
-        class commentUpdateTask extends AsyncTask<String, Integer, String> {
-
-            @Override
-            protected String doInBackground(String... url) {
-                for(Long comment : k) {
-                    updateSingleCommentCount(f, comment);
-                }
-                return null;
-            }
-            @Override
-            protected void onProgressUpdate(Integer... i) {}
-
-            @Override
-            protected void onPostExecute(String thumbnailUrl) {
-                feedAdapter.notifyDataSetChanged();
-            }
-        }
-
-        commentUpdateTask task = new commentUpdateTask();
-        asyncTasks.add(task);
-
-        // TODO use threadpoolexecutor?
-        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
-    // Recursively update comment count
-    public void updateSingleCommentCount(FeedItem f, Long id){
-
-        final FeedItem fi = f;
-
-        itemUrl.child(Long.toString(id)).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-
-                if (snapshot.getValue() == null) {
-                    return;
-                }
-
-                ArrayList<Long> kids = (ArrayList<Long>) ((Map<String, Object>) snapshot.getValue()).get("kids");
-
-                // Update child commentCount
-                if (kids != null) {
-
-                    fi.addCommentCount(kids.size());
-                    //feedAdapter.notifyDataSetChanged();
-
-                    for (int i = 0; i < kids.size(); i++) {
-                        updateSingleCommentCount(fi, kids.get(i));
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                System.err.println("Could not retrieve post! " + firebaseError);
-            }
-        });
     }
 
     // Recieves a host url, and the position of the feed item
