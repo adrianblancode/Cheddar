@@ -1,45 +1,53 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_feed"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/fragment_feed">
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <com.github.ksoichiro.android.observablescrollview.ObservableListView
-            android:id="@+id/feed_list"
+        <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/swipeContainer"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@null"
-            android:dividerHeight="0dp"/>
+            android:layout_height="match_parent>
+
+            <com.github.ksoichiro.android.observablescrollview.ObservableListView
+                android:id="@+id/feed_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@null"
+                android:dividerHeight="0dp"/>
+
+        </android.support.v4.widget.SwipeRefreshLayout>
 
         <LinearLayout
             android:id="@+id/activity_main_progress"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center_horizontal|center_vertical">
+
             <ProgressBar
+                android:id="@+id/marker_progress"
+                style="?android:attr/progressBarStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="50dp"
                 android:layout_marginTop="-100dp"
-                android:indeterminate="true"
-                android:id="@+id/marker_progress"
-                style="?android:attr/progressBarStyle"/>
+                android:indeterminate="true" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/activity_main_none"
-            android:visibility="gone"
+            style="@style/Base.TextAppearance.AppCompat.Body1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
             android:layout_gravity="center_vertical"
+            android:layout_marginTop="20dp"
             android:gravity="center_horizontal"
-            style="@style/Base.TextAppearance.AppCompat.Body1"
+            android:text="Could not load submissions."
             android:textColor="@color/abc_primary_text_material_light"
-            android:text="Could not load submissions."/>
+            android:visibility="gone" />
     </LinearLayout>
 
 </FrameLayout>
