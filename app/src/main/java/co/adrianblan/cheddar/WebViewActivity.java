@@ -1,7 +1,6 @@
 package co.adrianblan.cheddar;
 
 import android.content.Intent;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -49,7 +48,7 @@ public class WebViewActivity extends AppCompatActivity {
         // If we have a related feed item, we choose the advanced toolbar
         if(feedItem != null){
             hasFeedItem = true;
-            thumbnail = (Bitmap) getIntent().getParcelableExtra("thumbnail");
+            thumbnail = getIntent().getParcelableExtra("thumbnail");
             getSupportActionBar().setTitle(feedItem.getTitle());
             getSupportActionBar().setSubtitle(feedItem.getShortUrl());
 

@@ -93,7 +93,8 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         itemUrl = baseUrl.child("/item/");
         storiesUrl = baseUrl.child(getArguments().getString("url"));
 
-        asyncTasks = new ArrayList<AsyncTask>();
+        //noinspection Convert2Diamond
+        asyncTasks = new ArrayList<>();
         lastSubmissionUpdate = new Date();
 
         if(savedInstanceState == null) {
@@ -132,8 +133,8 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         updateHeaderPadding(true);
         listView.addHeaderView(empty);
 
-        no_submissions = (TextView) rootView.findViewById(R.id.activity_main_none);
-        progress = (LinearLayout) rootView.findViewById(R.id.activity_main_progress);
+        no_submissions = rootView.findViewById(R.id.activity_main_none);
+        progress = rootView.findViewById(R.id.activity_main_progress);
 
         listView.setAdapter(feedAdapter);
 
@@ -329,7 +330,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         if(descendantObject != null) {
             f.setDescendants((Long) descendantObject);
         } else {
-            System.err.println("Null descendants: " + (String) ret.get("title"));
+            System.err.println("Null descendants: " + ret.get("title"));
             f.setDescendants(0L);
         }
 

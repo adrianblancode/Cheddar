@@ -1,22 +1,13 @@
 package co.adrianblan.cheddar;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.method.LinkMovementMethod;
-import android.text.method.MovementMethod;
-import android.text.style.ClickableSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.URLSpan;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -99,8 +90,8 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         lv.setAdapter(commentAdapter);
         addCommentOnClickListeners(lv);
 
-        no_comments = (TextView) findViewById(R.id.activity_comment_none);
-        progress = (LinearLayout) findViewById(R.id.activity_comment_progress);
+        no_comments = findViewById(R.id.activity_comment_none);
+        progress = findViewById(R.id.activity_comment_progress);
 
         // Don't update if we already have retrieved saved comments
         if(commentAdapter.getCount() == 0) {
@@ -128,7 +119,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         TextView time = (TextView) header.findViewById(R.id.feed_item_time);
         time.setText(feedItem.getTime());
 
-        thumbnail = (Bitmap) getIntent().getParcelableExtra("thumbnail");
+        thumbnail = getIntent().getParcelableExtra("thumbnail");
 
         // Generate new TextDrawable
         ImageView imageView = (ImageView) header.findViewById(R.id.feed_item_thumbnail);
@@ -177,7 +168,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
 
             // Helper function to do fancy formatting with html
             // Yes this method sucks, no I didn't find anything better to intercept clicks that actually wokrs
-            comment_text.setText(commentAdapter.trimWhitespace(Html.fromHtml(feedItem.getText())));
+            comment_text.setText(CommentAdapter.trimWhitespace(Html.fromHtml(feedItem.getText())));
 
             divider.setBackgroundColor(Color.parseColor("#ff6600"));
             divider.getLayoutParams().height = 3;
