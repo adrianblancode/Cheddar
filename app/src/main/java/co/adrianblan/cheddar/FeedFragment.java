@@ -100,7 +100,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             feedAdapter = new FeedAdapter(getActivity());
         } else {
             // Restore saved data
-            ArrayList<FeedItem> feedItems = (ArrayList<FeedItem>) savedInstanceState.getSerializable("feedItems");
+            ArrayList<FeedItem> feedItems = savedInstanceState.getParcelableArrayList("feedItems");
             feedAdapter = new FeedAdapter(feedItems, getActivity());
         }
 
@@ -572,6 +572,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         super.onSaveInstanceState(savedInstanceState);
 
         // Save data
-        savedInstanceState.putSerializable("feedItems", feedAdapter.getFeedItems());
+        savedInstanceState.putParcelableArrayList("feedItems", feedAdapter.getFeedItems());
     }
 }
