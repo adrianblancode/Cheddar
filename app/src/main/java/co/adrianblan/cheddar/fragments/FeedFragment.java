@@ -45,9 +45,6 @@ import co.adrianblan.cheddar.R;
 import co.adrianblan.cheddar.activities.MainActivity;
 import co.adrianblan.cheddar.models.FeedItem;
 
-/**
- * Created by Adrian on 2015-07-28.
- */
 public class FeedFragment extends Fragment implements ObservableScrollViewCallbacks {
 
     private FeedAdapter feedAdapter;

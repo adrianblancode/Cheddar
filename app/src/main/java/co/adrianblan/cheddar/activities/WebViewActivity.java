@@ -17,9 +17,6 @@ import android.widget.ProgressBar;
 import co.adrianblan.cheddar.models.FeedItem;
 import co.adrianblan.cheddar.R;
 
-/**
- * Created by Adrian on 2015-07-28.
- */
 public class WebViewActivity extends AppCompatActivity {
 
     private WebView myWebView;

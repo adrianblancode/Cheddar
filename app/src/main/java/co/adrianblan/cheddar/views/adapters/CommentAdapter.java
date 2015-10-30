@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
@@ -30,9 +31,6 @@ import co.adrianblan.cheddar.activities.WebViewActivity;
 import co.adrianblan.cheddar.models.Comment;
 import co.adrianblan.cheddar.models.FeedItem;
 
-/**
- * Created by Adrian on 2015-07-30.
- */
 public class CommentAdapter extends BaseAdapter {
 
     private ArrayList<Comment> comments;
@@ -56,11 +54,11 @@ public class CommentAdapter extends BaseAdapter {
         feedItem = fi;
     }
 
-    public void add (Comment c){
+    public void add(Comment c) {
         comments.add(c);
     }
 
-    public void add (int i, Comment c){
+    public void add(int i, Comment c) {
         comments.add(i, c);
     }
 
@@ -70,8 +68,8 @@ public class CommentAdapter extends BaseAdapter {
 
     public int getPosition(Comment c) {
 
-        for(int i = 0; i < getCount(); i++) {
-            if(comments.get(i).equals(c)){
+        for (int i = 0; i < getCount(); i++) {
+            if (comments.get(i).equals(c)) {
                 return i;
             }
         }
@@ -79,7 +77,7 @@ public class CommentAdapter extends BaseAdapter {
         return -1;
     }
 
-    public ArrayList<Comment> getComments(){
+    public ArrayList<Comment> getComments() {
         return comments;
     }
 
@@ -113,20 +111,20 @@ public class CommentAdapter extends BaseAdapter {
             TextView hidden_children;
         }
 
-        if(colors == null){
+        if (colors == null) {
             colors = initColors(parent.getContext());
         }
 
         final Comment com = comments.get(position);
 
-        if(com.isHidden()){
+        if (com.isHidden()) {
             // Inflate and return an empty layout
             return new View(context);
         }
 
         ViewHolder holder;
 
-        if(convertView == null || convertView.getTag() == null) {
+        if (convertView == null || convertView.getTag() == null) {
 
             holder = new ViewHolder();
 
@@ -155,7 +153,7 @@ public class CommentAdapter extends BaseAdapter {
             holder.title.setTextColor(context.getResources().getColor(R.color.colorPrimary));
             holder.title.setText(holder.title.getText() + " [OP]");
         } else {
-            holder.title.setTextColor(context.getResources().getColor(R.color.abc_secondary_text_material_light));
+            holder.title.setTextColor(ContextCompat.getColor(context, R.color.abc_secondary_text_material_light));
         }
 
         // If the comment exists
@@ -177,7 +175,7 @@ public class CommentAdapter extends BaseAdapter {
         holder.indicator.setPadding((int) dpToPixels(4, parent.getContext()) * (com.getHierarchy() - 1), 0, 0, 0);
 
         // We don't need the indicator for top level commentCount
-        if(com.getHierarchy() == 0){
+        if (com.getHierarchy() == 0) {
             holder.indicator.setVisibility(View.GONE);
             holder.indicator_color.setVisibility(View.GONE);
         } else {
@@ -189,7 +187,7 @@ public class CommentAdapter extends BaseAdapter {
             holder.indicator_color.setBackgroundColor(color);
         }
 
-        if(com.hasHideChildren()){
+        if (com.hasHideChildren()) {
             holder.hidden_children.setText("+" + Integer.toString(com.getHiddenChildren()));
             holder.hidden_children.setVisibility(View.VISIBLE);
         } else {
@@ -202,17 +200,17 @@ public class CommentAdapter extends BaseAdapter {
     // Initializes the list of colours which will be used to display comment hierarchy
     public ArrayList<Integer> initColors(Context context) {
         ArrayList<Integer> colors = new ArrayList<>();
-        colors.add(context.getResources().getColor(R.color.colorPrimary));
-        colors.add(context.getResources().getColor(R.color.materialPink));
-        colors.add(context.getResources().getColor(R.color.materialDeepPurple));
-        colors.add(context.getResources().getColor(R.color.materialBlue)); // Not really material blue but who cares
-        colors.add(context.getResources().getColor(R.color.materialGreen));
-        colors.add(context.getResources().getColor(R.color.materialAmber));
+        colors.add(ContextCompat.getColor(context, R.color.colorPrimary));
+        colors.add(ContextCompat.getColor(context, R.color.materialPink));
+        colors.add(ContextCompat.getColor(context, R.color.materialDeepPurple));
+        colors.add(ContextCompat.getColor(context, R.color.materialBlue)); // Not really material blue but who cares
+        colors.add(ContextCompat.getColor(context, R.color.materialGreen));
+        colors.add(ContextCompat.getColor(context, R.color.materialAmber));
 
         return colors;
     }
 
-    public static float dpToPixels(float dp, Context context){
+    public static float dpToPixels(float dp, Context context) {
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
         return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
@@ -223,7 +221,7 @@ public class CommentAdapter extends BaseAdapter {
         int i = source.length();
 
         // loop back to the first non-whitespace character
-        while(--i >= 0 && Character.isWhitespace(source.charAt(i))) {
+        while (--i >= 0 && Character.isWhitespace(source.charAt(i))) {
         }
 
         // Removes two trailing newlines
@@ -231,8 +229,8 @@ public class CommentAdapter extends BaseAdapter {
 
         SpannableStringBuilder ssb = new SpannableStringBuilder(source);
 
-        for(i = 0; i + 1 < source.length(); i++){
-            if(Character.isWhitespace(source.charAt(i)) && Character.isWhitespace(source.charAt(i + 1))) {
+        for (i = 0; i + 1 < source.length(); i++) {
+            if (Character.isWhitespace(source.charAt(i)) && Character.isWhitespace(source.charAt(i + 1))) {
 
                 // Reduces the size of double whitespace
                 ssb.setSpan(new RelativeSizeSpan(0.4f), i, i + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -242,8 +240,7 @@ public class CommentAdapter extends BaseAdapter {
         return ssb;
     }
 
-    protected void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span)
-    {
+    protected void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span) {
         int start = strBuilder.getSpanStart(span);
         int end = strBuilder.getSpanEnd(span);
         int flags = strBuilder.getSpanFlags(span);
@@ -280,7 +277,7 @@ public class CommentAdapter extends BaseAdapter {
         CharSequence sequence = Html.fromHtml(html);
         SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
         URLSpan[] urls = strBuilder.getSpans(0, sequence.length(), URLSpan.class);
-        for(URLSpan span : urls) {
+        for (URLSpan span : urls) {
             makeLinkClickable(strBuilder, span);
         }
 

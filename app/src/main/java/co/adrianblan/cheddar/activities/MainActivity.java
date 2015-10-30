@@ -89,7 +89,8 @@ public class MainActivity extends AppCompatActivity {
     // Since each response is less than 1KB we have a lot to spare
     private void enableHttpResponseCache() {
         try {
-            long httpCacheSize = 1 * 1024 * 1024; // 1 MiB
+            //noinspection PointlessArithmeticExpression
+            long httpCacheSize = 1024 * 1024; // 1 MiB
             File httpCacheDir = new File(getCacheDir(), "http");
             Class.forName("android.net.http.HttpResponseCache")
                     .getMethod("install", File.class, long.class)

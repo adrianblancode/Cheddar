@@ -13,9 +13,6 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.widget.TextView;
 
-/**
- * Created by Adrian on 2015-08-12.
- */
 public class TextViewFixTouchConsume extends TextView {
 
     boolean dontConsumeNonUrlClicks = true;

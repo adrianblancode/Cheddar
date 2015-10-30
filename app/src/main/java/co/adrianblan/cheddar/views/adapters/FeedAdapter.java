@@ -21,9 +21,6 @@ import co.adrianblan.cheddar.activities.CommentActivity;
 import co.adrianblan.cheddar.activities.WebViewActivity;
 import co.adrianblan.cheddar.models.FeedItem;
 
-/**
- * Created by Adrian on 2015-07-25.
- */
 public class FeedAdapter extends BaseAdapter {
 
     private ArrayList<FeedItem> feedItems;
