@@ -25,7 +25,7 @@ public class FeedAdapter extends BaseAdapter {
     private final Context context;
 
     public FeedAdapter(Context c) {
-        feedItems = new ArrayList<FeedItem>();
+        feedItems = new ArrayList<>();
         context = c;
     }
 

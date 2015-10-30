@@ -36,7 +36,7 @@ public class CommentAdapter extends BaseAdapter {
     // Constructor which creates new arraylist
     public CommentAdapter(FeedItem fi, Context c) {
         colors = null;
-        comments = new ArrayList<Comment>();
+        comments = new ArrayList<>();
         context = c;
         feedItem = fi;
     }
@@ -193,7 +193,7 @@ public class CommentAdapter extends BaseAdapter {
 
     // Initializes the list of colours which will be used to display comment hierarchy
     public ArrayList<Integer> initColors(Context context) {
-        ArrayList<Integer> colors = new ArrayList<Integer>();
+        ArrayList<Integer> colors = new ArrayList<>();
         colors.add(context.getResources().getColor(R.color.colorPrimary));
         colors.add(context.getResources().getColor(R.color.materialPink));
         colors.add(context.getResources().getColor(R.color.materialDeepPurple));
@@ -206,8 +206,7 @@ public class CommentAdapter extends BaseAdapter {
 
     public static float dpToPixels(float dp, Context context){
         DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        int px = Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
-        return px;
+        return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
     }
 
     // Removes trailing double whitespace, reduces the size of other double whitespace

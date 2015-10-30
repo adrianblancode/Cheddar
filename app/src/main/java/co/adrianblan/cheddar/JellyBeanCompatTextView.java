@@ -127,8 +127,10 @@ public class JellyBeanCompatTextView extends TextView {
     private FixingResult addSpacesAroundSpansUntilFixed(SpannableStringBuilder builder, int widthMeasureSpec, int heightMeasureSpec) {
 
         Object[] spans = builder.getSpans(0, builder.length(), Object.class);
-        List<Object> spansWithSpacesBefore = new ArrayList<Object>(spans.length);
-        List<Object> spansWithSpacesAfter = new ArrayList<Object>(spans.length);
+        //noinspection Convert2Diamond
+        List<Object> spansWithSpacesBefore = new ArrayList<>(spans.length);
+        //noinspection Convert2Diamond
+        List<Object> spansWithSpacesAfter = new ArrayList<>(spans.length);
 
         for (Object span : spans) {
             int spanStart = builder.getSpanStart(span);
