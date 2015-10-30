@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -44,6 +45,7 @@ import static android.widget.AdapterView.*;
 // Activity which shows comments to a feed item
 public class CommentActivity extends AppCompatActivity implements ObservableScrollViewCallbacks {
 
+    private SwipeRefreshLayout swipeContainer;
     private CommentAdapter commentAdapter; // Adapter which stores comments
     private ArrayList<Long> kids; // Stores the array of individual comment IDs
     private Date lastSubmissionUpdate; // Time since last submission update
@@ -69,7 +71,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         Firebase.setAndroidContext(this);
         baseUrl = new Firebase("https://hacker-news.firebaseio.com/v0/item/");
 
-        if(savedInstanceState == null){
+        if (savedInstanceState == null) {
             Bundle b = getIntent().getExtras();
             feedItem = b.getParcelable("feedItem");
             commentAdapter = new CommentAdapter(feedItem, this);
@@ -98,13 +100,22 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         progress = findViewById(R.id.activity_comment_progress);
 
         // Don't get new comments if we already have retrieved saved comments
-        if(commentAdapter.getCount() == 0) {
+        if (commentAdapter.getCount() == 0) {
             updateComments();
         }
+
+        swipeContainer = (SwipeRefreshLayout) findViewById(R.id.swipeContainer);
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                updateComments();
+            }
+        });
+
     }
 
     // Initializes the feed item header with data
-    public View initHeader(final FeedItem feedItem){
+    public View initHeader(final FeedItem feedItem) {
 
         header = View.inflate(this, R.layout.feed_item, null);
 
@@ -129,9 +140,9 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         ImageView imageView = (ImageView) header.findViewById(R.id.feed_item_thumbnail);
 
         // Use thumbnail for the feed item
-        if(thumbnail != null){
+        if (thumbnail != null) {
             imageView.setImageBitmap(thumbnail);
-        } else if (feedItem.getTextDrawable() != null){
+        } else if (feedItem.getTextDrawable() != null) {
             imageView.setImageDrawable(feedItem.getTextDrawable());
         } else {
             // Generate TextDrawable if we don't have one
@@ -139,14 +150,13 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
             TextDrawable drawable = builder.buildRect(feedItem.getLetter(), feedItem.getColor());
             imageView.setImageDrawable(drawable);
 
-            if(feedItem.getTextDrawable() == null){
+            if (feedItem.getTextDrawable() == null) {
                 feedItem.setTextDrawable(drawable);
             }
         }
 
         // If the url doesn't go to hacker news
-        if(feedItem.getLongUrl() != null){
-
+        if (feedItem.getLongUrl() != null) {
             LinearLayout image_container = (LinearLayout) header.findViewById(R.id.feed_item_thumbnail_container);
 
             // If we click the thumbnail, get to the webview
@@ -168,8 +178,6 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
 
         // If the feeditem has any text, we display it
         if(feedItem.getText() != null && !feedItem.getText().isEmpty()) {
-
-            // We use RobotoTextView to get Roboto Bold on author titles
             RobotoTextView comment_title = (RobotoTextView) header.findViewById(R.id.feed_item_comment_title);
 
             // JellyBeanCompatTextView fixes a bug with TextView spannables and earlier versions and android
@@ -198,7 +206,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
     }
 
     // Adds onClickListeners for hiding and revealing comments
-    public void addCommentOnClickListeners(ListView lv){
+    public void addCommentOnClickListeners(ListView lv) {
 
         // So, for some weird reason our longClicks are not consumed properly
         // Thus we need a manual timeout to prevent onItemClick from triggering after onItemLongClick
@@ -273,14 +281,15 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
     }
 
     // Starts updating the commentCount from the top level
-    public void updateComments(){
+    public void updateComments() {
 
-        if(lastSubmissionUpdate != null) {
+        if (lastSubmissionUpdate != null) {
             Date d = new Date();
             long seconds = (d.getTime() - lastSubmissionUpdate.getTime()) / 1000;
 
             // We want to throttle repeated refreshes
             if (seconds < 2) {
+                resetSwipeContainer();
                 return;
             }
         }
@@ -336,10 +345,19 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
                 progress.setVisibility(View.GONE);
             }
         });
+
+        resetSwipeContainer();
+    }
+
+    // Stops the swipe container refresh animation
+    public void resetSwipeContainer() {
+        if (swipeContainer != null) {
+            swipeContainer.setRefreshing(false);
+        }
     }
 
     // Gets an url to a single comment
-    public void updateSingleComment(Long id, Comment parent){
+    public void updateSingleComment(Long id, Comment parent) {
 
         final Comment par = parent;
 
@@ -370,11 +388,11 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
 
                 // If we load a comment into a collapsed chain, we must hide it
                 int position = commentAdapter.getPosition(com);
-                if(position > 0){
+                if (position > 0) {
 
                     Comment aboveComment = commentAdapter.getItem(position - 1);
 
-                    if(aboveComment.isHidden() || (aboveComment.hasHideChildren() && aboveComment.getHierarchy() > com.getHierarchy())){
+                    if (aboveComment.isHidden() || (aboveComment.hasHideChildren() && aboveComment.getHierarchy() > com.getHierarchy())) {
                         com.setIsHidden(true);
                     }
                 }
@@ -404,7 +422,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
     }
 
     // Updates the header with new data
-    public void updateHeader(){
+    public void updateHeader() {
         TextView scoreView = (TextView) header.findViewById(R.id.feed_item_score);
         scoreView.setText(Long.toString(feedItem.getScore()));
 
@@ -421,16 +439,17 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
 
     // Converts the difference between two dates into a pretty date
     // There's probably a joke in there somewhere
-    public String getPrettyDate(Long time){
+    public String getPrettyDate(Long time) {
 
         Date past = new Date(time * 1000);
         Date now = new Date();
 
-        if(TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) > 0){
+        if (TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) > 0) {
             return TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) + "d";
-        } else if(TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) > 0){
+        } else if (TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) > 0) {
             return TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) + "h";
-        } if(TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime()) > 0){
+        }
+        if (TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime()) > 0) {
             return TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime()) + "m";
         } else {
             return TimeUnit.MILLISECONDS.toSeconds(now.getTime() - past.getTime()) + "s";
@@ -442,7 +461,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         MenuInflater menuInflater = getMenuInflater();
 
         // If we don't have an Url, we make sure you can't go to the webview
-        if(feedItem.getLongUrl() != null) {
+        if (feedItem.getLongUrl() != null) {
             menuInflater.inflate(R.menu.menu_comments, menu);
         } else {
             menuInflater.inflate(R.menu.menu_main, menu);
@@ -457,16 +476,12 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        if(id == android.R.id.home){
+        if (id == android.R.id.home) {
             onBackPressed();
             return true;
-        }
-
-        else if (id == R.id.menu_refresh) {
+        } else if (id == R.id.menu_refresh) {
             updateComments();
-        }
-
-        else if(id == R.id.menu_webview){
+        } else if (id == R.id.menu_webview) {
             Intent intent = new Intent(this, WebViewActivity.class);
             Bundle b = new Bundle();
             b.putParcelable("feedItem", feedItem);
@@ -479,10 +494,12 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
     }
 
     @Override
-    public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {}
+    public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
+    }
 
     @Override
-    public void onDownMotionEvent() {}
+    public void onDownMotionEvent() {
+    }
 
     @Override
     public void onUpOrCancelMotionEvent(ScrollState scrollState) {
@@ -501,7 +518,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
     }
 
     // Updates the padding on header to compensate for what is visible on the screen
-    public void updateHeaderPadding(boolean show){
+    public void updateHeaderPadding(boolean show) {
         if (show) {
             header.setPadding(0, (int) getResources().getDimension(R.dimen.toolbar_height), 0, 0);
         } else {
