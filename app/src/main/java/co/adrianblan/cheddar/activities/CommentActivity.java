@@ -32,15 +32,18 @@ import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
-import co.adrianblan.cheddar.models.Comment;
-import co.adrianblan.cheddar.views.adapters.CommentAdapter;
-import co.adrianblan.cheddar.models.FeedItem;
-import co.adrianblan.cheddar.views.JellyBeanCompatTextView;
 import co.adrianblan.cheddar.R;
+import co.adrianblan.cheddar.models.Comment;
+import co.adrianblan.cheddar.models.FeedItem;
+import co.adrianblan.cheddar.utils.StringUtils;
+import co.adrianblan.cheddar.views.JellyBeanCompatTextView;
+import co.adrianblan.cheddar.views.adapters.CommentAdapter;
 
-import static android.widget.AdapterView.*;
+import static android.widget.AdapterView.GONE;
+import static android.widget.AdapterView.OnItemClickListener;
+import static android.widget.AdapterView.OnItemLongClickListener;
+import static android.widget.AdapterView.VISIBLE;
 
 // Activity which shows comments to a feed item
 public class CommentActivity extends AppCompatActivity implements ObservableScrollViewCallbacks {
@@ -316,7 +319,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
                 kids = (ArrayList<Long>) ret.get("kids");
 
                 // Update the feed item data
-                feedItem.setTime(getPrettyDate((long) ret.get("time")));
+                feedItem.setTime(StringUtils.getPrettyDate((long) ret.get("time")));
                 feedItem.setScore((Long) ret.get("score"));
 
                 // If the feed item has comments
@@ -375,7 +378,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
                 Comment com = new Comment();
                 com.setBy((String) ret.get("by"));
                 com.setBody((String) ret.get("text"));
-                com.setTime(getPrettyDate((Long) ret.get("time")));
+                com.setTime(StringUtils.getPrettyDate((Long) ret.get("time")));
 
                 // Check if top level comment
                 if (par == null) {
@@ -437,24 +440,6 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         timeView.setText(feedItem.getTime());
     }
 
-    // Converts the difference between two dates into a pretty date
-    // There's probably a joke in there somewhere
-    public String getPrettyDate(Long time) {
-
-        Date past = new Date(time * 1000);
-        Date now = new Date();
-
-        if (TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) > 0) {
-            return TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) + "d";
-        } else if (TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) > 0) {
-            return TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) + "h";
-        }
-        if (TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime()) > 0) {
-            return TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime()) + "m";
-        } else {
-            return TimeUnit.MILLISECONDS.toSeconds(now.getTime() - past.getTime()) + "s";
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
