@@ -76,13 +76,13 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
 
         if(savedInstanceState == null){
             Bundle b = getIntent().getExtras();
-            feedItem = (FeedItem) b.getSerializable("feedItem");
+            feedItem = b.getParcelable("feedItem");
             commentAdapter = new CommentAdapter(feedItem, this);
         } else {
 
             // We retrieve the saved items
-            feedItem = (FeedItem) savedInstanceState.getSerializable("feedItem");
-            ArrayList<Comment> comments = (ArrayList<Comment>) savedInstanceState.getSerializable("comments");
+            feedItem = savedInstanceState.getParcelable("feedItem");
+            ArrayList<Comment> comments = savedInstanceState.getParcelableArrayList("comments");
             commentAdapter = new CommentAdapter(comments, feedItem, this);
         }
 
@@ -156,7 +156,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
                 public void onClick(View v) {
                     Intent intent = new Intent(v.getContext(), WebViewActivity.class);
                     Bundle bundle = new Bundle();
-                    bundle.putSerializable("feedItem", feedItem);
+                    bundle.putParcelable("feedItem", feedItem);
                     intent.putExtra("thumbnail", thumbnail);
                     intent.putExtras(bundle);
                     startActivity(intent);
@@ -464,7 +464,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         else if(id == R.id.menu_webview){
             Intent intent = new Intent(this, WebViewActivity.class);
             Bundle b = new Bundle();
-            b.putSerializable("feedItem", feedItem);
+            b.putParcelable("feedItem", feedItem);
             intent.putExtra("thumbnail", thumbnail);
             intent.putExtras(b);
             startActivity(intent);
@@ -510,7 +510,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         super.onSaveInstanceState(savedInstanceState);
 
         // Save data
-        savedInstanceState.putSerializable("feedItem", feedItem);
-        savedInstanceState.putSerializable("comments", commentAdapter.getComments());
+        savedInstanceState.putParcelable("feedItem", feedItem);
+        savedInstanceState.putParcelableArrayList("comments", commentAdapter.getComments());
     }
 }

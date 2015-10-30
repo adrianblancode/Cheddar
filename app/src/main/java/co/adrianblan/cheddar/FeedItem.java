@@ -2,13 +2,13 @@ package co.adrianblan.cheddar;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-
-import java.io.Serializable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by Adrian on 2015-07-25.
  */
-public class FeedItem implements Serializable {
+public class FeedItem implements Parcelable {
 
     // For info on these variables, check out the Hacker News FireBase API
     private Long submissionId;
@@ -146,4 +146,48 @@ public class FeedItem implements Serializable {
     public void setColor(int color) {
         this.color = color;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeValue(this.submissionId);
+        dest.writeString(this.title);
+        dest.writeString(this.by);
+        dest.writeString(this.text);
+        dest.writeLong(this.score);
+        dest.writeLong(this.descendants);
+        dest.writeString(this.time);
+        dest.writeString(this.shortUrl);
+        dest.writeString(this.longUrl);
+        dest.writeString(this.letter);
+        dest.writeInt(this.color);
+    }
+
+    protected FeedItem(Parcel in) {
+        this.submissionId = (Long) in.readValue(Long.class.getClassLoader());
+        this.title = in.readString();
+        this.by = in.readString();
+        this.text = in.readString();
+        this.score = in.readLong();
+        this.descendants = in.readLong();
+        this.time = in.readString();
+        this.shortUrl = in.readString();
+        this.longUrl = in.readString();
+        this.letter = in.readString();
+        this.color = in.readInt();
+    }
+
+    public static final Creator<FeedItem> CREATOR = new Creator<FeedItem>() {
+        public FeedItem createFromParcel(Parcel source) {
+            return new FeedItem(source);
+        }
+
+        public FeedItem[] newArray(int size) {
+            return new FeedItem[size];
+        }
+    };
 }

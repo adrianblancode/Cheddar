@@ -150,7 +150,7 @@ public class FeedAdapter extends BaseAdapter {
 
                 Intent intent = new Intent(v.getContext(), CommentActivity.class);
                 Bundle b = new Bundle();
-                b.putSerializable("feedItem", item);
+                b.putParcelable("feedItem", item);
                 intent.putExtra("thumbnail", thumbnail);
                 intent.putExtras(b);
                 context.startActivity(intent);
@@ -181,7 +181,7 @@ public class FeedAdapter extends BaseAdapter {
 
                     Intent intent = new Intent(v.getContext(), WebViewActivity.class);
                     Bundle b = new Bundle();
-                    b.putSerializable("feedItem", item);
+                    b.putParcelable("feedItem", item);
                     intent.putExtra("thumbnail", thumbnail);
                     intent.putExtras(b);
                     context.startActivity(intent);

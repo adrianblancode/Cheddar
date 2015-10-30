@@ -32,7 +32,7 @@ public class WebViewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_webview);
 
         Bundle b = getIntent().getExtras();
-        feedItem = (FeedItem) b.getSerializable("feedItem");
+        feedItem = b.getParcelable("feedItem");
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_webview);
         setSupportActionBar(toolbar);
@@ -162,7 +162,7 @@ public class WebViewActivity extends AppCompatActivity {
             // Go to the comments
             Intent intent = new Intent(getApplicationContext(), CommentActivity.class);
             Bundle b = new Bundle();
-            b.putSerializable("feedItem", feedItem);
+            b.putParcelable("feedItem", feedItem);
             intent.putExtra("thumbnail", thumbnail);
             intent.putExtras(b);
             startActivity(intent);
