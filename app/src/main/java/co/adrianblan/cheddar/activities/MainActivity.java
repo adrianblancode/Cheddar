@@ -1,4 +1,4 @@
-package co.adrianblan.cheddar;
+package co.adrianblan.cheddar.activities;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -17,6 +17,9 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 
 import java.io.File;
+
+import co.adrianblan.cheddar.fragments.FeedFragment;
+import co.adrianblan.cheddar.R;
 
 public class MainActivity extends AppCompatActivity {
 

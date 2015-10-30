@@ -1,4 +1,4 @@
-package co.adrianblan.cheddar;
+package co.adrianblan.cheddar.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -13,6 +13,9 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
+
+import co.adrianblan.cheddar.models.FeedItem;
+import co.adrianblan.cheddar.R;
 
 /**
  * Created by Adrian on 2015-07-28.

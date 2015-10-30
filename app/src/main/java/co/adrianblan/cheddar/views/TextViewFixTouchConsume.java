@@ -1,4 +1,4 @@
-package co.adrianblan.cheddar;
+package co.adrianblan.cheddar.views;
 
 import android.content.Context;
 import android.text.Html;

@@ -1,4 +1,4 @@
-package co.adrianblan.cheddar;
+package co.adrianblan.cheddar.views.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,6 +15,11 @@ import android.widget.TextView;
 import com.amulyakhare.textdrawable.TextDrawable;
 
 import java.util.ArrayList;
+
+import co.adrianblan.cheddar.R;
+import co.adrianblan.cheddar.activities.CommentActivity;
+import co.adrianblan.cheddar.activities.WebViewActivity;
+import co.adrianblan.cheddar.models.FeedItem;
 
 /**
  * Created by Adrian on 2015-07-25.

@@ -1,4 +1,4 @@
-package co.adrianblan.cheddar;
+package co.adrianblan.cheddar.views.adapters;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,6 +22,13 @@ import android.widget.TextView;
 import com.devspark.robototextview.widget.RobotoTextView;
 
 import java.util.ArrayList;
+
+import co.adrianblan.cheddar.views.JellyBeanCompatTextView;
+import co.adrianblan.cheddar.R;
+import co.adrianblan.cheddar.views.TextViewFixTouchConsume;
+import co.adrianblan.cheddar.activities.WebViewActivity;
+import co.adrianblan.cheddar.models.Comment;
+import co.adrianblan.cheddar.models.FeedItem;
 
 /**
  * Created by Adrian on 2015-07-30.

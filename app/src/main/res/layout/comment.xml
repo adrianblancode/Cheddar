@@ -92,7 +92,7 @@
                     android:text="+22"/>
             </RelativeLayout>
 
-        <co.adrianblan.cheddar.JellyBeanCompatTextView
+        <co.adrianblan.cheddar.views.JellyBeanCompatTextView
             android:id="@+id/comment_body"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

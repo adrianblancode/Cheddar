@@ -1,4 +1,4 @@
-package co.adrianblan.cheddar;
+package co.adrianblan.cheddar.fragments;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,9 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.firebase.client.DataSnapshot;
@@ -41,6 +39,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import co.adrianblan.cheddar.views.adapters.FeedAdapter;
+import co.adrianblan.cheddar.R;
+import co.adrianblan.cheddar.activities.MainActivity;
+import co.adrianblan.cheddar.models.FeedItem;
 
 /**
  * Created by Adrian on 2015-07-28.

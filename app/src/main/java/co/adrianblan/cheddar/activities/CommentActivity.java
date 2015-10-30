@@ -1,4 +1,4 @@
-package co.adrianblan.cheddar;
+package co.adrianblan.cheddar.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -32,6 +32,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import co.adrianblan.cheddar.models.Comment;
+import co.adrianblan.cheddar.views.adapters.CommentAdapter;
+import co.adrianblan.cheddar.models.FeedItem;
+import co.adrianblan.cheddar.views.JellyBeanCompatTextView;
+import co.adrianblan.cheddar.R;
 
 import static android.widget.AdapterView.*;
 
