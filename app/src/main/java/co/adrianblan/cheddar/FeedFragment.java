@@ -70,8 +70,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     private final int submissionUpdateNum = 20;
     int loadedSubmissions = -1;
 
-    // Used to fill the space when viewpager minimizes
-    View empty;
     View no_submissions;
     View progress;
     ProgressBar footer;
@@ -133,10 +131,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         ObservableListView listView = (ObservableListView) rootView.findViewById(R.id.feed_list);
         listView.setScrollViewCallbacks(this);
 
-        empty = inflater.inflate(R.layout.empty, listView, false);
-        updateHeaderPadding(true);
-        listView.addHeaderView(empty);
-
         no_submissions = rootView.findViewById(R.id.activity_main_none);
         progress = rootView.findViewById(R.id.activity_main_progress);
 
@@ -186,7 +180,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             }
         });
 
-
+        updateHeaderPadding(true);
         return rootView;
     }
 
@@ -550,8 +544,8 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     // Updates the padding on header to compensate for what is visible on the screen
     public void updateHeaderPadding(boolean show) {
 
-        if (empty == null) {
-            System.err.println("Can't update padding for empty view!");
+        if (swipeContainer == null) {
+            System.err.println("Can't update padding for swipeContainer, not initialized");
             return;
         }
 
@@ -559,11 +553,13 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             // Padding equivalent to both the toolabr and viewpager
             int height = (int) getResources().getDimension(R.dimen.toolbar_height);
             height += (int) getResources().getDimension(R.dimen.viewpager_height);
-            empty.setPadding(0, height, 0, 0);
+            swipeContainer.setPadding(0, height, 0, 0);
+            swipeContainer.setProgressViewOffset(true, height, height + 100);
         } else {
             // If we hide the toolbar, we need to reduce the padding to compensate
             int height = (int) getActivity().getApplicationContext().getResources().getDimension(R.dimen.viewpager_height);
-            empty.setPadding(0, height, 0, 0);
+            swipeContainer.setPadding(0, height, 0, 0);
+            swipeContainer.setProgressViewOffset(true, height, height + 100);
         }
     }
 
