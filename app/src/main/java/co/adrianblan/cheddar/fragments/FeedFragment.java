@@ -376,7 +376,7 @@ public class FeedFragment extends Fragment {
 
         final FeedItem fi = f;
 
-        int position = feedItems.indexOf(fi);
+        final int position = feedItems.indexOf(fi);
 
         if (thumbnail == null || position == -1) {
             return;
@@ -386,7 +386,7 @@ public class FeedFragment extends Fragment {
         // Otherwise we create a TextDrawable for it
         if (thumbnail.getWidth() > 50 && thumbnail.getHeight() > 50) {
             feedItems.get(position).setThumbnail(thumbnail);
-            feedAdapter.notifyDataSetChanged();
+            feedAdapter.notifyItemChanged(position);
         }
 
         // Generate lots of palettes from the favicon asynchronously
@@ -411,7 +411,7 @@ public class FeedFragment extends Fragment {
                 }
 
                 fi.setTextDrawable(drawable);
-                feedAdapter.notifyDataSetChanged();
+                feedAdapter.notifyItemChanged(position);
             }
         });
     }
