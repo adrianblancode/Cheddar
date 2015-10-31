@@ -7,8 +7,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,17 +17,12 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.ProgressBar;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
-import com.github.ksoichiro.android.observablescrollview.ObservableListView;
-import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
-import com.github.ksoichiro.android.observablescrollview.ScrollState;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.ImageSize;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
@@ -38,16 +34,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
+import co.adrianblan.cheddar.utils.StringUtils;
+import co.adrianblan.cheddar.views.listeners.EndlessRecyclerOnScrollListener;
 import co.adrianblan.cheddar.views.adapters.FeedAdapter;
 import co.adrianblan.cheddar.R;
-import co.adrianblan.cheddar.activities.MainActivity;
 import co.adrianblan.cheddar.models.FeedItem;
 
-public class FeedFragment extends Fragment implements ObservableScrollViewCallbacks {
+public class FeedFragment extends Fragment {
 
     private FeedAdapter feedAdapter;
+    private ArrayList<FeedItem> feedItems;
 
     // Stores the submission IDs used for the API
     private ArrayList<Long> submissionIDs;
@@ -65,12 +62,10 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     private Date lastSubmissionUpdate;
     private final int submissionUpdateTime = 0;
     private final int submissionUpdateNum = 20;
-    int loadedSubmissions = -1;
+    private int loadedSubmissions = -1;
 
-    View no_submissions;
-    View progress;
-    ProgressBar footer;
-
+    //    private View no_submissions;
+//    private View progress;
     private SwipeRefreshLayout swipeContainer;
 
     public static FeedFragment newInstance() {
@@ -95,15 +90,14 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         lastSubmissionUpdate = new Date();
 
         if (savedInstanceState == null) {
-            feedAdapter = new FeedAdapter(getActivity());
+            feedItems = new ArrayList<>();
         } else {
             // Restore saved data
-            ArrayList<FeedItem> feedItems = savedInstanceState.getParcelableArrayList("feedItems");
-            feedAdapter = new FeedAdapter(feedItems, getActivity());
+            feedItems = savedInstanceState.getParcelableArrayList("feedItems");
         }
 
-        loadedSubmissions = feedAdapter.getCount();
-
+        feedAdapter = new FeedAdapter(feedItems);
+        loadedSubmissions = feedItems.size();
     }
 
     @Override
@@ -115,7 +109,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             updateSubmissions();
         }
 
-        updateHeaderPadding();
     }
 
     @Override
@@ -124,52 +117,19 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
 
         View rootView = inflater.inflate(R.layout.fragment_feed, container, false);
 
-        ObservableListView listView = (ObservableListView) rootView.findViewById(R.id.feed_list);
-        listView.setScrollViewCallbacks(this);
+//        no_submissions = rootView.findViewById(R.id.activity_main_none);
+//        progress = rootView.findViewById(R.id.activity_main_progress);
 
-        no_submissions = rootView.findViewById(R.id.activity_main_none);
-        progress = rootView.findViewById(R.id.activity_main_progress);
-
-        listView.setAdapter(feedAdapter);
-
-        //If we scroll to the end, we simply fetch more submissions
-        listView.setOnScrollListener(new AbsListView.OnScrollListener() {
-
-            private int preLast;
-
+        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.feed_list);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(feedAdapter);
+        recyclerView.addOnScrollListener(new EndlessRecyclerOnScrollListener(linearLayoutManager) {
             @Override
-            public void onScrollStateChanged(AbsListView view, int scrollState) {
-            }
-
-            @Override
-            public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
-
-                if (view.getId() == R.id.feed_list) {
-                    final int lastItem = firstVisibleItem + visibleItemCount;
-                    if (lastItem >= totalItemCount) {
-
-                        Date d = new Date();
-                        long seconds = (d.getTime() - lastSubmissionUpdate.getTime()) / 1000;
-
-                        //to avoid multiple calls for last item
-                        if (lastItem != preLast && lastItem >= submissionUpdateNum && seconds >= submissionUpdateTime) {
-
-                            // Get new feed items
-                            updateSubmissions();
-                            preLast = lastItem;
-                            lastSubmissionUpdate = d;
-                        }
-                    }
-                }
+            public void onLoadMore(int current_page) {
+                updateSubmissions();
             }
         });
-
-        // Show loading progress bar
-        footer = new ProgressBar(getActivity().getApplicationContext());
-        footer.setPadding(0, 65, 0, 65);
-        footer.setIndeterminate(true);
-        footer.setVisibility(View.GONE);
-        listView.addFooterView(footer);
 
         swipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.swipeContainer);
         swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -179,7 +139,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             }
         });
 
-        updateHeaderPadding(true);
         return rootView;
     }
 
@@ -190,7 +149,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         long seconds = (d.getTime() - lastSubmissionUpdate.getTime()) / 1000;
 
         //We dont want to be able to spam resets
-        if (feedAdapter.getCount() > 0 && seconds >= submissionUpdateTime) {
+        if (feedItems.size() > 0 && seconds >= submissionUpdateTime) {
 
             lastSubmissionUpdate = d;
 
@@ -210,12 +169,12 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
 
             loadedSubmissions = 0;
             submissionIDs = null;
-            feedAdapter.clear();
+            feedItems.clear();
             feedAdapter.notifyDataSetChanged();
 
-            progress.setVisibility(View.VISIBLE);
-            footer.setVisibility(View.GONE);
-            no_submissions.setVisibility(View.GONE);
+//            progress.setVisibility(View.VISIBLE);
+//            footer.setVisibility(View.GONE);
+//            no_submissions.setVisibility(View.GONE);
 
             updateSubmissions();
             swipeContainer.setRefreshing(false);
@@ -239,16 +198,16 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
                     updateSubmissions();
 
                     // Hide the progress bar
-                    progress.setVisibility(View.GONE);
-                    footer.setVisibility(View.VISIBLE);
+//                    progress.setVisibility(View.GONE);
+//                    footer.setVisibility(View.VISIBLE);
                 }
 
                 @Override
                 public void onCancelled(FirebaseError firebaseError) {
                     System.err.println("Could not retrieve posts! " + firebaseError);
-                    no_submissions.setVisibility(View.VISIBLE);
-                    progress.setVisibility(View.GONE);
-                    footer.setVisibility(View.GONE);
+//                    no_submissions.setVisibility(View.VISIBLE);
+//                    progress.setVisibility(View.GONE);
+//                    footer.setVisibility(View.GONE);
                 }
             });
         } else {
@@ -262,11 +221,13 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
                 updateSingleSubmission(submissionIDs.get(loadedSubmissions));
             }
 
-            if (loadedSubmissions == submissionIDs.size()) {
-                no_submissions.setVisibility(View.VISIBLE);
-            }
+
+//            if (loadedSubmissions == submissionIDs.size()) {
+//                no_submissions.setVisibility(View.VISIBLE);
+//            }
         }
     }
+
 
     // Gets an url to a single submission and updates it in the feedadapter
     public void updateSingleSubmission(final Long submissionId) {
@@ -297,8 +258,8 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
                 }
 
                 FeedItem f = initNewFeedItem(submissionId, ret, site);
-                feedAdapter.add(f);
-                feedAdapter.notifyDataSetChanged();
+                feedItems.add(f);
+                feedAdapter.notifyItemInserted(feedItems.size());
 
                 if (site != null) {
                     // Asynchronously updates images for the feed item
@@ -321,7 +282,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         f.setSubmissionId(submissionId);
 
         // Gets readable date
-        String time = getPrettyDate((Long) ret.get("time"));
+        String time = StringUtils.getPrettyDate((Long) ret.get("time"));
 
         // Set titles and other data
         f.setTitle((String) ret.get("title"));
@@ -415,7 +376,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
 
         final FeedItem fi = f;
 
-        int position = feedAdapter.getPosition(fi);
+        int position = feedItems.indexOf(fi);
 
         if (thumbnail == null || position == -1) {
             return;
@@ -424,7 +385,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         // We only display the image if it's large enough
         // Otherwise we create a TextDrawable for it
         if (thumbnail.getWidth() > 50 && thumbnail.getHeight() > 50) {
-            feedAdapter.getItem(position).setThumbnail(thumbnail);
+            feedItems.get(position).setThumbnail(thumbnail);
             feedAdapter.notifyDataSetChanged();
         }
 
@@ -455,25 +416,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         });
     }
 
-    // Converts the difference between two dates into a pretty date
-    // There's probably a joke in there somewhere
-    public String getPrettyDate(Long time) {
-
-        Date past = new Date(time * 1000);
-        Date now = new Date();
-
-        if (TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) > 0) {
-            return TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) + "d";
-        } else if (TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) > 0) {
-            return TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) + "h";
-        }
-        if (TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime()) > 0) {
-            return TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime()) + "m";
-        } else {
-            return TimeUnit.MILLISECONDS.toSeconds(now.getTime() - past.getTime()) + "s";
-        }
-    }
-
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 
@@ -498,95 +440,10 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     }
 
     @Override
-    public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
-    }
-
-    @Override
-    public void onDownMotionEvent() {
-    }
-
-    @Override
-    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
-        MainActivity main = (MainActivity) getActivity();
-        if (main == null) {
-            return;
-        }
-
-        ActionBar ab = main.getSupportActionBar();
-
-        if (scrollState == ScrollState.UP) {
-            if (ab.isShowing()) {
-                ab.hide();
-                updateHeaderPadding(false);
-            }
-        } else if (scrollState == ScrollState.DOWN) {
-            if (!ab.isShowing()) {
-                ab.show();
-                updateHeaderPadding(true);
-            }
-        }
-    }
-
-    // Updates the padding of the header if it's visible
-    public void updateHeaderPadding() {
-        MainActivity m = ((MainActivity) getActivity());
-
-        // If the fragment comes into view, update padding
-        if (m != null) {
-            ActionBar ab = m.getSupportActionBar();
-            if (ab != null) {
-                updateHeaderPadding(ab.isShowing());
-            }
-        }
-    }
-
-    // Updates the padding on header to compensate for what is visible on the screen
-    public void updateHeaderPadding(boolean show) {
-
-        if (swipeContainer == null) {
-            System.err.println("Can't update padding for swipeContainer, not initialized");
-            return;
-        }
-
-        if (show) {
-            // Padding equivalent to both the toolabr and viewpager
-            int height = (int) getResources().getDimension(R.dimen.toolbar_height);
-            height += (int) getResources().getDimension(R.dimen.viewpager_height);
-            swipeContainer.setPadding(0, height, 0, 0);
-            swipeContainer.setProgressViewOffset(true, height, height + 100);
-        } else {
-            // If we hide the toolbar, we need to reduce the padding to compensate
-            int height = (int) getActivity().getApplicationContext().getResources().getDimension(R.dimen.viewpager_height);
-            swipeContainer.setPadding(0, height, 0, 0);
-            swipeContainer.setProgressViewOffset(true, height, height + 100);
-        }
-    }
-
-    // When we put a fragment into view, we also need to adjust the padding
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-
-        updateHeaderPadding();
-    }
-
-    private boolean toolbarIsShown() {
-        // Toolbar is 0 in Y-axis, so we can say it's shown.
-        return ((MainActivity) getActivity().getApplicationContext()).findViewById(R.id.toolbar_main).getTranslationY() == 0;
-    }
-
-    private boolean toolbarIsHidden() {
-        // Toolbar is outside of the screen and absolute Y matches the height of it.
-        // So we can say it's hidden.
-        View mToolbar = ((MainActivity) getActivity().getApplicationContext()).findViewById(R.id.toolbar_main);
-        return mToolbar.getTranslationY() == -mToolbar.getHeight();
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 
         // Save data
-        savedInstanceState.putParcelableArrayList("feedItems", feedAdapter.getFeedItems());
+        savedInstanceState.putParcelableArrayList("feedItems", feedItems);
     }
 }

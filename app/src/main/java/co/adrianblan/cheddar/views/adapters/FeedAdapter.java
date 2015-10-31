@@ -1,128 +1,60 @@
 package co.adrianblan.cheddar.views.adapters;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.os.Bundle;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import co.adrianblan.cheddar.R;
 import co.adrianblan.cheddar.activities.CommentActivity;
 import co.adrianblan.cheddar.activities.WebViewActivity;
 import co.adrianblan.cheddar.models.FeedItem;
+import co.adrianblan.cheddar.views.listeners.FeedItemClickListener;
 
-public class FeedAdapter extends BaseAdapter {
+public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
 
-    private ArrayList<FeedItem> feedItems;
-    private final Context context;
+    private List<FeedItem> items;
 
-    public FeedAdapter(Context c) {
-        feedItems = new ArrayList<>();
-        context = c;
-    }
-
-    public FeedAdapter(ArrayList<FeedItem> fi, Context c) {
-        feedItems = fi;
-        context = c;
-    }
-
-    public ArrayList<FeedItem> getFeedItems(){
-        return feedItems;
-    }
-
-    public void add (FeedItem f){
-        feedItems.add(f);
-    }
-
-    public void clear() {
-        feedItems.clear();
-    }
-
-    public int getPosition(FeedItem f) {
-
-        for(int i = 0; i < getCount(); i++) {
-            if(feedItems.get(i).equals(f)){
-                return i;
-            }
-        }
-
-        return -1;
+    public FeedAdapter(List<FeedItem> items) {
+        this.items = items;
     }
 
     @Override
-    public int getCount() {
-        return feedItems.size();
+    public FeedAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
+
+        //Inflate the custom layout
+        View itemView = inflater.inflate(R.layout.feed_item, parent, false);
+
+        //Return a new holder instance
+        return new ViewHolder(itemView);
     }
 
     @Override
-    public FeedItem getItem(int position) {
-        return feedItems.get(position);
-    }
+    public void onBindViewHolder(FeedAdapter.ViewHolder holder, int position) {
+        FeedItem item = items.get(position);
 
-    @Override
-    public long getItemId(int position) {
-        return 0;
-    }
+        holder.titleView.setText(item.getTitle());
+        holder.shortUrlView.setText(item.getShortUrl());
+        holder.scoreView.setText(Long.toString(item.getScore()));
+        holder.commentsView.setText(Long.toString(item.getDescendants()));
+        holder.timeView.setText(item.getTime());
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-
-        class ViewHolder {
-            TextView title;
-            TextView shortUrl;
-            TextView score;
-            TextView comments;
-            TextView time;
-            ImageView thumbnail;
-            LinearLayout body;
-        }
-
-        final FeedItem item = feedItems.get(position);
-
-        ViewHolder holder;
-
-        if(convertView == null){
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.feed_item, parent, false);
-
-            holder = new ViewHolder();
-            holder.title = (TextView) convertView.findViewById(R.id.feed_item_title);
-            holder.shortUrl = (TextView) convertView.findViewById(R.id.feed_item_shortUrl);
-            holder.score = (TextView) convertView.findViewById(R.id.feed_item_score);
-            holder.comments = (TextView) convertView.findViewById(R.id.feed_item_comments);
-            holder.time = (TextView) convertView.findViewById(R.id.feed_item_time);
-            holder.thumbnail = (ImageView) convertView.findViewById(R.id.feed_item_thumbnail);
-            holder.body = (LinearLayout) convertView.findViewById(R.id.feed_item_text);
-
-            // Store the holder with the view.
-            convertView.setTag(holder);
-
-        } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
-
-        holder.title.setText(item.getTitle());
-        holder.shortUrl.setText(item.getShortUrl());
-        holder.score.setText(Long.toString(item.getScore()));
-        holder.comments.setText(Long.toString(item.getDescendants()));
-        holder.time.setText(item.getTime());
-
-        // If we have a high resolution thumbnail, display it
-        if(item.getThumbnail() != null){
-            holder.thumbnail.setImageBitmap(item.getThumbnail());
+        //If we have a high resolution thumbnail, display it
+        if (item.getThumbnail() != null) {
+            holder.thumbnailView.setImageBitmap(item.getThumbnail());
         } else if (item.getTextDrawable() != null) {
             // Otherwise, just use the TextDrawable
-            holder.thumbnail.setImageDrawable(item.getTextDrawable());
+            holder.thumbnailView.setImageDrawable(item.getTextDrawable());
         } else {
             // Generate new TextDrawable thumbnail
             TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
@@ -130,70 +62,50 @@ public class FeedAdapter extends BaseAdapter {
             item.setTextDrawable(drawable);
         }
 
+        // Click on body -> Comment Activity
+        View.OnClickListener commentListener = new FeedItemClickListener(CommentActivity.class, item);
+        holder.bodyView.setOnClickListener(commentListener);
 
-
-        // Comment listener
-        View.OnClickListener commentOnClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                Bitmap thumbnail = item.getThumbnail();
-
-                // Store thumbnail
-                if(thumbnail != null) {
-
-                    final int maxThumbnailSize = 144;
-
-                    // We can't pass through too much data through intents (terrible)
-                    // Wordpress has something silly like 512x512 px
-                    if (thumbnail.getHeight() > maxThumbnailSize || thumbnail.getWidth() > maxThumbnailSize) {
-                        thumbnail = Bitmap.createScaledBitmap(thumbnail, maxThumbnailSize, maxThumbnailSize, false);
-                    }
-                }
-
-                Intent intent = new Intent(v.getContext(), CommentActivity.class);
-                Bundle b = new Bundle();
-                b.putParcelable("feedItem", item);
-                intent.putExtra("thumbnail", thumbnail);
-                intent.putExtras(b);
-                context.startActivity(intent);
-            }
-        };
-
-        // TODO move onclick listeners to somewhere that makes sense?
-        // Comment, click on body
-        holder.body.setOnClickListener(commentOnClickListener);
-
-        // Webview, click on thumbnail
-        if(item.getShortUrl().equals(context.getResources().getString(R.string.hacker_news_url_placeholder))){
-
-            // If it points to hacker news, we need to the comments on click instead
-            holder.thumbnail.setOnClickListener(commentOnClickListener);
+        // Click on thumbnail -> Web view
+        // If link points to Hacker News go to comments then.
+        if (item.getShortUrl().equals(holder.itemView.getContext().getString(R.string.hacker_news_url_placeholder))) {
+            holder.thumbnailView.setOnClickListener(commentListener);
         } else {
-            holder.thumbnail.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-
-                    Bitmap thumbnail = item.getThumbnail();
-
-                    // Store thumbnail
-                    if(thumbnail != null) {
-                        // We can't pass through too much data through intents (terrible)
-                        if (thumbnail.getHeight() > 100 || thumbnail.getWidth() > 100) {
-                            thumbnail = Bitmap.createScaledBitmap(thumbnail, 100, 100, false);
-                        }
-                    }
-
-                    Intent intent = new Intent(v.getContext(), WebViewActivity.class);
-                    Bundle b = new Bundle();
-                    b.putParcelable("feedItem", item);
-                    intent.putExtra("thumbnail", thumbnail);
-                    intent.putExtras(b);
-                    context.startActivity(intent);
-                }
-            });
+            holder.thumbnailView.setOnClickListener(new FeedItemClickListener(WebViewActivity.class, item));
         }
+    }
 
-        return convertView;
+    @Override
+    public int getItemCount() {
+        return items.size();
+    }
+
+
+    /**
+     * Provide direct reference to the views within the data of each item
+     * Used to cache views
+     */
+    public class ViewHolder extends RecyclerView.ViewHolder {
+
+        public TextView titleView;
+        public TextView shortUrlView;
+        public TextView scoreView;
+        public TextView commentsView;
+        public TextView timeView;
+        public ImageView thumbnailView;
+        public LinearLayout bodyView;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+
+            titleView = (TextView) itemView.findViewById(R.id.feed_item_title);
+            shortUrlView = (TextView) itemView.findViewById(R.id.feed_item_shortUrl);
+            scoreView = (TextView) itemView.findViewById(R.id.feed_item_score);
+            commentsView = (TextView) itemView.findViewById(R.id.feed_item_comments);
+            timeView = (TextView) itemView.findViewById(R.id.feed_item_time);
+            thumbnailView = (ImageView) itemView.findViewById(R.id.feed_item_thumbnail);
+            bodyView = (LinearLayout) itemView.findViewById(R.id.feed_item_text);
+            
+        }
     }
 }

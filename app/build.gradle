@@ -32,11 +32,15 @@ repositories {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    // Google Support Library
     compile 'com.android.support:appcompat-v7:23.1.0'
-    compile 'com.firebase:firebase-client-android:2.3.1'
+    compile 'com.android.support:design:23.1.0'
     compile 'com.android.support:palette-v7:23.1.0'
+    compile 'com.android.support:recyclerview-v7:23.1.0'
+
+    compile 'com.firebase:firebase-client-android:2.3.1'
+
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
-    compile 'com.jpardogo.materialtabstrip:library:1.1.0'
     compile 'com.github.ksoichiro:android-observablescrollview:1.5.0'
     compile 'com.github.johnkil.android-robototextview:robototextview:2.4.0'
 }
