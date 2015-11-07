@@ -1,287 +1,175 @@
 package co.adrianblan.cheddar.views.adapters;
 
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.text.Html;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.ClickableSpan;
-import android.text.style.RelativeSizeSpan;
-import android.text.style.URLSpan;
-import android.util.DisplayMetrics;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.devspark.robototextview.widget.RobotoTextView;
 
-import java.util.ArrayList;
+import java.util.List;
 
-import co.adrianblan.cheddar.views.JellyBeanCompatTextView;
 import co.adrianblan.cheddar.R;
-import co.adrianblan.cheddar.views.TextViewFixTouchConsume;
-import co.adrianblan.cheddar.activities.WebViewActivity;
 import co.adrianblan.cheddar.models.Comment;
 import co.adrianblan.cheddar.models.FeedItem;
+import co.adrianblan.cheddar.utils.DesignUtils;
+import co.adrianblan.cheddar.utils.StringUtils;
+import co.adrianblan.cheddar.views.JellyBeanCompatTextView;
+import co.adrianblan.cheddar.views.TextViewFixTouchConsume;
 
-public class CommentAdapter extends BaseAdapter {
+// RecyclerViewAdapter Header Code adapted from
+// https://gist.github.com/hister/d56c00fb5fd2dfaf279b
+public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private ArrayList<Comment> comments;
-    private ArrayList<Integer> colors;
-    private final Context context;
-    private FeedItem feedItem; // Feed item which is the parent of all comments
+    private static final int TYPE_HEADER = 0;
+    private static final int TYPE_ITEM = 1;
 
-    // Constructor which creates new arraylist
-    public CommentAdapter(FeedItem fi, Context c) {
-        colors = null;
-        comments = new ArrayList<>();
-        context = c;
-        feedItem = fi;
-    }
+    private List<Comment> comments;
+    private FeedItem feedItem;
+    private Context context;
+    private static int[] colors = {
+            R.color.colorPrimary,
+            R.color.materialPink,
+            R.color.materialDeepPurple,
+            R.color.materialBlue,
+            R.color.materialGreen,
+            R.color.materialAmber
+    };
 
-    // Constructor which copies arraylist
-    public CommentAdapter(ArrayList<Comment> comments, FeedItem fi, Context c) {
-        colors = null;
+    public CommentAdapter(List<Comment> comments, Context context, FeedItem feedItem) {
         this.comments = comments;
-        context = c;
-        feedItem = fi;
-    }
-
-    public void add(Comment c) {
-        comments.add(c);
-    }
-
-    public void add(int i, Comment c) {
-        comments.add(i, c);
-    }
-
-    public void clear() {
-        comments.clear();
-    }
-
-    public int getPosition(Comment c) {
-
-        for (int i = 0; i < getCount(); i++) {
-            if (comments.get(i).equals(c)) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    public ArrayList<Comment> getComments() {
-        return comments;
-    }
-
-
-    @Override
-    public int getCount() {
-        return comments.size();
+        this.feedItem = feedItem;
+        this.context = context;
     }
 
     @Override
-    public Comment getItem(int position) {
-        return comments.get(position);
-    }
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
 
-    @Override
-    public long getItemId(int position) {
-        return 0;
-    }
+        if (viewType == TYPE_ITEM) {
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+            //Inflate the custom layout
+            View itemView = inflater.inflate(R.layout.comment, parent, false);
 
-        class ViewHolder {
-            RobotoTextView title;
-            TextView body;
-            TextView time;
-            LinearLayout container;
-            LinearLayout text_container;
-            LinearLayout indicator;
-            LinearLayout indicator_color;
-            TextView hidden_children;
-        }
-
-        if (colors == null) {
-            colors = initColors(parent.getContext());
-        }
-
-        final Comment com = comments.get(position);
-
-        if (com.isHidden()) {
-            // Inflate and return an empty layout
-            return new View(context);
-        }
-
-        ViewHolder holder;
-
-        if (convertView == null || convertView.getTag() == null) {
-
-            holder = new ViewHolder();
-
-            LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = inflater.inflate(R.layout.comment, parent, false);
-            holder.title = (RobotoTextView) convertView.findViewById(R.id.comment_title);
-            holder.body = (JellyBeanCompatTextView) convertView.findViewById(R.id.comment_body);
-            holder.time = (TextView) convertView.findViewById(R.id.comment_time);
-            holder.container = (LinearLayout) convertView.findViewById(R.id.comment);
-            holder.text_container = (LinearLayout) convertView.findViewById(R.id.comment_text_container);
-            holder.indicator = (LinearLayout) convertView.findViewById(R.id.comment_indicator);
-            holder.indicator_color = (LinearLayout) convertView.findViewById(R.id.comment_indicator_color);
-            holder.hidden_children = (TextView) convertView.findViewById(R.id.comment_hidden_children);
-
-            // Store the holder with the view.
-            convertView.setTag(holder);
-
+            //Return a new holder instance
+            return new ViewHolder(itemView);
         } else {
-            holder = (ViewHolder) convertView.getTag();
-        }
 
-        holder.title.setText(com.getBy());
+            View feedView = inflater.inflate(R.layout.feed_item, parent, false);
+            return new FeedAdapter.ViewHolder(feedView);
+
+        }
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (holder instanceof CommentAdapter.ViewHolder) {
+            bindCommentHolder((CommentAdapter.ViewHolder) holder, feedItem, getComment(position), context);
+        } else {
+            FeedAdapter.bindFeedItemHolder((FeedAdapter.ViewHolder) holder, feedItem, false);
+        }
+    }
+
+    public static void bindCommentHolder(ViewHolder commentHolder, FeedItem feedItem, Comment comment, Context context) {
+        commentHolder.title.setText(comment.getBy());
 
         // If the author of the feed item is also the author of the comment
-        if(com.getBy().equals(feedItem.getBy())){
-            holder.title.setTextColor(context.getResources().getColor(R.color.colorPrimary));
-            holder.title.setText(holder.title.getText() + " [OP]");
+        if (comment.getBy().equals(feedItem.getBy())) {
+            commentHolder.title.setTextColor(ContextCompat.getColor(context, R.color.colorPrimary));
+            commentHolder.title.setText(commentHolder.title.getText() + " [OP]");
         } else {
-            holder.title.setTextColor(ContextCompat.getColor(context, R.color.abc_secondary_text_material_light));
+            commentHolder.title.setTextColor(ContextCompat.getColor(context, R.color.abc_secondary_text_material_light));
         }
 
         // If the comment exists
-        if(com.getBody() != null && !com.hasHideChildren()) {
-            holder.body.setVisibility(View.VISIBLE);
+        if (comment.getBody() != null && !comment.hasHideChildren()) {
+            commentHolder.body.setVisibility(View.VISIBLE);
 
             // We can't show the text as is, but have to parse it as html
-            setTextViewHTML(holder.body, com.getBody());
+            StringUtils.setTextViewHTML(commentHolder.body, comment.getBody());
 
             //This link movement method only consumes on URL clicks
-            holder.body.setMovementMethod(TextViewFixTouchConsume.LocalLinkMovementMethod.getInstance());
+            commentHolder.body.setMovementMethod(TextViewFixTouchConsume.LocalLinkMovementMethod.getInstance());
         } else {
-            holder.body.setVisibility(View.GONE);
+            commentHolder.body.setVisibility(View.GONE);
         }
 
-        holder.time.setText(com.getTime());
+        commentHolder.time.setText(comment.getTime());
 
         // Adds padding based on hierarchy, and adds hierarchy indicator
-        holder.indicator.setPadding((int) dpToPixels(4, parent.getContext()) * (com.getHierarchy() - 1), 0, 0, 0);
+        commentHolder.indicator.setPadding((int) DesignUtils.dpToPixels(4, context) * (comment.getHierarchy() - 1), 0, 0, 0);
 
         // We don't need the indicator for top level commentCount
-        if (com.getHierarchy() == 0) {
-            holder.indicator.setVisibility(View.GONE);
-            holder.indicator_color.setVisibility(View.GONE);
+        if (comment.getHierarchy() == 0) {
+            commentHolder.indicator.setVisibility(View.GONE);
+            commentHolder.indicator_color.setVisibility(View.GONE);
         } else {
-            holder.indicator.setVisibility(View.VISIBLE);
-            holder.indicator_color.setVisibility(View.VISIBLE);
+            commentHolder.indicator.setVisibility(View.VISIBLE);
+            commentHolder.indicator_color.setVisibility(View.VISIBLE);
 
             // Use modulo to get the appropriate color for indicator
-            int color = colors.get((com.getHierarchy() - 1) % colors.size());
-            holder.indicator_color.setBackgroundColor(color);
+            int color = ContextCompat.getColor(context, colors[(comment.getHierarchy() - 1) % colors.length]);
+            commentHolder.indicator_color.setBackgroundColor(color);
         }
 
-        if (com.hasHideChildren()) {
-            holder.hidden_children.setText("+" + Integer.toString(com.getHiddenChildren()));
-            holder.hidden_children.setVisibility(View.VISIBLE);
+        if (comment.hasHideChildren()) {
+            commentHolder.hidden_children.setText("+" + Integer.toString(comment.getHiddenChildren()));
+            commentHolder.hidden_children.setVisibility(View.VISIBLE);
         } else {
-            holder.hidden_children.setVisibility(View.GONE);
+            commentHolder.hidden_children.setVisibility(View.GONE);
+        }
+    }
+
+
+    @Override
+    public int getItemCount() {
+        return comments.size() + 1;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (isPositionHeader(position)) {
+            return TYPE_HEADER;
         }
 
-        return convertView;
+        return TYPE_ITEM;
     }
 
-    // Initializes the list of colours which will be used to display comment hierarchy
-    public ArrayList<Integer> initColors(Context context) {
-        ArrayList<Integer> colors = new ArrayList<>();
-        colors.add(ContextCompat.getColor(context, R.color.colorPrimary));
-        colors.add(ContextCompat.getColor(context, R.color.materialPink));
-        colors.add(ContextCompat.getColor(context, R.color.materialDeepPurple));
-        colors.add(ContextCompat.getColor(context, R.color.materialBlue)); // Not really material blue but who cares
-        colors.add(ContextCompat.getColor(context, R.color.materialGreen));
-        colors.add(ContextCompat.getColor(context, R.color.materialAmber));
-
-        return colors;
+    private boolean isPositionHeader(int position) {
+        return position == 0;
     }
 
-    public static float dpToPixels(float dp, Context context) {
-        DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-        return Math.round(dp * (displayMetrics.xdpi / DisplayMetrics.DENSITY_DEFAULT));
+    private Comment getComment(int position) {
+        return comments.get(position - 1);
     }
 
-    // Removes trailing double whitespace, reduces the size of other double whitespace
-    public static SpannableStringBuilder trimWhitespace(CharSequence source) {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        int i = source.length();
+        public RobotoTextView title;
+        public TextView body;
+        public TextView time;
+        public LinearLayout container;
+        public LinearLayout text_container;
+        public LinearLayout indicator;
+        public LinearLayout indicator_color;
+        public TextView hidden_children;
 
-        // loop back to the first non-whitespace character
-        while (--i >= 0 && Character.isWhitespace(source.charAt(i))) {
+        public ViewHolder(View itemView) {
+            super(itemView);
+
+            title = (RobotoTextView) itemView.findViewById(R.id.comment_title);
+            body = (JellyBeanCompatTextView) itemView.findViewById(R.id.comment_body);
+            time = (TextView) itemView.findViewById(R.id.comment_time);
+            container = (LinearLayout) itemView.findViewById(R.id.comment);
+            text_container = (LinearLayout) itemView.findViewById(R.id.comment_text_container);
+            indicator = (LinearLayout) itemView.findViewById(R.id.comment_indicator);
+            indicator_color = (LinearLayout) itemView.findViewById(R.id.comment_indicator_color);
+            hidden_children = (TextView) itemView.findViewById(R.id.comment_hidden_children);
         }
-
-        // Removes two trailing newlines
-        source = source.subSequence(0, i + 1);
-
-        SpannableStringBuilder ssb = new SpannableStringBuilder(source);
-
-        for (i = 0; i + 1 < source.length(); i++) {
-            if (Character.isWhitespace(source.charAt(i)) && Character.isWhitespace(source.charAt(i + 1))) {
-
-                // Reduces the size of double whitespace
-                ssb.setSpan(new RelativeSizeSpan(0.4f), i, i + 2, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                i++;
-            }
-        }
-        return ssb;
-    }
-
-    protected void makeLinkClickable(SpannableStringBuilder strBuilder, final URLSpan span) {
-        int start = strBuilder.getSpanStart(span);
-        int end = strBuilder.getSpanEnd(span);
-        int flags = strBuilder.getSpanFlags(span);
-        ClickableSpan clickable = new ClickableSpan() {
-            public void onClick(View view) {
-
-                final View v = view;
-
-                // We show a dialog if the user wants to open the link
-                new AlertDialog.Builder(context)
-                        .setTitle("Open Link")
-                        .setMessage(span.getURL())
-                        .setPositiveButton("Open", new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int id) {
-                                // If we click links, we go to the webview
-                                System.out.println("Clicked: " + span.getURL());
-                                Intent intent = new Intent(v.getContext(), WebViewActivity.class);
-                                Bundle bundle = new Bundle();
-                                bundle.putString("url", span.getURL());
-                                intent.putExtras(bundle);
-                                context.startActivity(intent);
-                            }
-                        })
-                        .setNegativeButton("Cancel", null)
-                        .show();
-            }
-        };
-        strBuilder.setSpan(clickable, start, end, flags);
-        strBuilder.removeSpan(span);
-    }
-
-    // Works some magic with converting the html to a proper text view
-    protected void setTextViewHTML(TextView text, String html) {
-        CharSequence sequence = Html.fromHtml(html);
-        SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
-        URLSpan[] urls = strBuilder.getSpans(0, sequence.length(), URLSpan.class);
-        for (URLSpan span : urls) {
-            makeLinkClickable(strBuilder, span);
-        }
-
-        // In the end we trim the whitespace
-        text.setText(trimWhitespace(strBuilder));
     }
 }

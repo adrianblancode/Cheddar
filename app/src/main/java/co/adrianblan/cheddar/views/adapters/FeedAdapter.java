@@ -41,8 +41,10 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(FeedAdapter.ViewHolder holder, int position) {
-        FeedItem item = items.get(position);
+        bindFeedItemHolder(holder, items.get(position), true);
+    }
 
+    public static void bindFeedItemHolder(FeedAdapter.ViewHolder holder, FeedItem item, boolean addClickListeners) {
         holder.titleView.setText(item.getTitle());
         holder.shortUrlView.setText(item.getShortUrl());
         holder.scoreView.setText(Long.toString(item.getScore()));
@@ -62,18 +64,22 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
             item.setTextDrawable(drawable);
         }
 
-        // Click on body -> Comment Activity
-        View.OnClickListener commentListener = new FeedItemClickListener(CommentActivity.class, item);
-        holder.bodyView.setOnClickListener(commentListener);
+        if (addClickListeners) {
 
-        // Click on thumbnail -> Web view
-        // If link points to Hacker News go to comments then.
-        if (item.getShortUrl().equals(holder.itemView.getContext().getString(R.string.hacker_news_url_placeholder))) {
-            holder.thumbnailView.setOnClickListener(commentListener);
-        } else {
-            holder.thumbnailView.setOnClickListener(new FeedItemClickListener(WebViewActivity.class, item));
+            // Click on body -> Comment Activity
+            View.OnClickListener commentListener = new FeedItemClickListener(CommentActivity.class, item);
+            holder.bodyView.setOnClickListener(commentListener);
+
+            // Click on thumbnail -> Web view
+            // If link points to Hacker News go to comments then.
+            if (item.getShortUrl().equals(holder.itemView.getContext().getString(R.string.hacker_news_url_placeholder))) {
+                holder.thumbnailView.setOnClickListener(commentListener);
+            } else {
+                holder.thumbnailView.setOnClickListener(new FeedItemClickListener(WebViewActivity.class, item));
+            }
         }
     }
+
 
     @Override
     public int getItemCount() {
@@ -85,7 +91,7 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
      * Provide direct reference to the views within the data of each item
      * Used to cache views
      */
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
         public TextView titleView;
         public TextView shortUrlView;

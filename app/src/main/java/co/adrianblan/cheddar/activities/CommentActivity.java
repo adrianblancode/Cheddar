@@ -5,18 +5,17 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
@@ -25,9 +24,6 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
-import com.github.ksoichiro.android.observablescrollview.ObservableListView;
-import com.github.ksoichiro.android.observablescrollview.ObservableScrollViewCallbacks;
-import com.github.ksoichiro.android.observablescrollview.ScrollState;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -41,18 +37,17 @@ import co.adrianblan.cheddar.views.JellyBeanCompatTextView;
 import co.adrianblan.cheddar.views.adapters.CommentAdapter;
 
 import static android.widget.AdapterView.GONE;
-import static android.widget.AdapterView.OnItemClickListener;
-import static android.widget.AdapterView.OnItemLongClickListener;
 import static android.widget.AdapterView.VISIBLE;
 
 // Activity which shows comments to a feed item
-public class CommentActivity extends AppCompatActivity implements ObservableScrollViewCallbacks {
+public class CommentActivity extends AppCompatActivity {
 
     private SwipeRefreshLayout swipeContainer;
     private CommentAdapter commentAdapter; // Adapter which stores comments
+    private ArrayList<Comment> comments; // Reference to adapter dataset
     private ArrayList<Long> kids; // Stores the array of individual comment IDs
     private Date lastSubmissionUpdate; // Time since last submission update
-    private Date lastOnItemLongClick; // Time since last comment hidden
+
 
     private FeedItem feedItem;
     private Long newCommentCount;
@@ -77,14 +72,19 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         if (savedInstanceState == null) {
             Bundle b = getIntent().getExtras();
             feedItem = b.getParcelable("feedItem");
-            commentAdapter = new CommentAdapter(feedItem, this);
+            comments = new ArrayList<>();
         } else {
-
             // We retrieve the saved items
             feedItem = savedInstanceState.getParcelable("feedItem");
-            ArrayList<Comment> comments = savedInstanceState.getParcelableArrayList("comments");
-            commentAdapter = new CommentAdapter(comments, feedItem, this);
+            comments = savedInstanceState.getParcelableArrayList("comments");
+
         }
+        commentAdapter = new CommentAdapter(comments, this, feedItem);
+        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.comment_list);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(commentAdapter);
+
 
         // Init toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_comment);
@@ -92,18 +92,11 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(feedItem.getTitle());
 
-        // Initialize the list view
-        ObservableListView lv = (ObservableListView) findViewById(R.id.activity_comment_list);
-        lv.setScrollViewCallbacks(this);
-        lv.addHeaderView(initHeader(feedItem));
-        lv.setAdapter(commentAdapter);
-        addCommentOnClickListeners(lv);
-
         no_comments = findViewById(R.id.activity_comment_none);
         progress = findViewById(R.id.activity_comment_progress);
 
-        // Don't get new comments if we already have retrieved saved comments
-        if (commentAdapter.getCount() == 0) {
+        // Don't update if we already have retrieved saved comments
+        if (comments.isEmpty()) {
             updateComments();
         }
 
@@ -190,7 +183,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
             comment_title.setText(feedItem.getBy() + " [OP]");
 
             // Helper function to do fancy formatting with the comment text
-            comment_text.setText(CommentAdapter.trimWhitespace(Html.fromHtml(feedItem.getText())));
+            comment_text.setText(StringUtils.trimWhitespace(Html.fromHtml(feedItem.getText())));
 
             divider.setBackgroundColor(Color.parseColor("#ff6600"));
             divider.getLayoutParams().height = 3;
@@ -202,86 +195,83 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
             comment_divider.setVisibility(GONE);
         }
 
-        //Add padding so that we compensate for the Toolbar
-        updateHeaderPadding(true);
-
         return header;
     }
 
-    // Adds onClickListeners for hiding and revealing comments
-    public void addCommentOnClickListeners(ListView lv) {
-
-        // So, for some weird reason our longClicks are not consumed properly
-        // Thus we need a manual timeout to prevent onItemClick from triggering after onItemLongClick
-        lastOnItemLongClick = new Date();
-
-        // And short clicks for revealing comments
-        lv.setOnItemClickListener(new OnItemClickListener() {
-
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                // If there is no comment data, or we clicked the header, return
-                if (commentAdapter.getComments().size() == 0 || position == 0) {
-                    return;
-                }
-
-                Date d = new Date();
-                long ms = (d.getTime() - lastOnItemLongClick.getTime());
-
-                Comment comment = commentAdapter.getItem(position - 1);
-                int hierarchy = comment.getHierarchy();
-
-                if (comment.hasHideChildren() && ms > 1500) {
-
-                    comment.setHideChildren(false);
-                    // Find all child comments with higher hierarchy and show them
-                    for (int i = position; commentAdapter.getComments().get(i).getHierarchy() > hierarchy && i < commentAdapter.getComments().size(); i++) {
-                        commentAdapter.getItem(i).setIsHidden(false);
-                    }
-                }
-                commentAdapter.notifyDataSetChanged();
-            }
-        });
-
-        // We listen to long clicks for hiding comments
-        lv.setOnItemLongClickListener(new OnItemLongClickListener() {
-
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-
-                // If there is no comment data, or we clicked the header, return
-                if (commentAdapter.getComments().size() == 0 || position == 0) {
-                    return false;
-                }
-
-                Comment comment = commentAdapter.getItem(position - 1);
-                int hierarchy = comment.getHierarchy();
-
-                if (!comment.hasHideChildren()) {
-                    lastOnItemLongClick = new Date();
-                    int i;
-
-                    // Find all child comments with higher hierarchy and hide them
-                    // We do the direct access since we want to be able to access hidden comments
-                    for (i = position; commentAdapter.getComments().get(i).getHierarchy() > hierarchy && i < commentAdapter.getComments().size(); i++) {
-                        commentAdapter.getItem(i).setIsHidden(true);
-                    }
-
-                    int hiddenChildren = i - position;
-                    comment.setHiddenChildren(hiddenChildren);
-
-                    if (hiddenChildren > 0) {
-                        comment.setHideChildren(true);
-                    }
-
-                    commentAdapter.notifyDataSetChanged();
-                }
-
-                return true;
-            }
-        });
-    }
+//    // Adds onClickListeners for hiding and revealing comments
+//    public void addCommentOnClickListeners(ListView lv) {
+//
+//        // So, for some weird reason our longClicks are not consumed properly
+//        // Thus we need a manual timeout to prevent onItemClick from triggering after onItemLongClick
+//        lastOnItemLongClick = new Date();
+//
+//        // And short clicks for revealing comments
+//        lv.setOnItemClickListener(new OnItemClickListener() {
+//
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//                // If there is no comment data, or we clicked the header, return
+//                if (commentAdapter.getComments().size() == 0 || position == 0) {
+//                    return;
+//                }
+//
+//                Date d = new Date();
+//                long ms = (d.getTime() - lastOnItemLongClick.getTime());
+//
+//                Comment comment = commentAdapter.getItem(position - 1);
+//                int hierarchy = comment.getHierarchy();
+//
+//                if (comment.hasHideChildren() && ms > 1500) {
+//
+//                    comment.setHideChildren(false);
+//                    // Find all child comments with higher hierarchy and show them
+//                    for (int i = position; commentAdapter.getComments().get(i).getHierarchy() > hierarchy && i < commentAdapter.getComments().size(); i++) {
+//                        commentAdapter.getItem(i).setIsHidden(false);
+//                    }
+//                }
+//                commentAdapter.notifyDataSetChanged();
+//            }
+//        });
+//
+//        // We listen to long clicks for hiding comments
+//        lv.setOnItemLongClickListener(new OnItemLongClickListener() {
+//
+//            @Override
+//            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//                // If there is no comment data, or we clicked the header, return
+//                if (commentAdapter.getComments().size() == 0 || position == 0) {
+//                    return false;
+//                }
+//
+//                Comment comment = commentAdapter.getItem(position - 1);
+//                int hierarchy = comment.getHierarchy();
+//
+//                if (!comment.hasHideChildren()) {
+//                    lastOnItemLongClick = new Date();
+//                    int i;
+//
+//                    // Find all child comments with higher hierarchy and hide them
+//                    // We do the direct access since we want to be able to access hidden comments
+//                    for (i = position; commentAdapter.getComments().get(i).getHierarchy() > hierarchy && i < commentAdapter.getComments().size(); i++) {
+//                        commentAdapter.getItem(i).setIsHidden(true);
+//                    }
+//
+//                    int hiddenChildren = i - position;
+//                    comment.setHiddenChildren(hiddenChildren);
+//
+//                    if (hiddenChildren > 0) {
+//                        comment.setHideChildren(true);
+//                    }
+//
+//                    commentAdapter.notifyDataSetChanged();
+//                }
+//
+//                return true;
+//            }
+//        });
+//    }
 
     // Starts updating the commentCount from the top level
     public void updateComments() {
@@ -300,7 +290,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         lastSubmissionUpdate = new Date();
 
         newCommentCount = 0L;
-        commentAdapter.clear();
+        comments.clear();
         commentAdapter.notifyDataSetChanged();
 
         progress.setVisibility(View.VISIBLE);
@@ -327,14 +317,14 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
 
                     no_comments.setVisibility(View.GONE);
                     newCommentCount += kids.size();
-                    updateHeader();
+//                    updateHeader();
 
                     //TODO fix race condition
                     for (int i = 0; i < kids.size(); i++) {
                         updateSingleComment(kids.get(i), null);
                     }
                 } else {
-                    updateHeader();
+//                    updateHeader();
 
                     //If we can't load any posts, we show a warning
                     no_comments.setVisibility(View.VISIBLE);
@@ -383,31 +373,30 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
                 // Check if top level comment
                 if (par == null) {
                     com.setHierarchy(0);
-                    commentAdapter.add(com);
+                    comments.add(com);
                 } else {
                     com.setHierarchy(par.getHierarchy() + 1);
-                    commentAdapter.add(commentAdapter.getPosition(par) + 1, com);
+                    comments.add(comments.indexOf(par) + 1, com);
                 }
 
-                // If we load a comment into a collapsed chain, we must hide it
-                int position = commentAdapter.getPosition(com);
-                if (position > 0) {
-
-                    Comment aboveComment = commentAdapter.getItem(position - 1);
-
-                    if (aboveComment.isHidden() || (aboveComment.hasHideChildren() && aboveComment.getHierarchy() > com.getHierarchy())) {
-                        com.setIsHidden(true);
-                    }
-                }
-
-                commentAdapter.notifyDataSetChanged();
+//                // If we load a comment into a collapsed chain, we must hide it
+//                int position = comments.indexOf(com);
+//                if (position > 0) {
+//
+//                    Comment aboveComment = comments.get(position - 1);
+//
+//                    if (aboveComment.isHidden() || (aboveComment.hasHideChildren() && aboveComment.getHierarchy() > com.getHierarchy())) {
+//                        com.setIsHidden(true);
+//                    }
+//                }
+                commentAdapter.notifyItemChanged(comments.indexOf(com));
                 ArrayList<Long> kids = (ArrayList<Long>) ret.get("kids");
 
                 // Update child commentCount
                 if (kids != null) {
 
                     newCommentCount += kids.size();
-                    updateHeader();
+//                    updateHeader();
 
                     // We're counting backwards since we are too lazy to fix a race condition
                     //TODO fix race condition
@@ -479,45 +468,11 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
     }
 
     @Override
-    public void onScrollChanged(int scrollY, boolean firstScroll, boolean dragging) {
-    }
-
-    @Override
-    public void onDownMotionEvent() {
-    }
-
-    @Override
-    public void onUpOrCancelMotionEvent(ScrollState scrollState) {
-        ActionBar ab = getSupportActionBar();
-        if (scrollState == ScrollState.UP) {
-            if (ab.isShowing()) {
-                ab.hide();
-                updateHeaderPadding(false);
-            }
-        } else if (scrollState == ScrollState.DOWN) {
-            if (!ab.isShowing()) {
-                ab.show();
-                updateHeaderPadding(true);
-            }
-        }
-    }
-
-    // Updates the padding on header to compensate for what is visible on the screen
-    public void updateHeaderPadding(boolean show) {
-        if (show) {
-            header.setPadding(0, (int) getResources().getDimension(R.dimen.toolbar_height), 0, 0);
-        } else {
-            // If we hide the toolbar, we need to reduce the padding to compensate
-            header.setPadding(0, 0, 0, 0);
-        }
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
 
         // Save data
         savedInstanceState.putParcelable("feedItem", feedItem);
-        savedInstanceState.putParcelableArrayList("comments", commentAdapter.getComments());
+        savedInstanceState.putParcelableArrayList("comments", comments);
     }
 }

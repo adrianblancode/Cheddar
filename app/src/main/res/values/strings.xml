@@ -2,4 +2,5 @@
     <string name="app_name">Cheddar</string>
     <string name="action_settings">Settings</string>
     <string name="hacker_news_url_placeholder">Hacker News</string>
+    <string name="no_comments">There are no comments to load.</string>
 </resources>
