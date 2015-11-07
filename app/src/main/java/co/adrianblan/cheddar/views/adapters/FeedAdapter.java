@@ -1,7 +1,10 @@
 package co.adrianblan.cheddar.views.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +13,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.amulyakhare.textdrawable.TextDrawable;
+import com.devspark.robototextview.widget.RobotoTextView;
 
 import java.util.List;
 
@@ -17,7 +21,12 @@ import co.adrianblan.cheddar.R;
 import co.adrianblan.cheddar.activities.CommentActivity;
 import co.adrianblan.cheddar.activities.WebViewActivity;
 import co.adrianblan.cheddar.models.FeedItem;
+import co.adrianblan.cheddar.utils.StringUtils;
+import co.adrianblan.cheddar.views.JellyBeanCompatTextView;
 import co.adrianblan.cheddar.views.listeners.FeedItemClickListener;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
 
@@ -80,6 +89,29 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         }
     }
 
+    public static void bindFeedItemHolderExpanded(FeedAdapter.ViewHolder holder, FeedItem item) {
+        bindFeedItemHolder(holder, item, false);
+
+        // If the feeditem has any text, we display it
+        if (item.getText() != null && !item.getText().isEmpty()) {
+
+            holder.commentTitle.setText(item.getBy() + " [OP]");
+
+            // Helper function to do fancy formatting with html
+            // Yes this method sucks, no I didn't find anything better to intercept clicks that actually wokrs
+            holder.commentText.setText(StringUtils.trimWhitespace(Html.fromHtml(item.getText())));
+
+            holder.divider.setBackgroundColor(Color.parseColor("#ff6600"));
+            holder.divider.getLayoutParams().height = 3;
+
+            holder.comment.setVisibility(VISIBLE);
+            holder.commentDivider.setVisibility(VISIBLE);
+        } else {
+            holder.comment.setVisibility(GONE);
+            holder.commentDivider.setVisibility(GONE);
+        }
+    }
+
 
     @Override
     public int getItemCount() {
@@ -101,6 +133,15 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
         public ImageView thumbnailView;
         public LinearLayout bodyView;
 
+
+        //TODO I Don't like this here!
+        public LinearLayout comment;
+        public LinearLayout commentDivider;
+        public RobotoTextView commentTitle;
+        public TextView commentText;
+        public LinearLayout divider;
+
+
         public ViewHolder(View itemView) {
             super(itemView);
 
@@ -111,7 +152,13 @@ public class FeedAdapter extends RecyclerView.Adapter<FeedAdapter.ViewHolder> {
             timeView = (TextView) itemView.findViewById(R.id.feed_item_time);
             thumbnailView = (ImageView) itemView.findViewById(R.id.feed_item_thumbnail);
             bodyView = (LinearLayout) itemView.findViewById(R.id.feed_item_text);
-            
+
+            comment = (LinearLayout) itemView.findViewById(R.id.feed_item_comment);
+            commentDivider = (LinearLayout) itemView.findViewById(R.id.feed_item_comment_divider);
+            commentTitle = (RobotoTextView) itemView.findViewById(R.id.feed_item_comment_title);
+            commentText = (JellyBeanCompatTextView) itemView.findViewById(R.id.feed_item_comment_text);
+            divider = (LinearLayout) itemView.findViewById(R.id.feed_item_divider);
+
         }
     }
 }

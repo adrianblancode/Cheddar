@@ -1,8 +1,10 @@
 package co.adrianblan.cheddar.views.adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +22,9 @@ import co.adrianblan.cheddar.utils.DesignUtils;
 import co.adrianblan.cheddar.utils.StringUtils;
 import co.adrianblan.cheddar.views.JellyBeanCompatTextView;
 import co.adrianblan.cheddar.views.TextViewFixTouchConsume;
+
+import static android.view.View.GONE;
+import static android.view.View.VISIBLE;
 
 // RecyclerViewAdapter Header Code adapted from
 // https://gist.github.com/hister/d56c00fb5fd2dfaf279b
@@ -70,8 +75,8 @@ public class CommentAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof CommentAdapter.ViewHolder) {
             bindCommentHolder((CommentAdapter.ViewHolder) holder, feedItem, getComment(position), context);
-        } else {
-            FeedAdapter.bindFeedItemHolder((FeedAdapter.ViewHolder) holder, feedItem, false);
+        } else if (holder instanceof FeedAdapter.ViewHolder) {
+            FeedAdapter.bindFeedItemHolderExpanded((FeedAdapter.ViewHolder) holder, feedItem);
         }
     }
 
