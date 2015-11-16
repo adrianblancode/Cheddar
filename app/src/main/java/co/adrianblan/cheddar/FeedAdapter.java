@@ -122,7 +122,7 @@ public class FeedAdapter extends BaseAdapter {
             // Otherwise, just use the TextDrawable
             holder.thumbnail.setImageDrawable(item.getTextDrawable());
         } else {
-            // Generate TextDrawable thumbnail
+            // Generate new TextDrawable thumbnail
             TextDrawable.IShapeBuilder builder = TextDrawable.builder().beginConfig().bold().toUpperCase().endConfig();
             TextDrawable drawable = builder.buildRect(item.getLetter(), item.getColor());
             item.setTextDrawable(drawable);
@@ -137,6 +137,7 @@ public class FeedAdapter extends BaseAdapter {
 
                 Bitmap thumbnail = item.getThumbnail();
 
+                // Store thumbnail
                 if(thumbnail != null) {
 
                     final int maxThumbnailSize = 144;
@@ -164,7 +165,7 @@ public class FeedAdapter extends BaseAdapter {
         // Webview, click on thumbnail
         if(item.getShortUrl().equals(context.getResources().getString(R.string.hacker_news_url_placeholder))){
 
-            // If it points to hacker news, we need to go to the commentCount instead
+            // If it points to hacker news, we need to the comments on click instead
             holder.thumbnail.setOnClickListener(commentOnClickListener);
         } else {
             holder.thumbnail.setOnClickListener(new View.OnClickListener() {
@@ -172,6 +173,8 @@ public class FeedAdapter extends BaseAdapter {
                 public void onClick(View v) {
 
                     Bitmap thumbnail = item.getThumbnail();
+
+                    // Store thumbnail
                     if(thumbnail != null) {
                         // We can't pass through too much data through intents (terrible)
                         if (thumbnail.getHeight() > 100 || thumbnail.getWidth() > 100) {

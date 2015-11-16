@@ -10,16 +10,17 @@ import android.os.Parcelable;
  */
 public class FeedItem implements Parcelable {
 
-    // For info on these variables, check out the Hacker News FireBase API
-    private Long submissionId;
-    private String title;
-    private String by;
-    private String text;
-    private long score;
-    private long descendants;
-    private String time;
-    private String shortUrl;
-    private String longUrl;
+    // For more info on these variables, check out the Hacker News FireBase API
+    private Long submissionId; // The unique ID of the submission
+    private String title; // Title of the submission
+    private String by; // Author of the submission
+    private String text; // Submission text
+    private long score; // Number of votes of the submission
+    private long descendants; // Number of comments of the submission
+
+    private String time; // Time the submission was posted
+    private String shortUrl; // Domain the submission links to
+    private String longUrl; // Full URL the submission links to
 
     // Marked transient so they won't get included in the bundle
     private transient Bitmap thumbnail;

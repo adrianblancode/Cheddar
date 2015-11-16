@@ -31,7 +31,7 @@ public class CommentAdapter extends BaseAdapter {
     private ArrayList<Comment> comments;
     private ArrayList<Integer> colors;
     private final Context context;
-    private FeedItem feedItem;
+    private FeedItem feedItem; // Feed item which is the parent of all comments
 
     // Constructor which creates new arraylist
     public CommentAdapter(FeedItem fi, Context c) {
@@ -143,7 +143,7 @@ public class CommentAdapter extends BaseAdapter {
 
         holder.title.setText(com.getBy());
 
-        // If the writer of the comment is also the feedItem of the submission
+        // If the author of the feed item is also the author of the comment
         if(com.getBy().equals(feedItem.getBy())){
             holder.title.setTextColor(context.getResources().getColor(R.color.colorPrimary));
             holder.title.setText(holder.title.getText() + " [OP]");
@@ -151,6 +151,7 @@ public class CommentAdapter extends BaseAdapter {
             holder.title.setTextColor(context.getResources().getColor(R.color.abc_secondary_text_material_light));
         }
 
+        // If the comment exists
         if(com.getBody() != null && !com.hasHideChildren()) {
             holder.body.setVisibility(View.VISIBLE);
 
@@ -165,7 +166,7 @@ public class CommentAdapter extends BaseAdapter {
 
         holder.time.setText(com.getTime());
 
-        // Adds padding based on hierarchy, and adds indicator
+        // Adds padding based on hierarchy, and adds hierarchy indicator
         holder.indicator.setPadding((int) dpToPixels(4, parent.getContext()) * (com.getHierarchy() - 1), 0, 0, 0);
 
         // We don't need the indicator for top level commentCount
@@ -176,7 +177,7 @@ public class CommentAdapter extends BaseAdapter {
             holder.indicator.setVisibility(View.VISIBLE);
             holder.indicator_color.setVisibility(View.VISIBLE);
 
-            // Use modulo to get the appropriate color
+            // Use modulo to get the appropriate color for indicator
             int color = colors.get((com.getHierarchy() - 1) % colors.size());
             holder.indicator_color.setBackgroundColor(color);
         }

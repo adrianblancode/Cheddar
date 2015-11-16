@@ -55,9 +55,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
     // Base URL for the hacker news API
     private Firebase baseUrl;
 
-    // Sub URL used for gathering commentCount
-    private Firebase itemUrl;
-
     // Sub URL used for different stories
     private Firebase storiesUrl;
 
@@ -91,7 +88,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         // Init API stuff
         Firebase.setAndroidContext(getActivity().getApplicationContext());
         baseUrl = new Firebase("https://hacker-news.firebaseio.com/v0/");
-        itemUrl = baseUrl.child("/item/");
         storiesUrl = baseUrl.child(getArguments().getString("url"));
 
         //noinspection Convert2Diamond
@@ -157,6 +153,8 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
 
                         //to avoid multiple calls for last item
                         if (lastItem != preLast && lastItem >= submissionUpdateNum && seconds >= submissionUpdateTime) {
+
+                            // Get new feed items
                             updateSubmissions();
                             preLast = lastItem;
                             lastSubmissionUpdate = d;
@@ -166,6 +164,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             }
         });
 
+        // Show loading progress bar
         footer = new ProgressBar(getActivity().getApplicationContext());
         footer.setPadding(0, 65, 0, 65);
         footer.setIndeterminate(true);
@@ -288,6 +287,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
                 String url = (String) ret.get("url");
                 URL site = null;
 
+                // If the url exists
                 if (url != null) {
                     try {
                         site = new URL(url);
@@ -323,9 +323,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         // Gets readable date
         String time = getPrettyDate((Long) ret.get("time"));
 
-        int comments = 0;
-        ArrayList<Long> kids = (ArrayList<Long>) ret.get("kids");
-
         // Set titles and other data
         f.setTitle((String) ret.get("title"));
         f.setText((String) ret.get("text"));
@@ -342,6 +339,7 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             f.setDescendants(0L);
         }
 
+        // Hacker News site urls are null
         if (site != null) {
             String domain = site.getHost().replace("www.", "");
             f.setShortUrl(domain);
@@ -370,26 +368,6 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
         // Url to an API that automatically fetches the best thumbnail for the site
         String thumbnailUrl = "http://icons.better-idea.org/api/icons?url=" + url + "&i_am_feeling_lucky=yes";
 
-        class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-
-            // Asynctask that fetches a thumbnail
-            protected Bitmap doInBackground(String... urls) {
-                Bitmap b = null;
-                try {
-                    InputStream in = new java.net.URL(urls[0]).openStream();
-                    b = BitmapFactory.decodeStream(in);
-                } catch (Exception e) {
-                    Log.e("Image fetching error", e.getMessage());
-                    e.printStackTrace();
-                }
-                return b;
-            }
-
-            protected void onPostExecute(Bitmap thumbnail) {
-                processThumbnail(thumbnail, fi);
-            }
-        }
-
         // For some weird reason, the ImageLoaderLibrary crashes if run below KitKat
         // Thus we instead have to do it manually with an AsyncTask
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -405,6 +383,27 @@ public class FeedFragment extends Fragment implements ObservableScrollViewCallba
             ImageSize targetSize = new ImageSize(144, 144); // result Bitmap will be fit to this size
             ImageLoader.getInstance().loadImage(thumbnailUrl, targetSize, thumbnailLoader);
         } else {
+
+            class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+
+                // Asynctask that fetches a thumbnail
+                protected Bitmap doInBackground(String... urls) {
+                    Bitmap b = null;
+                    try {
+                        InputStream in = new java.net.URL(urls[0]).openStream();
+                        b = BitmapFactory.decodeStream(in);
+                    } catch (Exception e) {
+                        Log.e("Image fetching error", e.getMessage());
+                        e.printStackTrace();
+                    }
+                    return b;
+                }
+
+                protected void onPostExecute(Bitmap thumbnail) {
+                    processThumbnail(thumbnail, fi);
+                }
+            }
+
             DownloadImageTask task = new DownloadImageTask();
             asyncTasks.add(task);
             task.execute(thumbnailUrl);

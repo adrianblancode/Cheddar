@@ -35,15 +35,13 @@ import java.util.concurrent.TimeUnit;
 
 import static android.widget.AdapterView.*;
 
-/**
- * Created by Adrian on 2015-07-29.
- */
+// Activity which shows comments to a feed item
 public class CommentActivity extends AppCompatActivity implements ObservableScrollViewCallbacks {
 
-    private CommentAdapter commentAdapter;
-    private ArrayList<Long> kids;
-    private Date lastSubmissionUpdate;
-    private Date lastOnItemLongClick;
+    private CommentAdapter commentAdapter; // Adapter which stores comments
+    private ArrayList<Long> kids; // Stores the array of individual comment IDs
+    private Date lastSubmissionUpdate; // Time since last submission update
+    private Date lastOnItemLongClick; // Time since last comment hidden
 
     private FeedItem feedItem;
     private Long newCommentCount;
@@ -53,7 +51,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
     private View no_comments;
     private View progress;
 
-    // Base URL for the hacker news API
+    // Base URL for the Hacker News Firebase API
     private Firebase baseUrl;
 
     @Override
@@ -83,7 +81,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle(feedItem.getTitle());
 
-        // Init list
+        // Initialize the list view
         ObservableListView lv = (ObservableListView) findViewById(R.id.activity_comment_list);
         lv.setScrollViewCallbacks(this);
         lv.addHeaderView(initHeader(feedItem));
@@ -93,13 +91,13 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         no_comments = findViewById(R.id.activity_comment_none);
         progress = findViewById(R.id.activity_comment_progress);
 
-        // Don't update if we already have retrieved saved comments
+        // Don't get new comments if we already have retrieved saved comments
         if(commentAdapter.getCount() == 0) {
             updateComments();
         }
     }
 
-    // Initializes the submission header with data
+    // Initializes the feed item header with data
     public View initHeader(final FeedItem feedItem){
 
         header = View.inflate(this, R.layout.feed_item, null);
@@ -119,10 +117,12 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         TextView time = (TextView) header.findViewById(R.id.feed_item_time);
         time.setText(feedItem.getTime());
 
+        // Retrieve saved thumbnail
         thumbnail = getIntent().getParcelableExtra("thumbnail");
 
-        // Generate new TextDrawable
         ImageView imageView = (ImageView) header.findViewById(R.id.feed_item_thumbnail);
+
+        // Use thumbnail for the feed item
         if(thumbnail != null){
             imageView.setImageBitmap(thumbnail);
         } else if (feedItem.getTextDrawable() != null){
@@ -140,7 +140,9 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
 
         // If the url doesn't go to hacker news
         if(feedItem.getLongUrl() != null){
+
             LinearLayout image_container = (LinearLayout) header.findViewById(R.id.feed_item_thumbnail_container);
+
             // If we click the thumbnail, get to the webview
             image_container.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -160,14 +162,17 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
 
         // If the feeditem has any text, we display it
         if(feedItem.getText() != null && !feedItem.getText().isEmpty()) {
+
+            // We use RobotoTextView to get Roboto Bold on author titles
             RobotoTextView comment_title = (RobotoTextView) header.findViewById(R.id.feed_item_comment_title);
+
+            // JellyBeanCompatTextView fixes a bug with TextView spannables and earlier versions and android
             TextView comment_text = (JellyBeanCompatTextView) header.findViewById(R.id.feed_item_comment_text);
             LinearLayout divider = (LinearLayout) header.findViewById(R.id.feed_item_divider);
 
             comment_title.setText(feedItem.getBy() + " [OP]");
 
-            // Helper function to do fancy formatting with html
-            // Yes this method sucks, no I didn't find anything better to intercept clicks that actually wokrs
+            // Helper function to do fancy formatting with the comment text
             comment_text.setText(CommentAdapter.trimWhitespace(Html.fromHtml(feedItem.getText())));
 
             divider.setBackgroundColor(Color.parseColor("#ff6600"));
@@ -283,6 +288,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         progress.setVisibility(View.VISIBLE);
         no_comments.setVisibility(View.GONE);
 
+        // We retrieve the comment data belonging to the feed item
         baseUrl.child(Long.toString(feedItem.getSubmissionId())).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -298,6 +304,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
                 feedItem.setTime(getPrettyDate((long) ret.get("time")));
                 feedItem.setScore((Long) ret.get("score"));
 
+                // If the feed item has comments
                 if (kids != null) {
 
                     no_comments.setVisibility(View.GONE);
@@ -395,6 +402,7 @@ public class CommentActivity extends AppCompatActivity implements ObservableScro
         TextView scoreView = (TextView) header.findViewById(R.id.feed_item_score);
         scoreView.setText(Long.toString(feedItem.getScore()));
 
+        // If the number of new comments is larger than the old number
         if(newCommentCount > feedItem.getDescendants()) {
             TextView commentView = (TextView) header.findViewById(R.id.feed_item_comments);
             commentView.setText(Long.toString(newCommentCount));

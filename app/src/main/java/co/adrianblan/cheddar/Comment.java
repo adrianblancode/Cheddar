@@ -3,18 +3,16 @@ package co.adrianblan.cheddar;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by Adrian on 2015-07-30.
- */
+// Stores individual comments
 public class Comment implements Parcelable {
-    private String by;
-    private String body;
-    private String time;
+    private String by;  // Author of the comment
+    private String body; // Comment text
+    private String time; // Time the comment was posted
 
-    private boolean hideChildren;
-    private boolean isHidden;
-    private boolean toBeHidden;
-    private int hiddenChildren;
+    private boolean hideChildren; // Whether the children of the comment are hidden
+    private boolean isHidden; // Whether the comment is hidden itself
+    private boolean toBeHidden; // Whether the comment is marked to be hidden
+    private int hiddenChildren; // How many hidden children the comment has
 
     // At what level the comment should be shown
     private int hierarchy;
