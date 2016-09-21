@@ -1,4 +1,4 @@
-package co.adrianblan.cheddar;
+package co.adrianblan.cheddar.activities;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,9 +14,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
-/**
- * Created by Adrian on 2015-07-28.
- */
+import co.adrianblan.cheddar.models.FeedItem;
+import co.adrianblan.cheddar.R;
+
 public class WebViewActivity extends AppCompatActivity {
 
     private WebView myWebView;

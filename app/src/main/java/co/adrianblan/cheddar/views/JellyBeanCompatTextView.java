@@ -11,7 +11,7 @@
 // WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 // License for the specific language governing permissions and limitations under
 // the License.
-package co.adrianblan.cheddar;
+package co.adrianblan.cheddar.views;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +22,8 @@ import android.text.Spanned;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TextView;
+
+import co.adrianblan.cheddar.BuildConfig;
 
 /**
  * <p>

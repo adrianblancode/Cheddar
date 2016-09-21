@@ -11,7 +11,8 @@
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:baselineAligned="false">
         <LinearLayout
             android:id="@+id/feed_item_text"
             android:layout_width="wrap_content"
@@ -118,7 +119,6 @@
                 android:id="@+id/feed_item_thumbnail"
                 android:layout_width="72dp"
                 android:layout_height="72dp"
-                android:layout_alignParentRight="true"
                 android:layout_gravity="right"/>
         </LinearLayout>
     </LinearLayout>
@@ -149,7 +149,7 @@
             android:textColor="@color/white"
             android:text="Commenter"/>
 
-        <co.adrianblan.cheddar.JellyBeanCompatTextView
+        <co.adrianblan.cheddar.views.JellyBeanCompatTextView
             android:id="@+id/feed_item_comment_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

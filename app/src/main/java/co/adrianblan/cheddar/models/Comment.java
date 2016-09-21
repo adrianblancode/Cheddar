@@ -1,4 +1,4 @@
-package co.adrianblan.cheddar;
+package co.adrianblan.cheddar.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

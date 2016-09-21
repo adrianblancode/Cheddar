@@ -1,13 +1,10 @@
-package co.adrianblan.cheddar;
+package co.adrianblan.cheddar.models;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * Created by Adrian on 2015-07-25.
- */
 public class FeedItem implements Parcelable {
 
     // For more info on these variables, check out the Hacker News FireBase API

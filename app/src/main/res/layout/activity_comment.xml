@@ -1,58 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/activity_comment"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/activity_comment_list_container"
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark">
+
+        <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/toolbar_comment"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            app:layout_scrollFlags="scroll|enterAlways" />
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipeContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <com.github.ksoichiro.android.observablescrollview.ObservableListView
-            android:id="@+id/activity_comment_list"
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/comment_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:divider="@null"
-            android:dividerHeight="0dp"/>
+            android:background="?android:attr/selectableItemBackground"
+            android:scrollbars="vertical" />
 
-        <LinearLayout
-            android:id="@+id/activity_comment_progress"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_horizontal|center_vertical">
-            <ProgressBar
-                android:layout_width="wrap_content"
-                android:layout_height="50dp"
-                android:layout_marginBottom="25dp"
-                android:indeterminate="true"
-                android:id="@+id/marker_progress"
-                style="?android:attr/progressBarStyle"/>
-        </LinearLayout>
+    </android.support.v4.widget.SwipeRefreshLayout>
 
-        <TextView
-            android:id="@+id/activity_comment_none"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:layout_gravity="center_vertical"
-            android:gravity="center_horizontal"
-            style="@style/Base.TextAppearance.AppCompat.Body1"
-            android:textColor="@color/abc_primary_text_material_light"
-            android:text="There are no comments to load."/>
+    <LinearLayout
+        android:id="@+id/activity_comment_progress"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal|center_vertical">
+
+        <ProgressBar
+            android:id="@+id/marker_progress"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginBottom="25dp"
+            android:indeterminate="true" />
     </LinearLayout>
 
-    <android.support.v7.widget.Toolbar
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/toolbar_comment"
+    <TextView
+        android:id="@+id/activity_comment_none"
+        style="@style/Base.TextAppearance.AppCompat.Body1"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/toolbar_height"
-        android:background="@color/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark"
-        android:elevation="4dp"/>
-</FrameLayout>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="20dp"
+        android:gravity="center_horizontal"
+        android:text="@string/no_comments"
+        android:textColor="@color/abc_primary_text_material_light"
+        android:visibility="gone" />
+
+</android.support.design.widget.CoordinatorLayout>

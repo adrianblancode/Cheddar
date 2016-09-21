@@ -1,7 +1,8 @@
-package co.adrianblan.cheddar;
+package co.adrianblan.cheddar.activities;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -10,13 +11,15 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import com.astuetz.PagerSlidingTabStrip;
 import com.nostra13.universalimageloader.cache.memory.impl.WeakMemoryCache;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.download.BaseImageDownloader;
 
 import java.io.File;
+
+import co.adrianblan.cheddar.fragments.FeedFragment;
+import co.adrianblan.cheddar.R;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -33,9 +36,8 @@ public class MainActivity extends AppCompatActivity {
         pager.setAdapter(new PagerAdapter(getSupportFragmentManager()));
 
         // Bind the tabs to the ViewPager
-        PagerSlidingTabStrip tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
-        tabs.setShouldExpand(true);
-        tabs.setViewPager(pager);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.toolbar_tabs);
+        tabLayout.setupWithViewPager(pager);
 
         enableHttpResponseCache();
         initImageLoader();
@@ -86,7 +88,8 @@ public class MainActivity extends AppCompatActivity {
     // Since each response is less than 1KB we have a lot to spare
     private void enableHttpResponseCache() {
         try {
-            long httpCacheSize = 1 * 1024 * 1024; // 1 MiB
+            //noinspection PointlessArithmeticExpression
+            long httpCacheSize = 1024 * 1024; // 1 MiB
             File httpCacheDir = new File(getCacheDir(), "http");
             Class.forName("android.net.http.HttpResponseCache")
                     .getMethod("install", File.class, long.class)
