@@ -1,0 +1,2 @@
+rootProject.name='Boilerplate'
+include ':app'
