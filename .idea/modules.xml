@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="ProjectModuleManager">
-    <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/Boilerplate.iml" filepath="$PROJECT_DIR$/.idea/modules/Boilerplate.iml" group="Boilerplate" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/app.iml" group="Boilerplate/app" />
-    </modules>
-  </component>
-</project>
