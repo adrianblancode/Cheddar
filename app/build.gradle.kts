@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -18,9 +21,36 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        getByName("debug") {
+            storeFile = rootProject.file("debug.keystore")
+            storePassword = "debugkey"
+            keyAlias = "debugkey"
+            keyPassword = "debugkey"
+        }
+        create("release") {
+            val propsFile = rootProject.file("keystore.properties")
+            if (propsFile.exists()) {
+                val props = Properties()
+                props.load(FileInputStream(propsFile))
+                storeFile = file(props["storeFile"]!!)
+                storePassword = props["storePassword"] as String
+                keyAlias = props["keyAlias"] as String
+                keyPassword = props["keyPassword"] as String
+            } else {
+                println("File keystore.properties not found.")
+            }
+        }
+    }
+
     buildTypes {
+        getByName("debug") {
+            signingConfig =  signingConfigs.getByName("debug")
+            applicationIdSuffix = ".debug"
+        }
         getByName("release") {
-            isMinifyEnabled = false
+            signingConfig =  signingConfigs.getByName("release")
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
