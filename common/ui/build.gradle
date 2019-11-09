@@ -15,4 +15,6 @@ dependencies {
     api(Dependencies.androidxActivity)
     api(Dependencies.androidxFragment)
     api(Dependencies.androidxLifecycle)
+    api(Dependencies.androidxLifecycleExt)
+    api(Dependencies.androidxLifecycleViewModelExt)
 }

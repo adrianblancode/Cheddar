@@ -1,4 +1,4 @@
-package co.adrianblan.ui
+package co.adrianblan.common.ui
 
 import org.junit.Test
 

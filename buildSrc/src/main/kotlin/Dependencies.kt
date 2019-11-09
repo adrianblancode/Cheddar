@@ -37,11 +37,13 @@ object Dependencies {
     const val androidxMaterial = "androidx.ui:ui-material:${Versions.androidxMaterial}"
     const val androidxActivity = "androidx.activity:activity-ktx:${Versions.androidxActivity}"
     const val androidxFragment = "androidx.fragment:fragment-ktx:${Versions.androidxFragment}"
-    const val androidxLifecycle = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.androidxLifecycle}"
+    const val androidxLifecycle = "androidx.lifecycle:lifecycle-extensions:${Versions.androidxLifecycle}"
+    const val androidxLifecycleExt = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.androidxLifecycle}"
+    const val androidxLifecycleViewModelExt = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.androidxLifecycle}"
 
     const val dagger = "com.google.dagger:dagger:${Versions.daggerVersion}"
     const val daggerCompiler = "com.google.dagger:dagger-compiler:${Versions.daggerVersion}"
-    const val daggerAndroid = "com.google.dagger:dagger-android:${Versions.daggerVersion}"
+    const val daggerAndroid = "com.google.dagger:dagger-android-support:${Versions.daggerVersion}"
     const val daggerAndroidCompiler = "com.google.dagger:dagger-android-processor:${Versions.daggerVersion}"
 
     const val okio = "com.squareup.okio:okio:2.4.1"
