@@ -1,0 +1,22 @@
+apply from: rootProject.file("gradle/library.gradle")
+
+android {
+    // Remove when Moshi compiles without problems again
+    configurations.all {
+        resolutionStrategy {
+            force "com.squareup.moshi:moshi:${Versions.moshiVersion}"
+        }
+    }
+}
+
+dependencies {
+    // Must be api or kapt will fail
+    api(Dependencies.okhttpCore)
+    implementation(Dependencies.okhttpLoggingInterceptor)
+    implementation(Dependencies.retrofitCore)
+    implementation(Dependencies.retrofitMoshiConverter)
+
+    // Must be api or kapt will fail
+    api(Dependencies.moshi)
+    kapt(Dependencies.moshiCodegen)
+}

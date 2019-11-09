@@ -1,3 +1,5 @@
+// Base for all modules
+
 apply plugin: "kotlin-android"
 apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
@@ -39,7 +41,6 @@ dependencies {
     api(Dependencies.coroutinesCore)
     api(Dependencies.coroutinesAndroid)
 
-    implementation(Dependencies.okio)
     implementation(Dependencies.timber)
     implementation(Dependencies.androidxCore)
 

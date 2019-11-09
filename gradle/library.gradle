@@ -1,3 +1,5 @@
+// Base for modules consumed as libraries
+
 apply plugin: "com.android.library"
 apply from: rootProject.file("gradle/android.gradle")
 
@@ -12,6 +14,6 @@ android {
 
 dependencies {
     if (path != ":common") {
-        implementation project(":common")
+        implementation(project(":common"))
     }
 }

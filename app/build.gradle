@@ -50,6 +50,9 @@ android {
 }
 
 dependencies {
-    implementation project(":common")
-    implementation project(":common:ui")
+    implementation(project(":common"))
+    implementation(project(":common:ui"))
+    implementation project(":network")
+
+    debugImplementation(Dependencies.leakcanary)
 }

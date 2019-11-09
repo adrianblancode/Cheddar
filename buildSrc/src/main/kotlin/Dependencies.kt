@@ -15,7 +15,9 @@ object Versions {
     const val androidxLifecycle = "2.2.0-rc02"
 
     const val daggerVersion = "2.25.2"
-    const val moshiVersion = "9.0.1"
+    const val okhttpVersion = "4.2.2"
+    const val retrofitVersion = "2.6.2"
+    const val moshiVersion = "1.9.1"
 
     const val junit = "4.12"
     const val androidTestJunit = "1.1.1"
@@ -46,12 +48,13 @@ object Dependencies {
     const val daggerAndroid = "com.google.dagger:dagger-android-support:${Versions.daggerVersion}"
     const val daggerAndroidCompiler = "com.google.dagger:dagger-android-processor:${Versions.daggerVersion}"
 
-    const val okio = "com.squareup.okio:okio:2.4.1"
-    const val okhttp_core = "com.squareup.okhttp3:okhttp:4.2.2"
-    const val retrofit_core = "com.squareup.retrofit2:retrofit:2.6.2"
+    const val okhttpCore = "com.squareup.okhttp3:okhttp:${Versions.okhttpVersion}"
+    const val okhttpLoggingInterceptor =  "com.squareup.okhttp3:logging-interceptor:${Versions.okhttpVersion}"
+    const val retrofitCore = "com.squareup.retrofit2:retrofit:${Versions.retrofitVersion}"
+    const val retrofitMoshiConverter = "com.squareup.retrofit2:converter-moshi:${Versions.retrofitVersion}"
     const val moshi = "com.squareup.moshi:moshi:${Versions.moshiVersion}"
     const val moshiCodegen = "com.squareup.moshi:moshi-kotlin-codegen:${Versions.moshiVersion}"
-
+    const val leakcanary = "com.squareup.leakcanary:leakcanary-android:2.0-beta-3"
     const val timber = "com.jakewharton.timber:timber:4.7.1"
 
     const val junit = "junit:junit:${Versions.junit}"
