@@ -10,11 +10,11 @@ object Versions {
     const val androidxUiLayout = "0.1.0-dev02"
     const val androidxUiTooling = "0.1.0-dev02"
     const val androidxMaterial = "0.1.0-dev02"
-    const val androidxActivity = "1.1.0-rc01"
-    const val androidxFragment = "1.2.0-rc01"
-    const val androidxLifecycle = "2.2.0-rc01"
+    const val androidxActivity = "1.1.0-rc02"
+    const val androidxFragment = "1.2.0-rc02"
+    const val androidxLifecycle = "2.2.0-rc02"
 
-    const val daggerVersion = "2.24"
+    const val daggerVersion = "2.25.2"
     const val moshiVersion = "9.0.1"
 
     const val junit = "4.12"
