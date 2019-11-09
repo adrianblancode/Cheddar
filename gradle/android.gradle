@@ -1,0 +1,53 @@
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
+apply plugin: "kotlin-kapt"
+
+android {
+
+    compileSdkVersion Versions.targetSdkVersion
+    defaultConfig {
+        minSdkVersion Versions.minSdkVersion
+        targetSdkVersion Versions.targetSdkVersion
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+        test.java.srcDirs += "src/test/kotlin"
+        androidTest.java.srcDirs += "src/androidTest/kotlin"
+        buildTypes.forEach { buildType ->
+            maybeCreate(buildType.name).java.srcDirs += "src/$buildType.name/kotlin"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+kapt {
+    useBuildCache = true
+}
+
+dependencies {
+    api(Dependencies.kotlinStdlib)
+    api(Dependencies.coroutinesCore)
+    api(Dependencies.coroutinesAndroid)
+
+    implementation(Dependencies.okio)
+    implementation(Dependencies.timber)
+    implementation(Dependencies.androidxCore)
+
+    implementation(Dependencies.dagger)
+    implementation(Dependencies.daggerAndroid)
+    kapt(Dependencies.daggerCompiler)
+    kapt(Dependencies.daggerAndroidCompiler)
+
+    testImplementation(Dependencies.junit)
+    androidTestImplementation(Dependencies.androidTestJunit)
+}

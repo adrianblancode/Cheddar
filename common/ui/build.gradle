@@ -1,0 +1,18 @@
+apply from: rootProject.file("gradle/library.gradle")
+
+android {
+    buildFeatures {
+        compose true
+    }
+}
+
+dependencies {
+    api(Dependencies.androidxAppcompat)
+    api(Dependencies.androidxCore)
+    api(Dependencies.androidxUiLayout)
+    api(Dependencies.androidxUiTooling)
+    api(Dependencies.androidxMaterial)
+    api(Dependencies.androidxActivity)
+    api(Dependencies.androidxFragment)
+    api(Dependencies.androidxLifecycle)
+}

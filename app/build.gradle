@@ -1,0 +1,55 @@
+apply plugin: "com.android.application"
+apply from: rootProject.file("gradle/android.gradle")
+
+android {
+
+    defaultConfig {
+        applicationId = "co.adrianblan.boilerplate"
+        versionCode = 1
+        versionName = "0.1"
+    }
+
+    signingConfigs {
+        getByName("debug") {
+            storeFile = rootProject.file("debug.keystore")
+            storePassword = "debugkey"
+            keyAlias = "debugkey"
+            keyPassword = "debugkey"
+        }
+        create("release") {
+            def propsFile = rootProject.file("keystore.properties")
+            if (propsFile.exists()) {
+                val props = Properties()
+                props.load(FileInputStream(propsFile))
+                storeFile = file(props["storeFile"])
+                storePassword = props["storePassword"]
+                keyAlias = props["keyAlias"]
+                keyPassword = props["keyPassword"]
+            } else {
+                println("File keystore.properties not found.")
+            }
+        }
+    }
+
+    buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+            applicationIdSuffix ".debug"
+            minifyEnabled false
+        }
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+            minifyEnabled = true
+            shrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "../proguard-rules.pro"
+            )
+        }
+    }
+}
+
+dependencies {
+    implementation project(":common")
+    implementation project(":common:ui")
+}

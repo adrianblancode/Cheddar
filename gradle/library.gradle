@@ -1,0 +1,17 @@
+apply plugin: "com.android.library"
+apply from: rootProject.file("gradle/android.gradle")
+
+android {
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), '../proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    if (path != ":common") {
+        implementation project(":common")
+    }
+}
