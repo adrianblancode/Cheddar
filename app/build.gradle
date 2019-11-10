@@ -1,5 +1,5 @@
 apply plugin: "com.android.application"
-apply from: rootProject.file("gradle/android.gradle")
+apply from: rootProject.file("gradle/base-module.gradle")
 
 android {
 

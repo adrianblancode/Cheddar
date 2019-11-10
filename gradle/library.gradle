@@ -1,7 +1,7 @@
 // Base for modules consumed as libraries
 
 apply plugin: "com.android.library"
-apply from: rootProject.file("gradle/android.gradle")
+apply from: rootProject.file("gradle/base-module.gradle")
 
 android {
     buildTypes {
