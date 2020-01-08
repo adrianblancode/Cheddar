@@ -45,9 +45,7 @@ dependencies {
     implementation(Dependencies.androidxCore)
 
     implementation(Dependencies.dagger)
-    implementation(Dependencies.daggerAndroid)
     kapt(Dependencies.daggerCompiler)
-    kapt(Dependencies.daggerAndroidCompiler)
 
     testImplementation(Dependencies.junit)
     androidTestImplementation(Dependencies.androidTestJunit)

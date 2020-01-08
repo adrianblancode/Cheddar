@@ -7,12 +7,8 @@ object Versions {
 
     const val androidxAppcompat = "1.1.0"
     const val androidxCore = "1.1.0"
-    const val androidxUiLayout = "0.1.0-dev02"
-    const val androidxUiTooling = "0.1.0-dev02"
-    const val androidxMaterial = "0.1.0-dev02"
+    const val composeVersion = "0.1.0-dev02"
     const val androidxActivity = "1.1.0-rc02"
-    const val androidxFragment = "1.2.0-rc02"
-    const val androidxLifecycle = "2.2.0-rc02"
 
     const val daggerVersion = "2.25.2"
     const val okhttpVersion = "4.2.2"
@@ -34,19 +30,13 @@ object Dependencies {
 
     const val androidxAppcompat = "androidx.appcompat:appcompat:${Versions.androidxAppcompat}"
     const val androidxCore = "androidx.core:core-ktx:${Versions.androidxCore}"
-    const val androidxUiLayout = "androidx.ui:ui-layout:${Versions.androidxUiLayout}"
-    const val androidxUiTooling = "androidx.ui:ui-tooling:${Versions.androidxUiTooling}"
-    const val androidxMaterial = "androidx.ui:ui-material:${Versions.androidxMaterial}"
+    const val androidxUiLayout = "androidx.ui:ui-layout:${Versions.composeVersion}"
+    const val androidxUiTooling = "androidx.ui:ui-tooling:${Versions.composeVersion}"
+    const val androidxMaterial = "androidx.ui:ui-material:${Versions.composeVersion}"
     const val androidxActivity = "androidx.activity:activity-ktx:${Versions.androidxActivity}"
-    const val androidxFragment = "androidx.fragment:fragment-ktx:${Versions.androidxFragment}"
-    const val androidxLifecycle = "androidx.lifecycle:lifecycle-extensions:${Versions.androidxLifecycle}"
-    const val androidxLifecycleExt = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.androidxLifecycle}"
-    const val androidxLifecycleViewModelExt = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.androidxLifecycle}"
 
     const val dagger = "com.google.dagger:dagger:${Versions.daggerVersion}"
     const val daggerCompiler = "com.google.dagger:dagger-compiler:${Versions.daggerVersion}"
-    const val daggerAndroid = "com.google.dagger:dagger-android-support:${Versions.daggerVersion}"
-    const val daggerAndroidCompiler = "com.google.dagger:dagger-android-processor:${Versions.daggerVersion}"
 
     const val okhttpCore = "com.squareup.okhttp3:okhttp:${Versions.okhttpVersion}"
     const val okhttpLoggingInterceptor =  "com.squareup.okhttp3:logging-interceptor:${Versions.okhttpVersion}"
