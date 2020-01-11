@@ -5,18 +5,15 @@ import androidx.annotation.CheckResult
 import androidx.annotation.ColorRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.Composable
-import androidx.compose.ambient
-import androidx.compose.effectOf
 import androidx.compose.unaryPlus
-import androidx.core.content.ContextCompat
 import androidx.ui.core.*
-import androidx.ui.graphics.Color
 import androidx.ui.layout.Align
 import androidx.ui.layout.Center
 import androidx.ui.layout.Container
 import androidx.ui.layout.Spacing
 import androidx.ui.material.*
 import androidx.ui.material.ripple.Ripple
+import androidx.ui.res.colorResource
 import androidx.ui.res.imageResource
 import androidx.ui.res.stringResource
 import androidx.ui.text.font.FontFamily
@@ -40,20 +37,23 @@ fun GreetingView() {
             title = {
                 Text(
                     text = +stringResource(R.string.app_name),
-                    style = +themeTextStyle { h6 }
+                    style = (+MaterialTheme.typography()).h6
                 )
             }
         )
     }
     Center {
-        Text(text = "Hello world!", style = (+themeTextStyle { h3 }).copy(color = +themeColor { primary }))
+        Text(
+            text = "Hello world!",
+            style = (+MaterialTheme.typography()).h3.copy(color = (+MaterialTheme.colors()).primary)
+        )
     }
     Align(alignment = Alignment.BottomRight) {
         Container(modifier = Spacing(bottom = 16.dp, right = 8.dp)) {
             Ripple(bounded = true) {
                 FloatingActionButton(
                     icon = +imageResource(android.R.drawable.ic_menu_search),
-                    color = +themeColor { secondary },
+                    color = (+MaterialTheme.colors()).secondary,
                     onClick = {}
                 )
             }
@@ -63,15 +63,14 @@ fun GreetingView() {
 
 @Composable
 fun AppTheme(children: @Composable() () -> Unit) {
-    val colors =
-        MaterialColors().copy(
-            primary = +colorResource(R.color.colorPrimary),
-            primaryVariant = +colorResource(R.color.colorPrimaryDark),
-            secondary = +colorResource(R.color.colorAccent)
-        )
+    val colors = ColorPalette(
+        primary = +colorResource(R.color.colorPrimary),
+        primaryVariant = +colorResource(R.color.colorPrimaryDark),
+        secondary = +colorResource(R.color.colorAccent)
+    )
 
     val typography =
-        MaterialTypography()
+        Typography()
             .let {
 
                 val mediumFont = FontFamily("sans-serif-medium")
@@ -89,16 +88,11 @@ fun AppTheme(children: @Composable() () -> Unit) {
     MaterialTheme(colors = colors, typography = typography, children = children)
 }
 
+
 @Preview
 @Composable
 fun DefaultPreview() {
     AppTheme {
         GreetingView()
     }
-}
-
-@CheckResult(suggest = "+")
-private fun colorResource(@ColorRes id: Int) = effectOf<Color> {
-    val context = +ambient(ContextAmbient)
-    Color(ContextCompat.getColor(context, id))
 }

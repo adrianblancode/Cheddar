@@ -9,8 +9,13 @@ android {
 dependencies {
     api(Dependencies.androidxAppcompat)
     api(Dependencies.androidxCore)
-    api(Dependencies.androidxUiLayout)
-    api(Dependencies.androidxUiTooling)
-    api(Dependencies.androidxMaterial)
     api(Dependencies.androidxActivity)
+
+    api(Dependencies.androidxComposeRuntime)
+    api(Dependencies.androidxUiFramework)
+    api(Dependencies.androidxUiLayout)
+    api(Dependencies.androidxUiMaterial)
+    api(Dependencies.androidxUiFoundation)
+    api(Dependencies.androidxUiAnimation)
+    api(Dependencies.androidxUiTooling)
 }
