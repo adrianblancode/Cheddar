@@ -1,5 +1,6 @@
-rootProject.name='Boilerplate'
+rootProject.name='Cheddar'
 include ':app'
 include ':common'
 include ':common:ui'
 include ':network'
+include ':hackernews'

@@ -4,7 +4,7 @@ apply from: rootProject.file("gradle/base-module.gradle")
 android {
 
     defaultConfig {
-        applicationId = "co.adrianblan.boilerplate"
+        applicationId = "co.adrianblan.cheddar"
         versionCode = 1
         versionName = "0.1"
     }
@@ -52,7 +52,7 @@ android {
 dependencies {
     implementation(project(":common"))
     implementation(project(":common:ui"))
-    implementation project(":network")
+    implementation project(":hackernews")
 
     debugImplementation(Dependencies.leakcanary)
 }

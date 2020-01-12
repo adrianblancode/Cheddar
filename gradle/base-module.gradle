@@ -36,7 +36,8 @@ dependencies {
     implementation(Dependencies.androidxCore)
 
     implementation(Dependencies.dagger)
-    kapt(Dependencies.daggerCompiler)
+    // TODO reenable once kapt works with compose
+    // kapt(Dependencies.daggerCompiler)
 
     testImplementation(Dependencies.junit)
     androidTestImplementation(Dependencies.androidTestJunit)
