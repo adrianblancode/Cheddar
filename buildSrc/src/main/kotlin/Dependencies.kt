@@ -20,7 +20,13 @@ object Versions {
 }
 
 object Dependencies {
+
+    const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
+    const val kotlinSerializationPlugin = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}"
+
     const val kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}"
+    const val kotlinSerializationRuntime = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.14.0"
+
     const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutinesVersion}"
     const val coroutinesAndroid =  "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutinesVersion}"
 
@@ -43,9 +49,7 @@ object Dependencies {
     const val okhttpCore = "com.squareup.okhttp3:okhttp:${Versions.okhttpVersion}"
     const val okhttpLoggingInterceptor =  "com.squareup.okhttp3:logging-interceptor:${Versions.okhttpVersion}"
     const val retrofitCore = "com.squareup.retrofit2:retrofit:${Versions.retrofitVersion}"
-    const val retrofitMoshiConverter = "com.squareup.retrofit2:converter-moshi:${Versions.retrofitVersion}"
-    const val moshi = "com.squareup.moshi:moshi:${Versions.moshiVersion}"
-    const val moshiCodegen = "com.squareup.moshi:moshi-kotlin-codegen:${Versions.moshiVersion}"
+    const val retrofitSerializationConverter = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0"
     const val leakcanary = "com.squareup.leakcanary:leakcanary-android:2.0-beta-3"
     const val timber = "com.jakewharton.timber:timber:4.7.1"
 

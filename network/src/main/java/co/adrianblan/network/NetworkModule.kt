@@ -1,6 +1,5 @@
 package co.adrianblan.network
 
-import com.squareup.moshi.Moshi
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
@@ -10,7 +9,6 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
-import retrofit2.converter.moshi.MoshiConverterFactory
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
@@ -20,12 +18,6 @@ abstract class NetworkModule {
 
     @Module
     companion object {
-
-        @Provides
-        @Singleton
-        fun provideMoshi(): Moshi =
-            Moshi.Builder()
-                .build()
 
         @Singleton
         @Provides
@@ -65,13 +57,12 @@ abstract class NetworkModule {
         @Provides
         @Singleton
         fun provideRetrofit(
-            okHttpClient: Lazy<OkHttpClient>,
-            moshi: Moshi
+            okHttpClient: Lazy<OkHttpClient>
         ): Retrofit =
             Retrofit.Builder()
                 // TODO replace with own URL
                 .baseUrl("https://example.com/")
-                .addConverterFactory(MoshiConverterFactory.create(moshi))
+                // .addConverterFactory(Json.asConverterFactory("application/json".toMediaType()))
                 // Defer expensive initialization of OkHttp until first network call
                 .callFactory(
                     object : Call.Factory {
