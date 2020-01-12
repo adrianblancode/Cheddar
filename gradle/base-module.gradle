@@ -13,15 +13,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
-    sourceSets {
-        main.java.srcDirs += "src/main/kotlin"
-        test.java.srcDirs += "src/test/kotlin"
-        androidTest.java.srcDirs += "src/androidTest/kotlin"
-        buildTypes.forEach { buildType ->
-            maybeCreate(buildType.name).java.srcDirs += "src/$buildType.name/kotlin"
-        }
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
