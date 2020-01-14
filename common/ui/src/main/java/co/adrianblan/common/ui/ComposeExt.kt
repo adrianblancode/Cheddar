@@ -1,15 +1,14 @@
 package co.adrianblan.common.ui
 
-import androidx.compose.effectOf
-import androidx.compose.memo
-import androidx.compose.onCommit
-import androidx.compose.state
+import androidx.compose.*
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import timber.log.Timber
 
-fun <T> observe(data: LiveData<T>) = effectOf<T> {
+inline fun <reified T> observe(data: LiveData<T>) = effectOf<T> {
+    // Ugly hack with default value, otherwise will reuse state for other LiveData even if other types
     // Throw if LiveData value is null
-    val result = +state { data.value!! }
+    val result = +stateFor(data.value) { data.value!! }
     val observer = +memo { Observer<T> { result.value = it } }
 
     +onCommit(data) {

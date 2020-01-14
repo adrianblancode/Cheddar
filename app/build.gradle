@@ -55,6 +55,7 @@ dependencies {
     implementation project(":network")
     implementation project(":hackernews")
     implementation(project(":stories"))
+    implementation(project(":storydetail"))
 
     debugImplementation(Dependencies.leakcanary)
 }

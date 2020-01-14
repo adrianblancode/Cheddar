@@ -1,5 +1,6 @@
 package co.adrianblan.common.ui
 
+import androidx.annotation.CallSuper
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -9,7 +10,8 @@ abstract class Interactor {
     protected val attachScope =
         CoroutineScope(Dispatchers.Main.immediate + attachJob)
 
-    fun onDetach() {
+    @CallSuper
+    open fun onDetach() {
         attachJob.cancel()
     }
 }

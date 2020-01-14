@@ -1,13 +1,13 @@
-package co.adrianblan.cheddar.feature.stories
+package co.adrianblan.stories
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.ui.Interactor
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
-import co.adrianblan.stories.StoriesViewState
+import co.adrianblan.common.ui.StoriesViewState
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -21,13 +21,16 @@ constructor(
     private val hackerNewsRepository: HackerNewsRepository
 ) : Interactor() {
 
-    val storiesViewState by lazy {
-        MutableLiveData<StoriesViewState>(StoriesViewState.Loading)
+    val viewState: LiveData<StoriesViewState> get() = _viewState
+
+    private val _viewState by lazy {
+        MutableLiveData<StoriesViewState>(
+            StoriesViewState.Loading)
     }
 
     init {
         attachScope.launch {
-            storiesViewState.value =
+            _viewState.value =
                 try {
                     val storyIds: List<StoryId> =
                         withContext(Dispatchers.IO) {

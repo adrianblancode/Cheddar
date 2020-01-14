@@ -2,16 +2,16 @@ package co.adrianblan.cheddar
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.ui.core.setContent
 import co.adrianblan.cheddar.di.DaggerRootComponent
 import co.adrianblan.cheddar.extensions.appComponent
-import co.adrianblan.cheddar.feature.stories.StoriesInteractor
-import co.adrianblan.stories.setupView
+import co.adrianblan.common.ui.AppTheme
 import javax.inject.Inject
 
-class RootActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity() {
 
     @Inject
-    internal lateinit var storiesInteractor: StoriesInteractor
+    internal lateinit var rootComposer: RootComposer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -21,11 +21,21 @@ class RootActivity : AppCompatActivity() {
             .build()
             .inject(this)
 
-        setupView { storiesInteractor.storiesViewState }
+        setContent {
+            AppTheme {
+                rootComposer.composeView()
+            }
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        storiesInteractor.onDetach()
+        // TODO
+    }
+
+    override fun onBackPressed() {
+        if (!rootComposer.onBackPressed()) {
+            super.onBackPressed()
+        }
     }
 }

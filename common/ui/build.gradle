@@ -7,6 +7,9 @@ android {
 }
 
 dependencies {
+    // TODO remove once kept works with compose
+    api(project(":hackernews"))
+
     api(Dependencies.androidxAppcompat)
     api(Dependencies.androidxCore)
     api(Dependencies.androidxActivity)
