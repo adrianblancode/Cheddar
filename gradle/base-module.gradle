@@ -35,9 +35,11 @@ dependencies {
     implementation(Dependencies.timber)
     implementation(Dependencies.androidxCore)
 
-    implementation(Dependencies.dagger)
-    // TODO reenable once kapt works with compose
-    // kapt(Dependencies.daggerCompiler)
+    // TODO remove once kapt works with compose
+    if (path != ":common:ui" && path != ":stories") {
+        implementation(Dependencies.dagger)
+        kapt(Dependencies.daggerCompiler)
+    }
 
     testImplementation(Dependencies.junit)
     androidTestImplementation(Dependencies.androidTestJunit)

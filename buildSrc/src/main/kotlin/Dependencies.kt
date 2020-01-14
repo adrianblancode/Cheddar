@@ -10,10 +10,9 @@ object Versions {
     const val composeVersion = "0.1.0-dev03"
     const val androidxActivity = "1.1.0-rc02"
 
-    const val daggerVersion = "2.25.2"
+    const val daggerVersion = "2.25.4"
     const val okhttpVersion = "4.2.2"
     const val retrofitVersion = "2.6.2"
-    const val moshiVersion = "1.9.1"
 
     const val junit = "4.12"
     const val androidTestJunit = "1.1.1"

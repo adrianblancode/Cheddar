@@ -2,14 +2,14 @@ package co.adrianblan.hackernews.api
 
 import kotlinx.serialization.*
 
-@Serializable
+@Serializable(with = StoryIdSerializer::class)
 data class StoryId(val id: Long)
 
 @Serializable
 data class Story(
     val id: StoryId,
     val title: String,
-    val text: String,
+    val text: String? = null,
     val by: String,
     val time: Long,
     val url: String? = null,
@@ -18,7 +18,7 @@ data class Story(
     val descendants: Int? = null
 )
 
-@Serializable
+@Serializable(with = CommentIdSerializer::class)
 data class CommentId(val id: Long)
 
 @Serializable

@@ -15,11 +15,12 @@ abstract class NetworkModule {
     @Module
     companion object {
 
+        @JvmStatic
         @Singleton
         @Provides
         fun provideOkHttp(
-            applicationInterceptors: Set<ApplicationInterceptor>,
-            networkInterceptors: Set<NetworkInterceptor>
+            applicationInterceptors: Set<@JvmSuppressWildcards ApplicationInterceptor>,
+            networkInterceptors: Set<@JvmSuppressWildcards NetworkInterceptor>
         ): OkHttpClient =
             OkHttpClient.Builder()
                 .apply {

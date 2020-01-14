@@ -1,0 +1,5 @@
+apply from: rootProject.file("gradle/feature.gradle")
+
+dependencies {
+    implementation(project(":hackernews"))
+}

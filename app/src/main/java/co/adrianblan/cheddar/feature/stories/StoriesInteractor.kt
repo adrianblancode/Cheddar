@@ -1,32 +1,54 @@
 package co.adrianblan.cheddar.feature.stories
 
-import androidx.compose.Model
+import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.ui.Interactor
+import co.adrianblan.hackernews.HackerNewsRepository
+import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
+import co.adrianblan.stories.StoriesViewState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
 class StoriesInteractor
 @Inject
 constructor(
-    // private val hackerNewsRepository: HackerNewsRepository
+    private val hackerNewsRepository: HackerNewsRepository
 ) : Interactor() {
 
-    val storiesViewState = StoriesViewState(listOf(StoryId(1)))
+    val storiesViewState by lazy {
+        MutableLiveData<StoriesViewState>(StoriesViewState.Loading)
+    }
 
     init {
-        storiesViewState.stories = listOf(StoryId(1), StoryId(2))
-        attachScope.launch(Dispatchers.Main) {
-            delay(2000L)
-            storiesViewState.stories = listOf(StoryId(1), StoryId(2), StoryId(3))
+        attachScope.launch {
+            storiesViewState.value =
+                try {
+                    val storyIds: List<StoryId> =
+                        withContext(Dispatchers.IO) {
+                            hackerNewsRepository.fetchTopStories()
+                        }
+
+                    val stories: List<Story> =
+                        flow {
+                            storyIds
+                                .take(10)
+                                .forEach { storyId ->
+                                    val story = hackerNewsRepository.fetchStory(storyId)
+                                    emit(story)
+                                }
+                        }.toList()
+
+                    StoriesViewState.Success(stories)
+                } catch (t: Throwable) {
+                    Timber.e(t)
+                    StoriesViewState.Error
+                }
         }
     }
 }
-
-@Model
-data class StoriesViewState(
-    var stories: List<StoryId>
-)

@@ -52,7 +52,9 @@ android {
 dependencies {
     implementation(project(":common"))
     implementation(project(":common:ui"))
+    implementation project(":network")
     implementation project(":hackernews")
+    implementation(project(":stories"))
 
     debugImplementation(Dependencies.leakcanary)
 }
