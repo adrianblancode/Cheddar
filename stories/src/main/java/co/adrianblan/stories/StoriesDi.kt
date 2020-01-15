@@ -1,33 +1,32 @@
 package co.adrianblan.stories
 
+import co.adrianblan.common.ParentScope
 import dagger.BindsInstance
 import dagger.Subcomponent
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.inject.Scope
 
 @StoriesScope
 @Subcomponent
-abstract class StoriesComponent {
+interface StoriesComponent {
 
-    abstract fun storiesComposer(): StoriesComposer
+    fun storiesComposer(): StoriesComposer
 
     @Subcomponent.Factory
-    internal interface Factory {
-        fun build(@BindsInstance listener: StoriesComposer.Listener): StoriesComponent
+    interface Factory {
+        fun build(
+            @StoriesInternal @BindsInstance listener: StoriesComposer.Listener,
+            @StoriesInternal @BindsInstance parentScope: ParentScope
+        ): StoriesComponent
     }
-}
-
-class StoriesBuilder
-@Inject internal constructor(
-    private val storiesComponentFactory: StoriesComponent.Factory
-) {
-    fun build(listener: StoriesComposer.Listener): StoriesComposer =
-        storiesComponentFactory
-            .build(listener)
-            .storiesComposer()
 }
 
 @Scope
 @Retention
 internal annotation class StoriesScope
+
+@Qualifier
+@Retention
+internal annotation class StoriesInternal

@@ -28,11 +28,10 @@ sealed class StoriesViewState {
 // TODO remove block later
 @Composable
 fun StoriesScreen(
-    stateBlock: () -> LiveData<StoriesViewState>,
+    viewState: LiveData<StoriesViewState>,
     onStoryClick: (StoryId) -> Unit
 ) {
-    val viewState = +observe(stateBlock())
-    StoriesView(viewState, onStoryClick)
+    StoriesView(+observe(viewState), onStoryClick)
 }
 
 @Composable

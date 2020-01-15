@@ -1,19 +1,22 @@
 package co.adrianblan.cheddar
 
+import co.adrianblan.cheddar.di.RootInternal
+import co.adrianblan.common.ParentScope
 import co.adrianblan.common.ui.Composer
 import co.adrianblan.common.ui.RootScreen
 import co.adrianblan.common.ui.StackRouter
 import co.adrianblan.hackernews.api.StoryId
+import co.adrianblan.stories.StoriesComponent
 import co.adrianblan.stories.StoriesComposer
-import co.adrianblan.stories.StoriesBuilder
+import co.adrianblan.storydetail.StoryDetailComponent
 import co.adrianblan.storydetail.StoryDetailComposer
-import co.adrianblan.storydetail.StoryDetailBuilder
 import javax.inject.Inject
 
 class RootComposer
 @Inject constructor(
-    private val storiesBuilder: StoriesBuilder,
-    private val storyDetailBuilder: StoryDetailBuilder
+    private val storiesComponentBuilder: StoriesComponent.Factory,
+    private val storyDetailComponentBuilder: StoryDetailComponent.Factory,
+    @RootInternal private val parentScope: ParentScope
 ) : Composer, StoriesComposer.Listener, StoryDetailComposer.Listener {
 
     private val router by lazy {
@@ -21,17 +24,23 @@ class RootComposer
     }
 
     private val storiesComposer: StoriesComposer by lazy {
-        storiesBuilder
-            .build(this)
+        storiesComponentBuilder
+            .build(
+                listener = this,
+                parentScope = parentScope
+            )
+            .storiesComposer()
     }
 
     override fun onStoryClicked(storyId: StoryId) {
         router.push(
-            storyDetailBuilder
+            storyDetailComponentBuilder
                 .build(
                     storyId = storyId,
-                    listener = this
+                    listener = this,
+                    parentScope = parentScope
                 )
+                .storyDetailComposer()
         )
     }
 
@@ -40,8 +49,10 @@ class RootComposer
     }
 
     override fun composeView() =
-        RootScreen { router }
+        RootScreen(router)
 
     override fun onBackPressed(): Boolean =
         router.onBackPressed()
+
+    override fun detach() {}
 }

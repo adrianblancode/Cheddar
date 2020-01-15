@@ -27,11 +27,10 @@ sealed class StoryDetailViewState {
 // TODO remove block later
 @Composable
 fun StoryDetailScreen(
-    stateBlock: () -> LiveData<StoryDetailViewState>,
+    viewState: LiveData<StoryDetailViewState>,
     onBackPressed: () -> Unit
 ) {
-    val viewState = +observe(stateBlock())
-    StoryDetailView(viewState, onBackPressed)
+    StoryDetailView(+observe(viewState), onBackPressed)
 }
 
 
@@ -86,6 +85,8 @@ fun StoryDetailHeader(story: Story) {
 @Preview
 @Composable
 fun StoryDetailPreview() {
-    val viewState = StoryDetailViewState.Success(Story.dummy)
-    StoryDetailView(viewState) {}
+    AppTheme {
+        val viewState = StoryDetailViewState.Success(Story.dummy)
+        StoryDetailView(viewState) {}
+    }
 }

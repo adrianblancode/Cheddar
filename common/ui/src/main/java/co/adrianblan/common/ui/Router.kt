@@ -21,9 +21,12 @@ class StackRouter private constructor(
 
     private fun pop() {
         composers.removeAt(composers.size - 1)
+            .apply {
+                detach()
+            }
     }
 
-    private fun canPop() = composers.size >= 1
+    private fun canPop() = composers.size > 1
 
     override fun onBackPressed(): Boolean {
         // Iterate through stack of children, see if any children handle it

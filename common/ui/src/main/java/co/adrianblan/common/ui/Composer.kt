@@ -6,5 +6,7 @@ interface Composer {
     @Composable
     fun composeView()
 
+    fun detach()
+
     fun onBackPressed() = false
 }

@@ -3,12 +3,13 @@ package co.adrianblan.stories
 import co.adrianblan.common.ui.Composer
 import co.adrianblan.common.ui.StoriesScreen
 import co.adrianblan.hackernews.api.StoryId
+import kotlinx.coroutines.cancel
 import javax.inject.Inject
 
 class StoriesComposer
 @Inject constructor(
     private val storiesInteractor: StoriesInteractor,
-    private val listener: Listener
+    @StoriesInternal private val listener: Listener
 ): Composer {
 
     interface Listener {
@@ -17,7 +18,10 @@ class StoriesComposer
 
     override fun composeView() =
         StoriesScreen(
-            stateBlock = { storiesInteractor.viewState },
+            viewState = storiesInteractor.viewState,
             onStoryClick = { listener.onStoryClicked(it) }
         )
+
+    override fun detach() =
+        storiesInteractor.scope.cancel()
 }

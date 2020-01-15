@@ -1,20 +1,16 @@
 package co.adrianblan.common.ui
 
-import androidx.annotation.CallSuper
 import co.adrianblan.common.DispatcherProvider
+import co.adrianblan.common.ParentScope
 import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
 
 abstract class Interactor {
 
     abstract val dispatcherProvider: DispatcherProvider
 
-    private val attachJob: CoroutineContext = SupervisorJob()
-    protected val attachScope =
-        CoroutineScope(Dispatchers.Main.immediate + attachJob)
+    abstract val parentScope: ParentScope
 
-    @CallSuper
-    open fun onDetach() {
-        attachJob.cancel()
+    val scope: CoroutineScope by lazy {
+        parentScope.createChildScope(dispatcherProvider)
     }
 }

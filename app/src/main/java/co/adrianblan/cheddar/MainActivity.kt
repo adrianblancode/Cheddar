@@ -5,20 +5,25 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.ui.core.setContent
 import co.adrianblan.cheddar.di.DaggerRootComponent
 import co.adrianblan.cheddar.extensions.appComponent
+import co.adrianblan.common.ParentScope
 import co.adrianblan.common.ui.AppTheme
-import javax.inject.Inject
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var rootComposer: RootComposer
+    private val scope = MainScope()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         rootComposer =
-            DaggerRootComponent.builder()
-                .appComponent(appComponent)
-                .build()
+            DaggerRootComponent.factory()
+                .build(
+                    parentScope = ParentScope.of(scope),
+                    appComponent = appComponent
+                )
                 .rootComposer()
 
         setContent {
@@ -30,7 +35,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        // TODO
+        // if (!isChangingConfigurations)
+        scope.cancel()
     }
 
     override fun onBackPressed() {
