@@ -2,6 +2,7 @@ package co.adrianblan.storydetail
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.ui.Interactor
 import co.adrianblan.common.ui.StoryDetailViewState
 import co.adrianblan.hackernews.HackerNewsRepository
@@ -16,7 +17,8 @@ import javax.inject.Inject
 class StoryDetailInteractor
 @Inject constructor(
     private val storyId: StoryId,
-    private val hackerNewsRepository: HackerNewsRepository
+    private val hackerNewsRepository: HackerNewsRepository,
+    override val dispatcherProvider: DispatcherProvider
 ) : Interactor() {
 
     val viewState: LiveData<StoryDetailViewState> get() = _viewState
@@ -30,7 +32,7 @@ class StoryDetailInteractor
             _viewState.value =
                 try {
                     val story: Story =
-                        withContext(Dispatchers.IO) {
+                        withContext(dispatcherProvider.IO) {
                             hackerNewsRepository.fetchStory(storyId)
                         }
 

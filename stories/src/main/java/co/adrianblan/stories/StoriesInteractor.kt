@@ -2,12 +2,12 @@ package co.adrianblan.stories
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.ui.Interactor
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.common.ui.StoriesViewState
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
@@ -18,7 +18,8 @@ import javax.inject.Inject
 class StoriesInteractor
 @Inject
 constructor(
-    private val hackerNewsRepository: HackerNewsRepository
+    private val hackerNewsRepository: HackerNewsRepository,
+    override val dispatcherProvider: DispatcherProvider
 ) : Interactor() {
 
     val viewState: LiveData<StoriesViewState> get() = _viewState
@@ -33,7 +34,7 @@ constructor(
             _viewState.value =
                 try {
                     val storyIds: List<StoryId> =
-                        withContext(Dispatchers.IO) {
+                        withContext(dispatcherProvider.IO) {
                             hackerNewsRepository.fetchTopStories()
                         }
 

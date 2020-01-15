@@ -16,7 +16,7 @@ import javax.inject.Scope
 )
 object RootModule
 
-@MainScope
+@RootScope
 @Component(
     modules = [RootModule::class],
     dependencies = [AppComponent::class]
@@ -31,4 +31,9 @@ interface RootComponent {
 
 @Scope
 @Retention
-internal annotation class MainScope
+internal annotation class RootScope
+
+@Qualifier
+@Retention
+@Target(AnnotationTarget.VALUE_PARAMETER, AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.FIELD, AnnotationTarget.PROPERTY_GETTER, AnnotationTarget.PROPERTY_SETTER)
+internal annotation class RootInternal
