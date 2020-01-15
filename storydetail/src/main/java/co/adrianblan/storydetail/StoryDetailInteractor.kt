@@ -4,11 +4,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.ParentScope
+import co.adrianblan.common.ui.CommentsViewState
 import co.adrianblan.common.ui.Interactor
 import co.adrianblan.common.ui.StoryDetailViewState
 import co.adrianblan.hackernews.HackerNewsRepository
+import co.adrianblan.hackernews.api.Comment
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -30,18 +36,52 @@ class StoryDetailInteractor
 
     init {
         scope.launch {
-            _viewState.value =
-                try {
-                    val story: Story =
-                        withContext(dispatcherProvider.IO) {
-                            hackerNewsRepository.fetchStory(storyId)
-                        }
 
-                    StoryDetailViewState.Success(story)
+            val story: Story =
+                try {
+                    withContext(dispatcherProvider.IO) {
+                        hackerNewsRepository.fetchStory(storyId)
+                    }
+
                 } catch (t: Throwable) {
                     Timber.e(t)
-                    StoryDetailViewState.Error
+                    _viewState.value = StoryDetailViewState.Error
+                    return@launch
                 }
+
+            _viewState.value =
+                StoryDetailViewState.Success(
+                    story,
+                    CommentsViewState.Loading
+                )
+
+            try {
+                val comments: List<Comment> =
+                    flow {
+                        story.kids
+                            .forEach { commentId ->
+                                val comment = hackerNewsRepository.fetchComment(commentId)
+                                emit(comment)
+                            }
+                    }
+                        .flowOn(dispatcherProvider.IO)
+                        .toList()
+
+                _viewState.value =
+                    StoryDetailViewState.Success(
+                        story,
+                        CommentsViewState.Success(comments)
+                    )
+            } catch (t: Throwable) {
+
+                Timber.e(t)
+
+                _viewState.value =
+                    StoryDetailViewState.Success(
+                        story,
+                        CommentsViewState.Error
+                    )
+            }
         }
     }
 }

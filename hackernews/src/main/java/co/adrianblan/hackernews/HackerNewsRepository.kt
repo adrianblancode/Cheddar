@@ -1,8 +1,6 @@
 package co.adrianblan.hackernews
 
-import co.adrianblan.hackernews.api.HackerNewsApi
-import co.adrianblan.hackernews.api.Story
-import co.adrianblan.hackernews.api.StoryId
+import co.adrianblan.hackernews.api.*
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,4 +15,7 @@ class HackerNewsRepository
 
     suspend fun fetchTopStories(): List<StoryId> =
         hackerNewsApi.fetchTopStories()
+
+    suspend fun fetchComment(commentId: CommentId): Comment =
+        hackerNewsApi.fetchComment(commentId.id)
 }

@@ -15,13 +15,27 @@ import androidx.ui.material.TopAppBar
 import androidx.ui.res.imageResource
 import androidx.ui.res.stringResource
 import androidx.ui.tooling.preview.Preview
+import co.adrianblan.hackernews.api.Comment
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.dummy
 
 sealed class StoryDetailViewState {
-    data class Success(val story: Story) : StoryDetailViewState()
+    data class Success(
+        val story: Story,
+        val commentsViewState: CommentsViewState
+    ) : StoryDetailViewState()
+
     object Loading : StoryDetailViewState()
     object Error : StoryDetailViewState()
+}
+
+sealed class CommentsViewState {
+    data class Success(
+        val comments: List<Comment>
+    ) : CommentsViewState()
+
+    object Loading : CommentsViewState()
+    object Error : CommentsViewState()
 }
 
 // TODO remove block later
@@ -40,7 +54,7 @@ fun StoryDetailView(viewState: StoryDetailViewState, onBackPressed: () -> Unit) 
         inflexible {
             TopAppBar(
                 navigationIcon = {
-                  VectorImageButton(id = R.drawable.ic_back, onClick = onBackPressed)
+                    VectorImageButton(id = R.drawable.ic_back, onClick = onBackPressed)
                 },
                 title = {
                     Text(
@@ -53,7 +67,13 @@ fun StoryDetailView(viewState: StoryDetailViewState, onBackPressed: () -> Unit) 
         expanded(1f) {
             when (viewState) {
                 is StoryDetailViewState.Loading -> LoadingView()
-                is StoryDetailViewState.Success -> StoryDetailHeader(viewState.story)
+                is StoryDetailViewState.Success ->
+                    VerticalScroller {
+                        Column {
+                            StoryDetailHeader(viewState.story)
+                            CommentsView(viewState.commentsViewState)
+                        }
+                    }
                 is StoryDetailViewState.Error -> ErrorView()
             }
         }
@@ -62,22 +82,49 @@ fun StoryDetailView(viewState: StoryDetailViewState, onBackPressed: () -> Unit) 
 
 @Composable
 fun StoryDetailHeader(story: Story) {
-    VerticalScroller {
-        Padding(left = 16.dp, right = 16.dp, top = 16.dp, bottom = 12.dp) {
-            Column(arrangement = Arrangement.Begin, modifier = ExpandedWidth) {
-                Text(
-                    text = story.title,
-                    style = (+MaterialTheme.typography()).h6
-                )
-                story.text
-                    .takeIf { !it.isNullOrEmpty() }
-                    ?.let { text ->
-                        Text(
-                            text = Html.fromHtml(text).toString(),
-                            style = (+MaterialTheme.typography()).body1
-                        )
-                    }
+    Padding(left = 16.dp, right = 16.dp, top = 16.dp, bottom = 12.dp) {
+        Column(arrangement = Arrangement.Begin, modifier = ExpandedWidth) {
+            Text(
+                text = story.title,
+                style = (+MaterialTheme.typography()).h6
+            )
+            story.text
+                .takeIf { !it.isNullOrEmpty() }
+                ?.let { text ->
+                    Text(
+                        text = Html.fromHtml(text).toString(),
+                        style = (+MaterialTheme.typography()).body1
+                    )
+                }
+        }
+    }
+}
+
+@Composable
+fun CommentsView(viewState: CommentsViewState) {
+    when (viewState) {
+        is CommentsViewState.Loading ->
+            LoadingView()
+        is CommentsViewState.Success ->
+            viewState.comments.forEach { comment ->
+                CommentItem(comment)
             }
+        is CommentsViewState.Error -> ErrorView()
+    }
+}
+
+@Composable
+fun CommentItem(comment: Comment) {
+    Padding(left = 16.dp, right = 16.dp, top = 8.dp, bottom = 6.dp) {
+        Column(arrangement = Arrangement.Begin, modifier = ExpandedWidth) {
+            Text(
+                text = comment.by.orEmpty(),
+                style = (+MaterialTheme.typography()).h6
+            )
+            Text(
+                text = Html.fromHtml(comment.text?.trimEnd().orEmpty()).toString(),
+                style = (+MaterialTheme.typography()).body1
+            )
         }
     }
 }
@@ -86,7 +133,11 @@ fun StoryDetailHeader(story: Story) {
 @Composable
 fun StoryDetailPreview() {
     AppTheme {
-        val viewState = StoryDetailViewState.Success(Story.dummy)
+        val viewState =
+            StoryDetailViewState.Success(
+                story = Story.dummy,
+                commentsViewState = CommentsViewState.Success(listOf(Comment.dummy))
+            )
         StoryDetailView(viewState) {}
     }
 }

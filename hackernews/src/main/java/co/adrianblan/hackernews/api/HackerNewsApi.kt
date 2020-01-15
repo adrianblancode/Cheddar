@@ -25,4 +25,7 @@ interface HackerNewsApi {
 
     @GET("jobstories.json")
     suspend fun fetchJobStories(): List<StoryId>
+
+    @GET("item/{commentId}.json")
+    suspend fun fetchComment(@Path("commentId") commentId: Long): Comment
 }

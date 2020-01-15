@@ -10,6 +10,7 @@ import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.common.ui.StoriesViewState
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -47,7 +48,9 @@ constructor(
                                     val story = hackerNewsRepository.fetchStory(storyId)
                                     emit(story)
                                 }
-                        }.toList()
+                        }
+                            .flowOn(dispatcherProvider.IO)
+                            .toList()
 
                     StoriesViewState.Success(stories)
                 } catch (t: Throwable) {

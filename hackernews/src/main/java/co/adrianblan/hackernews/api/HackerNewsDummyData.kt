@@ -12,7 +12,6 @@ val Story.Companion.dummy get() =
 val Comment.Companion.dummy get() =
     Comment(
         id = CommentId(1),
-        title = "Test comment title",
         text = "Test comment text",
         by = "Test comment author",
         time = 0L

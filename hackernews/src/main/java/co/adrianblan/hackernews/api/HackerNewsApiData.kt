@@ -24,9 +24,9 @@ data class CommentId(val id: Long)
 @Serializable
 data class Comment(
     val id: CommentId,
-    val title: String,
-    val text: String,
-    val by: String,
+    // Comments can be deleted
+    val text: String? = null,
+    val by: String? = null,
     val time: Long,
     val kids: List<CommentId> = emptyList()
 )
