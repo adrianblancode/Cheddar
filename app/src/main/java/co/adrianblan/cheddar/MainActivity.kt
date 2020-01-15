@@ -10,16 +10,16 @@ import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
 
-    @Inject
-    internal lateinit var rootComposer: RootComposer
+    private lateinit var rootComposer: RootComposer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        DaggerRootComponent.builder()
-            .appComponent(appComponent)
-            .build()
-            .inject(this)
+        rootComposer =
+            DaggerRootComponent.builder()
+                .appComponent(appComponent)
+                .build()
+                .rootComposer()
 
         setContent {
             AppTheme {

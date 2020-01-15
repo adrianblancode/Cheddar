@@ -4,16 +4,16 @@ import co.adrianblan.common.ui.Composer
 import co.adrianblan.common.ui.RootScreen
 import co.adrianblan.common.ui.StackRouter
 import co.adrianblan.hackernews.api.StoryId
-import co.adrianblan.stories.StoriesComponent
 import co.adrianblan.stories.StoriesComposer
-import co.adrianblan.storydetail.StoryDetailComponent
+import co.adrianblan.stories.StoriesBuilder
 import co.adrianblan.storydetail.StoryDetailComposer
+import co.adrianblan.storydetail.StoryDetailBuilder
 import javax.inject.Inject
 
 class RootComposer
 @Inject constructor(
-    private val storiesComponentFactory: StoriesComponent.Factory,
-    private val storyDetailComponentFactory: StoryDetailComponent.Factory
+    private val storiesBuilder: StoriesBuilder,
+    private val storyDetailBuilder: StoryDetailBuilder
 ) : Composer, StoriesComposer.Listener, StoryDetailComposer.Listener {
 
     private val router by lazy {
@@ -21,16 +21,17 @@ class RootComposer
     }
 
     private val storiesComposer: StoriesComposer by lazy {
-        storiesComponentFactory
+        storiesBuilder
             .build(this)
-            .storiesComposer()
     }
 
     override fun onStoryClicked(storyId: StoryId) {
         router.push(
-            storyDetailComponentFactory
-                .build(storyId, this)
-                .storyDetailComposer()
+            storyDetailBuilder
+                .build(
+                    storyId = storyId,
+                    listener = this
+                )
         )
     }
 
