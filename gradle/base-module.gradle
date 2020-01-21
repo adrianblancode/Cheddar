@@ -36,7 +36,7 @@ dependencies {
     implementation(Dependencies.androidxCore)
 
     // TODO remove once kapt works with compose
-    if (path != ":common:ui") {
+    if (path != ":common-ui") {
         implementation(Dependencies.dagger)
         kapt(Dependencies.daggerCompiler)
     }

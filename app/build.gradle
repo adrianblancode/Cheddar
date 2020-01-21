@@ -51,11 +51,11 @@ android {
 
 dependencies {
     implementation(project(":common"))
-    implementation(project(":common:ui"))
+    implementation(project(":common-ui"))
     implementation project(":network")
     implementation project(":hackernews")
-    implementation(project(":stories"))
-    implementation(project(":storydetail"))
+    implementation(project(':feature-stories'))
+    implementation(project(':feature-storydetail'))
 
     debugImplementation(Dependencies.leakcanary)
 }

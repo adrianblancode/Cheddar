@@ -2,9 +2,9 @@ package co.adrianblan.cheddar
 
 import co.adrianblan.cheddar.di.RootInternal
 import co.adrianblan.common.ParentScope
-import co.adrianblan.common.ui.Composer
-import co.adrianblan.common.ui.RootScreen
-import co.adrianblan.common.ui.StackRouter
+import co.adrianblan.ui.Composer
+import co.adrianblan.ui.RootScreen
+import co.adrianblan.ui.StackRouter
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.stories.StoriesComponent
 import co.adrianblan.stories.StoriesComposer

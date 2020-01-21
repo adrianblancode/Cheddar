@@ -6,7 +6,7 @@ import androidx.ui.core.setContent
 import co.adrianblan.cheddar.di.DaggerRootComponent
 import co.adrianblan.cheddar.extensions.appComponent
 import co.adrianblan.common.ParentScope
-import co.adrianblan.common.ui.AppTheme
+import co.adrianblan.ui.AppTheme
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 

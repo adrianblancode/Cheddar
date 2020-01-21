@@ -1,0 +1,24 @@
+apply from: rootProject.file("gradle/library.gradle")
+
+android {
+    buildFeatures {
+        compose true
+    }
+}
+
+dependencies {
+    // TODO remove once kapt works with compose
+    api(project(":hackernews"))
+
+    api(Dependencies.androidxAppcompat)
+    api(Dependencies.androidxCore)
+    api(Dependencies.androidxActivity)
+
+    api(Dependencies.androidxComposeRuntime)
+    api(Dependencies.androidxUiFramework)
+    api(Dependencies.androidxUiLayout)
+    api(Dependencies.androidxUiMaterial)
+    api(Dependencies.androidxUiFoundation)
+    api(Dependencies.androidxUiAnimation)
+    api(Dependencies.androidxUiTooling)
+}
