@@ -8,7 +8,6 @@ import co.adrianblan.ui.Interactor
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
-import co.adrianblan.ui.StoriesViewState
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.toList
@@ -28,7 +27,8 @@ constructor(
     val viewState: LiveData<StoriesViewState> get() = _viewState
 
     private val _viewState by lazy {
-        MutableLiveData<StoriesViewState>(StoriesViewState.Loading)
+        MutableLiveData<StoriesViewState>(
+            StoriesViewState.Loading)
     }
 
     init {

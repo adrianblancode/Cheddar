@@ -8,8 +8,8 @@ import kotlinx.serialization.Serializer
 @Serializer(forClass = StoryId::class)
 object StoryIdSerializer: KSerializer<StoryId> {
 
-    override fun serialize(encoder: Encoder, obj: StoryId) =
-        encoder.encodeLong(obj.id)
+    override fun serialize(encoder: Encoder, value: StoryId) =
+        encoder.encodeLong(value.id)
 
     override fun deserialize(decoder: Decoder): StoryId =
         StoryId(decoder.decodeLong())
@@ -18,8 +18,8 @@ object StoryIdSerializer: KSerializer<StoryId> {
 @Serializer(forClass = CommentId::class)
 object CommentIdSerializer: KSerializer<CommentId> {
 
-    override fun serialize(encoder: Encoder, obj: CommentId) =
-        encoder.encodeLong(obj.id)
+    override fun serialize(encoder: Encoder, value: CommentId) =
+        encoder.encodeLong(value.id)
 
     override fun deserialize(decoder: Decoder): CommentId =
         CommentId(decoder.decodeLong())

@@ -1,26 +1,27 @@
 package co.adrianblan.ui
 
 import androidx.compose.Composable
-import androidx.compose.unaryPlus
 import androidx.ui.material.ColorPalette
 import androidx.ui.material.MaterialTheme
 import androidx.ui.material.Typography
+import androidx.ui.material.lightColorPalette
 import androidx.ui.res.colorResource
 import androidx.ui.text.font.FontFamily
 
 @Composable
 fun AppTheme(children: @Composable() () -> Unit) {
-    val colors = ColorPalette(
-        primary = +colorResource(R.color.colorPrimary),
-        primaryVariant = +colorResource(R.color.colorPrimaryDark),
-        secondary = +colorResource(R.color.colorAccent)
+    val colors = lightColorPalette(
+        primary = colorResource(R.color.colorPrimary),
+        primaryVariant = colorResource(R.color.colorPrimaryDark),
+        secondary = colorResource(R.color.colorAccent)
     )
 
     val typography =
         Typography()
             .let {
 
-                val mediumFont = FontFamily("sans-serif-medium")
+                // val mediumFont = FontFamily("sans-serif-medium")
+                val mediumFont = FontFamily.SansSerif
 
                 it.copy(
                     h1 = it.h1.copy(fontFamily = mediumFont),

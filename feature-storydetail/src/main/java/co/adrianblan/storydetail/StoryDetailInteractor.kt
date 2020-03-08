@@ -4,9 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.ParentScope
-import co.adrianblan.ui.CommentsViewState
 import co.adrianblan.ui.Interactor
-import co.adrianblan.ui.StoryDetailViewState
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.api.Comment
 import co.adrianblan.hackernews.api.Story
@@ -30,7 +28,8 @@ class StoryDetailInteractor
     val viewState: LiveData<StoryDetailViewState> get() = _viewState
 
     private val _viewState by lazy {
-        MutableLiveData<StoryDetailViewState>(StoryDetailViewState.Loading)
+        MutableLiveData<StoryDetailViewState>(
+            StoryDetailViewState.Loading)
     }
 
     init {

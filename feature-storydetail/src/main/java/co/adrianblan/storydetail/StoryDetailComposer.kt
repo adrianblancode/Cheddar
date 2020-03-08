@@ -1,7 +1,6 @@
 package co.adrianblan.storydetail
 
 import co.adrianblan.ui.Composer
-import co.adrianblan.ui.StoryDetailScreen
 import kotlinx.coroutines.cancel
 import javax.inject.Inject
 

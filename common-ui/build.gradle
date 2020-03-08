@@ -4,12 +4,14 @@ android {
     buildFeatures {
         compose true
     }
+
+    composeOptions {
+        kotlinCompilerVersion "1.3.61-dev-withExperimentalGoogleExtensions-20200129"
+        kotlinCompilerExtensionVersion Versions.compose
+    }
 }
 
 dependencies {
-    // TODO remove once kapt works with compose
-    api(project(":hackernews"))
-
     api(Dependencies.androidxAppcompat)
     api(Dependencies.androidxCore)
     api(Dependencies.androidxActivity)
