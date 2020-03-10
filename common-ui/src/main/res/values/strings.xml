@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Cheddar</string>
 
+    <string name="loading_title">"Loading…"</string>
+    <string name="error_title">"A technical error has occurred, please try again later."</string>
+
     <string name="stories_top_title">Top Stories</string>
     <string name="stories_best_title">Best Stories</string>
     <string name="stories_new_title">New Stories</string>

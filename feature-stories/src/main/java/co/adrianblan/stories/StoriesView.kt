@@ -19,12 +19,13 @@ import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.TextUnit
 import androidx.ui.unit.dp
 import androidx.ui.unit.lerp
+import androidx.ui.unit.px
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.dummy
 import co.adrianblan.ui.*
-import timber.log.Timber
+import co.adrianblan.ui.InsetsAmbient
 
 
 @Composable
@@ -60,6 +61,11 @@ fun StoriesView(
                                     StoryItem(story, onStoryClick)
                                 }
                             }
+
+                            val insets = InsetsAmbient.current
+                            with (DensityAmbient.current) {
+                                Spacer(modifier = LayoutHeight(insets.bottom.px.toDp()))
+                            }
                         }
                     }
                 is StoriesViewState.Error -> ErrorView()
@@ -79,12 +85,12 @@ fun StoriesToolbar(scroller: ScrollerPosition) {
                 collapsed
             )
 
-        val minHeight = lerp(100.dp, 56.dp, collapsed)
+        val height = lerp(100.dp, 56.dp, collapsed)
 
         Container(
             padding = EdgeInsets(12.dp),
             alignment = Alignment.BottomLeft,
-            constraints = DpConstraints(minHeight = minHeight)
+            constraints = DpConstraints(minHeight = height)
         ) {
 
             val showStoriesPopup = state { false }
@@ -111,7 +117,7 @@ fun StoriesHeader(
     headerTextSize: TextUnit = MaterialTheme.typography().h6.fontSize,
     onClick: () -> Unit
 ) {
-    Surface(shape = RoundedCornerShape(4.dp)) {
+    Box(shape = RoundedCornerShape(4.dp)) {
         Ripple(true) {
             Clickable(onClick = onClick) {
                 Container(padding = EdgeInsets(4.dp)) {
@@ -121,8 +127,8 @@ fun StoriesHeader(
                             style = MaterialTheme.typography().h4.copy(fontSize = headerTextSize)
                         )
                         VectorImage(
-                            Icons.Default.ArrowDropDown,
-                            tint = MaterialTheme.colors().onPrimary,
+                            vector = Icons.Default.ArrowDropDown,
+                            tint = MaterialTheme.colors().onBackground,
                             modifier = LayoutGravity.Center
                         )
                     }

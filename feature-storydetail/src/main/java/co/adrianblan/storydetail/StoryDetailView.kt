@@ -2,27 +2,31 @@ package co.adrianblan.storydetail
 
 import android.text.Html
 import androidx.compose.Composable
+import androidx.compose.remember
 import androidx.lifecycle.LiveData
+import androidx.ui.core.Alignment
+import androidx.ui.core.DensityAmbient
 import androidx.ui.core.Text
-import androidx.ui.foundation.AdapterList
 import androidx.ui.foundation.ScrollerPosition
 import androidx.ui.foundation.VerticalScroller
 import androidx.ui.layout.*
 import androidx.ui.material.FloatingActionButton
 import androidx.ui.material.MaterialTheme
 import androidx.ui.material.Scaffold
-import androidx.ui.material.TopAppBar
 import androidx.ui.material.icons.Icons
 import androidx.ui.material.icons.filled.*
-import androidx.ui.res.imageResource
-import androidx.ui.res.stringResource
+import androidx.ui.text.style.TextOverflow
 import androidx.ui.tooling.preview.Preview
+import androidx.ui.unit.Dp
 import androidx.ui.unit.dp
+import androidx.ui.unit.lerp
+import androidx.ui.unit.px
+import co.adrianblan.common.lerp
 import co.adrianblan.hackernews.api.Comment
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.dummy
 import co.adrianblan.ui.*
-import co.adrianblan.ui.R
+import co.adrianblan.ui.InsetsAmbient
 
 @Composable
 fun StoryDetailScreen(
@@ -37,7 +41,6 @@ fun StoryDetailScreen(
     )
 }
 
-
 @Composable
 fun StoryDetailView(
     viewState: StoryDetailViewState,
@@ -46,6 +49,7 @@ fun StoryDetailView(
 ) {
 
     val scroller = ScrollerPosition()
+    val insets = InsetsAmbient.current
 
     Scaffold(
         topAppBar = {
@@ -71,6 +75,10 @@ fun StoryDetailView(
                                         ErrorView()
                                 }
                             }
+
+                            with (DensityAmbient.current) {
+                                Spacer(modifier = LayoutHeight(insets.bottom.px.toDp()))
+                            }
                         }
                     }
                 is StoryDetailViewState.Error -> ErrorView()
@@ -79,10 +87,17 @@ fun StoryDetailView(
         floatingActionButton = {
             val url = (viewState as? StoryDetailViewState.Success)?.story?.url
             if (url != null) {
-                FloatingActionButton(
-                    onClick = { onStoryContentClicked(url) }
-                ) {
-                    VectorImage(Icons.Default.NavigateNext, tint = MaterialTheme.colors().secondary)
+                with(DensityAmbient.current) {
+                    Container(padding = EdgeInsets(bottom = insets.bottom.px.toDp())) {
+                        FloatingActionButton(
+                            onClick = { onStoryContentClicked(url) }
+                        ) {
+                            VectorImage(
+                                vector = Icons.Default.ArrowForward,
+                                tint = MaterialTheme.colors().secondary
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -97,30 +112,44 @@ fun StoryDetailToolbar(
 ) {
     CollapsingToolbar(scroller) { collapsed ->
 
-        val minHeight = androidx.ui.unit.lerp(140.dp, 56.dp, collapsed)
+        val maxHeight = 140.dp
+        val minHeight = 56.dp
+        val height = remember(collapsed) { lerp(maxHeight, minHeight, collapsed) }
 
-        Container(
-            padding = EdgeInsets(left = 16.dp, right = 16.dp, top = 16.dp, bottom = 12.dp)
-        ) {
-            Stack {
+        Stack {
+            Container(padding = EdgeInsets(4.dp)) {
                 VectorImageButton(
-                    Icons.Default.ArrowBack,
-                    tint = MaterialTheme.colors().onPrimary,
-                    modifier = LayoutGravity.TopLeft
+                    vector = Icons.Default.ArrowBack,
+                    tint = MaterialTheme.colors().onBackground,
+                    modifier = LayoutGravity.TopLeft + LayoutSize(48.dp, 48.dp)
                 ) {
                     onBackPressed()
                 }
+            }
 
-                Container(
-                    modifier = LayoutGravity.BottomLeft,
-                    constraints = DpConstraints(minHeight = minHeight)
-                ) {
-                    Text(
-                        text = storyTitle,
-                        style = MaterialTheme.typography().h6,
-                        modifier = LayoutWidth.Fill + LayoutGravity.BottomLeft
-                    )
-                }
+            val titleCollapsedLeftOffset = remember(collapsed) { lerp(0.dp, 48.dp, collapsed) }
+            val titleCollapsedTopOffset = remember(collapsed) { lerp(48.dp, 0.dp, collapsed) }
+            val titleMaxLines = remember(collapsed) { if (collapsed > 0.1f) 1 else 3 }
+
+            Container(
+                alignment = Alignment.BottomLeft,
+                modifier = LayoutHeight.Min(height)
+            ) {
+                Text(
+                    text = storyTitle,
+                    style = MaterialTheme.typography().h6,
+                    modifier = LayoutGravity.CenterLeft +
+                            LayoutPadding(
+                                left = 16.dp + titleCollapsedLeftOffset,
+                                right = 16.dp,
+                                top = titleCollapsedTopOffset
+                            ) +
+                            LayoutWidth.Fill +
+                            LayoutHeight.Min(minHeight) +
+                            LayoutAlign.CenterLeft,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = titleMaxLines
+                )
             }
         }
     }

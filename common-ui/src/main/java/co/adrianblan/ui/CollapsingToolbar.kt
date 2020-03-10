@@ -1,11 +1,15 @@
 package co.adrianblan.ui
 
 import androidx.compose.Composable
+import androidx.ui.core.DensityAmbient
 import androidx.ui.foundation.ScrollerPosition
+import androidx.ui.layout.Container
+import androidx.ui.layout.EdgeInsets
 import androidx.ui.layout.LayoutWidth
 import androidx.ui.material.surface.Surface
 import androidx.ui.unit.dp
 import androidx.ui.unit.lerp
+import androidx.ui.unit.px
 import kotlin.math.min
 
 @Composable
@@ -22,6 +26,11 @@ fun CollapsingToolbar(
     val elevation = lerp(0.dp, 12.dp, collapsed)
 
     Surface(elevation = elevation, modifier = LayoutWidth.Fill) {
-        children(collapsed)
+        with(DensityAmbient.current) {
+            val insets = InsetsAmbient.current
+            Container(padding = EdgeInsets(top = insets.top.px.toDp())) {
+                children(collapsed)
+            }
+        }
     }
 }

@@ -6,7 +6,8 @@ val Story.Companion.dummy get() =
         title = "Test story title",
         text = "Test story text",
         by = "Test story author",
-        time = 0L
+        time = 0L,
+        url = "www.example.com"
     )
 
 val Comment.Companion.dummy get() =

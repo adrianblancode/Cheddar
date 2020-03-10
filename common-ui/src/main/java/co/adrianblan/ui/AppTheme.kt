@@ -1,19 +1,37 @@
 package co.adrianblan.ui
 
+import android.content.res.Configuration
 import androidx.compose.Composable
+import androidx.ui.core.ContextAmbient
 import androidx.ui.graphics.Color
 import androidx.ui.material.*
 import androidx.ui.res.colorResource
 import androidx.ui.text.font.FontFamily
 import androidx.ui.text.font.FontWeight
+import co.adrianblan.ui.extensions.isNightModeActive
 
 @Composable
 fun AppTheme(children: @Composable() () -> Unit) {
-    val colors = lightColorPalette(
-        primary = colorResource(R.color.colorPrimary),
-        secondary = colorResource(R.color.colorAccent),
-        onPrimary = Color.Black
-    )
+
+    val colors =
+        if (isNightModeActive()) {
+            darkColorPalette(
+                primary = colorResource(R.color.colorPrimary),
+                primaryVariant = colorResource(R.color.colorPrimary),
+                secondary = colorResource(R.color.colorAccent),
+                background = Color.Black,
+                surface = Color.Black,
+                onPrimary = Color.White,
+                onSecondary = Color.White
+            )
+        } else {
+            lightColorPalette(
+                primary = colorResource(R.color.colorPrimary),
+                primaryVariant = colorResource(R.color.colorPrimary),
+                secondary = colorResource(R.color.colorAccent),
+                onPrimary = Color.Black
+            )
+        }
 
     val typography =
         Typography()
@@ -33,4 +51,10 @@ fun AppTheme(children: @Composable() () -> Unit) {
             }
 
     MaterialTheme(colors = colors, typography = typography, children = children)
+}
+
+@Composable
+fun isNightModeActive(): Boolean {
+    val context = ContextAmbient.current
+    return context.resources.isNightModeActive()
 }
