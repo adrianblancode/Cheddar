@@ -57,5 +57,6 @@ dependencies {
     implementation(project(':feature-stories'))
     implementation(project(':feature-storydetail'))
 
+    implementation(Dependencies.androidxBrowser)
     debugImplementation(Dependencies.leakcanary)
 }

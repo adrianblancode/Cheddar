@@ -8,9 +8,7 @@ import co.adrianblan.ui.Interactor
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -28,34 +26,35 @@ constructor(
 
     private val _viewState by lazy {
         MutableLiveData<StoriesViewState>(
-            StoriesViewState.Loading)
+            StoriesViewState.Loading
+        )
     }
 
     init {
         scope.launch {
-            _viewState.value =
-                try {
-                    val storyIds: List<StoryId> =
-                        withContext(dispatcherProvider.IO) {
-                            hackerNewsRepository.fetchTopStories()
-                        }
+            flow<StoriesViewState> {
+                val storyIds: List<StoryId> = hackerNewsRepository.fetchTopStories()
 
-                    val stories: List<Story> =
-                        flow {
-                            storyIds
-                                .take(10)
-                                .forEach { storyId ->
-                                    val story = hackerNewsRepository.fetchStory(storyId)
-                                    emit(story)
-                                }
-                        }
-                            .flowOn(dispatcherProvider.IO)
-                            .toList()
+                val stories: List<Story> =
+                    flow {
+                        storyIds
+                            .take(20)
+                            .forEach { storyId ->
+                                val story = hackerNewsRepository.fetchStory(storyId)
+                                emit(story)
+                            }
+                    }
+                        .toList()
 
-                    StoriesViewState.Success(stories)
-                } catch (t: Throwable) {
-                    Timber.e(t)
-                    StoriesViewState.Error
+                emit(StoriesViewState.Success(stories))
+            }
+                .flowOn(dispatcherProvider.IO)
+                .catch {
+                    Timber.e(it)
+                    emit(StoriesViewState.Error)
+                }
+                .collect {
+                    _viewState.value = it
                 }
         }
     }

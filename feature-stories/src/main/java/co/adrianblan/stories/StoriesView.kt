@@ -1,30 +1,31 @@
 package co.adrianblan.stories
 
 import android.text.Html
-import androidx.compose.Composable
+import androidx.compose.*
 import androidx.lifecycle.LiveData
-import androidx.ui.core.Text
-import androidx.ui.foundation.Clickable
-import androidx.ui.foundation.VerticalScroller
+import androidx.ui.core.*
+import androidx.ui.foundation.*
+import androidx.ui.foundation.shape.corner.RoundedCornerShape
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
-import androidx.ui.material.TopAppBar
+import androidx.ui.material.Scaffold
+import androidx.ui.material.icons.Icons
+import androidx.ui.material.icons.filled.ArrowDropDown
 import androidx.ui.material.ripple.Ripple
+import androidx.ui.material.surface.Surface
 import androidx.ui.res.stringResource
 import androidx.ui.text.style.TextOverflow
 import androidx.ui.tooling.preview.Preview
+import androidx.ui.unit.TextUnit
 import androidx.ui.unit.dp
+import androidx.ui.unit.lerp
+import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.dummy
 import co.adrianblan.ui.*
-import co.adrianblan.ui.R
+import timber.log.Timber
 
-sealed class StoriesViewState {
-    data class Success(val stories: List<Story>) : StoriesViewState()
-    object Loading : StoriesViewState()
-    object Error : StoriesViewState()
-}
 
 @Composable
 fun StoriesScreen(
@@ -41,34 +42,150 @@ fun StoriesView(
     viewState: StoriesViewState,
     onStoryClick: (StoryId) -> Unit
 ) {
-    Column {
-        TopAppBar(
-            title = {
-                Text(
-                    text = stringResource(R.string.app_name),
-                    style = (MaterialTheme.typography()).h6
-                )
-            }
-        )
-        Container(modifier = LayoutFlexible(flex = 1f)) {
+    val scroller = ScrollerPosition()
+
+    Scaffold(
+        topAppBar = {
+            StoriesToolbar(scroller)
+        },
+        bodyContent = {
             when (viewState) {
                 is StoriesViewState.Loading -> LoadingView()
                 is StoriesViewState.Success ->
-                    VerticalScroller {
+                    // TODO change to AdapterList
+                    VerticalScroller(scrollerPosition = scroller) {
                         Column {
                             viewState.stories.map { story ->
-                                StoryItem(
-                                    story,
-                                    onStoryClick
-                                )
+                                key(story.id) {
+                                    StoryItem(story, onStoryClick)
+                                }
                             }
                         }
                     }
                 is StoriesViewState.Error -> ErrorView()
             }
         }
+    )
+}
+
+@Composable
+fun StoriesToolbar(scroller: ScrollerPosition) {
+    CollapsingToolbar(scroller) { collapsed ->
+
+        val headerTextSize =
+            lerp(
+                MaterialTheme.typography().h4.fontSize,
+                MaterialTheme.typography().h6.fontSize,
+                collapsed
+            )
+
+        val minHeight = lerp(100.dp, 56.dp, collapsed)
+
+        Container(
+            padding = EdgeInsets(12.dp),
+            alignment = Alignment.BottomLeft,
+            constraints = DpConstraints(minHeight = minHeight)
+        ) {
+
+            val showStoriesPopup = state { false }
+
+            Recompose { recompose ->
+                StoriesHeader(headerTextSize = headerTextSize) {
+                    showStoriesPopup.value = true
+                    recompose()
+                }
+
+                if (showStoriesPopup.value) {
+                    StoryTypePopup {
+                        showStoriesPopup.value = false
+                        recompose()
+                    }
+                }
+            }
+        }
     }
 }
+
+@Composable
+fun StoriesHeader(
+    headerTextSize: TextUnit = MaterialTheme.typography().h6.fontSize,
+    onClick: () -> Unit
+) {
+    Surface(shape = RoundedCornerShape(4.dp)) {
+        Ripple(true) {
+            Clickable(onClick = onClick) {
+                Container(padding = EdgeInsets(4.dp)) {
+                    Row {
+                        Text(
+                            text = stringResource(R.string.stories_top_title),
+                            style = MaterialTheme.typography().h4.copy(fontSize = headerTextSize)
+                        )
+                        VectorImage(
+                            Icons.Default.ArrowDropDown,
+                            tint = MaterialTheme.colors().onPrimary,
+                            modifier = LayoutGravity.Center
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun StoryTypePopup(onDismiss: () -> Unit) {
+    DropdownPopup(popupProperties = PopupProperties(true, onDismissRequest = onDismiss)) {
+        Container(
+            padding = EdgeInsets(20.dp),
+            constraints = DpConstraints(maxWidth = 200.dp)
+        ) {
+            Surface(
+                shape = RoundedCornerShape(4.dp),
+                color = MaterialTheme.colors().background,
+                elevation = 4.dp
+            ) {
+                Column {
+                    val storyTypes = remember { StoryType.values() }
+
+                    storyTypes
+                        .map { storyType ->
+                            StoryTypePopupItem(storyType) {
+                                onDismiss()
+                            }
+                        }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun StoryTypePopupItem(storyType: StoryType, onClick: (StoryType) -> Unit) {
+    Ripple(bounded = true) {
+        Clickable(onClick = { onClick(storyType) }) {
+            Container(
+                padding = EdgeInsets(8.dp),
+                modifier = LayoutWidth.Fill,
+                alignment = Alignment.BottomLeft
+            ) {
+                Text(
+                    text = stringResource(storyType.titleStringResource()),
+                    style = MaterialTheme.typography().h6
+                )
+            }
+        }
+    }
+}
+
+private fun StoryType.titleStringResource(): Int =
+    when (this) {
+        StoryType.TOP -> R.string.stories_top_title
+        StoryType.BEST -> R.string.stories_best_title
+        StoryType.NEW -> R.string.stories_new_title
+        StoryType.ASK -> R.string.stories_ask_title
+        StoryType.SHOW -> R.string.stories_show_title
+        StoryType.JOB -> R.string.stories_job_title
+    }
 
 @Composable
 fun StoryItem(story: Story, onStoryClick: (StoryId) -> Unit) {
@@ -83,7 +200,7 @@ fun StoryItem(story: Story, onStoryClick: (StoryId) -> Unit) {
                 ) {
                     Text(
                         text = story.title,
-                        style = (MaterialTheme.typography()).h6
+                        style = MaterialTheme.typography().h6
                     )
                     story.text
                         .takeIf { !it.isNullOrEmpty() }
@@ -91,7 +208,7 @@ fun StoryItem(story: Story, onStoryClick: (StoryId) -> Unit) {
                             Text(
                                 text = Html.fromHtml(text).toString()
                                     .replace("\n\n", " "),
-                                style = (MaterialTheme.typography()).body1,
+                                style = MaterialTheme.typography().body1,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )

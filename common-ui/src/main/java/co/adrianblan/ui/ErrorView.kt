@@ -12,7 +12,7 @@ fun ErrorView() {
     Container(expanded = true, padding = EdgeInsets(16.dp)) {
         Text(
             text = "Error",
-            style = (MaterialTheme.typography()).h6
+            style = MaterialTheme.typography().h6
         )
     }
 }

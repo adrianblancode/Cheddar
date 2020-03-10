@@ -9,9 +9,8 @@ import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.api.Comment
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
-import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -29,57 +28,64 @@ class StoryDetailInteractor
 
     private val _viewState by lazy {
         MutableLiveData<StoryDetailViewState>(
-            StoryDetailViewState.Loading)
+            StoryDetailViewState.Loading
+        )
     }
 
     init {
         scope.launch {
+            flow<StoryDetailViewState> {
 
-            val story: Story =
-                try {
-                    withContext(dispatcherProvider.IO) {
-                        hackerNewsRepository.fetchStory(storyId)
-                    }
+                val story: Story = hackerNewsRepository.fetchStory(storyId)
 
-                } catch (t: Throwable) {
-                    Timber.e(t)
-                    _viewState.value = StoryDetailViewState.Error
-                    return@launch
-                }
-
-            _viewState.value =
-                StoryDetailViewState.Success(
-                    story,
-                    CommentsViewState.Loading
+                emit(
+                    StoryDetailViewState.Success(
+                        story,
+                        listOf(
+                            StoryDetailItem.CommentLoadingItem
+                        )
+                    )
                 )
 
-            try {
-                val comments: List<Comment> =
-                    flow {
-                        story.kids
-                            .forEach { commentId ->
-                                val comment = hackerNewsRepository.fetchComment(commentId)
-                                emit(comment)
-                            }
-                    }
-                        .flowOn(dispatcherProvider.IO)
-                        .toList()
+                try {
+                    val comments: List<Comment> =
+                        flow {
+                            story.kids
+                                .forEach { commentId ->
+                                    val comment = hackerNewsRepository.fetchComment(commentId)
+                                    emit(comment)
+                                }
+                        }
+                            .toList()
 
-                _viewState.value =
-                    StoryDetailViewState.Success(
-                        story,
-                        CommentsViewState.Success(comments)
+                    emit(
+                        StoryDetailViewState.Success(
+                            story,
+                            comments.map { StoryDetailItem.CommentItem(it) }
+                        )
                     )
-            } catch (t: Throwable) {
+                } catch (t: Throwable) {
 
-                Timber.e(t)
+                    Timber.e(t)
 
-                _viewState.value =
-                    StoryDetailViewState.Success(
-                        story,
-                        CommentsViewState.Error
+                    emit(
+                        StoryDetailViewState.Success(
+                            story,
+                            listOf(
+                                StoryDetailItem.CommentErrorItem
+                            )
+                        )
                     )
+                }
             }
+                .flowOn(dispatcherProvider.IO)
+                .catch {
+                    Timber.e(it)
+                    emit(StoryDetailViewState.Error)
+                }
+                .collect {
+                    _viewState.value = it
+                }
         }
     }
 }

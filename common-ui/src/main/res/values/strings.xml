@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">Cheddar</string>
+
+    <string name="stories_top_title">Top Stories</string>
+    <string name="stories_best_title">Best Stories</string>
+    <string name="stories_new_title">New Stories</string>
+    <string name="stories_ask_title">Ask HN</string>
+    <string name="stories_show_title">Show HN</string>
+    <string name="stories_job_title">Jobs</string>
+
 </resources>

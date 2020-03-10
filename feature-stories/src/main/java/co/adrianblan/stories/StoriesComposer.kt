@@ -18,7 +18,9 @@ class StoriesComposer
     override fun composeView() =
         StoriesScreen(
             viewState = storiesInteractor.viewState,
-            onStoryClick = { listener.onStoryClicked(it) }
+            onStoryClick = {
+                listener.onStoryClicked(it)
+            }
         )
 
     override fun detach() =

@@ -12,12 +12,14 @@ class StoryDetailComposer
 ): Composer {
 
     interface Listener {
+        fun onStoryContentClicked(storyContentUrl: String)
         fun onStoryDetailFinished()
     }
 
     override fun composeView() =
         StoryDetailScreen(
             viewState = storyDetailInteractor.viewState,
+            onStoryContentClicked = { listener.onStoryContentClicked(it) },
             onBackPressed = { listener.onStoryDetailFinished() }
         )
 

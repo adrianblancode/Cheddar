@@ -12,7 +12,7 @@ fun LoadingView() {
     Container(expanded = true, padding = EdgeInsets(16.dp)) {
         Text(
             text = "Loading…",
-            style = (MaterialTheme.typography()).h6
+            style = MaterialTheme.typography().h6
         )
     }
 }

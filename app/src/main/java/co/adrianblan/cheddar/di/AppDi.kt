@@ -25,6 +25,8 @@ object AppModule {
 ])
 interface AppComponent {
 
+    fun context(): Context
+    
     fun dispatcherProvider(): DispatcherProvider
     fun hackerNewsRepository(): HackerNewsRepository
 
