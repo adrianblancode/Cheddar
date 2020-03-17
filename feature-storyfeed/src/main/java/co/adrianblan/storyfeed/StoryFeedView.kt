@@ -1,4 +1,4 @@
-package co.adrianblan.stories
+package co.adrianblan.storyfeed
 
 import android.text.Html
 import androidx.compose.*
@@ -29,36 +29,36 @@ import co.adrianblan.ui.InsetsAmbient
 
 
 @Composable
-fun StoriesScreen(
-    viewState: LiveData<StoriesViewState>,
+fun StoryFeedScreen(
+    viewState: LiveData<StoryFeedViewState>,
     onStoryClick: (StoryId) -> Unit
 ) {
-    StoriesView(
+    StoryFeedView(
         observe(viewState), onStoryClick
     )
 }
 
 @Composable
-fun StoriesView(
-    viewState: StoriesViewState,
+fun StoryFeedView(
+    viewState: StoryFeedViewState,
     onStoryClick: (StoryId) -> Unit
 ) {
     val scroller = ScrollerPosition()
 
     Scaffold(
         topAppBar = {
-            StoriesToolbar(scroller)
+            StoryFeedToolbar(scroller)
         },
         bodyContent = {
             when (viewState) {
-                is StoriesViewState.Loading -> LoadingView()
-                is StoriesViewState.Success ->
+                is StoryFeedViewState.Loading -> LoadingView()
+                is StoryFeedViewState.Success ->
                     // TODO change to AdapterList
                     VerticalScroller(scrollerPosition = scroller) {
                         Column {
                             viewState.stories.map { story ->
                                 key(story.id) {
-                                    StoryItem(story, onStoryClick)
+                                    StoryFeedItem(story, onStoryClick)
                                 }
                             }
 
@@ -68,14 +68,14 @@ fun StoriesView(
                             }
                         }
                     }
-                is StoriesViewState.Error -> ErrorView()
+                is StoryFeedViewState.Error -> ErrorView()
             }
         }
     )
 }
 
 @Composable
-fun StoriesToolbar(scroller: ScrollerPosition) {
+fun StoryFeedToolbar(scroller: ScrollerPosition) {
     CollapsingToolbar(scroller) { collapsed ->
 
         val headerTextSize =
@@ -93,17 +93,18 @@ fun StoriesToolbar(scroller: ScrollerPosition) {
             constraints = DpConstraints(minHeight = height)
         ) {
 
-            val showStoriesPopup = state { false }
+            val showStoryTypePopup = state { false }
 
+            // Seems like if statement does not automatically recompose on state change
             Recompose { recompose ->
-                StoriesHeader(headerTextSize = headerTextSize) {
-                    showStoriesPopup.value = true
+                StoryFeedHeader(headerTextSize = headerTextSize) {
+                    showStoryTypePopup.value = true
                     recompose()
                 }
 
-                if (showStoriesPopup.value) {
+                if (showStoryTypePopup.value) {
                     StoryTypePopup {
-                        showStoriesPopup.value = false
+                        showStoryTypePopup.value = false
                         recompose()
                     }
                 }
@@ -113,7 +114,7 @@ fun StoriesToolbar(scroller: ScrollerPosition) {
 }
 
 @Composable
-fun StoriesHeader(
+fun StoryFeedHeader(
     headerTextSize: TextUnit = MaterialTheme.typography().h6.fontSize,
     onClick: () -> Unit
 ) {
@@ -194,7 +195,7 @@ private fun StoryType.titleStringResource(): Int =
     }
 
 @Composable
-fun StoryItem(story: Story, onStoryClick: (StoryId) -> Unit) {
+fun StoryFeedItem(story: Story, onStoryClick: (StoryId) -> Unit) {
     Ripple(bounded = true) {
         Clickable(onClick = { onStoryClick(story.id) }) {
             Container(
@@ -227,10 +228,10 @@ fun StoryItem(story: Story, onStoryClick: (StoryId) -> Unit) {
 
 @Preview
 @Composable
-fun StoriesPreview() {
+fun StoryFeedPreview() {
     AppTheme {
         val viewState =
-            StoriesViewState.Success(listOf(Story.dummy))
-        StoriesView(viewState) {}
+            StoryFeedViewState.Success(listOf(Story.dummy))
+        StoryFeedView(viewState) {}
     }
 }

@@ -10,8 +10,8 @@ import co.adrianblan.ui.Composer
 import co.adrianblan.ui.RootScreen
 import co.adrianblan.ui.StackRouter
 import co.adrianblan.hackernews.api.StoryId
-import co.adrianblan.stories.StoriesComponent
-import co.adrianblan.stories.StoriesComposer
+import co.adrianblan.storyfeed.StoryFeedComponent
+import co.adrianblan.storyfeed.StoryFeedComposer
 import co.adrianblan.storydetail.StoryDetailComponent
 import co.adrianblan.storydetail.StoryDetailComposer
 import javax.inject.Inject
@@ -20,22 +20,22 @@ class RootComposer
 @Inject constructor(
     // TODO remove context
     private val context: Context,
-    private val storiesComponentBuilder: StoriesComponent.Factory,
+    private val storyFeedComponentBuilder: StoryFeedComponent.Factory,
     private val storyDetailComponentBuilder: StoryDetailComponent.Factory,
     @RootInternal private val parentScope: ParentScope
-) : Composer, StoriesComposer.Listener, StoryDetailComposer.Listener {
+) : Composer, StoryFeedComposer.Listener, StoryDetailComposer.Listener {
 
     private val router by lazy {
-        StackRouter.of(storiesComposer)
+        StackRouter.of(storyFeedComposer)
     }
 
-    private val storiesComposer: StoriesComposer by lazy {
-        storiesComponentBuilder
+    private val storyFeedComposer: StoryFeedComposer by lazy {
+        storyFeedComponentBuilder
             .build(
                 listener = this,
                 parentScope = parentScope
             )
-            .storiesComposer()
+            .storyFeedComposer()
     }
 
     override fun onStoryClicked(storyId: StoryId) {

@@ -2,7 +2,7 @@ package co.adrianblan.cheddar.di
 
 import co.adrianblan.cheddar.RootComposer
 import co.adrianblan.common.ParentScope
-import co.adrianblan.stories.StoriesComponent
+import co.adrianblan.storyfeed.StoryFeedComponent
 import co.adrianblan.storydetail.StoryDetailComponent
 import dagger.BindsInstance
 import dagger.Component
@@ -12,7 +12,7 @@ import javax.inject.Scope
 
 @Module(
     subcomponents = [
-        StoriesComponent::class,
+        StoryFeedComponent::class,
         StoryDetailComponent::class
     ]
 )

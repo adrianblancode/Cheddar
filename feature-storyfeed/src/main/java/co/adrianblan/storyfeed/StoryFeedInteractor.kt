@@ -1,4 +1,4 @@
-package co.adrianblan.stories
+package co.adrianblan.storyfeed
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -10,29 +10,28 @@ import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
-class StoriesInteractor
+class StoryFeedInteractor
 @Inject
 constructor(
     private val hackerNewsRepository: HackerNewsRepository,
     override val dispatcherProvider: DispatcherProvider,
-    @StoriesInternal override val parentScope: ParentScope
+    @StoryFeedInternal override val parentScope: ParentScope
 ) : Interactor() {
 
-    val viewState: LiveData<StoriesViewState> get() = _viewState
+    val viewState: LiveData<StoryFeedViewState> get() = _viewState
 
     private val _viewState by lazy {
-        MutableLiveData<StoriesViewState>(
-            StoriesViewState.Loading
+        MutableLiveData<StoryFeedViewState>(
+            StoryFeedViewState.Loading
         )
     }
 
     init {
         scope.launch {
-            flow<StoriesViewState> {
+            flow<StoryFeedViewState> {
                 val storyIds: List<StoryId> = hackerNewsRepository.fetchTopStories()
 
                 val stories: List<Story> =
@@ -46,12 +45,12 @@ constructor(
                     }
                         .toList()
 
-                emit(StoriesViewState.Success(stories))
+                emit(StoryFeedViewState.Success(stories))
             }
                 .flowOn(dispatcherProvider.IO)
                 .catch {
                     Timber.e(it)
-                    emit(StoriesViewState.Error)
+                    emit(StoryFeedViewState.Error)
                 }
                 .collect {
                     _viewState.value = it

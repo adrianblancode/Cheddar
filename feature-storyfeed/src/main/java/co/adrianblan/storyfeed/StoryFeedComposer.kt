@@ -1,14 +1,14 @@
-package co.adrianblan.stories
+package co.adrianblan.storyfeed
 
 import co.adrianblan.ui.Composer
 import co.adrianblan.hackernews.api.StoryId
 import kotlinx.coroutines.cancel
 import javax.inject.Inject
 
-class StoriesComposer
+class StoryFeedComposer
 @Inject constructor(
-    private val storiesInteractor: StoriesInteractor,
-    @StoriesInternal private val listener: Listener
+    private val storyFeedInteractor: StoryFeedInteractor,
+    @StoryFeedInternal private val listener: Listener
 ): Composer {
 
     interface Listener {
@@ -16,13 +16,13 @@ class StoriesComposer
     }
 
     override fun composeView() =
-        StoriesScreen(
-            viewState = storiesInteractor.viewState,
+        StoryFeedScreen(
+            viewState = storyFeedInteractor.viewState,
             onStoryClick = {
                 listener.onStoryClicked(it)
             }
         )
 
     override fun detach() =
-        storiesInteractor.scope.cancel()
+        storyFeedInteractor.scope.cancel()
 }
