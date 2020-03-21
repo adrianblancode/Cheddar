@@ -5,16 +5,14 @@ import androidx.compose.frames.ModelList
 import androidx.compose.frames.modelListOf
 
 interface Router {
-    fun activeComposer(): Composer
+    val composers: List<Composer>
     fun onBackPressed(): Boolean
 }
 
 @Model
 class StackRouter private constructor(
-    private var composers: ModelList<Composer>
+    override val composers: ModelList<Composer>
 ): Router {
-
-    override fun activeComposer(): Composer = composers.last()
 
     fun push(composer: Composer) =
         composers.add(composer)

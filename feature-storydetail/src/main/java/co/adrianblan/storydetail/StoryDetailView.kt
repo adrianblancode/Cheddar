@@ -110,11 +110,12 @@ fun StoryDetailToolbar(
     scroller: ScrollerPosition,
     onBackPressed: () -> Unit
 ) {
-    CollapsingToolbar(scroller) { collapsed ->
+    val maxHeight = 140.dp
 
-        val maxHeight = 140.dp
-        val minHeight = 56.dp
-        val height = remember(collapsed) { lerp(maxHeight, minHeight, collapsed) }
+    CollapsingToolbar(
+        scroller = scroller,
+        maxHeight = maxHeight
+    ) { collapsedFraction, height ->
 
         Stack {
             Container(padding = EdgeInsets(4.dp)) {
@@ -127,9 +128,9 @@ fun StoryDetailToolbar(
                 }
             }
 
-            val titleCollapsedLeftOffset = remember(collapsed) { lerp(0.dp, 48.dp, collapsed) }
-            val titleCollapsedTopOffset = remember(collapsed) { lerp(48.dp, 0.dp, collapsed) }
-            val titleMaxLines = remember(collapsed) { if (collapsed > 0.1f) 1 else 3 }
+            val titleCollapsedLeftOffset = remember(collapsedFraction) { lerp(0.dp, 48.dp, collapsedFraction) }
+            val titleCollapsedTopOffset = remember(collapsedFraction) { lerp(48.dp, 0.dp, collapsedFraction) }
+            val titleMaxLines = remember(collapsedFraction) { if (collapsedFraction > 0.1f) 1 else 3 }
 
             Container(
                 alignment = Alignment.BottomLeft,
@@ -145,7 +146,7 @@ fun StoryDetailToolbar(
                                 top = titleCollapsedTopOffset
                             ) +
                             LayoutWidth.Fill +
-                            LayoutHeight.Min(minHeight) +
+                            LayoutHeight(height) +
                             LayoutAlign.CenterLeft,
                     overflow = TextOverflow.Ellipsis,
                     maxLines = titleMaxLines

@@ -1,5 +1,6 @@
 package co.adrianblan.storydetail
 
+import androidx.compose.Composable
 import co.adrianblan.ui.Composer
 import kotlinx.coroutines.cancel
 import javax.inject.Inject
@@ -16,12 +17,13 @@ class StoryDetailComposer
         fun onStoryDetailFinished()
     }
 
-    override fun composeView() =
+    override val composeView = @Composable {
         StoryDetailScreen(
             viewState = storyDetailInteractor.viewState,
             onStoryContentClicked = { listener.onStoryContentClicked(it) },
             onBackPressed = { listener.onStoryDetailFinished() }
         )
+    }
 
     override fun detach() =
         storyDetailInteractor.scope.cancel()

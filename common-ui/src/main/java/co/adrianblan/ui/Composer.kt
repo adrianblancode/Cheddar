@@ -4,8 +4,7 @@ import androidx.compose.Composable
 
 interface Composer {
 
-    @Composable
-    fun composeView()
+    val composeView: @Composable() () -> Unit
 
     fun detach()
 

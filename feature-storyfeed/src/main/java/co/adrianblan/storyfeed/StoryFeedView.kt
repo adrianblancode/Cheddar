@@ -16,10 +16,7 @@ import androidx.ui.material.surface.Surface
 import androidx.ui.res.stringResource
 import androidx.ui.text.style.TextOverflow
 import androidx.ui.tooling.preview.Preview
-import androidx.ui.unit.TextUnit
-import androidx.ui.unit.dp
-import androidx.ui.unit.lerp
-import androidx.ui.unit.px
+import androidx.ui.unit.*
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
@@ -27,87 +24,126 @@ import co.adrianblan.hackernews.api.dummy
 import co.adrianblan.ui.*
 import co.adrianblan.ui.InsetsAmbient
 
+private const val toolbarMinHeightDp = 56
+private const val toolbarMaxHeightDp = 128
 
 @Composable
 fun StoryFeedScreen(
     viewState: LiveData<StoryFeedViewState>,
+    onStoryTypeClick: (StoryType) -> Unit,
     onStoryClick: (StoryId) -> Unit
 ) {
     StoryFeedView(
-        observe(viewState), onStoryClick
+        viewState = observe(viewState),
+        onStoryTypeClick = onStoryTypeClick,
+        onStoryClick = onStoryClick
     )
 }
 
 @Composable
 fun StoryFeedView(
     viewState: StoryFeedViewState,
+    onStoryTypeClick: (StoryType) -> Unit,
     onStoryClick: (StoryId) -> Unit
 ) {
     val scroller = ScrollerPosition()
 
-    Scaffold(
-        topAppBar = {
-            StoryFeedToolbar(scroller)
+    with(DensityAmbient.current) {
+        onCommit(viewState.storyType) {
+            val collapseDistance = (toolbarMaxHeightDp - toolbarMinHeightDp).dp
+
+            // If story type is changed, collapse
+            val scrollReset: Px = min(scroller.value.px, collapseDistance.toPx())
+            scroller.scrollTo(scrollReset.value)
+        }
+    }
+
+    CollapsingScaffold(
+        scroller = scroller,
+        maxHeight = toolbarMaxHeightDp.dp,
+        toolbarContent = { collapseFraction, height ->
+            StoryFeedToolbar(
+                collapsedFraction = collapseFraction,
+                height = height,
+                storyType = viewState.storyType,
+                onStoryTypeClick = onStoryTypeClick
+            )
         },
         bodyContent = {
-            when (viewState) {
-                is StoryFeedViewState.Loading -> LoadingView()
-                is StoryFeedViewState.Success ->
+            when (val storyFeedState: StoryFeedState = viewState.storyFeedState) {
+                is StoryFeedState.Loading -> LoadingView()
+                is StoryFeedState.Success ->
                     // TODO change to AdapterList
                     VerticalScroller(scrollerPosition = scroller) {
                         Column {
-                            viewState.stories.map { story ->
-                                key(story.id) {
-                                    StoryFeedItem(story, onStoryClick)
-                                }
-                            }
 
-                            val insets = InsetsAmbient.current
-                            with (DensityAmbient.current) {
+                            with(DensityAmbient.current) {
+                                val insets = InsetsAmbient.current
+                                val topInsets = insets.top.px.toDp()
+
+                                Spacer(modifier = LayoutHeight(toolbarMaxHeightDp.dp + topInsets))
+
+                                storyFeedState.stories.map { story ->
+                                    key(story.id) {
+                                        StoryFeedItem(story, onStoryClick)
+                                    }
+                                }
+
                                 Spacer(modifier = LayoutHeight(insets.bottom.px.toDp()))
                             }
                         }
                     }
-                is StoryFeedViewState.Error -> ErrorView()
+                is StoryFeedState.Error -> ErrorView()
             }
         }
     )
 }
 
 @Composable
-fun StoryFeedToolbar(scroller: ScrollerPosition) {
-    CollapsingToolbar(scroller) { collapsed ->
+fun StoryFeedToolbar(
+    collapsedFraction: Float,
+    height: Dp,
+    storyType: StoryType,
+    onStoryTypeClick: (StoryType) -> Unit
+) {
+
+    Container(
+        padding = EdgeInsets(12.dp),
+        alignment = Alignment.BottomLeft,
+        modifier = LayoutHeight(height)
+    ) {
 
         val headerTextSize =
             lerp(
                 MaterialTheme.typography().h4.fontSize,
                 MaterialTheme.typography().h6.fontSize,
-                collapsed
+                collapsedFraction
             )
 
-        val height = lerp(100.dp, 56.dp, collapsed)
+        val showStoryTypePopup = state { false }
 
-        Container(
-            padding = EdgeInsets(12.dp),
-            alignment = Alignment.BottomLeft,
-            constraints = DpConstraints(minHeight = height)
-        ) {
+        // Seems like if statement does not automatically recompose on state change
+        Recompose { recompose ->
+            StoryFeedHeader(
+                headerTextSize = headerTextSize,
+                storyType = storyType
+            ) {
+                showStoryTypePopup.value = true
+                recompose()
+            }
 
-            val showStoryTypePopup = state { false }
-
-            // Seems like if statement does not automatically recompose on state change
-            Recompose { recompose ->
-                StoryFeedHeader(headerTextSize = headerTextSize) {
-                    showStoryTypePopup.value = true
-                    recompose()
-                }
-
-                if (showStoryTypePopup.value) {
-                    StoryTypePopup {
+            if (showStoryTypePopup.value) {
+                StoryTypePopup(
+                    onStoryTypeClick = { storyType ->
+                        onStoryTypeClick(storyType)
+                        showStoryTypePopup.value = false
+                        recompose()
+                    },
+                    onDismiss = {
                         showStoryTypePopup.value = false
                         recompose()
                     }
-                }
+                )
             }
         }
     }
@@ -115,24 +151,32 @@ fun StoryFeedToolbar(scroller: ScrollerPosition) {
 
 @Composable
 fun StoryFeedHeader(
+    storyType: StoryType,
     headerTextSize: TextUnit = MaterialTheme.typography().h6.fontSize,
     onClick: () -> Unit
 ) {
-    Box(shape = RoundedCornerShape(4.dp)) {
-        Ripple(true) {
-            Clickable(onClick = onClick) {
-                Container(padding = EdgeInsets(4.dp)) {
-                    Row {
-                        Text(
-                            text = stringResource(R.string.stories_top_title),
-                            style = MaterialTheme.typography().h4.copy(fontSize = headerTextSize)
-                        )
-                        VectorImage(
-                            vector = Icons.Default.ArrowDropDown,
-                            tint = MaterialTheme.colors().onBackground,
-                            modifier = LayoutGravity.Center
-                        )
+    Ripple(true, radius = 4.dp) {
+        Clickable(onClick = onClick) {
+            Container(padding = EdgeInsets(4.dp)) {
+                Row {
+
+                    val title = remember(storyType) {
+                        stringResource(storyType.titleStringResource())
                     }
+                    
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography().h4
+                            .copy(
+                                fontSize = headerTextSize,
+                                color = MaterialTheme.colors().onPrimary
+                            )
+                    )
+                    VectorImage(
+                        vector = Icons.Default.ArrowDropDown,
+                        tint = MaterialTheme.colors().onBackground,
+                        modifier = LayoutGravity.Center
+                    )
                 }
             }
         }
@@ -140,26 +184,33 @@ fun StoryFeedHeader(
 }
 
 @Composable
-fun StoryTypePopup(onDismiss: () -> Unit) {
+fun StoryTypePopup(
+    onStoryTypeClick: (StoryType) -> Unit,
+    onDismiss: () -> Unit
+) {
     DropdownPopup(popupProperties = PopupProperties(true, onDismissRequest = onDismiss)) {
-        Container(
-            padding = EdgeInsets(20.dp),
-            constraints = DpConstraints(maxWidth = 200.dp)
-        ) {
-            Surface(
-                shape = RoundedCornerShape(4.dp),
-                color = MaterialTheme.colors().background,
-                elevation = 4.dp
+        // Popups require reapplication of the app theme
+        AppTheme {
+            Container(
+                padding = EdgeInsets(20.dp),
+                constraints = DpConstraints(maxWidth = 200.dp)
             ) {
-                Column {
-                    val storyTypes = remember { StoryType.values() }
+                Surface(
+                    shape = RoundedCornerShape(4.dp),
+                    color = MaterialTheme.colors().background,
+                    elevation = 4.dp
+                ) {
+                    Column {
+                        val storyTypes = remember { StoryType.values() }
 
-                    storyTypes
-                        .map { storyType ->
-                            StoryTypePopupItem(storyType) {
-                                onDismiss()
+                        storyTypes
+                            .map { storyType ->
+                                StoryTypePopupItem(storyType) {
+                                    onStoryTypeClick(storyType)
+                                    onDismiss()
+                                }
                             }
-                        }
+                    }
                 }
             }
         }
@@ -230,8 +281,15 @@ fun StoryFeedItem(story: Story, onStoryClick: (StoryId) -> Unit) {
 @Composable
 fun StoryFeedPreview() {
     AppTheme {
-        val viewState =
-            StoryFeedViewState.Success(listOf(Story.dummy))
-        StoryFeedView(viewState) {}
+        val viewState = StoryFeedViewState(
+            StoryType.TOP,
+            StoryFeedState.Success(listOf(Story.dummy))
+        )
+
+        StoryFeedView(
+            viewState,
+            onStoryTypeClick = {},
+            onStoryClick = {}
+        )
     }
 }

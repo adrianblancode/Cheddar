@@ -14,9 +14,9 @@ import androidx.ui.unit.px
 
 @Composable
 fun RootScreen(router: Router) {
-    Crossfade(router.activeComposer()) {
+    Crossfade(router.composers.lastOrNull()) {
         Stack {
-            it.composeView()
+            it?.composeView?.invoke()
 
             NavigationBarScrim(modifier = LayoutGravity.BottomCenter)
         }
@@ -32,7 +32,7 @@ fun NavigationBarScrim(
 
     with (DensityAmbient.current) {
         Surface(
-            color = MaterialTheme.colors().background.copy(alpha = 0.7f),
+            color = MaterialTheme.colors().background.copy(alpha = 0.75f),
             modifier = modifier + LayoutHeight(insets.current.bottom.px.toDp()) + LayoutWidth.Fill
         ) {}
     }

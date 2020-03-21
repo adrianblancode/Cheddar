@@ -1,11 +1,15 @@
 package co.adrianblan.storyfeed
 
-import androidx.compose.Model
+import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.Story
 
-@Model
-sealed class StoryFeedViewState {
-    data class Success(val stories: List<Story>) : StoryFeedViewState()
-    object Loading : StoryFeedViewState()
-    object Error : StoryFeedViewState()
+data class StoryFeedViewState(
+    val storyType: StoryType,
+    val storyFeedState: StoryFeedState
+)
+
+sealed class StoryFeedState {
+    data class Success(val stories: List<Story>) : StoryFeedState()
+    object Loading : StoryFeedState()
+    object Error : StoryFeedState()
 }

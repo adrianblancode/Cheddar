@@ -6,8 +6,11 @@ import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.ParentScope
 import co.adrianblan.ui.Interactor
 import co.adrianblan.hackernews.HackerNewsRepository
+import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
+import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -23,38 +26,53 @@ constructor(
 
     val viewState: LiveData<StoryFeedViewState> get() = _viewState
 
+    val initialStoryType: StoryType = StoryType.TOP
+
     private val _viewState by lazy {
         MutableLiveData<StoryFeedViewState>(
-            StoryFeedViewState.Loading
+            StoryFeedViewState(initialStoryType, StoryFeedState.Loading)
         )
     }
 
+    private val storyTypeChannel =
+        ConflatedBroadcastChannel<StoryType>(initialStoryType)
+
     init {
         scope.launch {
-            flow<StoryFeedViewState> {
-                val storyIds: List<StoryId> = hackerNewsRepository.fetchTopStories()
-
-                val stories: List<Story> =
+            storyTypeChannel.asFlow()
+                .flatMapConcat { storyType ->
                     flow {
-                        storyIds
-                            .take(20)
-                            .forEach { storyId ->
-                                val story = hackerNewsRepository.fetchStory(storyId)
-                                emit(story)
-                            }
-                    }
-                        .toList()
+                        emit(StoryFeedState.Loading)
 
-                emit(StoryFeedViewState.Success(stories))
-            }
-                .flowOn(dispatcherProvider.IO)
-                .catch {
-                    Timber.e(it)
-                    emit(StoryFeedViewState.Error)
+                        val storyIds: List<StoryId> = hackerNewsRepository.fetchStories(storyType)
+
+                        try {
+                            val stories: List<Story> =
+                                storyIds.take(12)
+                                    .asFlow()
+                                    .map { storyId ->
+                                        hackerNewsRepository.fetchStory(storyId)
+                                    }
+                                    .toList()
+
+                            emit(StoryFeedState.Success(stories))
+                        } catch (t: Throwable) {
+                            Timber.e(t)
+                            emit(StoryFeedState.Error)
+                        }
+                    }
+                        .map { storyFeedState ->
+                            StoryFeedViewState(storyType, storyFeedState)
+                        }
                 }
-                .collect {
-                    _viewState.value = it
+                .flowOn(dispatcherProvider.IO)
+                .collect { storyViewState ->
+                    _viewState.value = storyViewState
                 }
         }
+    }
+
+    fun onStoryTypeChanged(storyType: StoryType) {
+        storyTypeChannel.offer(storyType)
     }
 }

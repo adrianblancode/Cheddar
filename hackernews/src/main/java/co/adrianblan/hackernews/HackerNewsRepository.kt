@@ -20,8 +20,15 @@ class HackerNewsRepository
                     storyCache.put(storyId, story)
                 }
 
-    suspend fun fetchTopStories(): List<StoryId> =
-        hackerNewsApi.fetchTopStories()
+    suspend fun fetchStories(storyType: StoryType): List<StoryId> =
+        when (storyType) {
+            StoryType.TOP -> hackerNewsApi.fetchTopStories()
+            StoryType.BEST -> hackerNewsApi.fetchBestStories()
+            StoryType.NEW -> hackerNewsApi.fetchNewStories()
+            StoryType.ASK -> hackerNewsApi.fetchAskStories()
+            StoryType.SHOW -> hackerNewsApi.fetchShowStories()
+            StoryType.JOB -> hackerNewsApi.fetchJobStories()
+        }
 
     suspend fun fetchComment(commentId: CommentId): Comment =
         hackerNewsApi.fetchComment(commentId.id)

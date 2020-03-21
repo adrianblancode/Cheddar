@@ -1,5 +1,6 @@
 package co.adrianblan.storyfeed
 
+import androidx.compose.Composable
 import co.adrianblan.ui.Composer
 import co.adrianblan.hackernews.api.StoryId
 import kotlinx.coroutines.cancel
@@ -15,13 +16,17 @@ class StoryFeedComposer
         fun onStoryClicked(storyId: StoryId)
     }
 
-    override fun composeView() =
+    override val composeView = @Composable {
         StoryFeedScreen(
             viewState = storyFeedInteractor.viewState,
+            onStoryTypeClick = { storyType ->
+                storyFeedInteractor.onStoryTypeChanged(storyType)
+            },
             onStoryClick = {
                 listener.onStoryClicked(it)
             }
         )
+    }
 
     override fun detach() =
         storyFeedInteractor.scope.cancel()

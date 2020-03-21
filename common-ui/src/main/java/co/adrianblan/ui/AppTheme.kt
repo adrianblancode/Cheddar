@@ -1,10 +1,12 @@
 package co.adrianblan.ui
 
-import android.content.res.Configuration
 import androidx.compose.Composable
 import androidx.ui.core.ContextAmbient
 import androidx.ui.graphics.Color
-import androidx.ui.material.*
+import androidx.ui.material.MaterialTheme
+import androidx.ui.material.Typography
+import androidx.ui.material.darkColorPalette
+import androidx.ui.material.lightColorPalette
 import androidx.ui.res.colorResource
 import androidx.ui.text.font.FontFamily
 import androidx.ui.text.font.FontWeight

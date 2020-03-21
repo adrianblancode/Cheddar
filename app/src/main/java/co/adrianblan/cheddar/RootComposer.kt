@@ -3,6 +3,7 @@ package co.adrianblan.cheddar
 import android.content.Context
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
+import androidx.compose.Composable
 import androidx.core.net.toUri
 import co.adrianblan.cheddar.di.RootInternal
 import co.adrianblan.common.ParentScope
@@ -63,8 +64,9 @@ class RootComposer
         onBackPressed()
     }
 
-    override fun composeView() =
+    override val composeView = @Composable {
         RootScreen(router)
+    }
 
     override fun onBackPressed(): Boolean =
         router.onBackPressed()
