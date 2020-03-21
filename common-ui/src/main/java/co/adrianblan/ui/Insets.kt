@@ -6,6 +6,9 @@ import androidx.core.graphics.Insets
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 
+// Alpha for views which have content drawn behind it
+const val overInsetAlpha = 0.8f
+
 val InsetsAmbient = ambientOf { Insets.NONE }
 
 // Provides insets to children

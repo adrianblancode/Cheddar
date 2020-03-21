@@ -24,6 +24,9 @@ class StoryFeedComposer
             },
             onStoryClick = {
                 listener.onStoryClicked(it)
+            },
+            onPageEndReached = {
+                storyFeedInteractor.onPageEndReached()
             }
         )
     }

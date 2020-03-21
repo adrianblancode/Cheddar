@@ -32,7 +32,7 @@ fun NavigationBarScrim(
 
     with (DensityAmbient.current) {
         Surface(
-            color = MaterialTheme.colors().background.copy(alpha = 0.75f),
+            color = MaterialTheme.colors().background.copy(alpha = overInsetAlpha),
             modifier = modifier + LayoutHeight(insets.current.bottom.px.toDp()) + LayoutWidth.Fill
         ) {}
     }

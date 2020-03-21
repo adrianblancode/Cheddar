@@ -17,6 +17,7 @@ import androidx.ui.graphics.Outline
 import androidx.ui.graphics.Shape
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
+import androidx.ui.material.ripple.Ripple
 import androidx.ui.material.surface.Surface
 import androidx.ui.unit.*
 import kotlin.math.min
@@ -46,7 +47,7 @@ fun CollapsingToolbar(
 
         // Toolbar background
         Column {
-            Surface(color = MaterialTheme.colors().primary.copy(alpha = 0.75f)) {
+            Surface(color = MaterialTheme.colors().primary.copy(alpha = overInsetAlpha)) {
                 Container(
                     padding = EdgeInsets(top = topInsets),
                     modifier = LayoutWidth.Fill + LayoutHeight(height + topInsets)
@@ -99,7 +100,7 @@ fun CollapsingScaffold(
         }
 
         // Prevent children being clickable from behind toolbar
-        Clickable(onClick = null) {
+        Clickable(onClick = {}) {
             CollapsingToolbar(
                 scroller = scroller,
                 minHeight = minHeight,

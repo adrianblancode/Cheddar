@@ -9,10 +9,8 @@ import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.api.Comment
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -42,7 +40,7 @@ class StoryDetailInteractor
                     StoryDetailViewState.Success(
                         story,
                         listOf(
-                            StoryDetailItem.CommentLoadingItem
+                            StoryDetailItem.CommentsLoadingItem
                         )
                     )
                 )
@@ -72,7 +70,7 @@ class StoryDetailInteractor
                         StoryDetailViewState.Success(
                             story,
                             listOf(
-                                StoryDetailItem.CommentErrorItem
+                                StoryDetailItem.CommentsErrorItem
                             )
                         )
                     )

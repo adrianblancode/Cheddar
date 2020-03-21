@@ -8,9 +8,14 @@ import androidx.ui.material.Typography
 import androidx.ui.material.darkColorPalette
 import androidx.ui.material.lightColorPalette
 import androidx.ui.res.colorResource
+import androidx.ui.text.TextStyle
 import androidx.ui.text.font.FontFamily
 import androidx.ui.text.font.FontWeight
+import androidx.ui.unit.sp
 import co.adrianblan.ui.extensions.isNightModeActive
+
+val textSecondaryAlpha = 0.8f
+val textTertiaryAlpha = 0.6f
 
 @Composable
 fun AppTheme(children: @Composable() () -> Unit) {
@@ -31,28 +36,67 @@ fun AppTheme(children: @Composable() () -> Unit) {
                 primary = colorResource(R.color.colorPrimary),
                 primaryVariant = colorResource(R.color.colorPrimary),
                 secondary = colorResource(R.color.colorAccent),
+                secondaryVariant = colorResource(R.color.colorAccent),
                 onPrimary = Color.Black
             )
         }
 
-    val typography =
-        Typography()
-            .let {
+    val appFontFamily = FontFamily.SansSerif
+    val bodyFontFamily = FontFamily.SansSerif
 
-                // val mediumFont = FontFamily("sans-serif-medium")
-                val mediumFont = FontFamily.SansSerif
+    val themeTypography = Typography(
+        h4 = TextStyle(
+            fontFamily = appFontFamily,
+            fontWeight = FontWeight.W600,
+            fontSize = 30.sp
+        ),
+        h5 = TextStyle(
+            fontFamily = appFontFamily,
+            fontWeight = FontWeight.W600,
+            fontSize = 24.sp
+        ),
+        h6 = TextStyle(
+            fontFamily = appFontFamily,
+            fontWeight = FontWeight.W600,
+            fontSize = 20.sp
+        ),
+        subtitle1 = TextStyle(
+            fontFamily = appFontFamily,
+            fontWeight = FontWeight.W600,
+            fontSize = 16.sp
+        ),
+        subtitle2 = TextStyle(
+            fontFamily = appFontFamily,
+            fontWeight = FontWeight.W500,
+            fontSize = 14.sp
+        ),
+        body1 = TextStyle(
+            fontFamily = bodyFontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize = 16.sp
+        ),
+        body2 = TextStyle(
+            fontFamily = appFontFamily,
+            fontSize = 14.sp
+        ),
+        button = TextStyle(
+            fontFamily = appFontFamily,
+            fontWeight = FontWeight.W500,
+            fontSize = 14.sp
+        ),
+        caption = TextStyle(
+            fontFamily = appFontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize = 12.sp
+        ),
+        overline = TextStyle(
+            fontFamily = appFontFamily,
+            fontWeight = FontWeight.W500,
+            fontSize = 12.sp
+        )
+    )
 
-                it.copy(
-                    h1 = it.h1.copy(fontFamily = mediumFont, fontWeight = FontWeight.W500),
-                    h2 = it.h2.copy(fontFamily = mediumFont, fontWeight = FontWeight.W500),
-                    h3 = it.h3.copy(fontFamily = mediumFont, fontWeight = FontWeight.W500),
-                    h4 = it.h4.copy(fontFamily = mediumFont, fontWeight = FontWeight.W500),
-                    h5 = it.h5.copy(fontFamily = mediumFont, fontWeight = FontWeight.W500),
-                    h6 = it.h6.copy(fontFamily = mediumFont, fontWeight = FontWeight.W500)
-                )
-            }
-
-    MaterialTheme(colors = colors, typography = typography, children = children)
+    MaterialTheme(colors = colors, typography = themeTypography, children = children)
 }
 
 @Composable

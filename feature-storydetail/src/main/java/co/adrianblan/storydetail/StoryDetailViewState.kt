@@ -15,6 +15,7 @@ sealed class StoryDetailViewState {
 
 sealed class StoryDetailItem {
     data class CommentItem(val comment: Comment) : StoryDetailItem()
-    object CommentLoadingItem : StoryDetailItem()
-    object CommentErrorItem : StoryDetailItem()
+    object CommentsEmptyItem : StoryDetailItem()
+    object CommentsLoadingItem : StoryDetailItem()
+    object CommentsErrorItem : StoryDetailItem()
 }

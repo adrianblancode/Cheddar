@@ -5,7 +5,9 @@ import co.adrianblan.hackernews.api.Story
 
 data class StoryFeedViewState(
     val storyType: StoryType,
-    val storyFeedState: StoryFeedState
+    val storyFeedState: StoryFeedState,
+    val isLoadingMorePages: Boolean,
+    val hasLoadedAllPages: Boolean
 )
 
 sealed class StoryFeedState {

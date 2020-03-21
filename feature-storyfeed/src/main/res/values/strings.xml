@@ -1,0 +1,4 @@
+<resources>
+    <string name="stories_load_more_stories">Load more stories</string>
+    <string name="stories_no_more_stories">No more stories to load.</string>
+</resources>
