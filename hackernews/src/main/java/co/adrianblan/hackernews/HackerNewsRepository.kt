@@ -1,6 +1,5 @@
 package co.adrianblan.hackernews
 
-import android.util.LruCache
 import co.adrianblan.common.WeakCache
 import co.adrianblan.hackernews.api.*
 import javax.inject.Inject

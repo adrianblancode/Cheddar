@@ -6,9 +6,8 @@ import androidx.lifecycle.Observer
 
 @Composable
 inline fun <reified T> observe(data: LiveData<T>): T {
-    // Ugly hack with default value, otherwise will reuse state for other LiveData even if other types
     // Throw if LiveData value is null
-    val result = stateFor(data.value) { data.value!! }
+    val result = stateFor(data) { data.value!! }
     val observer = remember { Observer<T> { result.value = it } }
 
     onCommit(data) {

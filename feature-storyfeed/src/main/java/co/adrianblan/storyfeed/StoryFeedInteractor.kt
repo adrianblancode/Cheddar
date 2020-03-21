@@ -9,8 +9,10 @@ import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
+import co.adrianblan.hackernews.api.dummy
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -57,14 +59,14 @@ constructor(
             .filter { it <= MAX_PAGE }
             .map { pageIndex ->
 
-                isLoadingMorePagesChannel.send(true)
+                isLoadingMorePagesChannel.offer(true)
 
                 val offset = pageIndex * PAGE_SIZE
                 val pageStoryIds = storyIds.drop(offset).take(PAGE_SIZE)
 
                 if (pageStoryIds.isEmpty()) {
-                    isLoadingMorePagesChannel.send(false)
-                    hasLoadedAllPagesChannel.send(true)
+                    isLoadingMorePagesChannel.offer(false)
+                    hasLoadedAllPagesChannel.offer(true)
 
                     emptyList()
                 } else {
@@ -74,36 +76,38 @@ constructor(
                         }
                         .toList()
                         .also {
-                            isLoadingMorePagesChannel.send(false)
                             currentPageIndexGate = pageIndex
+                            isLoadingMorePagesChannel.offer(false)
                         }
                 }
             }
             .filter { it.isNotEmpty() }
+            .scanReduce { l1, l2 -> l1 + l2 }
 
     init {
         scope.launch {
             combine(
                 storyTypeChannel.asFlow()
                     .distinctUntilChanged()
+                    .conflate()
                     .flatMapLatest { storyType ->
-                        flow {
-                            emit(StoryFeedState.Loading)
+                        channelFlow<StoryFeedState> {
+                            offer(StoryFeedState.Loading)
 
                             val storyIds: List<StoryId> =
                                 hackerNewsRepository.fetchStories(storyType)
 
                             observePaginatedStories(storyIds)
-                                .scanReduce { l1, l2 -> l1 + l2 }
                                 .catch { t ->
                                     if (t is CancellationException) throw t
                                     else {
                                         Timber.e(t)
-                                        emit(StoryFeedState.Error)
+                                        offer(StoryFeedState.Error)
                                     }
                                 }
-                                .collect { stories ->
-                                    emit(StoryFeedState.Success(stories))
+                                .collectLatest { stories ->
+                                    ensureActive()
+                                    offer(StoryFeedState.Success(stories))
                                 }
                         }
                             .map { storyFeedState ->
@@ -127,9 +131,10 @@ constructor(
                     hasLoadedAllPages = hasLoadedAllPages
                 )
             }
-                .flowOn(dispatcherProvider.IO)
                 .distinctUntilChanged()
+                .flowOn(dispatcherProvider.IO)
                 .collectLatest { storyViewState ->
+                    ensureActive()
                     _viewState.value = storyViewState
                 }
         }
@@ -147,7 +152,7 @@ constructor(
     }
 
     companion object {
-        private const val PAGE_SIZE = 20
+        private const val PAGE_SIZE = 16
         private const val MAX_PAGE = 500 / PAGE_SIZE
     }
 }
