@@ -28,7 +28,6 @@ object HackerNewsModule {
         Retrofit.Builder()
             .baseUrl("https://hacker-news.firebaseio.com/v0/")
             .addConverterFactory(
-                // Accept unknown keys
                 Json(JsonConfiguration(ignoreUnknownKeys = true))
                     .asConverterFactory("application/json".toMediaType())
             )

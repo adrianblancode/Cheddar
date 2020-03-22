@@ -1,6 +1,6 @@
 package co.adrianblan.cheddar.di
 
-import co.adrianblan.cheddar.RootComposer
+import co.adrianblan.cheddar.RootNode
 import co.adrianblan.common.ParentScope
 import co.adrianblan.storyfeed.StoryFeedComponent
 import co.adrianblan.storydetail.StoryDetailComponent
@@ -24,7 +24,7 @@ object RootModule
     dependencies = [AppComponent::class]
 )
 interface RootComponent {
-    fun rootComposer(): RootComposer
+    fun rootNode(): RootNode
 
     @Component.Factory
     interface Factory {

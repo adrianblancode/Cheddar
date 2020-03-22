@@ -14,7 +14,7 @@ import androidx.ui.unit.px
 
 @Composable
 fun RootScreen(router: Router) {
-    Crossfade(router.composers.lastOrNull()) {
+    Crossfade(router.nodes.lastOrNull()) {
         Stack {
             it?.composeView?.invoke()
 

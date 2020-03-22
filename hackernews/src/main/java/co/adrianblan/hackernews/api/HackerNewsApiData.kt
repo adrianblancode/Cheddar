@@ -1,6 +1,8 @@
+@file:UseSerializers(InstantSerializer::class)
 package co.adrianblan.hackernews.api
 
 import kotlinx.serialization.*
+import java.time.Instant
 
 @Serializable(with = StoryIdSerializer::class)
 data class StoryId(val id: Long)
@@ -11,7 +13,7 @@ data class Story(
     val title: String,
     val text: String? = null,
     val by: String,
-    val time: Long,
+    val time: Instant,
     val url: String? = null,
     val kids: List<CommentId> = emptyList(),
     val score: Int? = null,
@@ -27,6 +29,6 @@ data class Comment(
     // Comments can be deleted
     val text: String? = null,
     val by: String? = null,
-    val time: Long,
+    val time: Instant,
     val kids: List<CommentId> = emptyList()
 )

@@ -1,16 +1,16 @@
 package co.adrianblan.storyfeed
 
 import androidx.compose.Composable
-import co.adrianblan.ui.Composer
+import co.adrianblan.ui.Node
 import co.adrianblan.hackernews.api.StoryId
 import kotlinx.coroutines.cancel
 import javax.inject.Inject
 
-class StoryFeedComposer
+class StoryFeedNode
 @Inject constructor(
     private val storyFeedInteractor: StoryFeedInteractor,
     @StoryFeedInternal private val listener: Listener
-): Composer {
+): Node {
 
     interface Listener {
         fun onStoryClicked(storyId: StoryId)

@@ -16,6 +16,9 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+
+        // Enable support for new Java APIs
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
@@ -40,6 +43,8 @@ dependencies {
         implementation(Dependencies.dagger)
         kapt(Dependencies.daggerCompiler)
     }
+
+    coreLibraryDesugaring(Dependencies.desugar)
 
     testImplementation(Dependencies.junit)
     androidTestImplementation(Dependencies.androidTestJunit)

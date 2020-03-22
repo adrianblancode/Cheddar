@@ -16,13 +16,13 @@ class RootViewModel(
 
     private val scope = MainScope()
 
-    val rootComposer =
+    val rootNode =
         DaggerRootComponent.factory()
             .build(
                 parentScope = ParentScope.of(scope),
                 appComponent = application.appComponent
             )
-            .rootComposer()
+            .rootNode()
 
     override fun onCleared() {
         super.onCleared()

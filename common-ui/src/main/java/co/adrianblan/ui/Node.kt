@@ -2,7 +2,7 @@ package co.adrianblan.ui
 
 import androidx.compose.Composable
 
-interface Composer {
+interface Node {
 
     val composeView: @Composable() () -> Unit
 

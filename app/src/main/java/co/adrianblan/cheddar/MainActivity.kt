@@ -15,7 +15,7 @@ import co.adrianblan.ui.extensions.orientation
 class MainActivity : AppCompatActivity() {
 
     private val rootViewModel : RootViewModel by viewModels()
-    private val rootComposer: RootComposer get() = rootViewModel.rootComposer
+    private val rootNode: RootNode get() = rootViewModel.rootNode
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,14 +44,14 @@ class MainActivity : AppCompatActivity() {
         setContent {
             AppTheme {
                 InsetsWrapper(contentView) {
-                    rootComposer.composeView()
+                    rootNode.composeView()
                 }
             }
         }
     }
 
     override fun onBackPressed() {
-        if (!rootComposer.onBackPressed()) {
+        if (!rootNode.onBackPressed()) {
             super.onBackPressed()
         }
     }

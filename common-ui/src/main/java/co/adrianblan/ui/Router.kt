@@ -5,32 +5,32 @@ import androidx.compose.frames.ModelList
 import androidx.compose.frames.modelListOf
 
 interface Router {
-    val composers: List<Composer>
+    val nodes: List<Node>
     fun onBackPressed(): Boolean
 }
 
 @Model
 class StackRouter private constructor(
-    override val composers: ModelList<Composer>
+    override val nodes: ModelList<Node>
 ): Router {
 
-    fun push(composer: Composer) =
-        composers.add(composer)
+    fun push(node: Node) =
+        nodes.add(node)
 
     private fun pop() {
-        composers.removeAt(composers.size - 1)
+        nodes.removeAt(nodes.size - 1)
             .apply {
                 detach()
             }
     }
 
-    private fun canPop() = composers.size > 1
+    private fun canPop() = nodes.size > 1
 
     override fun onBackPressed(): Boolean {
         // Iterate through stack of children, see if any children handle it
-        composers.reversed()
-            .forEach { composer ->
-                if (composer.onBackPressed()) {
+        nodes.reversed()
+            .forEach { node ->
+                if (node.onBackPressed()) {
                     return true
                 }
             }
@@ -42,7 +42,7 @@ class StackRouter private constructor(
     }
 
     companion object {
-        fun of(initialComposer: Composer): StackRouter =
-            StackRouter(modelListOf(initialComposer))
+        fun of(initialNode: Node): StackRouter =
+            StackRouter(modelListOf(initialNode))
     }
 }

@@ -11,13 +11,13 @@ import javax.inject.Scope
 @Subcomponent
 interface StoryDetailComponent {
 
-    fun storyDetailComposer(): StoryDetailComposer
+    fun storyDetailNode(): StoryDetailNode
 
     @Subcomponent.Factory
     interface Factory {
         fun build(
             @StoryDetailInternal @BindsInstance storyId: StoryId,
-            @StoryDetailInternal @BindsInstance listener: StoryDetailComposer.Listener,
+            @StoryDetailInternal @BindsInstance listener: StoryDetailNode.Listener,
             @StoryDetailInternal @BindsInstance parentScope: ParentScope
         ): StoryDetailComponent
     }

@@ -1,16 +1,16 @@
 package co.adrianblan.storydetail
 
 import androidx.compose.Composable
-import co.adrianblan.ui.Composer
+import co.adrianblan.ui.Node
 import kotlinx.coroutines.cancel
 import javax.inject.Inject
 
 
-class StoryDetailComposer
+class StoryDetailNode
 @Inject constructor(
     private val storyDetailInteractor: StoryDetailInteractor,
     @StoryDetailInternal private val listener: Listener
-): Composer {
+): Node {
 
     interface Listener {
         fun onStoryContentClicked(storyContentUrl: String)

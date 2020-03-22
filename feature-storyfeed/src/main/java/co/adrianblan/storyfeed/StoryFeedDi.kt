@@ -10,12 +10,12 @@ import javax.inject.Scope
 @Subcomponent
 interface StoryFeedComponent {
 
-    fun storyFeedComposer(): StoryFeedComposer
+    fun storyFeedNode(): StoryFeedNode
 
     @Subcomponent.Factory
     interface Factory {
         fun build(
-            @StoryFeedInternal @BindsInstance listener: StoryFeedComposer.Listener,
+            @StoryFeedInternal @BindsInstance listener: StoryFeedNode.Listener,
             @StoryFeedInternal @BindsInstance parentScope: ParentScope
         ): StoryFeedComponent
     }

@@ -46,6 +46,8 @@ object Dependencies {
     const val dagger = "com.google.dagger:dagger:${Versions.dagger}"
     const val daggerCompiler = "com.google.dagger:dagger-compiler:${Versions.dagger}"
 
+    const val desugar = "com.android.tools:desugar_jdk_libs:1.0.4"
+
     const val okhttpCore = "com.squareup.okhttp3:okhttp:${Versions.okhttp}"
     const val okhttpLoggingInterceptor =  "com.squareup.okhttp3:logging-interceptor:${Versions.okhttp}"
     const val retrofitCore = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
