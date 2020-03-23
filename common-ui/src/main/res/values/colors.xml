@@ -3,4 +3,6 @@
     <color name="colorPrimary">#FFF</color>
     <color name="colorPrimaryDark">#AFFF</color>
     <color name="colorAccent">#FF6600</color>
+
+    <color name="contentLoading">#CCC</color>
 </resources>

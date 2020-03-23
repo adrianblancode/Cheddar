@@ -24,4 +24,6 @@ dependencies {
     api(Dependencies.composeAnimation)
     api(Dependencies.composeTooling)
     api(Dependencies.composeIcons)
+
+    api(Dependencies.picasso)
 }

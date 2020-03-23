@@ -52,6 +52,10 @@ object Dependencies {
     const val okhttpLoggingInterceptor =  "com.squareup.okhttp3:logging-interceptor:${Versions.okhttp}"
     const val retrofitCore = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
     const val retrofitSerializationConverter = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0"
+
+    const val picasso = "com.squareup.picasso:picasso:2.71828"
+    const val jsoup = "org.jsoup:jsoup:1.13.1"
+
     const val leakcanary = "com.squareup.leakcanary:leakcanary-android:2.2"
     const val timber = "com.jakewharton.timber:timber:4.7.1"
 

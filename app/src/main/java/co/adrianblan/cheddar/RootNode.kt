@@ -11,6 +11,7 @@ import co.adrianblan.ui.Node
 import co.adrianblan.ui.RootScreen
 import co.adrianblan.ui.StackRouter
 import co.adrianblan.hackernews.api.StoryId
+import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.storyfeed.StoryFeedComponent
 import co.adrianblan.storyfeed.StoryFeedNode
 import co.adrianblan.storydetail.StoryDetailComponent
@@ -51,13 +52,13 @@ class RootNode
         )
     }
 
-    override fun onStoryContentClicked(storyContentUrl: String) {
+    override fun onStoryContentClicked(storyUrl: StoryUrl) {
         CustomTabsIntent.Builder()
             .build()
             .apply {
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
             }
-            .launchUrl(context, storyContentUrl.toUri())
+            .launchUrl(context, storyUrl.url.toUri())
     }
 
     override fun onStoryDetailFinished() {

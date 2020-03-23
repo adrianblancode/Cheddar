@@ -14,6 +14,7 @@ import androidx.ui.material.icons.Icons
 import androidx.ui.material.icons.filled.ArrowDropDown
 import androidx.ui.material.ripple.Ripple
 import androidx.ui.material.surface.Surface
+import androidx.ui.res.colorResource
 import androidx.ui.res.stringResource
 import androidx.ui.text.style.TextAlign
 import androidx.ui.text.style.TextOverflow
@@ -22,9 +23,11 @@ import androidx.ui.unit.*
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
+import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.hackernews.api.dummy
 import co.adrianblan.ui.*
 import co.adrianblan.ui.InsetsAmbient
+import co.adrianblan.webpreview.WebPreviewData
 
 private const val toolbarMinHeightDp = 56
 private const val toolbarMaxHeightDp = 128
@@ -44,12 +47,14 @@ fun StoryFeedScreen(
     viewState: LiveData<StoryFeedViewState>,
     onStoryTypeClick: (StoryType) -> Unit,
     onStoryClick: (StoryId) -> Unit,
+    onStoryContentClick: (StoryUrl) -> Unit,
     onPageEndReached: () -> Unit
 ) {
     StoryFeedView(
         viewState = observe(viewState),
         onStoryTypeClick = onStoryTypeClick,
         onStoryClick = onStoryClick,
+        onStoryContentClick = onStoryContentClick,
         onPageEndReached = onPageEndReached
     )
 }
@@ -59,6 +64,7 @@ fun StoryFeedView(
     viewState: StoryFeedViewState,
     onStoryTypeClick: (StoryType) -> Unit,
     onStoryClick: (StoryId) -> Unit,
+    onStoryContentClick: (StoryUrl) -> Unit,
     onPageEndReached: () -> Unit
 ) {
     val scroller = ScrollerPosition()
@@ -90,6 +96,7 @@ fun StoryFeedView(
                 scroller = scroller,
                 viewState = viewState,
                 onStoryClick = onStoryClick,
+                onStoryContentClick = onStoryContentClick,
                 onPageEndReached = onPageEndReached
             )
         }
@@ -101,6 +108,7 @@ fun StoryFeedBodyContent(
     scroller: ScrollerPosition,
     viewState: StoryFeedViewState,
     onStoryClick: (StoryId) -> Unit,
+    onStoryContentClick: (StoryUrl) -> Unit,
     onPageEndReached: () -> Unit
 ) {
 
@@ -111,6 +119,7 @@ fun StoryFeedBodyContent(
                 scroller = scroller,
                 viewState = viewState,
                 onStoryClick = onStoryClick,
+                onStoryContentClick = onStoryContentClick,
                 onPageEndReached = onPageEndReached
             )
         }
@@ -123,24 +132,27 @@ fun StoryFeedSuccessContentBody(
     scroller: ScrollerPosition,
     viewState: StoryFeedViewState,
     onStoryClick: (StoryId) -> Unit,
+    onStoryContentClick: (StoryUrl) -> Unit,
     onPageEndReached: () -> Unit
 ) {
     val storyFeedState = viewState.storyFeedState as StoryFeedState.Success
 
-    val scrollEndZone: Px =  with(DensityAmbient.current) { 120.dp.toPx() }
+    val scrollEndZone: Px = with(DensityAmbient.current) { 400.dp.toPx() }
 
-    /*
     Observe {
         val isScrolledToEnd: Boolean =
             scroller.value > scroller.maxPosition - scrollEndZone.value
 
         onCommit(isScrolledToEnd) {
             if (isScrolledToEnd) {
+
+                // Stop scroll fling
+                scroller.scrollTo(scroller.value)
+
                 onPageEndReached()
             }
         }
     }
-     */
 
     // TODO change to AdapterList
     VerticalScroller(scrollerPosition = scroller) {
@@ -154,21 +166,19 @@ fun StoryFeedSuccessContentBody(
                 Spacer(modifier = LayoutHeight(toolbarMaxHeightDp.dp + topInsets))
 
                 storyFeedState.stories.map { story ->
-                    key(story.id) {
-                        StoryFeedItem(story, onStoryClick)
+                    key(story.story.id) {
+                        StoryFeedItem(
+                            decoratedStory = story,
+                            onStoryClick = onStoryClick,
+                            onStoryContentClick = onStoryContentClick
+                        )
                     }
                 }
 
                 when {
                     viewState.isLoadingMorePages -> LoadingMoreStoriesView()
+                    !viewState.hasLoadedAllPages -> LoadMoreStoriesButton(onPageEndReached = onPageEndReached)
                     viewState.hasLoadedAllPages -> NoMoreStoriesView()
-                    !viewState.hasLoadedAllPages ->
-                        Button(
-                            modifier = LayoutWidth.Fill + LayoutHeight.Min(72.dp),
-                            onClick = onPageEndReached
-                        ) {
-                            Text(stringResource(R.string.stories_load_more_stories))
-                        }
                 }
 
                 Spacer(modifier = LayoutHeight(insets.bottom.px.toDp() + 8.dp))
@@ -178,86 +188,54 @@ fun StoryFeedSuccessContentBody(
 }
 
 @Composable
-fun StoryFeedToolbar(
-    collapsedFraction: Float,
-    height: Dp,
-    storyType: StoryType,
-    onStoryTypeClick: (StoryType) -> Unit
+fun StoryFeedItem(
+    decoratedStory: DecoratedStory,
+    onStoryClick: (StoryId) -> Unit,
+    onStoryContentClick: (StoryUrl) -> Unit
 ) {
+    val story = decoratedStory.story
+    val webPreview = decoratedStory.webPreview
 
-    Container(
-        padding = EdgeInsets(12.dp),
-        alignment = Alignment.BottomLeft,
-        modifier = LayoutHeight(height)
-    ) {
-
-        val headerTextSize =
-            lerp(
-                MaterialTheme.typography().h4.fontSize,
-                MaterialTheme.typography().h6.fontSize,
-                collapsedFraction
-            )
-
-        val showStoryTypePopup = state { false }
-
-        // Seems like if statement does not automatically recompose on state change
-        Recompose { recompose ->
-            StoryFeedHeader(
-                headerTextSize = headerTextSize,
-                storyType = storyType
+    Ripple(bounded = true) {
+        Clickable(onClick = { onStoryClick(story.id) }) {
+            Container(
+                padding = EdgeInsets(left = 16.dp, right = 16.dp, top = 16.dp, bottom = 12.dp)
             ) {
-                showStoryTypePopup.value = true
-                recompose()
-            }
-
-            if (showStoryTypePopup.value) {
-                StoryTypePopup(
-                    onStoryTypeClick = { storyType ->
-                        onStoryTypeClick(storyType)
-                        showStoryTypePopup.value = false
-                        recompose()
-                    },
-                    onDismiss = {
-                        showStoryTypePopup.value = false
-                        recompose()
-                    }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun StoryFeedHeader(
-    storyType: StoryType,
-    headerTextSize: TextUnit = MaterialTheme.typography().h6.fontSize,
-    onClick: () -> Unit
-) {
-    Surface(
-        shape = RoundedCornerShape(4.dp),
-        color = Color.Transparent
-    ) {
-        Ripple(true) {
-            Clickable(onClick = onClick) {
-                Container(padding = EdgeInsets(4.dp)) {
-                    Row {
-                        val title = remember(storyType) {
-                            stringResource(storyType.titleStringResource())
-                        }
-
+                Row {
+                    Column(
+                        arrangement = Arrangement.Begin,
+                        modifier = LayoutFlexible(1f)
+                    ) {
                         Text(
-                            text = title,
-                            style = MaterialTheme.typography().h4
-                                .copy(
-                                    fontSize = headerTextSize,
-                                    color = MaterialTheme.colors().onPrimary
-                                )
+                            text = story.title,
+                            style = MaterialTheme.typography().subtitle1
                         )
-                        VectorImage(
-                            vector = Icons.Default.ArrowDropDown,
-                            tint = MaterialTheme.colors().onBackground,
-                            modifier = LayoutGravity.Center
-                        )
+                        val description: String? =
+                            story.text
+                                .takeIf { !it.isNullOrEmpty() }
+                                ?.let {
+                                    Html.fromHtml(it).toString()
+                                        .replace("\n\n", " ")
+                                }
+                                ?: webPreview?.description
+
+                        if (description != null)
+                            Text(
+                                text = description,
+                                style = MaterialTheme.typography().body2,
+                                maxLines = 2,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                    }
+
+                    story.url?.let { storyUrl ->
+                        Spacer(modifier = LayoutWidth(12.dp))
+                        StoryFeedImage(
+                            storyId = story.id,
+                            webPreview = webPreview
+                        ) {
+                            onStoryContentClick(storyUrl)
+                        }
                     }
                 }
             }
@@ -266,34 +244,29 @@ fun StoryFeedHeader(
 }
 
 @Composable
-fun StoryFeedItem(
-    story: Story,
-    onStoryClick: (StoryId) -> Unit
+private fun StoryFeedImage(
+    @Pivotal storyId: StoryId,
+    webPreview: WebPreviewData?,
+    onClick: () -> Unit
 ) {
-    Ripple(bounded = true) {
-        Clickable(onClick = { onStoryClick(story.id) }) {
-            Container(
-                padding = EdgeInsets(left = 16.dp, right = 16.dp, top = 16.dp, bottom = 12.dp)
-            ) {
-                Column(
-                    arrangement = Arrangement.Begin,
-                    modifier = LayoutWidth.Fill
-                ) {
-                    Text(
-                        text = story.title,
-                        style = MaterialTheme.typography().subtitle1
-                    )
-                    story.text
-                        .takeIf { !it.isNullOrEmpty() }
-                        ?.let { text ->
-                            Text(
-                                text = Html.fromHtml(text).toString()
-                                    .replace("\n\n", " "),
-                                style = MaterialTheme.typography().body2,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        }
+    Surface(
+        shape = RoundedCornerShape(8.dp),
+        modifier = LayoutWidth(80.dp) + LayoutHeight(80.dp)
+    ) {
+        Ripple(bounded = true) {
+            Clickable(onClick = onClick) {
+                Stack {
+                    Surface(
+                        color = colorResource(R.color.contentLoading),
+                        modifier = LayoutWidth.Fill + LayoutHeight.Fill
+                    ) {}
+
+                    val imageUrl =
+                        webPreview?.imageUrl ?: webPreview?.iconUrl ?: webPreview?.favIconUrl
+
+                    if (imageUrl != null) {
+                        UrlImage(imageUrl)
+                    }
                 }
             }
         }
@@ -312,6 +285,28 @@ private fun LoadingMoreStoriesView() {
                 ),
             modifier = LayoutAlign.Center
         )
+    }
+}
+
+@Composable
+private fun LoadMoreStoriesButton(
+    onPageEndReached: () -> Unit
+) {
+    Container(modifier = LayoutWidth.Fill) {
+        Button(
+            modifier = LayoutAlign.Center,
+            onClick = onPageEndReached
+        ) {
+            Text(
+                stringResource(R.string.stories_load_more_stories),
+                modifier = LayoutPadding(
+                    left = 16.dp,
+                    right = 16.dp,
+                    top = 8.dp,
+                    bottom = 8.dp
+                )
+            )
+        }
     }
 }
 
@@ -340,7 +335,7 @@ fun StoryFeedPreview() {
     AppTheme {
         val viewState = StoryFeedViewState(
             StoryType.TOP,
-            StoryFeedState.Success(listOf(Story.dummy)),
+            StoryFeedState.Success(List(10) { DecoratedStory(Story.dummy, null) }),
             isLoadingMorePages = true,
             hasLoadedAllPages = false
         )
@@ -349,6 +344,7 @@ fun StoryFeedPreview() {
             viewState,
             onStoryTypeClick = {},
             onStoryClick = {},
+            onStoryContentClick = {},
             onPageEndReached = {}
         )
     }

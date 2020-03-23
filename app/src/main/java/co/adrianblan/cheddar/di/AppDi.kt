@@ -6,6 +6,7 @@ import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.hackernews.HackerNewsModule
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.network.NetworkModule
+import co.adrianblan.webpreview.WebPreviewRepository
 import dagger.*
 import javax.inject.Singleton
 
@@ -29,6 +30,7 @@ interface AppComponent {
     
     fun dispatcherProvider(): DispatcherProvider
     fun hackerNewsRepository(): HackerNewsRepository
+    fun webPreviewRepository(): WebPreviewRepository
 
     @Component.Factory
     interface Factory {

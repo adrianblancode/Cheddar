@@ -7,6 +7,9 @@ import java.time.Instant
 @Serializable(with = StoryIdSerializer::class)
 data class StoryId(val id: Long)
 
+@Serializable(with = StoryUrlSerializer::class)
+data class StoryUrl(val url: String)
+
 @Serializable
 data class Story(
     val id: StoryId,
@@ -14,7 +17,7 @@ data class Story(
     val text: String? = null,
     val by: String,
     val time: Instant,
-    val url: String? = null,
+    val url: StoryUrl? = null,
     val kids: List<CommentId> = emptyList(),
     val score: Int? = null,
     val descendants: Int? = null

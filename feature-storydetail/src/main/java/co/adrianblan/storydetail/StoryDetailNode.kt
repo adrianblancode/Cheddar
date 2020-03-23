@@ -1,6 +1,7 @@
 package co.adrianblan.storydetail
 
 import androidx.compose.Composable
+import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.ui.Node
 import kotlinx.coroutines.cancel
 import javax.inject.Inject
@@ -13,14 +14,14 @@ class StoryDetailNode
 ): Node {
 
     interface Listener {
-        fun onStoryContentClicked(storyContentUrl: String)
+        fun onStoryContentClicked(storyUrl: StoryUrl)
         fun onStoryDetailFinished()
     }
 
     override val composeView = @Composable {
         StoryDetailScreen(
             viewState = storyDetailInteractor.viewState,
-            onStoryContentClicked = { listener.onStoryContentClicked(it) },
+            onStoryContentClick = { listener.onStoryContentClicked(it) },
             onBackPressed = { listener.onStoryDetailFinished() }
         )
     }

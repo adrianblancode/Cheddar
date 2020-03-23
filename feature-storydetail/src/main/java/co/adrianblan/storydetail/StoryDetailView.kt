@@ -23,6 +23,7 @@ import androidx.ui.unit.lerp
 import androidx.ui.unit.px
 import co.adrianblan.hackernews.api.Comment
 import co.adrianblan.hackernews.api.Story
+import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.hackernews.api.dummy
 import co.adrianblan.ui.*
 import co.adrianblan.ui.InsetsAmbient
@@ -32,20 +33,20 @@ private const val toolbarMaxHeightDp = 128
 @Composable
 fun StoryDetailScreen(
     viewState: LiveData<StoryDetailViewState>,
-    onStoryContentClicked: (String) -> Unit,
+    onStoryContentClick: (StoryUrl) -> Unit,
     onBackPressed: () -> Unit
 ) {
     StoryDetailView(
-        observe(viewState),
-        onStoryContentClicked,
-        onBackPressed
+        viewState = observe(viewState),
+        onStoryContentClick = onStoryContentClick,
+        onBackPressed = onBackPressed
     )
 }
 
 @Composable
 fun StoryDetailView(
     viewState: StoryDetailViewState,
-    onStoryContentClicked: (String) -> Unit,
+    onStoryContentClick: (StoryUrl) -> Unit,
     onBackPressed: () -> Unit
 ) {
 
@@ -103,7 +104,7 @@ fun StoryDetailView(
                 with(DensityAmbient.current) {
                     Container(padding = EdgeInsets(bottom = insets.bottom.px.toDp())) {
                         FloatingActionButton(
-                            onClick = { onStoryContentClicked(url) }
+                            onClick = { onStoryContentClick(url) }
                         ) {
                             VectorImage(
                                 vector = Icons.Default.ArrowForward,
@@ -194,8 +195,8 @@ fun StoryDetailPreview() {
                 )
             )
         StoryDetailView(
-            viewState,
-            onStoryContentClicked = {},
+            viewState = viewState,
+            onStoryContentClick = {},
             onBackPressed = {}
         )
     }

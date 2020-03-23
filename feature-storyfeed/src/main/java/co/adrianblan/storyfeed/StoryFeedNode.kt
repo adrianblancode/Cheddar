@@ -3,6 +3,7 @@ package co.adrianblan.storyfeed
 import androidx.compose.Composable
 import co.adrianblan.ui.Node
 import co.adrianblan.hackernews.api.StoryId
+import co.adrianblan.hackernews.api.StoryUrl
 import kotlinx.coroutines.cancel
 import javax.inject.Inject
 
@@ -14,20 +15,16 @@ class StoryFeedNode
 
     interface Listener {
         fun onStoryClicked(storyId: StoryId)
+        fun onStoryContentClicked(storyUrl: StoryUrl)
     }
 
     override val composeView = @Composable {
         StoryFeedScreen(
             viewState = storyFeedInteractor.viewState,
-            onStoryTypeClick = { storyType ->
-                storyFeedInteractor.onStoryTypeChanged(storyType)
-            },
-            onStoryClick = {
-                listener.onStoryClicked(it)
-            },
-            onPageEndReached = {
-                storyFeedInteractor.onPageEndReached()
-            }
+            onStoryTypeClick = { storyFeedInteractor.onStoryTypeChanged(it) },
+            onStoryClick = { listener.onStoryClicked(it) },
+            onStoryContentClick = { listener.onStoryContentClicked(it) },
+            onPageEndReached = { storyFeedInteractor.onPageEndReached() }
         )
     }
 

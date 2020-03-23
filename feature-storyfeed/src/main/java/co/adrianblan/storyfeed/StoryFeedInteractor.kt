@@ -4,12 +4,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.ParentScope
+import co.adrianblan.common.onFirst
 import co.adrianblan.ui.Interactor
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.dummy
+import co.adrianblan.webpreview.WebPreviewData
+import co.adrianblan.webpreview.WebPreviewRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.ensureActive
@@ -22,6 +25,7 @@ class StoryFeedInteractor
 @Inject
 constructor(
     private val hackerNewsRepository: HackerNewsRepository,
+    private val webPreviewRepository: WebPreviewRepository,
     override val dispatcherProvider: DispatcherProvider,
     @StoryFeedInternal override val parentScope: ParentScope
 ) : Interactor() {
@@ -52,37 +56,84 @@ constructor(
 
     private val hasLoadedAllPagesChannel = ConflatedBroadcastChannel<Boolean>(false)
 
-    private fun observePaginatedStories(storyIds: List<StoryId>): Flow<List<Story>> =
+    // Observes a decorated story, it will first emit the story and then try to emit decorated data as well
+    private fun observeDecoratedStory(storyId: StoryId): Flow<DecoratedStory> =
+        flow {
+            val story = hackerNewsRepository.fetchStory(storyId)
+
+            emit(DecoratedStory(story, null))
+
+            story.url
+                ?.let { storyUrl ->
+                    try {
+                        val webPreview = webPreviewRepository.fetchWebPreview(storyUrl.url)
+                        emit(DecoratedStory(story, webPreview))
+                    } catch (t: Throwable) {
+                        Timber.e(t)
+                        // TODO emit error result
+                    }
+                }
+        }
+
+    // Takes a page, and observes the list of stories in the page
+    private fun observePage(pageIndex: Int, storyIds: List<StoryId>): Flow<List<DecoratedStory>> {
+
+        val offset = pageIndex * PAGE_SIZE
+        val pageStoryIds = storyIds.drop(offset).take(PAGE_SIZE)
+
+        return if (pageStoryIds.isEmpty()) flowOf(emptyList())
+        else {
+            combine(
+                pageStoryIds
+                    .map { storyId ->
+                        observeDecoratedStory(storyId)
+                    }
+            ) { decoratedStories ->
+                decoratedStories.toList()
+            }
+        }
+    }
+
+    // Takes a list of story ids, and observes the full list of stories based on pagination
+    private fun observePaginatedStories(storyIds: List<StoryId>): Flow<List<DecoratedStory>> =
         pageIndexChannel.asFlow()
             .conflate()
             .distinctUntilChanged()
             .filter { it <= MAX_PAGE }
-            .map { pageIndex ->
+            .flatMapConcat { pageIndex ->
 
                 isLoadingMorePagesChannel.offer(true)
 
-                val offset = pageIndex * PAGE_SIZE
-                val pageStoryIds = storyIds.drop(offset).take(PAGE_SIZE)
+                observePage(pageIndex, storyIds)
+                    .onFirst { stories ->
+                        isLoadingMorePagesChannel.offer(false)
 
-                if (pageStoryIds.isEmpty()) {
-                    isLoadingMorePagesChannel.offer(false)
-                    hasLoadedAllPagesChannel.offer(true)
-
-                    emptyList()
-                } else {
-                    pageStoryIds.asFlow()
-                        .map { storyId ->
-                            hackerNewsRepository.fetchStory(storyId)
-                        }
-                        .toList()
-                        .also {
-                            currentPageIndexGate = pageIndex
-                            isLoadingMorePagesChannel.offer(false)
-                        }
-                }
+                        if (stories.isEmpty()) hasLoadedAllPagesChannel.offer(false)
+                        else currentPageIndexGate = pageIndex
+                    }
+                    .map { pageStories ->
+                        pageIndex to pageStories
+                    }
             }
-            .filter { it.isNotEmpty() }
-            .scanReduce { l1, l2 -> l1 + l2 }
+            .scanReducePages()
+
+    /** Takes in a flow that returns pages of values, and emits a flow with the sorted latest emission per page */
+    private fun <T> Flow<Pair<Int, List<T>>>.scanReducePages(): Flow<List<T>> = flow {
+
+        val map = mutableMapOf<Int, List<T>>()
+
+        collect { (pageIndex: Int, value: List<T>) ->
+            map[pageIndex] = value
+
+            val sortedPages: List<T> =
+                map.entries
+                    .sortedBy { it.key }
+                    .map { it.value }
+                    .flatten()
+
+            emit(sortedPages)
+        }
+    }
 
     init {
         scope.launch {
@@ -152,7 +203,7 @@ constructor(
     }
 
     companion object {
-        private const val PAGE_SIZE = 16
+        private const val PAGE_SIZE = 20
         private const val MAX_PAGE = 500 / PAGE_SIZE
     }
 }

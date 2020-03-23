@@ -15,6 +15,18 @@ object StoryIdSerializer : KSerializer<StoryId> {
         StoryId(decoder.decodeLong())
 }
 
+@Serializer(forClass = StoryUrl::class)
+object StoryUrlSerializer : KSerializer<StoryUrl?> {
+
+    override fun serialize(encoder: Encoder, value: StoryUrl?) =
+        encoder.encodeString(value?.url.orEmpty())
+
+    override fun deserialize(decoder: Decoder): StoryUrl? =
+        decoder.decodeString()
+            .takeIf { it.isNotEmpty() }
+            ?.let { StoryUrl(it) }
+}
+
 @Serializer(forClass = CommentId::class)
 object CommentIdSerializer : KSerializer<CommentId> {
 

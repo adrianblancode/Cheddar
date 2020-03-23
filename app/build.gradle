@@ -54,6 +54,7 @@ dependencies {
     implementation(project(":common-ui"))
     implementation project(":network")
     implementation project(":hackernews")
+    implementation(project(":webpreview"))
     implementation(project(':feature-storyfeed'))
     implementation(project(':feature-storydetail'))
 
