@@ -16,8 +16,8 @@ import androidx.ui.text.font.fontFamily
 import androidx.ui.unit.sp
 import co.adrianblan.ui.extensions.isNightModeActive
 
-val textSecondaryAlpha = 0.8f
-val textTertiaryAlpha = 0.6f
+const val textSecondaryAlpha = 0.87f
+const val textTertiaryAlpha = 0.6f
 
 @Composable
 fun AppTheme(children: @Composable() () -> Unit) {

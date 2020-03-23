@@ -58,13 +58,13 @@ fun StoryTypePopupItem(storyType: StoryType, onClick: (StoryType) -> Unit) {
     Ripple(bounded = true) {
         Clickable(onClick = { onClick(storyType) }) {
             Container(
-                padding = EdgeInsets(8.dp),
                 modifier = LayoutWidth.Fill,
                 alignment = Alignment.BottomLeft
             ) {
                 Text(
                     text = stringResource(storyType.titleStringResource()),
-                    style = MaterialTheme.typography().subtitle1
+                    style = MaterialTheme.typography().h6,
+                    modifier = LayoutPadding(left = 12.dp, right = 12.dp, top = 8.dp, bottom = 6.dp)
                 )
             }
         }

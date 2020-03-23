@@ -6,16 +6,16 @@ import androidx.lifecycle.LiveData
 import androidx.ui.core.*
 import androidx.ui.foundation.*
 import androidx.ui.foundation.shape.corner.RoundedCornerShape
-import androidx.ui.graphics.Color
 import androidx.ui.layout.*
 import androidx.ui.material.Button
 import androidx.ui.material.MaterialTheme
-import androidx.ui.material.icons.Icons
-import androidx.ui.material.icons.filled.ArrowDropDown
 import androidx.ui.material.ripple.Ripple
 import androidx.ui.material.surface.Surface
 import androidx.ui.res.colorResource
 import androidx.ui.res.stringResource
+import androidx.ui.text.AnnotatedString
+import androidx.ui.text.SpanStyle
+import androidx.ui.text.length
 import androidx.ui.text.style.TextAlign
 import androidx.ui.text.style.TextOverflow
 import androidx.ui.tooling.preview.Preview
@@ -196,49 +196,103 @@ fun StoryFeedItem(
     val story = decoratedStory.story
     val webPreview = decoratedStory.webPreview
 
-    Ripple(bounded = true) {
-        Clickable(onClick = { onStoryClick(story.id) }) {
-            Container(
-                padding = EdgeInsets(left = 16.dp, right = 16.dp, top = 16.dp, bottom = 12.dp)
-            ) {
-                Row {
-                    Column(
-                        arrangement = Arrangement.Begin,
-                        modifier = LayoutFlexible(1f)
-                    ) {
-                        Text(
-                            text = story.title,
-                            style = MaterialTheme.typography().subtitle1
+    val siteName: String? = webPreview?.siteName
+
+    val description: String? =
+        story.text
+            .takeIf { !it.isNullOrEmpty() }
+            ?.let {
+                Html.fromHtml(it).toString()
+                    .replace("\n\n", " ")
+            }
+            ?: webPreview?.description
+
+    fun buildSubtitleString(): AnnotatedString {
+        val stringBuilder = AnnotatedString.Builder()
+
+        if (siteName != null) {
+            val emphStyle = MaterialTheme.typography().subtitle1
+
+            stringBuilder.pushStyle(
+                SpanStyle(
+                    fontWeight = emphStyle.fontWeight,
+                    fontFamily = emphStyle.fontFamily,
+                    fontStyle = emphStyle.fontStyle,
+                    color = MaterialTheme.colors().onPrimary
+                )
+            )
+
+            stringBuilder.append(siteName)
+            if (description != null) stringBuilder.append(" - ")
+
+            stringBuilder.popStyle()
+        }
+
+        if (description != null) {
+            stringBuilder.append(description)
+        }
+
+        return stringBuilder.toAnnotatedString()
+    }
+
+    val subtitle = buildSubtitleString()
+
+
+    Row {
+        Surface(
+            shape = RoundedCornerShape(3.dp),
+            modifier = LayoutFlexible(1f) +
+                    LayoutWidth.Fill +
+                    LayoutHeight.Min(110.dp) +
+                    LayoutAlign.Start
+        ) {
+            Ripple(bounded = true) {
+                Clickable(onClick = { onStoryClick(story.id) }) {
+
+                    // If there is a story image, we must share the space
+                    val rightPadding: Dp =
+                        if (story.url != null) 10.dp
+                        else 16.dp
+
+                    Container(
+                        modifier = LayoutWidth.Fill,
+                        padding = EdgeInsets(
+                            left = 16.dp,
+                            right = rightPadding,
+                            top = 16.dp,
+                            bottom = 12.dp
                         )
-                        val description: String? =
-                            story.text
-                                .takeIf { !it.isNullOrEmpty() }
-                                ?.let {
-                                    Html.fromHtml(it).toString()
-                                        .replace("\n\n", " ")
-                                }
-                                ?: webPreview?.description
-
-                        if (description != null) {
-                            Spacer(modifier = LayoutHeight(2.dp))
+                    ) {
+                        Column(modifier = LayoutAlign.Start + LayoutWidth.Fill) {
                             Text(
-                                text = description,
-                                style = MaterialTheme.typography().body2,
-                                maxLines = 2,
-                                overflow = TextOverflow.Ellipsis
+                                text = story.title,
+                                style = MaterialTheme.typography().subtitle1
                             )
-                        }
-                    }
 
-                    story.url?.let { storyUrl ->
-                        Spacer(modifier = LayoutWidth(12.dp))
-                        StoryFeedImage(webPreview = webPreview) {
-                            onStoryContentClick(storyUrl)
+                            if (subtitle.length > 0) {
+                                Spacer(modifier = LayoutHeight(3.dp))
+                                Text(
+                                    text = subtitle,
+                                    style = MaterialTheme.typography().body2.copy(
+                                        color = MaterialTheme.colors().onPrimary.copy(alpha = textSecondaryAlpha)
+                                    ),
+                                    maxLines = 3,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
                         }
                     }
                 }
             }
         }
+
+        story.url
+            ?.let { url ->
+                StoryFeedImage(
+                    webPreview = webPreview,
+                    onClick = { onStoryContentClick(url) }
+                )
+            }
     }
 }
 
@@ -247,23 +301,36 @@ private fun StoryFeedImage(
     webPreview: WebPreviewData?,
     onClick: () -> Unit
 ) {
-    Surface(
-        shape = RoundedCornerShape(8.dp),
-        modifier = LayoutWidth(80.dp) + LayoutHeight(80.dp)
-    ) {
+
+    Surface(shape = RoundedCornerShape(3.dp), modifier = LayoutHeight.Fill) {
         Ripple(bounded = true) {
             Clickable(onClick = onClick) {
-                Stack {
+                Container(
+                    padding = EdgeInsets(
+                        left = 10.dp,
+                        right = 16.dp,
+                        top = (16 + 1).dp,
+                        bottom = 14.dp
+                    )
+                ) {
                     Surface(
-                        color = colorResource(R.color.contentLoading),
-                        modifier = LayoutWidth.Fill + LayoutHeight.Fill
-                    ) {}
+                        shape = RoundedCornerShape(8.dp),
+                        modifier = LayoutWidth(80.dp) + LayoutHeight(80.dp)
+                    ) {
+                        Stack {
+                            Surface(
+                                color = colorResource(R.color.contentLoading),
+                                modifier = LayoutWidth.Fill + LayoutHeight.Fill
+                            ) {}
 
-                    val imageUrl =
-                        webPreview?.imageUrl ?: webPreview?.iconUrl ?: webPreview?.favIconUrl
+                            val imageUrl =
+                                webPreview?.imageUrl ?: webPreview?.iconUrl
+                                ?: webPreview?.favIconUrl
 
-                    if (imageUrl != null) {
-                        UrlImage(imageUrl)
+                            if (imageUrl != null) {
+                                UrlImage(imageUrl)
+                            }
+                        }
                     }
                 }
             }

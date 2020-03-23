@@ -42,15 +42,17 @@ class WebPreviewRepository
             .select("meta[property^=og:]")
 
         val siteName = ogTags.getOgContentOrNull(OG_SITE_NAME)
+            ?.takeIf { it.isNotEmpty() }
             ?: baseUrl.getSiteName()
 
         val description = ogTags.getOgContentOrNull(OG_DESCRIPTION)
             ?.replace("\n\n", " ")
+            ?.takeIf { it.isNotEmpty() }
 
         val imageUrl = ogTags.getOgContentOrNull(OG_IMAGE)
             ?.takeImageUrlIfCompatible()
             ?.completePartialUrl(baseUrl)
-
+            ?.takeIf { it.isNotEmpty() }
 
         // Make best effort to get icon tags
         val iconTags = head()
@@ -61,6 +63,7 @@ class WebPreviewRepository
                 ?: iconTags.getIconContentOrNull(SHORTCUT_ICON)?.takeImageUrlIfCompatible()
                 ?: iconTags.getIconContentOrNull(ICON))?.takeImageUrlIfCompatible()
                 ?.completePartialUrl(baseUrl)
+                ?.takeIf { it.isNotEmpty() }
 
         return WebPreviewData(
             siteName = siteName,
