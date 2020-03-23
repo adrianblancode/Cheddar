@@ -11,6 +11,8 @@ import androidx.ui.res.colorResource
 import androidx.ui.text.TextStyle
 import androidx.ui.text.font.FontFamily
 import androidx.ui.text.font.FontWeight
+import androidx.ui.text.font.font
+import androidx.ui.text.font.fontFamily
 import androidx.ui.unit.sp
 import co.adrianblan.ui.extensions.isNightModeActive
 
@@ -41,8 +43,12 @@ fun AppTheme(children: @Composable() () -> Unit) {
             )
         }
 
-    val appFontFamily = FontFamily.SansSerif
-    val bodyFontFamily = FontFamily.SansSerif
+    val regular = font(R.font.avenir_roman)
+    val medium = font(R.font.avenir_medium, FontWeight.W500)
+    val semibold = font(R.font.avenir_black, FontWeight.W600)
+
+    val appFontFamily = fontFamily(fonts = listOf(regular, medium, semibold))
+    val bodyFontFamily = appFontFamily
 
     val themeTypography = Typography(
         h4 = TextStyle(

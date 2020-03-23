@@ -219,21 +219,20 @@ fun StoryFeedItem(
                                 }
                                 ?: webPreview?.description
 
-                        if (description != null)
+                        if (description != null) {
+                            Spacer(modifier = LayoutHeight(2.dp))
                             Text(
                                 text = description,
                                 style = MaterialTheme.typography().body2,
                                 maxLines = 2,
                                 overflow = TextOverflow.Ellipsis
                             )
+                        }
                     }
 
                     story.url?.let { storyUrl ->
                         Spacer(modifier = LayoutWidth(12.dp))
-                        StoryFeedImage(
-                            storyId = story.id,
-                            webPreview = webPreview
-                        ) {
+                        StoryFeedImage(webPreview = webPreview) {
                             onStoryContentClick(storyUrl)
                         }
                     }
@@ -245,7 +244,6 @@ fun StoryFeedItem(
 
 @Composable
 private fun StoryFeedImage(
-    @Pivotal storyId: StoryId,
     webPreview: WebPreviewData?,
     onClick: () -> Unit
 ) {

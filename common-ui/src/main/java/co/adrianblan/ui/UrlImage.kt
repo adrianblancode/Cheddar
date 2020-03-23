@@ -8,6 +8,8 @@ import androidx.ui.foundation.DrawImage
 import androidx.ui.graphics.Color
 import androidx.ui.graphics.Image
 import androidx.ui.layout.Container
+import androidx.ui.layout.LayoutHeight
+import androidx.ui.layout.LayoutWidth
 import androidx.ui.material.ColorPalette
 import androidx.ui.material.surface.Surface
 import androidx.ui.unit.Dp
@@ -20,8 +22,7 @@ import com.squareup.picasso.Target
 fun UrlImage(
     imageUrl: String,
     height: Dp = 80.dp,
-    width: Dp = 80.dp,
-    modifier: Modifier = Modifier.None
+    width: Dp = 80.dp
 ) {
 
     val imageState = stateFor<ImageState, String>(imageUrl) {
@@ -73,6 +74,8 @@ fun UrlImage(
             picasso.cancelRequest(target)
         }
     }
+
+    val modifier: Modifier = LayoutWidth(width) + LayoutHeight(height)
 
     when (val state = imageState.value) {
         is ImageState.Loading -> Surface(color = Color.Magenta, modifier = modifier) {}
