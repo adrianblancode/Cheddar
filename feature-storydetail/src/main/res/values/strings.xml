@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="comments_empty">This story has no comments, yet.</string>
+    <string name="comments_empty">There are no comments here, yet.</string>
     <string name="comment_deleted_title">[REDACTED]</string>
 </resources>

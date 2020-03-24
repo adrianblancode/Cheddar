@@ -188,15 +188,10 @@ fun StoryFeedSuccessContentBody(
 private fun LoadingMoreStoriesView() {
     Container(
         padding = EdgeInsets(8.dp),
-        modifier = LayoutWidth.Fill + LayoutPadding(top = 16.dp)
+        modifier = LayoutWidth.Fill
     ) {
-        Text(
-            text = stringResource(id = R.string.loading_title),
-            style = MaterialTheme.typography().subtitle1
-                .copy(
-                    color = MaterialTheme.colors().onPrimary.copy(alpha = textSecondaryAlpha),
-                    textAlign = TextAlign.Center
-                ),
+        LoadingView(
+            textStyle = MaterialTheme.typography().subtitle1,
             modifier = LayoutAlign.Center
         )
     }
@@ -239,7 +234,7 @@ private fun NoMoreStoriesView() {
                     LayoutPadding(
                         left = 16.dp,
                         right = 16.dp,
-                        top = 20.dp,
+                        top = 16.dp,
                         bottom = 8.dp
                     )
         )

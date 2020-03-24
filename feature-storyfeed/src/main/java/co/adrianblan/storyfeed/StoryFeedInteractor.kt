@@ -99,7 +99,8 @@ constructor(
         pageIndexChannel.asFlow()
             // Block duplicate page emissions
             .distinctUntilChanged()
-            .flatMapConcat { pageIndex ->
+            // Unordered emissions are ok, as we collect pages after
+            .flatMapMerge { pageIndex ->
 
                 isLoadingMorePagesChannel.offer(true)
 
@@ -117,22 +118,23 @@ constructor(
             .scanReducePages()
 
     /** Takes in a flow that returns pages of values, and emits a flow with the sorted latest emission per page */
-    private fun <T> Flow<Pair<Int, List<T>>>.scanReducePages(): Flow<List<T>> = flow {
+    private fun <T> Flow<Pair<Int, List<T>>>.scanReducePages(): Flow<List<T>> =
+        flow {
 
-        val map = mutableMapOf<Int, List<T>>()
+            val map = mutableMapOf<Int, List<T>>()
 
-        collect { (pageIndex: Int, value: List<T>) ->
-            map[pageIndex] = value
+            collect { (pageIndex: Int, value: List<T>) ->
+                map[pageIndex] = value
 
-            val sortedPages: List<T> =
-                map.entries
-                    .sortedBy { it.key }
-                    .map { it.value }
-                    .flatten()
+                val sortedPages: List<T> =
+                    map.entries
+                        .sortedBy { it.key }
+                        .map { it.value }
+                        .flatten()
 
-            emit(sortedPages)
+                emit(sortedPages)
+            }
         }
-    }
 
     init {
         scope.launch {

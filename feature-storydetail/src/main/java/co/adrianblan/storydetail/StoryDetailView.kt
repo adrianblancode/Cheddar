@@ -186,14 +186,13 @@ fun CommentItem(commentItem: FlatComment) {
             bottom = 6.dp
         )
     ) {
-        Row {
+        Row(modifier = LayoutHeight.Fill) {
 
+            // TODO fill all height
             repeat(depthIndex) {
                 Surface(
-                    // color = colorResource(R.color.contentMuted),
                     color = Color.Transparent,
-                    modifier = LayoutHeight.Min(1.dp) +
-                            LayoutHeight.Fill +
+                    modifier = LayoutHeight.Fill +
                             LayoutPadding(right = 12.dp) +
                             LayoutWidth(1.dp)
                 ) {}
@@ -232,21 +231,6 @@ fun CommentItem(commentItem: FlatComment) {
 
 @Preview
 @Composable
-fun CommentsEmptyView() {
-    Container(
-        expanded = true,
-        padding = EdgeInsets(32.dp)
-    ) {
-        Text(
-            text = stringResource(id = R.string.comments_empty),
-            style = MaterialTheme.typography().h6.copy(textAlign = TextAlign.Center),
-            modifier = LayoutAlign.Center
-        )
-    }
-}
-
-@Preview
-@Composable
 fun StoryDetailPreview() {
     AppTheme {
         val viewState =
@@ -265,6 +249,21 @@ fun StoryDetailPreview() {
             viewState = viewState,
             onStoryContentClick = {},
             onBackPressed = {}
+        )
+    }
+}
+
+@Preview
+@Composable
+fun CommentsEmptyView() {
+    Container(
+        expanded = true,
+        padding = EdgeInsets(32.dp)
+    ) {
+        Text(
+            text = stringResource(id = R.string.comments_empty),
+            style = MaterialTheme.typography().h6.copy(textAlign = TextAlign.Center),
+            modifier = LayoutAlign.Center
         )
     }
 }
