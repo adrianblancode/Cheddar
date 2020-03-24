@@ -1,0 +1,7 @@
+apply from: rootProject.file("gradle/library.gradle")
+
+dependencies {
+    api(Dependencies.okhttpCore)
+    implementation(Dependencies.okhttpLoggingInterceptor)
+    api(Dependencies.retrofitCore)
+}

@@ -1,0 +1,10 @@
+apply from: rootProject.file("gradle/library.gradle")
+apply plugin: "kotlinx-serialization"
+
+dependencies {
+    implementation(project(":network"))
+
+    // Implemented here because module compiler plugin is needed
+    implementation(Dependencies.kotlinSerializationRuntime)
+    implementation(Dependencies.retrofitSerializationConverter)
+}

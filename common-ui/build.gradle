@@ -1,0 +1,29 @@
+apply from: rootProject.file("gradle/library.gradle")
+
+android {
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerVersion "1.3.61-dev-withExperimentalGoogleExtensions-20200129"
+        kotlinCompilerExtensionVersion Versions.compose
+    }
+}
+
+dependencies {
+    api(Dependencies.androidxAppcompat)
+    api(Dependencies.androidxCore)
+    api(Dependencies.androidxActivity)
+
+    api(Dependencies.composeRuntime)
+    api(Dependencies.composeFramework)
+    api(Dependencies.composeLayout)
+    api(Dependencies.composeMaterial)
+    api(Dependencies.composeFoundation)
+    api(Dependencies.composeAnimation)
+    api(Dependencies.composeTooling)
+    api(Dependencies.composeIcons)
+
+    api(Dependencies.picasso)
+}

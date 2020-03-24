@@ -1,0 +1,44 @@
+package co.adrianblan.cheddar.di
+
+import co.adrianblan.cheddar.RootNode
+import co.adrianblan.common.ParentScope
+import co.adrianblan.storyfeed.StoryFeedComponent
+import co.adrianblan.storydetail.StoryDetailComponent
+import dagger.BindsInstance
+import dagger.Component
+import dagger.Module
+import javax.inject.Qualifier
+import javax.inject.Scope
+
+@Module(
+    subcomponents = [
+        StoryFeedComponent::class,
+        StoryDetailComponent::class
+    ]
+)
+object RootModule
+
+@RootScope
+@Component(
+    modules = [RootModule::class],
+    dependencies = [AppComponent::class]
+)
+interface RootComponent {
+    fun rootNode(): RootNode
+
+    @Component.Factory
+    interface Factory {
+        fun build(
+            @RootInternal @BindsInstance parentScope: ParentScope,
+            appComponent: AppComponent
+        ) : RootComponent
+    }
+}
+
+@Scope
+@Retention
+internal annotation class RootScope
+
+@Qualifier
+@Retention
+internal annotation class RootInternal
