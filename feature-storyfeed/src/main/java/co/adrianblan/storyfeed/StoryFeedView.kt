@@ -207,6 +207,7 @@ fun StoryFeedItem(
             }
             ?: webPreview?.description
 
+    // Concatenates a subtitle string from the site name and description
     fun buildSubtitleString(): AnnotatedString {
         val stringBuilder = AnnotatedString.Builder()
 
@@ -357,7 +358,7 @@ private fun LoadingMoreStoriesView() {
 private fun LoadMoreStoriesButton(
     onPageEndReached: () -> Unit
 ) {
-    Container(modifier = LayoutWidth.Fill) {
+    Container(modifier = LayoutWidth.Fill + LayoutPadding(top = 12.dp)) {
         Button(
             modifier = LayoutAlign.Center,
             onClick = onPageEndReached

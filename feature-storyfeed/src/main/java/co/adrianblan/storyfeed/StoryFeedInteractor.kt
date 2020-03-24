@@ -5,13 +5,10 @@ import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.ParentScope
 import co.adrianblan.common.onFirst
-import co.adrianblan.ui.Interactor
+import co.adrianblan.ui.node.Interactor
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.StoryType
-import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
-import co.adrianblan.hackernews.api.dummy
-import co.adrianblan.webpreview.WebPreviewData
 import co.adrianblan.webpreview.WebPreviewRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel

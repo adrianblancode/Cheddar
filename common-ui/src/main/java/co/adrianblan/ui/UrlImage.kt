@@ -12,10 +12,12 @@ import androidx.ui.layout.LayoutHeight
 import androidx.ui.layout.LayoutWidth
 import androidx.ui.material.ColorPalette
 import androidx.ui.material.surface.Surface
+import androidx.ui.res.colorResource
 import androidx.ui.unit.Dp
 import androidx.ui.unit.dp
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
+import timber.log.Timber
 
 /** Takes an image url and loads it with Picasso */
 @Composable
@@ -33,7 +35,6 @@ fun UrlImage(
     val targetHeightPx = with(DensityAmbient.current) { height.toIntPx().value }
 
     onCommit(imageUrl) {
-        val picasso = Picasso.get()
 
         val target = object : Target {
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
@@ -45,6 +46,11 @@ fun UrlImage(
             }
 
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+
+                if (from == Picasso.LoadedFrom.NETWORK) {
+                    imageState.value = ImageState.Error
+                    return
+                }
 
                 imageState.value =
                     if (bitmap == null) ImageState.Error
@@ -65,6 +71,8 @@ fun UrlImage(
             }
         }
 
+        val picasso = Picasso.get()
+
         picasso
             .load(imageUrl)
             .into(target)
@@ -76,14 +84,26 @@ fun UrlImage(
     }
 
     val modifier: Modifier = LayoutWidth(width) + LayoutHeight(height)
+    DrawImageState(state = imageState.value, modifier = modifier)
+}
 
-    when (val state = imageState.value) {
-        is ImageState.Loading -> Surface(color = Color.Magenta, modifier = modifier) {}
-        is ImageState.Error -> Surface(color = Color.Red, modifier = modifier) {}
-        is ImageState.ImageSuccess ->
-            RepaintBoundary {
+@Composable
+private fun DrawImageState(state: ImageState, modifier: Modifier) {
+    RepaintBoundary {
+        when (state) {
+            is ImageState.Loading ->
+                Surface(
+                    color = colorResource(id = R.color.contentLoading),
+                    modifier = modifier
+                ) {}
+            is ImageState.Error ->
+                Surface(
+                    color = colorResource(id = R.color.contentLoading),
+                    modifier = modifier
+                ) {}
+            is ImageState.ImageSuccess ->
                 DrawImage(image = state.image)
-            }
+        }
     }
 }
 

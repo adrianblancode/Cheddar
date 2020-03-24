@@ -1,7 +1,7 @@
 package co.adrianblan.storyfeed
 
 import androidx.compose.Composable
-import co.adrianblan.ui.Node
+import co.adrianblan.ui.node.Node
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
 import kotlinx.coroutines.cancel

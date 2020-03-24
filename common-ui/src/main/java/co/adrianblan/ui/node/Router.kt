@@ -1,9 +1,10 @@
-package co.adrianblan.ui
+package co.adrianblan.ui.node
 
 import androidx.compose.Model
 import androidx.compose.frames.ModelList
 import androidx.compose.frames.modelListOf
 
+/** A Router is used by a parent Node to attach and detach child Nodes */
 interface Router {
     val nodes: List<Node>
     fun onBackPressed(): Boolean

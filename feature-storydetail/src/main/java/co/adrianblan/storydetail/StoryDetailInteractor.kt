@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.ParentScope
-import co.adrianblan.ui.Interactor
+import co.adrianblan.ui.node.Interactor
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.api.Comment
 import co.adrianblan.hackernews.api.Story

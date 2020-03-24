@@ -59,9 +59,10 @@ class WebPreviewRepository
             .select("link[rel]")
 
         val iconUrl =
-            (iconTags.getIconContentOrNull(APPLE_ICON)?.takeImageUrlIfCompatible()
-                ?: iconTags.getIconContentOrNull(SHORTCUT_ICON)?.takeImageUrlIfCompatible()
-                ?: iconTags.getIconContentOrNull(ICON))?.takeImageUrlIfCompatible()
+            (iconTags.getIconContentOrNull(APPLE_ICON_PRECOMPOSED)?.takeImageUrlIfCompatible()
+                ?: iconTags.getIconContentOrNull(APPLE_ICON)?.takeImageUrlIfCompatible()
+                ?: iconTags.getIconContentOrNull(ICON)?.takeImageUrlIfCompatible()
+                ?: iconTags.getIconContentOrNull(SHORTCUT_ICON)?.takeImageUrlIfCompatible())
                 ?.completePartialUrl(baseUrl)
                 ?.takeIf { it.isNotEmpty() }
 
@@ -75,15 +76,14 @@ class WebPreviewRepository
     }
 
     private fun List<Element>.getOgContentOrNull(propertyName: String): String? =
-        firstOrNull {
-            it.attr("property") == propertyName
-        }?.attr("content")
+        firstOrNull { it.attr("property") == propertyName }
+            ?.attr("content")
             .takeIf { it != null }
 
     private fun List<Element>.getIconContentOrNull(propertyName: String): String? =
-        firstOrNull {
-            it.attr("rel") == propertyName
-        }?.attr("href")
+        filter { it.attr("rel") == propertyName }
+            .maxBy { it.attr("sizes") }
+            ?.attr("href")
             .takeIf { it != null }
 
     private fun String.takeImageUrlIfCompatible(): String? {
@@ -101,6 +101,7 @@ class WebPreviewRepository
         private const val OG_DESCRIPTION = "og:description"
         private const val OG_IMAGE = "og:image"
 
+        private const val APPLE_ICON_PRECOMPOSED = "apple-touch-icon-precomposed"
         private const val APPLE_ICON = "apple-touch-icon"
         private const val SHORTCUT_ICON = "shortcut icon"
         private const val ICON = "icon"

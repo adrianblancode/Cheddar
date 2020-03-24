@@ -2,7 +2,7 @@ package co.adrianblan.storydetail
 
 import androidx.compose.Composable
 import co.adrianblan.hackernews.api.StoryUrl
-import co.adrianblan.ui.Node
+import co.adrianblan.ui.node.Node
 import kotlinx.coroutines.cancel
 import javax.inject.Inject
 

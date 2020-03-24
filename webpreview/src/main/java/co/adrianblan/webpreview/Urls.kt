@@ -32,7 +32,7 @@ internal fun String.baseUrl(): String {
 // Takes a possibly partial url eg "/image.png" and completes it
 internal fun String.completePartialUrl(baseUrl: String): String {
 
-    val url = this
+    val url = this.removePrefix(".")
 
     return if (url.startsWith("/")) baseUrl + url
     else url

@@ -11,6 +11,7 @@ import kotlinx.coroutines.cancel
 
 class RootViewModel(
     application: Application,
+    // TODO implement saved state
     savedStateHandle: SavedStateHandle
 ): AndroidViewModel(application) {
 

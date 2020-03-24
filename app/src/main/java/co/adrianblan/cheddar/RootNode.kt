@@ -7,9 +7,9 @@ import androidx.compose.Composable
 import androidx.core.net.toUri
 import co.adrianblan.cheddar.di.RootInternal
 import co.adrianblan.common.ParentScope
-import co.adrianblan.ui.Node
+import co.adrianblan.ui.node.Node
 import co.adrianblan.ui.RootScreen
-import co.adrianblan.ui.StackRouter
+import co.adrianblan.ui.node.StackRouter
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.storyfeed.StoryFeedComponent
