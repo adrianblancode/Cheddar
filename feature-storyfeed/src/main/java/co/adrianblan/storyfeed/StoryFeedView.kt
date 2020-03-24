@@ -190,7 +190,10 @@ fun StoryFeedSuccessContentBody(
 
 @Composable
 private fun LoadingMoreStoriesView() {
-    Container(padding = EdgeInsets(8.dp), modifier = LayoutWidth.Fill + LayoutPadding(top = 8.dp)) {
+    Container(
+        padding = EdgeInsets(8.dp),
+        modifier = LayoutWidth.Fill + LayoutPadding(top = 16.dp)
+    ) {
         Text(
             text = stringResource(id = R.string.loading_title),
             style = MaterialTheme.typography().subtitle1
@@ -207,7 +210,7 @@ private fun LoadingMoreStoriesView() {
 private fun LoadMoreStoriesButton(
     onPageEndReached: () -> Unit
 ) {
-    Container(modifier = LayoutWidth.Fill + LayoutPadding(top = 12.dp)) {
+    Container(modifier = LayoutWidth.Fill) {
         Button(
             modifier = LayoutAlign.Center,
             onClick = onPageEndReached
@@ -217,7 +220,7 @@ private fun LoadMoreStoriesButton(
                 modifier = LayoutPadding(
                     left = 16.dp,
                     right = 16.dp,
-                    top = 8.dp,
+                    top = 20.dp,
                     bottom = 8.dp
                 )
             )
@@ -227,11 +230,7 @@ private fun LoadMoreStoriesButton(
 
 @Composable
 private fun NoMoreStoriesView() {
-    Container(
-        expanded = true,
-        padding = EdgeInsets(32.dp),
-        modifier = LayoutHeight(180.dp)
-    ) {
+    Container(modifier = LayoutWidth.Fill) {
         Text(
             text = stringResource(id = R.string.stories_no_more_stories),
             style = MaterialTheme.typography().subtitle2
@@ -239,7 +238,13 @@ private fun NoMoreStoriesView() {
                     color = MaterialTheme.colors().onPrimary.copy(alpha = textSecondaryAlpha),
                     textAlign = TextAlign.Center
                 ),
-            modifier = LayoutAlign.Center
+            modifier = LayoutAlign.Center +
+                    LayoutPadding(
+                        left = 16.dp,
+                        right = 16.dp,
+                        top = 20.dp,
+                        bottom = 8.dp
+                    )
         )
     }
 }

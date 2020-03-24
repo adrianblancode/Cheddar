@@ -2,17 +2,16 @@ package co.adrianblan.storyfeed
 
 import androidx.compose.Composable
 import androidx.compose.remember
-import androidx.ui.core.Alignment
-import androidx.ui.core.DropdownPopup
-import androidx.ui.core.PopupProperties
-import androidx.ui.core.Text
+import androidx.ui.core.*
 import androidx.ui.foundation.Clickable
 import androidx.ui.foundation.shape.corner.RoundedCornerShape
+import androidx.ui.geometry.Offset
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
 import androidx.ui.material.ripple.Ripple
 import androidx.ui.material.surface.Surface
 import androidx.ui.res.stringResource
+import androidx.ui.unit.IntPxPosition
 import androidx.ui.unit.dp
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.ui.AppTheme
@@ -22,7 +21,10 @@ fun StoryTypePopup(
     onStoryTypeClick: (StoryType) -> Unit,
     onDismiss: () -> Unit
 ) {
-    DropdownPopup(popupProperties = PopupProperties(true, onDismissRequest = onDismiss)) {
+
+    DropdownPopup(
+        popupProperties = PopupProperties(true, onDismissRequest = onDismiss)
+    ) {
         // Popups require reapplication of the app theme
         AppTheme {
             Container(

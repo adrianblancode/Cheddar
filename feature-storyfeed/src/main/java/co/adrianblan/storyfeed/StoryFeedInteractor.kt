@@ -98,7 +98,6 @@ constructor(
         pageIndexChannel.asFlow()
             .conflate()
             .distinctUntilChanged()
-            .filter { it <= MAX_PAGE }
             .flatMapConcat { pageIndex ->
 
                 isLoadingMorePagesChannel.offer(true)
@@ -107,7 +106,7 @@ constructor(
                     .onFirst { stories ->
                         isLoadingMorePagesChannel.offer(false)
 
-                        if (stories.isEmpty()) hasLoadedAllPagesChannel.offer(false)
+                        if (stories.isEmpty()) hasLoadedAllPagesChannel.offer(true)
                         else currentPageIndexGate = pageIndex
                     }
                     .map { pageStories ->
@@ -203,6 +202,5 @@ constructor(
 
     companion object {
         private const val PAGE_SIZE = 20
-        private const val MAX_PAGE = 500 / PAGE_SIZE
     }
 }
