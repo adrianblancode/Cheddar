@@ -1,6 +1,9 @@
 package co.adrianblan.webpreview
 
 import co.adrianblan.common.WeakCache
+import co.adrianblan.common.baseUrl
+import co.adrianblan.common.completePartialUrl
+import co.adrianblan.common.urlSiteName
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -43,7 +46,7 @@ class WebPreviewRepository
 
         val siteName = ogTags.getOgContentOrNull(OG_SITE_NAME)
             ?.takeIf { it.isNotEmpty() }
-            ?: baseUrl.getSiteName()
+            ?: baseUrl.urlSiteName()
 
         val description = ogTags.getOgContentOrNull(OG_DESCRIPTION)
             ?.replace("\n\n", " ")

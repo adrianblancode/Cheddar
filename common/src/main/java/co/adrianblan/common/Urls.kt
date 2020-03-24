@@ -1,15 +1,22 @@
-package co.adrianblan.webpreview
+package co.adrianblan.common
 
-// Only remove .com because we are lazy
-internal fun String.getSiteName(): String =
-    this.removePrefix("https://")
+fun String.urlSiteName(): String {
+
+    /*
+    // Drops tld and also removes remaining .co
+    urlWithTld.split(".")
+        .dropLast(1)
+        .joinToString(".")
+        .removeSuffix(".co")
+     */
+
+    return baseUrl()
+        .removePrefix("https://")
         .removePrefix("http://")
         .removePrefix("www.")
-        .substringBefore("?")
-        .substringBefore("/")
-        .removeSuffix(".com")
+}
 
-internal fun String.baseUrl(): String {
+fun String.baseUrl(): String {
     val http = "http://"
     val https = "https://"
 
@@ -30,7 +37,7 @@ internal fun String.baseUrl(): String {
 }
 
 // Takes a possibly partial url eg "/image.png" and completes it
-internal fun String.completePartialUrl(baseUrl: String): String {
+fun String.completePartialUrl(baseUrl: String): String {
 
     val url = this.removePrefix(".")
 

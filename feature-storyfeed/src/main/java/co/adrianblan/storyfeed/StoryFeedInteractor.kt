@@ -56,20 +56,22 @@ constructor(
     // Observes a decorated story, it will first emit the story and then try to emit decorated data as well
     private fun observeDecoratedStory(storyId: StoryId): Flow<DecoratedStory> =
         flow {
+
             val story = hackerNewsRepository.fetchStory(storyId)
+            val storyUrl = story.url
 
-            emit(DecoratedStory(story, null))
+            if (storyUrl == null) emit(DecoratedStory(story, null))
+            else {
+                emit(DecoratedStory(story, WebPreviewState.Loading))
 
-            story.url
-                ?.let { storyUrl ->
-                    try {
-                        val webPreview = webPreviewRepository.fetchWebPreview(storyUrl.url)
-                        emit(DecoratedStory(story, webPreview))
-                    } catch (t: Throwable) {
-                        Timber.e(t)
-                        // TODO emit error result
-                    }
+                try {
+                    val webPreview = webPreviewRepository.fetchWebPreview(storyUrl.url)
+                    emit(DecoratedStory(story, WebPreviewState.Success(webPreview)))
+                } catch (t: Throwable) {
+                    Timber.e(t)
+                    emit(DecoratedStory(story, WebPreviewState.Error))
                 }
+            }
         }
 
     // Takes a page, and observes the list of stories in the page

@@ -4,5 +4,6 @@
     <color name="colorPrimaryDark">#AFFF</color>
     <color name="colorAccent">#FF6600</color>
 
-    <color name="contentLoading">#CCC</color>
+    <color name="contentLoading">#DDD</color>
+    <color name="contentShimmer">#E5E5E5</color>
 </resources>

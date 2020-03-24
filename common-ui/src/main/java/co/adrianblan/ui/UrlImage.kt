@@ -47,11 +47,6 @@ fun UrlImage(
 
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
 
-                if (from == Picasso.LoadedFrom.NETWORK) {
-                    imageState.value = ImageState.Error
-                    return
-                }
-
                 imageState.value =
                     if (bitmap == null) ImageState.Error
                     else {
@@ -92,10 +87,9 @@ private fun DrawImageState(state: ImageState, modifier: Modifier) {
     RepaintBoundary {
         when (state) {
             is ImageState.Loading ->
-                Surface(
-                    color = colorResource(id = R.color.contentLoading),
-                    modifier = modifier
-                ) {}
+                Container(expanded = true) {
+                    ShimmerView()
+                }
             is ImageState.Error ->
                 Surface(
                     color = colorResource(id = R.color.contentLoading),

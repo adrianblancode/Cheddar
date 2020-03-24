@@ -20,6 +20,7 @@ import androidx.ui.text.style.TextAlign
 import androidx.ui.text.style.TextOverflow
 import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.*
+import co.adrianblan.common.urlSiteName
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
@@ -188,160 +189,8 @@ fun StoryFeedSuccessContentBody(
 }
 
 @Composable
-fun StoryFeedItem(
-    decoratedStory: DecoratedStory,
-    onStoryClick: (StoryId) -> Unit,
-    onStoryContentClick: (StoryUrl) -> Unit
-) {
-    val story = decoratedStory.story
-    val webPreview = decoratedStory.webPreview
-
-    val siteName: String? = webPreview?.siteName
-
-    val description: String? =
-        story.text
-            .takeIf { !it.isNullOrEmpty() }
-            ?.let {
-                Html.fromHtml(it).toString()
-                    .replace("\n\n", " ")
-            }
-            ?: webPreview?.description
-
-    // Concatenates a subtitle string from the site name and description
-    fun buildSubtitleString(): AnnotatedString {
-        val stringBuilder = AnnotatedString.Builder()
-
-        if (siteName != null) {
-            val emphStyle = MaterialTheme.typography().subtitle1
-
-            stringBuilder.pushStyle(
-                SpanStyle(
-                    fontWeight = emphStyle.fontWeight,
-                    fontFamily = emphStyle.fontFamily,
-                    fontStyle = emphStyle.fontStyle,
-                    color = MaterialTheme.colors().onPrimary
-                )
-            )
-
-            stringBuilder.append(siteName)
-            if (description != null) stringBuilder.append(" - ")
-
-            stringBuilder.popStyle()
-        }
-
-        if (description != null) {
-            stringBuilder.append(description)
-        }
-
-        return stringBuilder.toAnnotatedString()
-    }
-
-    val subtitle = buildSubtitleString()
-
-
-    Row {
-        Surface(
-            shape = RoundedCornerShape(3.dp),
-            modifier = LayoutFlexible(1f) +
-                    LayoutWidth.Fill +
-                    LayoutHeight.Min(110.dp) +
-                    LayoutAlign.Start
-        ) {
-            Ripple(bounded = true) {
-                Clickable(onClick = { onStoryClick(story.id) }) {
-
-                    // If there is a story image, we must share the space
-                    val rightPadding: Dp =
-                        if (story.url != null) 10.dp
-                        else 16.dp
-
-                    Container(
-                        modifier = LayoutWidth.Fill,
-                        padding = EdgeInsets(
-                            left = 16.dp,
-                            right = rightPadding,
-                            top = 16.dp,
-                            bottom = 12.dp
-                        )
-                    ) {
-                        Column(modifier = LayoutAlign.Start + LayoutWidth.Fill) {
-                            Text(
-                                text = story.title,
-                                style = MaterialTheme.typography().subtitle1
-                            )
-
-                            if (subtitle.length > 0) {
-                                Spacer(modifier = LayoutHeight(3.dp))
-                                Text(
-                                    text = subtitle,
-                                    style = MaterialTheme.typography().body2.copy(
-                                        color = MaterialTheme.colors().onPrimary.copy(alpha = textSecondaryAlpha)
-                                    ),
-                                    maxLines = 3,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        story.url
-            ?.let { url ->
-                StoryFeedImage(
-                    webPreview = webPreview,
-                    onClick = { onStoryContentClick(url) }
-                )
-            }
-    }
-}
-
-@Composable
-private fun StoryFeedImage(
-    webPreview: WebPreviewData?,
-    onClick: () -> Unit
-) {
-
-    Surface(shape = RoundedCornerShape(3.dp), modifier = LayoutHeight.Fill) {
-        Ripple(bounded = true) {
-            Clickable(onClick = onClick) {
-                Container(
-                    padding = EdgeInsets(
-                        left = 10.dp,
-                        right = 16.dp,
-                        top = (16 + 1).dp,
-                        bottom = 14.dp
-                    )
-                ) {
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = LayoutWidth(80.dp) + LayoutHeight(80.dp)
-                    ) {
-                        Stack {
-                            Surface(
-                                color = colorResource(R.color.contentLoading),
-                                modifier = LayoutWidth.Fill + LayoutHeight.Fill
-                            ) {}
-
-                            val imageUrl =
-                                webPreview?.imageUrl ?: webPreview?.iconUrl
-                                ?: webPreview?.favIconUrl
-
-                            if (imageUrl != null) {
-                                UrlImage(imageUrl)
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
 private fun LoadingMoreStoriesView() {
-    Container(padding = EdgeInsets(8.dp), modifier = LayoutWidth.Fill) {
+    Container(padding = EdgeInsets(8.dp), modifier = LayoutWidth.Fill + LayoutPadding(top = 8.dp)) {
         Text(
             text = stringResource(id = R.string.loading_title),
             style = MaterialTheme.typography().subtitle1
@@ -401,7 +250,12 @@ fun StoryFeedPreview() {
     AppTheme {
         val viewState = StoryFeedViewState(
             StoryType.TOP,
-            StoryFeedState.Success(List(10) { DecoratedStory(Story.dummy, null) }),
+            StoryFeedState.Success(List(10) {
+                DecoratedStory(
+                    Story.dummy,
+                    WebPreviewState.Loading
+                )
+            }),
             isLoadingMorePages = true,
             hasLoadedAllPages = false
         )
