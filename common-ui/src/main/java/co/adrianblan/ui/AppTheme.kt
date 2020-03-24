@@ -44,7 +44,7 @@ fun AppTheme(children: @Composable() () -> Unit) {
         }
 
     val regular = font(R.font.avenir_roman)
-    val medium = font(R.font.avenir_medium, FontWeight.W500)
+    val medium = font(R.font.avenir_black, FontWeight.W500)
     val semibold = font(R.font.avenir_black, FontWeight.W600)
 
     val appFontFamily = fontFamily(fonts = listOf(regular, medium, semibold))

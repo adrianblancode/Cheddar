@@ -23,7 +23,7 @@ import co.adrianblan.common.lerp
 @Composable
 fun ShimmerView() {
 
-    val backgroundColor = colorResource(id = R.color.contentLoading)
+    val backgroundColor = colorResource(id = R.color.contentMuted)
 
     val shimmerColor = colorResource(id = R.color.contentShimmer)
     val shimmerPaint = Paint()

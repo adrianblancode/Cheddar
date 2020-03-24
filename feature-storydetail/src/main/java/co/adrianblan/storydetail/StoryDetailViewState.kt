@@ -6,16 +6,22 @@ import co.adrianblan.hackernews.api.Story
 sealed class StoryDetailViewState {
     data class Success(
         val story: Story,
-        val items: List<StoryDetailItem>
+        val commentState: StoryDetailCommentsState
     ) : StoryDetailViewState()
 
     object Loading : StoryDetailViewState()
     object Error : StoryDetailViewState()
 }
 
-sealed class StoryDetailItem {
-    data class CommentItem(val comment: Comment) : StoryDetailItem()
-    object CommentsEmptyItem : StoryDetailItem()
-    object CommentsLoadingItem : StoryDetailItem()
-    object CommentsErrorItem : StoryDetailItem()
+// A comment in the comment tree that has been flattened into a list
+data class FlatComment(
+    val comment: Comment,
+    val depthIndex: Int
+)
+
+sealed class StoryDetailCommentsState {
+    data class Success(val comments: List<FlatComment>) : StoryDetailCommentsState()
+    object Empty : StoryDetailCommentsState()
+    object Loading : StoryDetailCommentsState()
+    object Error : StoryDetailCommentsState()
 }

@@ -6,21 +6,24 @@ import androidx.compose.remember
 import androidx.lifecycle.LiveData
 import androidx.ui.core.Alignment
 import androidx.ui.core.DensityAmbient
+import androidx.ui.core.Modifier
 import androidx.ui.core.Text
 import androidx.ui.foundation.ScrollerPosition
 import androidx.ui.foundation.VerticalScroller
+import androidx.ui.graphics.Color
 import androidx.ui.layout.*
 import androidx.ui.material.FloatingActionButton
 import androidx.ui.material.MaterialTheme
 import androidx.ui.material.Scaffold
 import androidx.ui.material.icons.Icons
 import androidx.ui.material.icons.filled.*
+import androidx.ui.material.surface.Surface
+import androidx.ui.res.colorResource
+import androidx.ui.res.stringResource
+import androidx.ui.text.style.TextAlign
 import androidx.ui.text.style.TextOverflow
 import androidx.ui.tooling.preview.Preview
-import androidx.ui.unit.Dp
-import androidx.ui.unit.dp
-import androidx.ui.unit.lerp
-import androidx.ui.unit.px
+import androidx.ui.unit.*
 import co.adrianblan.hackernews.api.Comment
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryUrl
@@ -68,31 +71,34 @@ fun StoryDetailView(
                 },
                 bodyContent = {
                     when (viewState) {
-                        is StoryDetailViewState.Loading -> LoadingView()
                         is StoryDetailViewState.Success ->
-                            VerticalScroller(scroller) {
-                                Column {
 
-                                    with(DensityAmbient.current) {
-                                        val topInsets = insets.top.px.toDp()
+                            when (viewState.commentState) {
+                                is StoryDetailCommentsState.Success ->
+                                    VerticalScroller(scroller) {
+                                        Column {
+                                            with(DensityAmbient.current) {
+                                                val topInsets = insets.top.px.toDp()
+                                                Spacer(modifier = LayoutHeight(toolbarMaxHeightDp.dp + topInsets))
 
-                                        Spacer(modifier = LayoutHeight(toolbarMaxHeightDp.dp + topInsets))
+                                                viewState.commentState.comments
+                                                    .map { comment ->
+                                                        CommentItem(comment)
+                                                    }
 
-                                        viewState.items.map { item ->
-                                            when (item) {
-                                                is StoryDetailItem.CommentItem ->
-                                                    CommentItem(item.comment)
-                                                is StoryDetailItem.CommentsLoadingItem ->
-                                                    LoadingView()
-                                                is StoryDetailItem.CommentsErrorItem ->
-                                                    ErrorView()
+                                                Spacer(modifier = LayoutHeight(insets.bottom.px.toDp() + 8.dp + 56.dp))
                                             }
                                         }
-
-                                        Spacer(modifier = LayoutHeight(insets.bottom.px.toDp() + 8.dp))
                                     }
-                                }
+                                is StoryDetailCommentsState.Empty ->
+                                    CommentsEmptyView()
+                                is StoryDetailCommentsState.Loading ->
+                                    LoadingView()
+                                is StoryDetailCommentsState.Error ->
+                                    ErrorView()
                             }
+
+                        is StoryDetailViewState.Loading -> LoadingView()
                         is StoryDetailViewState.Error -> ErrorView()
                     }
                 }
@@ -104,11 +110,12 @@ fun StoryDetailView(
                 with(DensityAmbient.current) {
                     Container(padding = EdgeInsets(bottom = insets.bottom.px.toDp())) {
                         FloatingActionButton(
+                            color = MaterialTheme.colors().secondary,
                             onClick = { onStoryContentClick(url) }
                         ) {
                             VectorImage(
                                 vector = Icons.Default.ArrowForward,
-                                tint = MaterialTheme.colors().secondary
+                                tint = MaterialTheme.colors().surface
                             )
                         }
                     }
@@ -166,18 +173,75 @@ fun StoryDetailToolbar(
 }
 
 @Composable
-fun CommentItem(comment: Comment) {
-    Container(padding = EdgeInsets(left = 16.dp, right = 16.dp, top = 8.dp, bottom = 6.dp)) {
-        Column(arrangement = Arrangement.Begin, modifier = LayoutWidth.Fill) {
-            Text(
-                text = comment.by.orEmpty(),
-                style = MaterialTheme.typography().subtitle1
-            )
-            Text(
-                text = Html.fromHtml(comment.text.orEmpty()).toString().trimEnd(),
-                style = MaterialTheme.typography().body2
-            )
+fun CommentItem(commentItem: FlatComment) {
+
+    val comment = commentItem.comment
+    val depthIndex = commentItem.depthIndex
+
+    Container(
+        padding = EdgeInsets(
+            left = 16.dp,
+            right = 16.dp,
+            top = 8.dp,
+            bottom = 6.dp
+        )
+    ) {
+        Row {
+
+            repeat(depthIndex) {
+                Surface(
+                    // color = colorResource(R.color.contentMuted),
+                    color = Color.Transparent,
+                    modifier = LayoutHeight.Min(1.dp) +
+                            LayoutHeight.Fill +
+                            LayoutPadding(right = 12.dp) +
+                            LayoutWidth(1.dp)
+                ) {}
+            }
+
+            Column(
+                arrangement = Arrangement.Begin,
+                modifier = LayoutWidth.Fill + LayoutFlexible(1f)
+            ) {
+
+                // Comments can be deleted
+                val isDeleted = comment.by == null
+
+                if (isDeleted) {
+                    Spacer(LayoutHeight(12.dp))
+                    Text(
+                        text = stringResource(R.string.comment_deleted_title),
+                        style = MaterialTheme.typography().subtitle2
+                    )
+                    Spacer(LayoutHeight(16.dp))
+                } else {
+                    Text(
+                        text = comment.by.orEmpty(),
+                        style = MaterialTheme.typography().subtitle2
+                    )
+                    Spacer(LayoutHeight(2.dp))
+                    Text(
+                        text = Html.fromHtml(comment.text.orEmpty()).toString().trimEnd(),
+                        style = MaterialTheme.typography().body2
+                    )
+                }
+            }
         }
+    }
+}
+
+@Preview
+@Composable
+fun CommentsEmptyView() {
+    Container(
+        expanded = true,
+        padding = EdgeInsets(32.dp)
+    ) {
+        Text(
+            text = stringResource(id = R.string.comments_empty),
+            style = MaterialTheme.typography().h6.copy(textAlign = TextAlign.Center),
+            modifier = LayoutAlign.Center
+        )
     }
 }
 
@@ -188,10 +252,13 @@ fun StoryDetailPreview() {
         val viewState =
             StoryDetailViewState.Success(
                 story = Story.dummy,
-                items = listOf(
-                    StoryDetailItem.CommentItem(Comment.dummy),
-                    StoryDetailItem.CommentItem(Comment.dummy),
-                    StoryDetailItem.CommentItem(Comment.dummy)
+                commentState = StoryDetailCommentsState.Success(
+                    listOf(
+                        FlatComment(Comment.dummy, 0),
+                        FlatComment(Comment.dummy, 1),
+                        FlatComment(Comment.dummy, 2),
+                        FlatComment(Comment.dummy, 0)
+                    )
                 )
             )
         StoryDetailView(

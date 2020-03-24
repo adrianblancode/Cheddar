@@ -44,8 +44,9 @@ constructor(
 
     private val storyTypeChannel = ConflatedBroadcastChannel<StoryType>(initialStoryType)
 
+    // Which pages we have already loaded
     // Prevents UI from constantly requesting increasing pages, must only request next gated page
-    private var currentPageIndexGate = 0
+    private var currentPageIndexGate = -1
 
     private val pageIndexChannel = ConflatedBroadcastChannel<Int>(0)
 
@@ -96,7 +97,7 @@ constructor(
     // Takes a list of story ids, and observes the full list of stories based on pagination
     private fun observePaginatedStories(storyIds: List<StoryId>): Flow<List<DecoratedStory>> =
         pageIndexChannel.asFlow()
-            .conflate()
+            // Block duplicate page emissions
             .distinctUntilChanged()
             .flatMapConcat { pageIndex ->
 

@@ -1,34 +1,30 @@
 package co.adrianblan.storyfeed
 
-import android.text.Html
-import androidx.compose.*
+import androidx.compose.Composable
+import androidx.compose.Observe
+import androidx.compose.key
+import androidx.compose.onCommit
 import androidx.lifecycle.LiveData
-import androidx.ui.core.*
-import androidx.ui.foundation.*
-import androidx.ui.foundation.shape.corner.RoundedCornerShape
+import androidx.ui.core.DensityAmbient
+import androidx.ui.core.Text
+import androidx.ui.foundation.ScrollerPosition
+import androidx.ui.foundation.VerticalScroller
 import androidx.ui.layout.*
 import androidx.ui.material.Button
 import androidx.ui.material.MaterialTheme
-import androidx.ui.material.ripple.Ripple
-import androidx.ui.material.surface.Surface
-import androidx.ui.res.colorResource
 import androidx.ui.res.stringResource
-import androidx.ui.text.AnnotatedString
-import androidx.ui.text.SpanStyle
-import androidx.ui.text.length
 import androidx.ui.text.style.TextAlign
-import androidx.ui.text.style.TextOverflow
 import androidx.ui.tooling.preview.Preview
-import androidx.ui.unit.*
-import co.adrianblan.common.urlSiteName
+import androidx.ui.unit.Px
+import androidx.ui.unit.dp
+import androidx.ui.unit.min
+import androidx.ui.unit.px
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.hackernews.api.dummy
 import co.adrianblan.ui.*
-import co.adrianblan.ui.InsetsAmbient
-import co.adrianblan.webpreview.WebPreviewData
 
 private const val toolbarMinHeightDp = 56
 private const val toolbarMaxHeightDp = 128
@@ -210,17 +206,18 @@ private fun LoadingMoreStoriesView() {
 private fun LoadMoreStoriesButton(
     onPageEndReached: () -> Unit
 ) {
-    Container(modifier = LayoutWidth.Fill) {
+    Container(modifier = LayoutWidth.Fill + LayoutPadding(top = 8.dp)) {
         Button(
             modifier = LayoutAlign.Center,
             onClick = onPageEndReached
         ) {
             Text(
                 stringResource(R.string.stories_load_more_stories),
+                style = MaterialTheme.typography().subtitle2,
                 modifier = LayoutPadding(
                     left = 16.dp,
                     right = 16.dp,
-                    top = 20.dp,
+                    top = 12.dp,
                     bottom = 8.dp
                 )
             )

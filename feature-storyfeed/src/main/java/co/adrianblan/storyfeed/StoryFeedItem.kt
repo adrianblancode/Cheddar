@@ -97,7 +97,7 @@ private fun buildSubtitleString(
     val stringBuilder = AnnotatedString.Builder()
 
     if (siteName != null) {
-        val emphStyle = MaterialTheme.typography().subtitle1
+        val emphStyle = MaterialTheme.typography().subtitle2
 
         stringBuilder.pushStyle(
             SpanStyle(
@@ -200,7 +200,7 @@ private fun StoryFeedItemImage(
                     ) {
                         Stack {
                             Surface(
-                                color = colorResource(R.color.contentLoading),
+                                color = colorResource(R.color.contentMuted),
                                 modifier = LayoutWidth.Fill + LayoutHeight.Fill
                             ) {}
 

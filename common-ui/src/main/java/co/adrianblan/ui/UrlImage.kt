@@ -92,7 +92,7 @@ private fun DrawImageState(state: ImageState, modifier: Modifier) {
                 }
             is ImageState.Error ->
                 Surface(
-                    color = colorResource(id = R.color.contentLoading),
+                    color = colorResource(id = R.color.contentMuted),
                     modifier = modifier
                 ) {}
             is ImageState.ImageSuccess ->
