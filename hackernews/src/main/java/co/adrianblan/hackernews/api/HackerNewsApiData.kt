@@ -4,6 +4,9 @@ package co.adrianblan.hackernews.api
 import kotlinx.serialization.*
 import java.time.Instant
 
+
+// TODO map to domain classes
+
 @Serializable(with = StoryIdSerializer::class)
 data class StoryId(val id: Long)
 

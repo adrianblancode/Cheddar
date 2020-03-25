@@ -5,10 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.ParentScope
 import co.adrianblan.common.onFirst
-import co.adrianblan.ui.node.Interactor
+import co.adrianblan.common.scanReducePages
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.StoryId
+import co.adrianblan.ui.node.Interactor
 import co.adrianblan.webpreview.WebPreviewRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
@@ -117,31 +118,11 @@ constructor(
             }
             .scanReducePages()
 
-    /** Takes in a flow that returns pages of values, and emits a flow with the sorted latest emission per page */
-    private fun <T> Flow<Pair<Int, List<T>>>.scanReducePages(): Flow<List<T>> =
-        flow {
-
-            val map = mutableMapOf<Int, List<T>>()
-
-            collect { (pageIndex: Int, value: List<T>) ->
-                map[pageIndex] = value
-
-                val sortedPages: List<T> =
-                    map.entries
-                        .sortedBy { it.key }
-                        .map { it.value }
-                        .flatten()
-
-                emit(sortedPages)
-            }
-        }
-
     init {
         scope.launch {
             combine(
                 storyTypeChannel.asFlow()
                     .distinctUntilChanged()
-                    .conflate()
                     .flatMapLatest { storyType ->
                         channelFlow<StoryFeedState> {
                             offer(StoryFeedState.Loading)

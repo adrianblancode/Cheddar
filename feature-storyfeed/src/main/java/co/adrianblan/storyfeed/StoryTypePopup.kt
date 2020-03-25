@@ -2,22 +2,26 @@ package co.adrianblan.storyfeed
 
 import androidx.compose.Composable
 import androidx.compose.remember
-import androidx.ui.core.*
+import androidx.ui.core.DropdownPopup
+import androidx.ui.core.PopupProperties
+import androidx.ui.core.Text
 import androidx.ui.foundation.Clickable
 import androidx.ui.foundation.shape.corner.RoundedCornerShape
-import androidx.ui.geometry.Offset
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
+import androidx.ui.material.icons.Icons
+import androidx.ui.material.icons.filled.Check
 import androidx.ui.material.ripple.Ripple
 import androidx.ui.material.surface.Surface
 import androidx.ui.res.stringResource
-import androidx.ui.unit.IntPxPosition
 import androidx.ui.unit.dp
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.ui.AppTheme
+import co.adrianblan.ui.VectorImage
 
 @Composable
 fun StoryTypePopup(
+    selectedStoryType: StoryType,
     onStoryTypeClick: (StoryType) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -28,8 +32,8 @@ fun StoryTypePopup(
         // Popups require reapplication of the app theme
         AppTheme {
             Container(
-                padding = EdgeInsets(20.dp),
-                constraints = DpConstraints(maxWidth = 200.dp)
+                padding = EdgeInsets(8.dp),
+                constraints = DpConstraints(maxWidth = 190.dp)
             ) {
                 Surface(
                     shape = RoundedCornerShape(4.dp),
@@ -41,8 +45,12 @@ fun StoryTypePopup(
 
                         storyTypes
                             .map { storyType ->
+
+                                val isSelected = selectedStoryType == storyType
+
                                 StoryTypePopupItem(
-                                    storyType
+                                    storyType = storyType,
+                                    isSelected = isSelected
                                 ) {
                                     onStoryTypeClick(storyType)
                                     onDismiss()
@@ -56,18 +64,42 @@ fun StoryTypePopup(
 }
 
 @Composable
-fun StoryTypePopupItem(storyType: StoryType, onClick: (StoryType) -> Unit) {
+fun StoryTypePopupItem(
+    storyType: StoryType,
+    isSelected: Boolean,
+    onClick: (StoryType) -> Unit
+) {
     Ripple(bounded = true) {
         Clickable(onClick = { onClick(storyType) }) {
-            Container(
-                modifier = LayoutWidth.Fill,
-                alignment = Alignment.BottomLeft
-            ) {
-                Text(
-                    text = stringResource(storyType.titleStringResource()),
-                    style = MaterialTheme.typography().h6,
-                    modifier = LayoutPadding(left = 12.dp, right = 12.dp, top = 8.dp, bottom = 6.dp)
-                )
+            Container(modifier = LayoutWidth.Fill + LayoutAlign.BottomLeft) {
+                Row(arrangement = Arrangement.SpaceBetween) {
+
+                    Text(
+                        text = stringResource(storyType.titleStringResource()),
+                        style = MaterialTheme.typography().subtitle1,
+                        modifier = LayoutFlexible(1f) +
+                                LayoutPadding(
+                                    left = 12.dp,
+                                    top = 16.dp,
+                                    bottom = 12.dp,
+                                    right = 12.dp
+                                )
+                    )
+
+                    if (isSelected) {
+                        Container(
+                            modifier = LayoutGravity.Center,
+                            padding = EdgeInsets(right = 12.dp, top = 2.dp)
+                        ) {
+                            VectorImage(
+                                vector = Icons.Default.Check,
+                                tint = MaterialTheme.colors().secondary,
+                                modifier = LayoutGravity.Center +
+                                        LayoutSize(32.dp, 32.dp)
+                            )
+                        }
+                    }
+                }
             }
         }
     }

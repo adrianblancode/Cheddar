@@ -7,10 +7,9 @@ import androidx.ui.core.*
 import androidx.ui.foundation.DrawImage
 import androidx.ui.graphics.Color
 import androidx.ui.graphics.Image
-import androidx.ui.layout.Container
-import androidx.ui.layout.LayoutHeight
-import androidx.ui.layout.LayoutWidth
+import androidx.ui.layout.*
 import androidx.ui.material.ColorPalette
+import androidx.ui.material.MaterialTheme
 import androidx.ui.material.surface.Surface
 import androidx.ui.res.colorResource
 import androidx.ui.unit.Dp
@@ -78,23 +77,18 @@ fun UrlImage(
         }
     }
 
-    val modifier: Modifier = LayoutWidth(width) + LayoutHeight(height)
-    DrawImageState(state = imageState.value, modifier = modifier)
+    DrawImageState(state = imageState.value)
 }
 
 @Composable
-private fun DrawImageState(state: ImageState, modifier: Modifier) {
+private fun DrawImageState(state: ImageState) {
     RepaintBoundary {
         when (state) {
             is ImageState.Loading ->
                 Container(expanded = true) {
                     ShimmerView()
                 }
-            is ImageState.Error ->
-                Surface(
-                    color = colorResource(id = R.color.contentMuted),
-                    modifier = modifier
-                ) {}
+            is ImageState.Error -> {}
             is ImageState.ImageSuccess ->
                 DrawImage(image = state.image)
         }
@@ -102,7 +96,7 @@ private fun DrawImageState(state: ImageState, modifier: Modifier) {
 }
 
 private sealed class ImageState {
+    data class ImageSuccess(val image: Image) : ImageState()
     object Loading : ImageState()
     object Error : ImageState()
-    class ImageSuccess(val image: Image) : ImageState()
 }

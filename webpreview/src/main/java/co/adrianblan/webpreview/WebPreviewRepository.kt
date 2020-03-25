@@ -92,8 +92,8 @@ class WebPreviewRepository
     private fun String.takeImageUrlIfCompatible(): String? {
         val ending = this.split("?")[0]
 
-        // We want to prioritize other image types
-        val forbiddenTypes = listOf(".ico", ".svg")
+        // We can't render svg as is
+        val forbiddenTypes = listOf(".svg")
 
         return if (forbiddenTypes.any { ending.endsWith(it) }) null
         else this
