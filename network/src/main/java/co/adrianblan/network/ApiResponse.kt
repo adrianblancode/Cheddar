@@ -1,68 +1,91 @@
 package co.adrianblan.network
 
-data class ApiException(
-    val statusCode: Int,
-    val statusMessage: String,
-    val errorResponse: String?
-) : Exception("$statusCode $statusMessage $errorResponse")
+import retrofit2.Response
 
-/** Wrapper for Retrofit Response */
-sealed class ApiResponse<out T> {
+/** Api class which wraps network responses */
+sealed class ApiResponse<T : Any?> {
 
-    abstract val statusCode: Int?
+    abstract val statusCode: Int
 
-    abstract val statusMessage: String
-
-    val isSuccessful: Boolean
-        get() = statusCode in 200 until 300
-
-    data class Success<out T>(
+    data class Success<T>(
         override val statusCode: Int,
-        override val statusMessage: String,
+        // If empty response, data is null
         val data: T
-    ) : ApiResponse<T>() {
+    ) : ApiResponse<T>()
 
-        // Returns true if empty response
-        inline val isEmpty: Boolean
-            get() = data == null
+    data class ApiError<T>(
+        override val statusCode: Int,
+        val errorMessage: String?,
+        val httpErrorMessage: String?
+    ) : ApiResponse<T>()
+}
 
-        @Suppress("UNCHECKED_CAST")
-        internal fun <V> unsafeCast(): ApiResponse<V> = this as ApiResponse<V>
+fun <T : Any> Response<T>.wrapApiResponse(): ApiResponse<T?> {
 
-        // Creates a copy of the success, but with different data
-        @Suppress("UNCHECKED_CAST")
-        fun <V> withData(data: V): Success<V> {
-            if (isEmpty && data == null) {
-                return this as Success<V>
-            }
-            return (this as Success<V>).copy(data = data)
-        }
-    }
+    val response = this
 
-    data class Error<out T>(
-        override val statusCode: Int?,
-        override val statusMessage: String,
-        val error: Throwable,
-        val errorResponse: String?
-    ) : ApiResponse<T>() {
+    return if (response.isSuccessful) {
 
-        constructor(error: ApiException) : this(error.statusCode, error.statusMessage, error, error.errorResponse)
+        val body = response.body()
+            .takeIf { response.code() != 204 }
 
-        init {
-            require(!isSuccessful) { "Cannot create a successful Error" }
-        }
+        ApiResponse.Success(
+            statusCode = response.code(),
+            data = body
+        )
+    } else {
 
-        /**
-         * Cast this class's generic to another type.
-         */
-        @Suppress("UNCHECKED_CAST") // Fine because this class does not refer to T
-        fun <V> cast(): ApiResponse<V> = this as ApiResponse<V>
+        val errorMessage: String? =
+            response.errorBody()?.string()
 
-        companion object {
-
-            @JvmStatic
-            fun <T> createForNetworkError(error: Throwable): ApiResponse<T> =
-                Error(null, requireNotNull(error.message), error, null)
-        }
+        ApiResponse.ApiError(
+            statusCode = response.code(),
+            errorMessage = errorMessage,
+            httpErrorMessage = response.message()
+        )
     }
 }
+
+// Unwraps api response to success value or throws
+fun <T> ApiResponse<T>.unwrapApiResponse(): T =
+    when (this) {
+        is ApiResponse.Success -> this.data
+        is ApiResponse.ApiError -> throw ApiException.of(this)
+    }
+
+// Maps a empty body response to list
+fun <T : Any> ApiResponse<List<T>?>.mapNullResponseToEmptyList(): ApiResponse<List<T>> =
+    this.mapNullResponseTo { emptyList() }
+
+/** */
+@Suppress("UNCHECKED_CAST")
+fun <T : Any> ApiResponse<T?>.mapNullResponseTo(mapper: (ApiResponse<T?>) -> T): ApiResponse<T> =
+    when (this) {
+        is ApiResponse.Success<T?> ->
+            ApiResponse.Success<T>(
+                statusCode = statusCode,
+                data = this.data ?: mapper(this)
+            )
+        is ApiResponse.ApiError<T?> -> this as ApiResponse.ApiError<T>
+    }
+
+// Converts an api response to nullable success, or throws otherwise
+fun <T : Any> ApiResponse<T?>.toNullableSuccessResponseOrThrow(): ApiResponse.Success<T?> =
+    when (this) {
+        is ApiResponse.Success<T?> -> this
+        is ApiResponse.ApiError -> throw ApiException.of(this)
+    }
+
+// Converts a successful api response to non null data, or throws otherwise
+fun <T : Any> ApiResponse<T?>.throwIfEmptyResponse(): ApiResponse.Success<T> =
+    when (this) {
+        is ApiResponse.Success<T?> -> {
+            if (data == null) throw EmptyResponseException()
+            else ApiResponse.Success<T>(statusCode = statusCode, data = data)
+        }
+        is ApiResponse.ApiError -> throw ApiException.of(this)
+    }
+
+
+class EmptyResponseException() : Exception("Response returned empty body")
+
