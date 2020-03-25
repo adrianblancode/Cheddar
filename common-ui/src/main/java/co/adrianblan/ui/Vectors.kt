@@ -36,7 +36,7 @@ fun VectorImage(
 ) {
     with(DensityAmbient.current) {
         Container(
-            modifier = modifier + LayoutSize(vector.defaultWidth, vector.defaultHeight)
+            modifier = LayoutSize(vector.defaultWidth, vector.defaultHeight) + modifier
         ) {
             DrawVector(vector, tint)
         }

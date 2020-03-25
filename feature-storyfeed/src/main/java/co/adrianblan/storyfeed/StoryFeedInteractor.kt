@@ -12,6 +12,7 @@ import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.webpreview.WebPreviewRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -123,16 +124,20 @@ constructor(
 
             val map = mutableMapOf<Int, List<T>>()
 
-            collect { (pageIndex: Int, value: List<T>) ->
-                map[pageIndex] = value
+            coroutineScope {
+                collect { (pageIndex: Int, value: List<T>) ->
+                    ensureActive()
 
-                val sortedPages: List<T> =
-                    map.entries
-                        .sortedBy { it.key }
-                        .map { it.value }
-                        .flatten()
+                    map[pageIndex] = value
 
-                emit(sortedPages)
+                    val sortedPages: List<T> =
+                        map.entries
+                            .sortedBy { it.key }
+                            .map { it.value }
+                            .flatten()
+
+                    emit(sortedPages)
+                }
             }
         }
 
@@ -141,7 +146,6 @@ constructor(
             combine(
                 storyTypeChannel.asFlow()
                     .distinctUntilChanged()
-                    .conflate()
                     .flatMapLatest { storyType ->
                         channelFlow<StoryFeedState> {
                             offer(StoryFeedState.Loading)

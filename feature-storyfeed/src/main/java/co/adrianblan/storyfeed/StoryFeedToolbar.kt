@@ -58,6 +58,7 @@ fun StoryFeedToolbar(
 
             if (showStoryTypePopup) {
                 StoryTypePopup(
+                    selectedStoryType = storyType,
                     onStoryTypeClick = { storyType ->
                         onStoryTypeClick(storyType)
                         showStoryTypePopup = false

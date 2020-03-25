@@ -8,6 +8,7 @@ import androidx.ui.core.Alignment
 import androidx.ui.core.DensityAmbient
 import androidx.ui.core.Modifier
 import androidx.ui.core.Text
+import androidx.ui.foundation.Clickable
 import androidx.ui.foundation.ScrollerPosition
 import androidx.ui.foundation.VerticalScroller
 import androidx.ui.graphics.Color
@@ -17,6 +18,7 @@ import androidx.ui.material.MaterialTheme
 import androidx.ui.material.Scaffold
 import androidx.ui.material.icons.Icons
 import androidx.ui.material.icons.filled.*
+import androidx.ui.material.ripple.Ripple
 import androidx.ui.material.surface.Surface
 import androidx.ui.res.colorResource
 import androidx.ui.res.stringResource
@@ -134,12 +136,16 @@ fun StoryDetailToolbar(
 ) {
     Stack {
         Container(padding = EdgeInsets(4.dp)) {
-            VectorImageButton(
-                vector = Icons.Default.ArrowBack,
-                tint = MaterialTheme.colors().onBackground,
-                modifier = LayoutGravity.TopLeft + LayoutSize(48.dp, 48.dp)
-            ) {
-                onBackPressed()
+
+            Ripple(bounded = false) {
+                Clickable(onClick = onBackPressed) {
+                    Container(modifier = LayoutGravity.TopLeft + LayoutSize(48.dp, 48.dp)) {
+                        VectorImage(
+                            vector = Icons.Default.ArrowBack,
+                            tint = MaterialTheme.colors().onBackground
+                        )
+                    }
+                }
             }
         }
 
@@ -149,26 +155,28 @@ fun StoryDetailToolbar(
             remember(collapsedFraction) { lerp(48.dp, 0.dp, collapsedFraction) }
         val titleMaxLines = remember(collapsedFraction) { if (collapsedFraction > 0.1f) 1 else 3 }
 
-        Container(
-            alignment = Alignment.BottomLeft,
-            modifier = LayoutHeight(height)
-        ) {
-            Text(
-                text = storyTitle,
-                style = MaterialTheme.typography().h6,
-                modifier = LayoutGravity.CenterLeft +
-                        LayoutPadding(
-                            left = 16.dp + titleCollapsedLeftOffset,
-                            right = 16.dp,
-                            top = titleCollapsedTopOffset
-                        ) +
-                        LayoutWidth.Fill +
-                        LayoutHeight(height) +
-                        LayoutAlign.CenterLeft,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = titleMaxLines
+        val titleFontSize: TextUnit =
+            lerp(
+                MaterialTheme.typography().h6.fontSize,
+                MaterialTheme.typography().subtitle1.fontSize,
+                collapsedFraction
             )
-        }
+
+        Text(
+            text = storyTitle,
+            style = MaterialTheme.typography().h6.copy(fontSize = titleFontSize),
+            modifier = LayoutGravity.CenterLeft +
+                    LayoutPadding(
+                        left = 16.dp + titleCollapsedLeftOffset,
+                        right = 16.dp,
+                        top = titleCollapsedTopOffset
+                    ) +
+                    LayoutWidth.Fill +
+                    LayoutHeight(height) +
+                    LayoutAlign.CenterLeft,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = titleMaxLines
+        )
     }
 }
 

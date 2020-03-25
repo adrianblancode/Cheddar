@@ -17,10 +17,9 @@ import androidx.ui.material.MaterialTheme
 import androidx.ui.res.stringResource
 import androidx.ui.text.TextStyle
 import androidx.ui.tooling.preview.Preview
-import androidx.ui.unit.Dp
-import androidx.ui.unit.Px
-import androidx.ui.unit.TextUnit
-import androidx.ui.unit.dp
+import androidx.ui.unit.*
+import co.adrianblan.ui.extensions.lerp
+import kotlin.math.sin
 
 @Preview
 @Composable
@@ -60,7 +59,7 @@ private val loadingDefinition = transitionDefinition {
         loadingState using repeatable<Float> {
             animation = tween {
                 easing = LinearEasing
-                duration = 1500
+                duration = 1200
             }
             iterations = Infinite
         }
@@ -73,23 +72,15 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
 
     val size: Dp = with(DensityAmbient.current) { fontSize.toDp() }
 
+    val dotPaint = Paint().apply {
+        color = MaterialTheme.colors().onBackground
+    }
+
     Container(
         height = size,
         width = size * 1.2f,
         modifier = LayoutAlign.BottomCenter
     ) {
-
-        val textColor = MaterialTheme.colors().onBackground
-
-        val selectedPaint = Paint()
-            .apply {
-                color = MaterialTheme.colors().onBackground
-            }
-
-        val disabledPaint = Paint()
-            .apply {
-                color = textColor.copy(alpha = 0.35f)
-            }
 
         Transition(
             definition = loadingDefinition,
@@ -98,31 +89,54 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
         ) { transitionState ->
 
             val progress: Float = transitionState[loadingState]
-            val dotIndex: Int = ((progress * 3) % 3).toInt()
 
             Draw { canvas, parentSize ->
 
                 val widthStep: Px = parentSize.width * 0.25f
-                val circleOffsetY: Px = parentSize.height * 0.90f
+
+                // Positions for the lowest and highest points in animation
+                val circleBaseY: Px = parentSize.height * 0.90f
+                val circleTopY: Px = parentSize.height * 0.80f
+
+                val progressAngleBase: Double = progress * Math.PI * 2f
+                val maxProgressAngleOffset: Double = Math.PI * 0.7
 
                 val circleRadius = (parentSize.width * 0.08f).value
 
-                // Every step one dot is selected
-                canvas.drawCircle(
-                    Offset(dx = widthStep.value, dy = circleOffsetY.value),
-                    radius = circleRadius,
-                    paint = if (dotIndex == 0) selectedPaint else disabledPaint
-                )
-                canvas.drawCircle(
-                    Offset(dx = (widthStep * 2).value, dy = circleOffsetY.value),
-                    radius = circleRadius,
-                    paint = if (dotIndex == 1) selectedPaint else disabledPaint
-                )
-                canvas.drawCircle(
-                    Offset(dx = (widthStep * 3).value, dy = circleOffsetY.value),
-                    radius = circleRadius,
-                    paint = if (dotIndex == 2) selectedPaint else disabledPaint
-                )
+                repeat(3) { index ->
+
+                    // Dots have increasing progress offset to give a wave look
+                    val progressAngleOffset: Double = -(maxProgressAngleOffset / 2) * index
+
+                    // [-1, 1]
+                    val value = sin(progressAngleBase + progressAngleOffset).toFloat()
+
+                    // Factor applied to negative values
+                    val downBounceFactor = 0.25f
+
+                    // Coercion leads to two cycles, positive one animates up and negative is small bounce
+                    // [-downBounceFactor, 1]
+                    val yFraction =
+                        if (value > 0) value
+                        else value * downBounceFactor
+
+                    // Normalize to [0, 1]
+                    val normalizedYFraction =
+                        (yFraction + downBounceFactor / (1f + downBounceFactor))
+
+                    val circleDyValue = lerp(circleBaseY, circleTopY, normalizedYFraction)
+
+                    val circleDxValue = widthStep * (index + 1)
+
+                    canvas.drawCircle(
+                        Offset(
+                            dx = circleDxValue.value,
+                            dy = circleDyValue.value
+                        ),
+                        radius = circleRadius,
+                        paint = dotPaint
+                    )
+                }
             }
         }
     }

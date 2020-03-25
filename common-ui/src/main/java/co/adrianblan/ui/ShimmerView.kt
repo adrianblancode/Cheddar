@@ -16,7 +16,7 @@ import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.Px
 import androidx.ui.unit.px
 import androidx.ui.unit.toRect
-import co.adrianblan.common.lerp
+import co.adrianblan.ui.extensions.lerp
 
 /** View with a shimmering effect, for loading content */
 @Preview

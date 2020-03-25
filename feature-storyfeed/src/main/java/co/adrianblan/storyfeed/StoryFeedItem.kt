@@ -82,6 +82,7 @@ fun StoryFeedItem(
 
         if (storyUrl != null && webPreviewState != null) {
             StoryFeedItemImage(
+                storyUrl = storyUrl,
                 webPreviewState = webPreviewState,
                 onClick = { onStoryContentClick(storyUrl) }
             )
@@ -179,6 +180,7 @@ fun StoryFeedItemDescription(
 
 @Composable
 private fun StoryFeedItemImage(
+    storyUrl: StoryUrl,
     webPreviewState: WebPreviewState?,
     onClick: () -> Unit
 ) {
@@ -219,6 +221,7 @@ private fun StoryFeedItemImage(
 
                                     UrlImage(imageUrl)
                                 }
+                                is WebPreviewState.Error -> { }
                             }
                         }
                     }
