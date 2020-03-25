@@ -2,7 +2,7 @@
 
 # [WIP] Cheddar for Hacker News
 
-Cheddar is a lightweight reader for Hacker News, so you can read the latest news and comments from Hacker News on your mobile device. It is free, has no ads and uses Material Design. Cheddar has been developed with the purpose to provide a minimalist and intuitive experience, focusing on usability.
+Cheddar is an award winning social news reader for Hacker News. Currently it's being entirely rewritten using Kotlin + Flow, Compose, an entirely Compose-first architecture with heavy modularization. As Compose hasn't entered alpha yet, things might be very unstable for now.
 
 Featured on [XDA-Developers](http://www.xda-developers.com/apps-of-the-week-material-facebook-hacker-news-web-making-and-pac-man/), "Well-designed social news readers of this caliber do not come very often"
 
