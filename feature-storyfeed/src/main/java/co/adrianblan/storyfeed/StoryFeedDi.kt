@@ -3,6 +3,7 @@ package co.adrianblan.storyfeed
 import co.adrianblan.common.ParentScope
 import dagger.BindsInstance
 import dagger.Subcomponent
+import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.inject.Scope
 
@@ -28,3 +29,17 @@ internal annotation class StoryFeedScope
 @Qualifier
 @Retention
 internal annotation class StoryFeedInternal
+
+
+class StoryFeedNodeBuilder
+@Inject constructor(
+    private val storyFeedComponentBuilder: StoryFeedComponent.Factory
+) {
+    fun build(
+        listener: StoryFeedNode.Listener,
+        parentScope: ParentScope
+    ): StoryFeedNode =
+        storyFeedComponentBuilder
+            .build(listener, parentScope)
+            .storyFeedNode()
+}

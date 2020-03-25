@@ -1,20 +1,10 @@
 package co.adrianblan.common
 
-fun String.urlSiteName(): String {
-
-    /*
-    // Drops tld and also removes remaining .co
-    urlWithTld.split(".")
-        .dropLast(1)
-        .joinToString(".")
-        .removeSuffix(".co")
-     */
-
-    return baseUrl()
+fun String.urlSiteName(): String =
+    baseUrl()
         .removePrefix("https://")
         .removePrefix("http://")
         .removePrefix("www.")
-}
 
 fun String.baseUrl(): String {
     val http = "http://"

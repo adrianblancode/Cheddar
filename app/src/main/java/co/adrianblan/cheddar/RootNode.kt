@@ -1,29 +1,26 @@
 package co.adrianblan.cheddar
 
-import android.content.Context
-import android.content.Intent
-import androidx.browser.customtabs.CustomTabsIntent
+import androidx.annotation.VisibleForTesting
 import androidx.compose.Composable
-import androidx.core.net.toUri
 import co.adrianblan.cheddar.di.RootInternal
+import co.adrianblan.cheddar.extensions.CustomTabsLauncher
 import co.adrianblan.common.ParentScope
-import co.adrianblan.ui.node.Node
-import co.adrianblan.ui.RootScreen
-import co.adrianblan.ui.node.StackRouter
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
-import co.adrianblan.storyfeed.StoryFeedComponent
-import co.adrianblan.storyfeed.StoryFeedNode
-import co.adrianblan.storydetail.StoryDetailComponent
 import co.adrianblan.storydetail.StoryDetailNode
+import co.adrianblan.storydetail.StoryDetailNodeBuilder
+import co.adrianblan.storyfeed.StoryFeedNode
+import co.adrianblan.storyfeed.StoryFeedNodeBuilder
+import co.adrianblan.ui.RootScreen
+import co.adrianblan.ui.node.Node
+import co.adrianblan.ui.node.StackRouter
 import javax.inject.Inject
 
 class RootNode
 @Inject constructor(
-    // TODO remove context
-    private val context: Context,
-    private val storyFeedComponentBuilder: StoryFeedComponent.Factory,
-    private val storyDetailComponentBuilder: StoryDetailComponent.Factory,
+    private val storyFeedNodeBuilder: StoryFeedNodeBuilder,
+    private val storyDetailNodeBuilder: StoryDetailNodeBuilder,
+    private val customTabsLauncher: CustomTabsLauncher,
     @RootInternal private val parentScope: ParentScope
 ) : Node, StoryFeedNode.Listener, StoryDetailNode.Listener {
 
@@ -32,41 +29,38 @@ class RootNode
     }
 
     private val storyFeedNode: StoryFeedNode by lazy {
-        storyFeedComponentBuilder
+        storyFeedNodeBuilder
             .build(
                 listener = this,
                 parentScope = parentScope
             )
-            .storyFeedNode()
+    }
+
+    @VisibleForTesting
+    internal val nodes: List<Node>
+        get() = router.nodes
+
+    override val composeView = @Composable {
+        RootScreen(nodes)
     }
 
     override fun onStoryClicked(storyId: StoryId) {
         router.push(
-            storyDetailComponentBuilder
+            storyDetailNodeBuilder
                 .build(
                     storyId = storyId,
                     listener = this,
                     parentScope = parentScope
                 )
-                .storyDetailNode()
         )
     }
 
     override fun onStoryContentClicked(storyUrl: StoryUrl) {
-        CustomTabsIntent.Builder()
-            .build()
-            .apply {
-                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            }
-            .launchUrl(context, storyUrl.url.toUri())
+        customTabsLauncher.launchUrl(storyUrl.url)
     }
 
     override fun onStoryDetailFinished() {
         onBackPressed()
-    }
-
-    override val composeView = @Composable {
-        RootScreen(router)
     }
 
     override fun onBackPressed(): Boolean =

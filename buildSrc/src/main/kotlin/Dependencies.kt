@@ -16,6 +16,7 @@ object Versions {
 
     const val junit = "4.13"
     const val androidTestJunit = "1.1.1"
+    const val mockito = "3.3.3"
 }
 
 object Dependencies {
@@ -28,6 +29,7 @@ object Dependencies {
 
     const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
     const val coroutinesAndroid =  "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}"
+    const val coroutinesTest =  "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.coroutines}"
 
     const val androidxAppcompat = "androidx.appcompat:appcompat:${Versions.androidxAppcompat}"
     const val androidxCore = "androidx.core:core-ktx:${Versions.androidxCore}"
@@ -61,4 +63,7 @@ object Dependencies {
 
     const val junit = "junit:junit:${Versions.junit}"
     const val androidTestJunit = "androidx.test.ext:junit:${Versions.androidTestJunit}"
+    const val mockito = "org.mockito:mockito-core:${Versions.mockito}"
+    const val mockitoInline = "org.mockito:mockito-inline:${Versions.mockito}"
+    const val mockitoKotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"
 }

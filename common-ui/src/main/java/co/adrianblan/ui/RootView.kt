@@ -8,24 +8,25 @@ import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
 import androidx.ui.material.surface.Surface
 import androidx.ui.unit.px
+import co.adrianblan.ui.node.Node
 import co.adrianblan.ui.node.Router
 
 @Composable
-fun RootScreen(router: Router) {
-    Crossfade(router.nodes.lastOrNull()) {
+fun RootScreen(nodes: List<Node>) {
+    Crossfade(nodes.lastOrNull()) { node ->
         Stack {
 
             val insets = InsetsAmbient.current
 
             // We don't want to deal with the hassle of left-right insets, so just apply them to all screens
-            with (DensityAmbient.current) {
+            with(DensityAmbient.current) {
                 Container(
                     padding = EdgeInsets(
                         left = insets.left.px.toDp(),
                         right = insets.right.px.toDp()
                     )
                 ) {
-                    it?.composeView?.invoke()
+                    node?.composeView?.invoke()
                 }
             }
 
@@ -41,7 +42,7 @@ fun NavigationBarScrim(
 ) {
     val insets = InsetsAmbient.current
 
-    with (DensityAmbient.current) {
+    with(DensityAmbient.current) {
         Surface(
             color = MaterialTheme.colors().background.copy(alpha = overInsetAlpha),
             modifier = modifier + LayoutHeight(insets.bottom.px.toDp()) + LayoutWidth.Fill

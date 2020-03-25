@@ -31,9 +31,9 @@ kapt {
 }
 
 dependencies {
-    api(Dependencies.kotlinStdlib)
-    api(Dependencies.coroutinesCore)
-    api(Dependencies.coroutinesAndroid)
+    implementation(Dependencies.kotlinStdlib)
+    implementation(Dependencies.coroutinesCore)
+    implementation(Dependencies.coroutinesAndroid)
 
     implementation(Dependencies.timber)
     implementation(Dependencies.androidxCore)
@@ -48,4 +48,8 @@ dependencies {
 
     testImplementation(Dependencies.junit)
     androidTestImplementation(Dependencies.androidTestJunit)
+    testImplementation(Dependencies.mockito)
+    testImplementation(Dependencies.mockitoInline)
+    testImplementation(Dependencies.mockitoKotlin)
+    testImplementation(Dependencies.coroutinesTest)
 }

@@ -1,6 +1,8 @@
 package co.adrianblan.cheddar.di
 
 import android.content.Context
+import co.adrianblan.cheddar.extensions.CustomTabsLauncher
+import co.adrianblan.cheddar.extensions.CustomTabsLauncherImpl
 import co.adrianblan.common.DefaultDispatcherProvider
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.hackernews.HackerNewsModule
@@ -11,11 +13,17 @@ import dagger.*
 import javax.inject.Singleton
 
 @Module
-object AppModule {
-    @Singleton
-    @Provides
-    fun dispatcherProvider(): DispatcherProvider =
-        DefaultDispatcherProvider
+interface AppModule {
+
+    @Binds
+    fun CustomTabsLauncherImpl.bindInterface(): CustomTabsLauncher
+
+    companion object {
+        @Singleton
+        @Provides
+        fun dispatcherProvider(): DispatcherProvider =
+            DefaultDispatcherProvider
+    }
 }
 
 @Singleton
@@ -29,6 +37,8 @@ interface AppComponent {
     fun context(): Context
     
     fun dispatcherProvider(): DispatcherProvider
+    fun customTabsLauncher(): CustomTabsLauncher
+
     fun hackerNewsRepository(): HackerNewsRepository
     fun webPreviewRepository(): WebPreviewRepository
 
