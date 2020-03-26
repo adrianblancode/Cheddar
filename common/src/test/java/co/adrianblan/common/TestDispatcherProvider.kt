@@ -15,6 +15,8 @@ class TestDispatcherProvider: DispatcherProvider {
 
 class CoroutineTestRule : TestWatcher() {
 
+    private val dispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()
+
     override fun starting(description: Description?) {
         super.starting(description)
     }

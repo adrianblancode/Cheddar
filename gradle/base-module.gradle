@@ -46,6 +46,7 @@ dependencies {
 
     coreLibraryDesugaring(Dependencies.desugar)
 
+    testImplementation(Dependencies.androidxCoreTesting)
     testImplementation(Dependencies.junit)
     androidTestImplementation(Dependencies.androidTestJunit)
     testImplementation(Dependencies.mockito)
