@@ -35,18 +35,6 @@ import co.adrianblan.ui.InsetsAmbient
 
 private const val toolbarMaxHeightDp = 128
 
-@Composable
-fun StoryDetailScreen(
-    viewState: LiveData<StoryDetailViewState>,
-    onStoryContentClick: (StoryUrl) -> Unit,
-    onBackPressed: () -> Unit
-) {
-    StoryDetailView(
-        viewState = observe(viewState),
-        onStoryContentClick = onStoryContentClick,
-        onBackPressed = onBackPressed
-    )
-}
 
 @Composable
 fun StoryDetailView(

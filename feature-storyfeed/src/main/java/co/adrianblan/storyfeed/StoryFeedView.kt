@@ -40,23 +40,6 @@ internal fun StoryType.titleStringResource(): Int =
     }
 
 @Composable
-fun StoryFeedScreen(
-    viewState: LiveData<StoryFeedViewState>,
-    onStoryTypeClick: (StoryType) -> Unit,
-    onStoryClick: (StoryId) -> Unit,
-    onStoryContentClick: (StoryUrl) -> Unit,
-    onPageEndReached: () -> Unit
-) {
-    StoryFeedView(
-        viewState = observe(viewState),
-        onStoryTypeClick = onStoryTypeClick,
-        onStoryClick = onStoryClick,
-        onStoryContentClick = onStoryContentClick,
-        onPageEndReached = onPageEndReached
-    )
-}
-
-@Composable
 fun StoryFeedView(
     viewState: StoryFeedViewState,
     onStoryTypeClick: (StoryType) -> Unit,

@@ -1,28 +1,35 @@
 package co.adrianblan.ui.node
 
-import androidx.compose.Model
-import androidx.compose.frames.ModelList
-import androidx.compose.frames.modelListOf
-
 /** A Router is used by a parent Node to attach and detach child Nodes */
 interface Router {
-    val nodes: List<Node>
+    val nodes: List<Node<*>>
     fun onBackPressed(): Boolean
 }
 
-@Model
-class StackRouter private constructor(
-    override val nodes: ModelList<Node>
-): Router {
+class StackRouter constructor(
+    initialState: List<Node<*>>,
+    private val onRouterUpdate: Router.() -> Unit
+) : Router {
 
-    fun push(node: Node) =
+    override var nodes: MutableList<Node<*>> = initialState.toMutableList()
+        private set
+
+    init {
+        onRouterUpdate()
+    }
+
+    fun push(node: Node<*>) {
         nodes.add(node)
+        onRouterUpdate(this)
+    }
 
     private fun pop() {
         nodes.removeAt(nodes.size - 1)
             .apply {
                 detach()
             }
+
+        onRouterUpdate(this)
     }
 
     private fun canPop() = nodes.size > 1
@@ -40,10 +47,5 @@ class StackRouter private constructor(
             pop()
             true
         } else false
-    }
-
-    companion object {
-        fun of(initialNode: Node): StackRouter =
-            StackRouter(modelListOf(initialNode))
     }
 }

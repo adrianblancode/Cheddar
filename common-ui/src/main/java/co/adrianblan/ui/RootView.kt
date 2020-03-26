@@ -9,11 +9,10 @@ import androidx.ui.material.MaterialTheme
 import androidx.ui.material.surface.Surface
 import androidx.ui.unit.px
 import co.adrianblan.ui.node.Node
-import co.adrianblan.ui.node.Router
 
 @Composable
-fun RootScreen(nodes: List<Node>) {
-    Crossfade(nodes.lastOrNull()) { node ->
+fun RootView(node: Node<*>) {
+    Crossfade(node) {
         Stack {
 
             val insets = InsetsAmbient.current
@@ -26,7 +25,7 @@ fun RootScreen(nodes: List<Node>) {
                         right = insets.right.px.toDp()
                     )
                 ) {
-                    node?.composeView?.invoke()
+                    node.nodeView()
                 }
             }
 

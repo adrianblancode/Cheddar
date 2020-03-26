@@ -1,5 +1,6 @@
 package co.adrianblan.cheddar
 
+import androidx.compose.Model
 import co.adrianblan.storydetail.StoryDetailNodeBuilder
 import co.adrianblan.storyfeed.StoryFeedNode
 import co.adrianblan.storyfeed.StoryFeedNodeBuilder
@@ -31,10 +32,10 @@ class RootNodeTest {
         )
     }
 
-    // TODO re-enable @Test when compose works better with testing
     // We have a @Model in Router which throws if used outside an active frame
+    @Model
     fun testInitialState() {
-        assertEquals(1, rootNode.nodes.size)
-        assertEquals(StoryFeedNode::class, rootNode.nodes.lastOrNull()?.let { it::class })
+        assertEquals(1, rootNode.viewStateFlow.value)
+        assert(rootNode.viewStateFlow.value is StoryFeedNode)
     }
 }

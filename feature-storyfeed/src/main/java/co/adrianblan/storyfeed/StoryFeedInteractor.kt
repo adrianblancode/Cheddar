@@ -1,11 +1,6 @@
 package co.adrianblan.storyfeed
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import co.adrianblan.common.DispatcherProvider
-import co.adrianblan.common.ParentScope
-import co.adrianblan.common.onFirst
-import co.adrianblan.common.scanReducePages
+import co.adrianblan.common.*
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.StoryId
@@ -28,20 +23,19 @@ constructor(
     @StoryFeedInternal override val parentScope: ParentScope
 ) : Interactor() {
 
-    val viewState: LiveData<StoryFeedViewState> get() = _viewState
-
     private val initialStoryType: StoryType = StoryType.TOP
 
-    private val _viewState by lazy {
-        MutableLiveData<StoryFeedViewState>(
-            StoryFeedViewState(
-                storyType = initialStoryType,
-                storyFeedState = StoryFeedState.Loading,
-                isLoadingMorePages = true,
-                hasLoadedAllPages = false
-            )
+    private val viewStateChannel = ConflatedBroadcastChannel<StoryFeedViewState>(
+        StoryFeedViewState(
+            storyType = initialStoryType,
+            storyFeedState = StoryFeedState.Loading,
+            isLoadingMorePages = true,
+            hasLoadedAllPages = false
         )
-    }
+    )
+
+    val viewStateFlow: StateFlow<StoryFeedViewState> =
+        viewStateChannel.asStateFlow()
 
     private val storyTypeChannel = ConflatedBroadcastChannel<StoryType>(initialStoryType)
 
@@ -168,7 +162,7 @@ constructor(
                 .flowOn(dispatcherProvider.IO)
                 .collectLatest { storyViewState ->
                     ensureActive()
-                    _viewState.value = storyViewState
+                    viewStateChannel.offer(storyViewState)
                 }
         }
     }

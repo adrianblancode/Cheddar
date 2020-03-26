@@ -1,17 +1,17 @@
 package co.adrianblan.storydetail
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.ParentScope
+import co.adrianblan.common.StateFlow
+import co.adrianblan.common.asStateFlow
 import co.adrianblan.ui.node.Interactor
 import co.adrianblan.hackernews.HackerNewsRepository
-import co.adrianblan.hackernews.api.Comment
 import co.adrianblan.hackernews.api.CommentId
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -26,13 +26,10 @@ class StoryDetailInteractor
     @StoryDetailInternal override val parentScope: ParentScope
 ) : Interactor() {
 
-    val viewState: LiveData<StoryDetailViewState> get() = _viewState
+    private val viewStateChannel = ConflatedBroadcastChannel<StoryDetailViewState>(StoryDetailViewState.Loading)
 
-    private val _viewState by lazy {
-        MutableLiveData<StoryDetailViewState>(
-            StoryDetailViewState.Loading
-        )
-    }
+    val viewStateFlow: StateFlow<StoryDetailViewState> =
+        viewStateChannel.asStateFlow()
 
     private suspend fun fetchFlattenedComments(commentIds: List<CommentId>): List<FlatComment> =
         coroutineScope {
@@ -106,7 +103,7 @@ class StoryDetailInteractor
                     emit(StoryDetailViewState.Error)
                 }
                 .collect {
-                    _viewState.value = it
+                    viewStateChannel.offer(it)
                 }
         }
     }
