@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             AppTheme {
                 InsetsWrapper(contentView) {
-                    rootNode.composeView()
+                    rootNode.nodeView()
                 }
             }
         }

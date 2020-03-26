@@ -1,6 +1,7 @@
 package co.adrianblan.storydetail
 
 import androidx.compose.Composable
+import androidx.lifecycle.LiveData
 import co.adrianblan.common.StateFlow
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.ui.node.Node
@@ -19,17 +20,16 @@ class StoryDetailNode
         fun onStoryDetailFinished()
     }
 
-    override val viewStateFlow: StateFlow<StoryDetailViewState> =
-        storyDetailInteractor.viewStateFlow
+    override val viewState: LiveData<StoryDetailViewState> =
+        storyDetailInteractor.viewState
 
-    override val composeView: @Composable() (StoryDetailViewState) -> Unit =
-        { viewState ->
-            StoryDetailView(
-                viewState = viewState,
-                onStoryContentClick = { listener.onStoryContentClicked(it) },
-                onBackPressed = { listener.onStoryDetailFinished() }
-            )
-        }
+    override val viewDef = @Composable { viewState: StoryDetailViewState ->
+        StoryDetailView(
+            viewState = viewState,
+            onStoryContentClick = { listener.onStoryContentClicked(it) },
+            onBackPressed = { listener.onStoryDetailFinished() }
+        )
+    }
 
     override fun detach() =
         storyDetailInteractor.scope.cancel()

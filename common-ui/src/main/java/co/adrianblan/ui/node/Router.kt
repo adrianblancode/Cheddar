@@ -8,19 +8,20 @@ interface Router {
 
 class StackRouter constructor(
     initialState: List<Node<*>>,
-    private val onRouterUpdate: Router.() -> Unit
+    private val onNodesUpdate: (List<Node<*>>) -> Unit
 ) : Router {
 
-    override var nodes: MutableList<Node<*>> = initialState.toMutableList()
+    override lateinit var nodes: MutableList<Node<*>>
         private set
 
     init {
-        onRouterUpdate()
+        nodes = initialState.toMutableList()
+        onNodesUpdate(nodes)
     }
 
     fun push(node: Node<*>) {
         nodes.add(node)
-        onRouterUpdate(this)
+        onNodesUpdate(nodes)
     }
 
     private fun pop() {
@@ -29,7 +30,7 @@ class StackRouter constructor(
                 detach()
             }
 
-        onRouterUpdate(this)
+        onNodesUpdate(nodes)
     }
 
     private fun canPop() = nodes.size > 1

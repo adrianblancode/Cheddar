@@ -1,6 +1,7 @@
 package co.adrianblan.storyfeed
 
-import co.adrianblan.common.StateFlow
+import androidx.compose.Composable
+import androidx.lifecycle.LiveData
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.ui.node.Node
@@ -18,10 +19,10 @@ class StoryFeedNode
         fun onStoryContentClicked(storyUrl: StoryUrl)
     }
 
-    override val viewStateFlow: StateFlow<StoryFeedViewState> =
-        storyFeedInteractor.viewStateFlow
+    override val viewState: LiveData<StoryFeedViewState> =
+        storyFeedInteractor.viewState
 
-    override val composeView: (StoryFeedViewState) -> Unit = { viewState ->
+    override val viewDef = @Composable { viewState: StoryFeedViewState ->
         StoryFeedView(
             viewState = viewState,
             onStoryTypeClick = { storyFeedInteractor.onStoryTypeChanged(it) },

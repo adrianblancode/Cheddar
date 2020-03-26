@@ -1,6 +1,10 @@
 package co.adrianblan.cheddar
 
 import androidx.compose.Composable
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.ui.graphics.Color
+import androidx.ui.material.surface.Surface
 import co.adrianblan.cheddar.di.RootInternal
 import co.adrianblan.cheddar.extensions.CustomTabsLauncher
 import co.adrianblan.common.ParentScope
@@ -27,26 +31,22 @@ class RootNode
     @RootInternal private val parentScope: ParentScope
 ) : Node<Node<*>>(), StoryFeedNode.Listener, StoryDetailNode.Listener {
 
-    private val _viewStateFlow = ConflatedBroadcastChannel<Node<*>>()
+    private val _viewState = MutableLiveData<Node<*>>()
 
-    override val viewStateFlow: StateFlow<Node<*>> =
-        _viewStateFlow.asStateFlow()
+    override val viewState: LiveData<Node<*>> = _viewState
 
-    private val router by lazy {
-        StackRouter(listOf(storyFeedNode)) {
-            _viewStateFlow.offer(nodes.last())
-        }
-    }
-
-    private val storyFeedNode: StoryFeedNode by lazy {
+    private val storyFeedNode: StoryFeedNode =
         storyFeedNodeBuilder
             .build(
                 listener = this,
                 parentScope = parentScope
             )
-    }
 
-    override val composeView: @Composable() (Node<*>) -> Unit = { node ->
+    private val router = StackRouter(listOf(storyFeedNode)) { nodes ->
+            _viewState.value = nodes.last()
+        }
+
+    override val viewDef = @Composable { node: Node<*> ->
         RootView(node)
     }
 

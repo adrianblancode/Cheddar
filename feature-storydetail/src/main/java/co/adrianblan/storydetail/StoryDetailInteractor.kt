@@ -1,5 +1,7 @@
 package co.adrianblan.storydetail
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.ParentScope
 import co.adrianblan.common.StateFlow
@@ -26,10 +28,9 @@ class StoryDetailInteractor
     @StoryDetailInternal override val parentScope: ParentScope
 ) : Interactor() {
 
-    private val viewStateChannel = ConflatedBroadcastChannel<StoryDetailViewState>(StoryDetailViewState.Loading)
+    private val _viewState = MutableLiveData<StoryDetailViewState>(StoryDetailViewState.Loading)
 
-    val viewStateFlow: StateFlow<StoryDetailViewState> =
-        viewStateChannel.asStateFlow()
+    val viewState: LiveData<StoryDetailViewState> = _viewState
 
     private suspend fun fetchFlattenedComments(commentIds: List<CommentId>): List<FlatComment> =
         coroutineScope {
@@ -103,7 +104,7 @@ class StoryDetailInteractor
                     emit(StoryDetailViewState.Error)
                 }
                 .collect {
-                    viewStateChannel.offer(it)
+                    _viewState.value = it
                 }
         }
     }

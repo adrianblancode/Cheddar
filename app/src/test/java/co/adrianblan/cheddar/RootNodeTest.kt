@@ -8,6 +8,7 @@ import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.Assert.assertEquals
+import org.junit.Test
 
 class RootNodeTest {
 
@@ -33,9 +34,9 @@ class RootNodeTest {
     }
 
     // We have a @Model in Router which throws if used outside an active frame
-    @Model
+    @Test
     fun testInitialState() {
-        assertEquals(1, rootNode.viewStateFlow.value)
-        assert(rootNode.viewStateFlow.value is StoryFeedNode)
+        assertEquals(1, rootNode.viewState.value)
+        assert(rootNode.viewState.value is StoryFeedNode)
     }
 }

@@ -1,5 +1,7 @@
 package co.adrianblan.storyfeed
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.*
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.StoryType
@@ -25,7 +27,7 @@ constructor(
 
     private val initialStoryType: StoryType = StoryType.TOP
 
-    private val viewStateChannel = ConflatedBroadcastChannel<StoryFeedViewState>(
+    private val _viewState = MutableLiveData<StoryFeedViewState>(
         StoryFeedViewState(
             storyType = initialStoryType,
             storyFeedState = StoryFeedState.Loading,
@@ -34,8 +36,7 @@ constructor(
         )
     )
 
-    val viewStateFlow: StateFlow<StoryFeedViewState> =
-        viewStateChannel.asStateFlow()
+    val viewState: LiveData<StoryFeedViewState> = _viewState
 
     private val storyTypeChannel = ConflatedBroadcastChannel<StoryType>(initialStoryType)
 
@@ -162,7 +163,7 @@ constructor(
                 .flowOn(dispatcherProvider.IO)
                 .collectLatest { storyViewState ->
                     ensureActive()
-                    viewStateChannel.offer(storyViewState)
+                    _viewState.value = storyViewState
                 }
         }
     }
