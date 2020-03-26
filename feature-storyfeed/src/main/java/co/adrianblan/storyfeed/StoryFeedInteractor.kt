@@ -66,7 +66,7 @@ constructor(
                     emit(DecoratedStory(story, WebPreviewState.Success(webPreview)))
                 } catch (t: Throwable) {
                     Timber.e(t)
-                    emit(DecoratedStory(story, WebPreviewState.Error))
+                    emit(DecoratedStory(story, WebPreviewState.Error(t)))
                 }
             }
         }
@@ -130,7 +130,7 @@ constructor(
                                     if (t is CancellationException) throw t
                                     else {
                                         Timber.e(t)
-                                        offer(StoryFeedState.Error)
+                                        offer(StoryFeedState.Error(t))
                                     }
                                 }
                                 .collectLatest { stories ->

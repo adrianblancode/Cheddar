@@ -12,6 +12,6 @@ abstract class Interactor {
     abstract val parentScope: ParentScope
 
     val scope: CoroutineScope by lazy {
-        parentScope.createChildScope(dispatcherProvider)
+        parentScope.createChildScope()
     }
 }

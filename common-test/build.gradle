@@ -1,0 +1,25 @@
+apply plugin: "com.android.library"
+apply from: rootProject.file("gradle/base-configuration.gradle")
+
+android {
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), '../proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation(project(":common"))
+    implementation(Dependencies.kotlinStdlib)
+    implementation(Dependencies.coroutinesCore)
+    implementation(Dependencies.coroutinesAndroid)
+    implementation(Dependencies.timber)
+    implementation(Dependencies.androidxCore)
+
+    coreLibraryDesugaring(Dependencies.desugar)
+
+    implementation(Dependencies.androidxCoreTesting)
+    implementation(Dependencies.coroutinesTest)
+}

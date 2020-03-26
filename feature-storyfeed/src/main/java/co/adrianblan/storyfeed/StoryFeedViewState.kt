@@ -19,11 +19,11 @@ data class StoryFeedViewState(
 sealed class StoryFeedState {
     data class Success(val stories: List<DecoratedStory>) : StoryFeedState()
     object Loading : StoryFeedState()
-    object Error : StoryFeedState()
+    data class Error(val throwable: Throwable) : StoryFeedState()
 }
 
 sealed class WebPreviewState {
     data class Success(val webPreview: WebPreviewData) : WebPreviewState()
     object Loading : WebPreviewState()
-    object Error : WebPreviewState()
+    data class Error(val throwable: Throwable) : WebPreviewState()
 }

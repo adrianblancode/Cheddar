@@ -101,7 +101,7 @@ class StoryDetailInteractor
                 .flowOn(dispatcherProvider.IO)
                 .catch {
                     Timber.e(it)
-                    emit(StoryDetailViewState.Error)
+                    emit(StoryDetailViewState.Error(it))
                 }
                 .collect {
                     _viewState.value = it

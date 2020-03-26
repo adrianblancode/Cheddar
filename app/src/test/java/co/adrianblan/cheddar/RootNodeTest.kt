@@ -9,7 +9,9 @@ import co.adrianblan.storyfeed.StoryFeedNodeBuilder
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -49,35 +51,35 @@ class RootNodeTest {
 
     @Test
     fun testInitialState() {
-        assert(rootNode.viewState.value is StoryFeedNode)
+        assertThat(rootNode.viewState.value, instanceOf(StoryFeedNode::class.java))
     }
 
     // TODO make test for double push
     @Test
     fun testNavigateToStoryDetail() {
-        assert(rootNode.viewState.value is StoryFeedNode)
+        assertThat(rootNode.viewState.value, instanceOf(StoryFeedNode::class.java))
         val storyId = StoryId(1)
         rootNode.onStoryClicked(storyId)
-        assert(rootNode.viewState.value is StoryDetailNode)
+        assertThat(rootNode.viewState.value, instanceOf(StoryDetailNode::class.java))
     }
 
     @Test
     fun testStoryDetailFinished() {
-        assert(rootNode.viewState.value is StoryFeedNode)
+        assertThat(rootNode.viewState.value, instanceOf(StoryFeedNode::class.java))
         val storyId = StoryId(1)
         rootNode.onStoryClicked(storyId)
-        assert(rootNode.viewState.value is StoryDetailNode)
+        assertThat(rootNode.viewState.value, instanceOf(StoryDetailNode::class.java))
         rootNode.onStoryDetailFinished()
-        assert(rootNode.viewState.value is StoryFeedNode)
+        assertThat(rootNode.viewState.value, instanceOf(StoryFeedNode::class.java))
     }
 
     @Test
     fun testNavigateBack() {
-        assert(rootNode.viewState.value is StoryFeedNode)
+        assertThat(rootNode.viewState.value, instanceOf(StoryFeedNode::class.java))
         val storyId = StoryId(1)
         rootNode.onStoryClicked(storyId)
-        assert(rootNode.viewState.value is StoryDetailNode)
+        assertThat(rootNode.viewState.value, instanceOf(StoryDetailNode::class.java))
         rootNode.onBackPressed()
-        assert(rootNode.viewState.value is StoryFeedNode)
+        assertThat(rootNode.viewState.value, instanceOf(StoryFeedNode::class.java))
     }
 }

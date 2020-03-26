@@ -52,6 +52,7 @@ android {
 dependencies {
     implementation(project(":common"))
     implementation(project(":common-ui"))
+    implementation(project(":common-test"))
     implementation project(":network")
     implementation project(":hackernews")
     implementation(project(":webpreview"))
