@@ -41,7 +41,7 @@ class StoryDetailInteractorTest {
         storyDetailInteractor = StoryDetailInteractor(
             storyId = StoryId(1),
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            parentScope = ParentScope.of(scope),
+            scope = scope,
             hackerNewsRepository = hackerNewsRepository
         )
     }

@@ -42,41 +42,41 @@ class RootNodeTest {
             storyFeedNodeBuilder,
             storyDetailNodeBuilder,
             customTabsLauncher = mock(),
-            parentScope = mock()
+            scope = mock()
         )
     }
 
     @Test
     fun testInitialState() {
-        assertThat(rootNode.state.value, instanceOf(StoryFeedNode::class.java))
+        assertThat(rootNode.state.value?.activeNode, instanceOf(StoryFeedNode::class.java))
     }
 
     // TODO make test for double push
     @Test
     fun testNavigateToStoryDetail() {
-        assertThat(rootNode.state.value, instanceOf(StoryFeedNode::class.java))
+        assertThat(rootNode.state.value?.activeNode, instanceOf(StoryFeedNode::class.java))
         val storyId = StoryId(1)
         rootNode.onStoryClicked(storyId)
-        assertThat(rootNode.state.value, instanceOf(StoryDetailNode::class.java))
+        assertThat(rootNode.state.value?.activeNode, instanceOf(StoryDetailNode::class.java))
     }
 
     @Test
     fun testStoryDetailFinished() {
-        assertThat(rootNode.state.value, instanceOf(StoryFeedNode::class.java))
+        assertThat(rootNode.state.value?.activeNode, instanceOf(StoryFeedNode::class.java))
         val storyId = StoryId(1)
         rootNode.onStoryClicked(storyId)
-        assertThat(rootNode.state.value, instanceOf(StoryDetailNode::class.java))
+        assertThat(rootNode.state.value?.activeNode, instanceOf(StoryDetailNode::class.java))
         rootNode.onStoryDetailFinished()
-        assertThat(rootNode.state.value, instanceOf(StoryFeedNode::class.java))
+        assertThat(rootNode.state.value?.activeNode, instanceOf(StoryFeedNode::class.java))
     }
 
     @Test
     fun testNavigateBack() {
-        assertThat(rootNode.state.value, instanceOf(StoryFeedNode::class.java))
+        assertThat(rootNode.state.value?.activeNode, instanceOf(StoryFeedNode::class.java))
         val storyId = StoryId(1)
         rootNode.onStoryClicked(storyId)
-        assertThat(rootNode.state.value, instanceOf(StoryDetailNode::class.java))
+        assertThat(rootNode.state.value?.activeNode, instanceOf(StoryDetailNode::class.java))
         rootNode.onBackPressed()
-        assertThat(rootNode.state.value, instanceOf(StoryFeedNode::class.java))
+        assertThat(rootNode.state.value?.activeNode, instanceOf(StoryFeedNode::class.java))
     }
 }

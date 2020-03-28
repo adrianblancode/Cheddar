@@ -14,6 +14,7 @@ import co.adrianblan.storydetail.StoryDetailNodeBuilder
 import co.adrianblan.storyfeed.StoryFeedNode
 import co.adrianblan.storyfeed.StoryFeedNodeBuilder
 import co.adrianblan.ui.RootView
+import co.adrianblan.ui.RootViewState
 import co.adrianblan.ui.node.Node
 import co.adrianblan.ui.node.StackRouter
 import co.adrianblan.ui.observe
@@ -27,10 +28,10 @@ class RootNode
     private val storyDetailNodeBuilder: StoryDetailNodeBuilder,
     private val customTabsLauncher: CustomTabsLauncher,
     @RootInternal scope: CoroutineScope
-) : Node<Node<*>>(scope), StoryFeedNode.Listener, StoryDetailNode.Listener {
+) : Node<RootViewState>(scope), StoryFeedNode.Listener, StoryDetailNode.Listener {
 
-    private val _state = MutableLiveData<Node<*>>()
-    override val state: LiveData<Node<*>> = _state
+    private val _state = MutableLiveData<RootViewState>()
+    override val state: LiveData<RootViewState> = _state
 
     private val storyFeedNode: StoryFeedNode =
         storyFeedNodeBuilder
@@ -40,15 +41,15 @@ class RootNode
             )
 
     private val router = StackRouter(listOf(storyFeedNode)) { nodes ->
-        _state.value = nodes.last()
+        _state.value = RootViewState(nodes.last())
     }
 
     @Composable
-    override fun viewDef(state: Node<*>) = RootView(state)
+    override fun viewDef(state: RootViewState) = RootView(state)
 
     override fun onStoryClicked(storyId: StoryId) {
 
-        // Prevent duplicates
+        // Prevent duplicate push
         if (router.nodes.last() is StoryDetailNode) {
             router.pop()
         }

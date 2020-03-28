@@ -6,7 +6,7 @@ import co.adrianblan.webpreview.WebPreviewData
 
 data class DecoratedStory(
     val story: Story,
-    val webPreview: WebPreviewState?
+    val webPreviewState: WebPreviewState?
 )
 
 data class StoryFeedViewState(

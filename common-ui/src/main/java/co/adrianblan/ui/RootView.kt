@@ -10,9 +10,13 @@ import androidx.ui.material.surface.Surface
 import androidx.ui.unit.px
 import co.adrianblan.ui.node.Node
 
+data class RootViewState(
+    val activeNode: Node<*>
+)
+
 @Composable
-fun RootView(node: Node<*>) {
-    Crossfade(node) {
+fun RootView(rootViewState: RootViewState) {
+    Crossfade(rootViewState) {
         Stack {
 
             val insets = InsetsAmbient.current
@@ -25,7 +29,7 @@ fun RootView(node: Node<*>) {
                         right = insets.right.px.toDp()
                     )
                 ) {
-                    it.render()
+                    it.activeNode.render()
                 }
             }
 
