@@ -3,6 +3,7 @@ package co.adrianblan.storyfeed
 import co.adrianblan.common.ParentScope
 import dagger.BindsInstance
 import dagger.Subcomponent
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.inject.Scope
@@ -17,7 +18,7 @@ interface StoryFeedComponent {
     interface Factory {
         fun build(
             @StoryFeedInternal @BindsInstance listener: StoryFeedNode.Listener,
-            @StoryFeedInternal @BindsInstance parentScope: ParentScope
+            @StoryFeedInternal @BindsInstance scope: CoroutineScope
         ): StoryFeedComponent
     }
 }
@@ -40,6 +41,6 @@ class StoryFeedNodeBuilder
         parentScope: ParentScope
     ): StoryFeedNode =
         storyFeedComponentBuilder
-            .build(listener, parentScope)
+            .build(listener, parentScope.createChildScope())
             .storyFeedNode()
 }

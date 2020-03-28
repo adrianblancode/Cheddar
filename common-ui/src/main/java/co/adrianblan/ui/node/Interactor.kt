@@ -5,13 +5,8 @@ import co.adrianblan.common.ParentScope
 import kotlinx.coroutines.*
 
 /** An Interactor performs business logic inside a Node */
-abstract class Interactor {
-
+abstract class Interactor(
+    private val scope: CoroutineScope
+) {
     abstract val dispatcherProvider: DispatcherProvider
-
-    abstract val parentScope: ParentScope
-
-    val scope: CoroutineScope by lazy {
-        parentScope.createChildScope()
-    }
 }

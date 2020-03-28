@@ -25,7 +25,7 @@ fun RootView(node: Node<*>) {
                         right = insets.right.px.toDp()
                     )
                 ) {
-                    it.nodeView()
+                    it.render()
                 }
             }
 

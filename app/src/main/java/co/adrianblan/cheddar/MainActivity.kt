@@ -8,9 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.ui.core.setContent
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.InsetsWrapper
-import co.adrianblan.ui.extensions.Orientation
 import co.adrianblan.ui.extensions.isNightModeActive
-import co.adrianblan.ui.extensions.orientation
 
 class MainActivity : AppCompatActivity() {
 
@@ -39,7 +37,7 @@ class MainActivity : AppCompatActivity() {
         setContent {
             AppTheme {
                 InsetsWrapper(contentView) {
-                    rootNode.nodeView()
+                    rootNode.render()
                 }
             }
         }

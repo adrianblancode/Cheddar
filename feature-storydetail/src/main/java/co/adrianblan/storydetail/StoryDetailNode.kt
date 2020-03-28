@@ -2,9 +2,10 @@ package co.adrianblan.storydetail
 
 import androidx.compose.Composable
 import androidx.lifecycle.LiveData
-import co.adrianblan.common.StateFlow
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.ui.node.Node
+import co.adrianblan.ui.observeState
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import javax.inject.Inject
 
@@ -12,25 +13,23 @@ import javax.inject.Inject
 class StoryDetailNode
 @Inject constructor(
     private val storyDetailInteractor: StoryDetailInteractor,
-    @StoryDetailInternal private val listener: Listener
-) : Node<StoryDetailViewState>() {
+    @StoryDetailInternal private val listener: Listener,
+    @StoryDetailInternal scope: CoroutineScope
+) : Node<StoryDetailViewState>(scope) {
 
     interface Listener {
         fun onStoryContentClicked(storyUrl: StoryUrl)
         fun onStoryDetailFinished()
     }
 
-    override val viewState: LiveData<StoryDetailViewState> =
-        storyDetailInteractor.viewState
+    override val state: LiveData<StoryDetailViewState> =
+        storyDetailInteractor.state
 
-    override val viewDef = @Composable { viewState: StoryDetailViewState ->
+    @Composable
+    override fun viewDef(state: StoryDetailViewState) =
         StoryDetailView(
-            viewState = viewState,
+            viewState = state,
             onStoryContentClick = { listener.onStoryContentClicked(it) },
             onBackPressed = { listener.onStoryDetailFinished() }
         )
-    }
-
-    override fun detach() =
-        storyDetailInteractor.scope.cancel()
 }

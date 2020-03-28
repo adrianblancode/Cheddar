@@ -10,10 +10,8 @@ import co.adrianblan.test.CoroutineTestRule
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.stub
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.runBlockingTest
 import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Assert.assertThat
 import org.junit.Before
@@ -56,7 +54,7 @@ class StoryDetailInteractorTest {
         scope.advanceUntilIdle()
 
         assertThat(
-            storyDetailInteractor!!.viewState.value,
+            storyDetailInteractor!!.state.value,
             instanceOf(StoryDetailViewState.Success::class.java)
         )
     }

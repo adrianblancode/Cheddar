@@ -7,6 +7,7 @@ import co.adrianblan.storydetail.StoryDetailComponent
 import dagger.BindsInstance
 import dagger.Component
 import dagger.Module
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Qualifier
 import javax.inject.Scope
 
@@ -29,7 +30,7 @@ interface RootComponent {
     @Component.Factory
     interface Factory {
         fun build(
-            @RootInternal @BindsInstance parentScope: ParentScope,
+            @RootInternal @BindsInstance scope: CoroutineScope,
             appComponent: AppComponent
         ) : RootComponent
     }

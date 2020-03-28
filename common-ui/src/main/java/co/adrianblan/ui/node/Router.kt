@@ -24,7 +24,7 @@ class StackRouter constructor(
         onNodesUpdate(nodes)
     }
 
-    private fun pop() {
+    fun pop() {
         nodes.removeAt(nodes.size - 1)
             .apply {
                 detach()

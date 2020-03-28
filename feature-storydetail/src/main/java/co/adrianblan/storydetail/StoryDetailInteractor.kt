@@ -4,19 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.ParentScope
-import co.adrianblan.common.StateFlow
-import co.adrianblan.common.asStateFlow
 import co.adrianblan.ui.node.Interactor
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.api.CommentId
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -25,12 +19,12 @@ class StoryDetailInteractor
     @StoryDetailInternal private val storyId: StoryId,
     private val hackerNewsRepository: HackerNewsRepository,
     override val dispatcherProvider: DispatcherProvider,
-    @StoryDetailInternal override val parentScope: ParentScope
-) : Interactor() {
+    @StoryDetailInternal scope: CoroutineScope
+) : Interactor(scope) {
 
-    private val _viewState = MutableLiveData<StoryDetailViewState>(StoryDetailViewState.Loading)
+    private val _state = MutableLiveData<StoryDetailViewState>(StoryDetailViewState.Loading)
 
-    val viewState: LiveData<StoryDetailViewState> = _viewState
+    val state: LiveData<StoryDetailViewState> = _state
 
     private suspend fun fetchFlattenedComments(commentIds: List<CommentId>): List<FlatComment> =
         coroutineScope {
@@ -104,7 +98,7 @@ class StoryDetailInteractor
                     emit(StoryDetailViewState.Error(it))
                 }
                 .collect {
-                    _viewState.value = it
+                    _state.value = it
                 }
         }
     }

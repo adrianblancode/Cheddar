@@ -20,7 +20,7 @@ class RootViewModel(
     val rootNode =
         DaggerRootComponent.factory()
             .build(
-                parentScope = ParentScope.of(scope),
+                scope = scope,
                 appComponent = application.appComponent
             )
             .rootNode()

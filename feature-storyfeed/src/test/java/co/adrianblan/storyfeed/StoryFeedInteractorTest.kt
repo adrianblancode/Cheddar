@@ -7,7 +7,6 @@ import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.dummy
 import co.adrianblan.test.CoroutineTestRule
-import co.adrianblan.webpreview.WebPreviewData
 import co.adrianblan.webpreview.WebPreviewRepository
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
@@ -20,7 +19,6 @@ import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.io.IOException
 import java.lang.RuntimeException
 
 
@@ -63,7 +61,7 @@ class StoryFeedInteractorTest {
         scope.advanceUntilIdle()
 
         assertThat(
-            storyFeedInteractor!!.viewState.value?.storyFeedState,
+            storyFeedInteractor!!.state.value?.storyFeedState,
             instanceOf(StoryFeedState.Success::class.java)
         )
     }

@@ -10,13 +10,19 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun <T> observe(data: LiveData<T>): T? {
-    val result = stateFor(data) { data.value }
+fun <T> LiveData<T>.observeState(): T =
+    observe(this)
+
+@Composable
+fun <T> observe(liveData: LiveData<T>): T {
+
+    // throw if null value
+    val result = stateFor(liveData) { liveData.value!! }
     val observer = remember { Observer<T> { result.value = it } }
 
-    onCommit(data) {
-        data.observeForever(observer)
-        onDispose { data.removeObserver(observer) }
+    onCommit(liveData) {
+        liveData.observeForever(observer)
+        onDispose { liveData.removeObserver(observer) }
     }
 
     return result.value
@@ -25,7 +31,10 @@ fun <T> observe(data: LiveData<T>): T? {
 
 /* TODO re-enable when kapt works with compose
 @Composable
-fun <T> observe(stateFlow: StateFlow<T>): T? {
+fun <T> StateFlow<T>.observe(): T {
+
+    val stateFlow = this
+
     val result = stateFor(stateFlow) { stateFlow.value }
 
     onCommit(stateFlow) {

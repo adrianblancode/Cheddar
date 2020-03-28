@@ -9,6 +9,7 @@ import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.ui.node.Interactor
 import co.adrianblan.webpreview.WebPreviewRepository
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.*
@@ -22,12 +23,12 @@ constructor(
     private val hackerNewsRepository: HackerNewsRepository,
     private val webPreviewRepository: WebPreviewRepository,
     override val dispatcherProvider: DispatcherProvider,
-    @StoryFeedInternal override val parentScope: ParentScope
-) : Interactor() {
+    @StoryFeedInternal scope: CoroutineScope
+) : Interactor(scope) {
 
     private val initialStoryType: StoryType = StoryType.TOP
 
-    private val _viewState = MutableLiveData<StoryFeedViewState>(
+    private val _state = MutableLiveData<StoryFeedViewState>(
         StoryFeedViewState(
             storyType = initialStoryType,
             storyFeedState = StoryFeedState.Loading,
@@ -36,7 +37,7 @@ constructor(
         )
     )
 
-    val viewState: LiveData<StoryFeedViewState> = _viewState
+    val state: LiveData<StoryFeedViewState> = _state
 
     private val storyTypeChannel = ConflatedBroadcastChannel<StoryType>(initialStoryType)
 
@@ -163,7 +164,7 @@ constructor(
                 .flowOn(dispatcherProvider.IO)
                 .collectLatest { storyViewState ->
                     ensureActive()
-                    _viewState.value = storyViewState
+                    _state.value = storyViewState
                 }
         }
     }

@@ -4,6 +4,7 @@ import co.adrianblan.common.ParentScope
 import co.adrianblan.hackernews.api.StoryId
 import dagger.BindsInstance
 import dagger.Subcomponent
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.inject.Scope
@@ -19,7 +20,7 @@ interface StoryDetailComponent {
         fun build(
             @StoryDetailInternal @BindsInstance storyId: StoryId,
             @StoryDetailInternal @BindsInstance listener: StoryDetailNode.Listener,
-            @StoryDetailInternal @BindsInstance parentScope: ParentScope
+            @StoryDetailInternal @BindsInstance scope: CoroutineScope
         ): StoryDetailComponent
     }
 }
@@ -42,6 +43,6 @@ class StoryDetailNodeBuilder
         parentScope: ParentScope
     ): StoryDetailNode =
         storyDetailComponentBuilder
-            .build(storyId, listener, parentScope)
+            .build(storyId, listener, parentScope.createChildScope())
             .storyDetailNode()
 }
