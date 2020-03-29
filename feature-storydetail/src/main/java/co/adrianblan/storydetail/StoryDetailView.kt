@@ -5,7 +5,6 @@ import androidx.compose.Composable
 import androidx.compose.key
 import androidx.compose.remember
 import androidx.ui.core.DensityAmbient
-import androidx.ui.core.RepaintBoundary
 import androidx.ui.core.Text
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.Clickable
@@ -62,7 +61,9 @@ fun StoryDetailView(
         },
         bodyContent = {
             when (viewState) {
-                is StoryDetailViewState.Success ->
+                is StoryDetailViewState.Success -> {
+
+                    val story = viewState.story
 
                     when (viewState.commentsState) {
                         is StoryDetailCommentsState.Success ->
@@ -72,10 +73,22 @@ fun StoryDetailView(
                                         val topInsets = insets.top.px.toDp()
                                         Spacer(modifier = LayoutHeight(toolbarMaxHeightDp.dp + topInsets))
 
+                                        if (viewState.story.text != null) {
+                                            CommentItem(
+                                                text = story.text,
+                                                by = story.by,
+                                                depthIndex = 0,
+                                                storyAuthor = story.by
+                                            )
+                                        }
+
                                         viewState.commentsState.comments
                                             .map { comment ->
                                                 key(comment.comment.id) {
-                                                    CommentItem(comment)
+                                                    CommentItem(
+                                                        comment = comment,
+                                                        storyAuthor = story.by
+                                                    )
                                                 }
                                             }
 
@@ -90,6 +103,7 @@ fun StoryDetailView(
                         is StoryDetailCommentsState.Error ->
                             ErrorView()
                     }
+                }
 
                 is StoryDetailViewState.Loading -> LoadingView()
                 is StoryDetailViewState.Error -> ErrorView()
@@ -161,27 +175,25 @@ fun StoryDetailToolbar(
                     if (story.url != null) imageSize + 12.dp
                     else 0.dp
 
-                RepaintBoundary {
-                    Text(
-                        text = story.title,
-                        style = MaterialTheme.typography().h6.copy(
-                            fontSize = titleFontSize, 
-                            color = MaterialTheme.colors().onBackground
-                        ),
-                        modifier = LayoutPadding(
-                            left = 16.dp + titleCollapsedLeftOffset,
-                            right = 16.dp + titleRightOffset,
-                            bottom = 8.dp,
-                            top = 8.dp + titleCollapsedTopOffset
-                        ) +
-                                LayoutHeight(height) +
-                                LayoutWidth.Fill +
-                                LayoutAlign.CenterLeft +
-                                LayoutGravity.Center,
-                        overflow = TextOverflow.Ellipsis,
-                        maxLines = titleMaxLines
-                    )
-                }
+                Text(
+                    text = story.title,
+                    style = MaterialTheme.typography().h6.copy(
+                        fontSize = titleFontSize,
+                        color = MaterialTheme.colors().onBackground
+                    ),
+                    modifier = LayoutPadding(
+                        left = 16.dp + titleCollapsedLeftOffset,
+                        right = 16.dp + titleRightOffset,
+                        bottom = 8.dp,
+                        top = 8.dp + titleCollapsedTopOffset
+                    ) +
+                            LayoutHeight(height) +
+                            LayoutWidth.Fill +
+                            LayoutAlign.CenterLeft +
+                            LayoutGravity.Center,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = titleMaxLines
+                )
 
                 if (story.url != null) {
                     Box(modifier = LayoutGravity.BottomRight) {
@@ -256,10 +268,22 @@ private fun StoryDetailImage(
 }
 
 @Composable
-fun CommentItem(commentItem: FlatComment) {
+fun CommentItem(comment: FlatComment, storyAuthor: String?) {
+    CommentItem(
+        text = comment.comment.text,
+        by = comment.comment.by,
+        depthIndex = comment.depthIndex,
+        storyAuthor = storyAuthor
+    )
+}
 
-    val comment = commentItem.comment
-    val depthIndex = commentItem.depthIndex
+@Composable
+fun CommentItem(
+    text: String?,
+    by: String?,
+    depthIndex: Int,
+    storyAuthor: String?
+) {
 
     Container(
         padding = EdgeInsets(
@@ -287,7 +311,7 @@ fun CommentItem(commentItem: FlatComment) {
             ) {
 
                 // Comments can be deleted
-                val isDeleted = comment.by == null
+                val isDeleted = by == null
 
                 if (isDeleted) {
                     Spacer(LayoutHeight(12.dp))
@@ -297,13 +321,24 @@ fun CommentItem(commentItem: FlatComment) {
                     )
                     Spacer(LayoutHeight(16.dp))
                 } else {
+
+                    val isStoryAuthor = by == storyAuthor
+
+                    val authorColor: Color =
+                        if (isStoryAuthor) MaterialTheme.colors().secondary
+                        else MaterialTheme.colors().onBackground
+
+                    val authorSuffix =
+                        if (isStoryAuthor) " [op]"
+                        else ""
+
                     Text(
-                        text = comment.by.orEmpty(),
-                        style = MaterialTheme.typography().subtitle2
+                        text = by.orEmpty() + authorSuffix,
+                        style = MaterialTheme.typography().subtitle2.copy(color = authorColor)
                     )
                     Spacer(LayoutHeight(2.dp))
                     Text(
-                        text = Html.fromHtml(comment.text.orEmpty()).toString().trimEnd(),
+                        text = Html.fromHtml(text.orEmpty()).toString().trimEnd(),
                         style = MaterialTheme.typography().body2
                     )
                 }
