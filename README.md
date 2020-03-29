@@ -4,9 +4,6 @@
 
 Cheddar is a social news reader for Hacker News. Currently it's being entirely rewritten with: 
 
-Kotlin + Flow, Compose-first architecture, Dagger, modularization, day/night mode, insets and fancy animations. As Compose hasn't entered alpha yet, things might be very unstable for now.
-
-
 *   All views written entirely in Compose.
 *   Single activity fully Compose first architecture, based on composable units of business logic to drive both app behavior and the UI layer.
 *   Kotlin Coroutines / Flow for asynchronous work.
@@ -14,6 +11,7 @@ Kotlin + Flow, Compose-first architecture, Dagger, modularization, day/night mod
 *   Fancy animations, Day/Night mode, drawing behind insets, and more.
 
 As Compose hasn't even entered alpha yet, the some parts of the app might be **very** janky for now.
+
 
 ## App
 
