@@ -1,9 +1,6 @@
-![Cheddar logo](https://lh3.googleusercontent.com/lJZubdhJoiyKaH1H-vmdGMAd-c0Nt_KB8YcoQW2XKz3a5WjW0FGPfBlymXVOSwd0rnIi=w300-rw)
+![Cheddar logo](https://github.com/adrianblancode/Cheddar/blob/master/media/cheddar-icon.png)
 
-# [WIP] Cheddar for Hacker News
-
-
-![Build status](https://github.com/adrianblancode/Cheddar/workflows/Build/badge.svg)
+# [WIP] Cheddar for Hacker News ![Build status](https://github.com/adrianblancode/Cheddar/workflows/Build/badge.svg)
 
 Cheddar is a social news reader for Hacker News. Currently it's being entirely rewritten with: Kotlin + Flow, Compose-first architecture, Dagger, modularization, day/night mode, insets and fancy animations. As Compose hasn't entered alpha yet, things might be very unstable for now.
 
