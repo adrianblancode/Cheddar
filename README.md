@@ -10,6 +10,6 @@ Featured on [XDA-Developers](http://www.xda-developers.com/apps-of-the-week-mate
 
 [![Get it on Google Play!](http://adrianblan.co/images/google-play-badge.png)](https://play.google.com/store/apps/details?id=co.adrianblan.cheddar)
 
-## Images
+## Media
 
-![Cheddar image](https://github.com/adrianblancode/Cheddar/blob/master/media/screen-showcase.jpg)
+![Cheddar showcase](https://github.com/adrianblancode/Cheddar/blob/master/media/screen-showcase.gif)
