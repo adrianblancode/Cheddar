@@ -2,6 +2,7 @@ package co.adrianblan.storyfeed
 
 import android.text.Html
 import androidx.compose.Composable
+import androidx.compose.remember
 import androidx.ui.animation.Crossfade
 import androidx.ui.core.Text
 import androidx.ui.foundation.Clickable
@@ -38,7 +39,17 @@ fun StoryFeedItem(
     val story: Story = decoratedStory.story
     val storyUrl: StoryUrl? = story.url
 
-    val webPreviewState: WebPreviewState? = decoratedStory.webPreview
+    val webPreviewState: WebPreviewState? = decoratedStory.webPreviewState
+
+    val storyClick: () -> Unit =
+        remember(story) {
+            { onStoryClick(story.id) }
+        }
+
+    val storyContentClick: () -> Unit =
+        remember(story) {
+            { story.url?.let { onStoryContentClick(it) } }
+        }
 
     Row {
         Surface(
@@ -49,7 +60,7 @@ fun StoryFeedItem(
                     LayoutAlign.Start
         ) {
             Ripple(bounded = true) {
-                Clickable(onClick = { onStoryClick(story.id) }) {
+                Clickable(onClick = storyClick) {
 
                     // If there is a story image, we must share the space
                     val rightPadding: Dp =
@@ -84,7 +95,7 @@ fun StoryFeedItem(
             StoryFeedItemImage(
                 storyUrl = storyUrl,
                 webPreviewState = webPreviewState,
-                onClick = { onStoryContentClick(storyUrl) }
+                onClick = storyContentClick
             )
         }
     }
@@ -221,7 +232,8 @@ private fun StoryFeedItemImage(
 
                                     UrlImage(imageUrl)
                                 }
-                                is WebPreviewState.Error -> { }
+                                is WebPreviewState.Error -> {
+                                }
                             }
                         }
                     }
@@ -238,7 +250,7 @@ fun StoryFeedItemPreview() {
         StoryFeedItem(
             decoratedStory = DecoratedStory(
                 Story.dummy,
-                webPreview = WebPreviewState.Loading
+                webPreviewState = WebPreviewState.Loading
             ),
             onStoryClick = {},
             onStoryContentClick = {}

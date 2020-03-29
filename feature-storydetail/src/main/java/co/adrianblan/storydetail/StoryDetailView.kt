@@ -2,20 +2,19 @@ package co.adrianblan.storydetail
 
 import android.text.Html
 import androidx.compose.Composable
+import androidx.compose.key
 import androidx.compose.remember
-import androidx.lifecycle.LiveData
-import androidx.ui.core.Alignment
 import androidx.ui.core.DensityAmbient
-import androidx.ui.core.Modifier
+import androidx.ui.core.RepaintBoundary
 import androidx.ui.core.Text
+import androidx.ui.foundation.Box
 import androidx.ui.foundation.Clickable
 import androidx.ui.foundation.ScrollerPosition
 import androidx.ui.foundation.VerticalScroller
+import androidx.ui.foundation.shape.corner.RoundedCornerShape
 import androidx.ui.graphics.Color
 import androidx.ui.layout.*
-import androidx.ui.material.FloatingActionButton
 import androidx.ui.material.MaterialTheme
-import androidx.ui.material.Scaffold
 import androidx.ui.material.icons.Icons
 import androidx.ui.material.icons.filled.*
 import androidx.ui.material.ripple.Ripple
@@ -33,7 +32,8 @@ import co.adrianblan.hackernews.api.dummy
 import co.adrianblan.ui.*
 import co.adrianblan.ui.InsetsAmbient
 
-private const val toolbarMaxHeightDp = 128
+private const val toolbarMinHeightDp = 56
+private const val toolbarMaxHeightDp = 148
 
 
 @Composable
@@ -46,70 +46,53 @@ fun StoryDetailView(
     val scroller = ScrollerPosition()
     val insets = InsetsAmbient.current
 
-    Scaffold(
-        bodyContent = {
-            CollapsingScaffold(
-                scroller = scroller,
-                maxHeight = toolbarMaxHeightDp.dp,
-                toolbarContent = { collapsedFraction, height ->
-                    StoryDetailToolbar(
-                        storyTitle = (viewState as? StoryDetailViewState.Success)?.story?.title.orEmpty(),
-                        collapsedFraction = collapsedFraction,
-                        height = height,
-                        onBackPressed = onBackPressed
-                    )
-                },
-                bodyContent = {
-                    when (viewState) {
-                        is StoryDetailViewState.Success ->
 
-                            when (viewState.commentState) {
-                                is StoryDetailCommentsState.Success ->
-                                    VerticalScroller(scroller) {
-                                        Column {
-                                            with(DensityAmbient.current) {
-                                                val topInsets = insets.top.px.toDp()
-                                                Spacer(modifier = LayoutHeight(toolbarMaxHeightDp.dp + topInsets))
-
-                                                viewState.commentState.comments
-                                                    .map { comment ->
-                                                        CommentItem(comment)
-                                                    }
-
-                                                Spacer(modifier = LayoutHeight(insets.bottom.px.toDp() + 8.dp + 56.dp))
-                                            }
-                                        }
-                                    }
-                                is StoryDetailCommentsState.Empty ->
-                                    CommentsEmptyView()
-                                is StoryDetailCommentsState.Loading ->
-                                    LoadingView()
-                                is StoryDetailCommentsState.Error ->
-                                    ErrorView()
-                            }
-
-                        is StoryDetailViewState.Loading -> LoadingView()
-                        is StoryDetailViewState.Error -> ErrorView()
-                    }
-                }
+    CollapsingScaffold(
+        scroller = scroller,
+        minHeight = toolbarMinHeightDp.dp,
+        maxHeight = toolbarMaxHeightDp.dp,
+        toolbarContent = { collapsedFraction, height ->
+            StoryDetailToolbar(
+                viewState = viewState,
+                collapsedFraction = collapsedFraction,
+                height = height,
+                onStoryContentClick = onStoryContentClick,
+                onBackPressed = onBackPressed
             )
         },
-        floatingActionButton = {
-            val url = (viewState as? StoryDetailViewState.Success)?.story?.url
-            if (url != null) {
-                with(DensityAmbient.current) {
-                    Container(padding = EdgeInsets(bottom = insets.bottom.px.toDp())) {
-                        FloatingActionButton(
-                            color = MaterialTheme.colors().secondary,
-                            onClick = { onStoryContentClick(url) }
-                        ) {
-                            VectorImage(
-                                vector = Icons.Default.ArrowForward,
-                                tint = MaterialTheme.colors().surface
-                            )
-                        }
+        bodyContent = {
+            when (viewState) {
+                is StoryDetailViewState.Success ->
+
+                    when (viewState.commentsState) {
+                        is StoryDetailCommentsState.Success ->
+                            VerticalScroller(scroller) {
+                                Column {
+                                    with(DensityAmbient.current) {
+                                        val topInsets = insets.top.px.toDp()
+                                        Spacer(modifier = LayoutHeight(toolbarMaxHeightDp.dp + topInsets))
+
+                                        viewState.commentsState.comments
+                                            .map { comment ->
+                                                key(comment.comment.id) {
+                                                    CommentItem(comment)
+                                                }
+                                            }
+
+                                        Spacer(modifier = LayoutHeight(insets.bottom.px.toDp() + 8.dp))
+                                    }
+                                }
+                            }
+                        is StoryDetailCommentsState.Empty ->
+                            CommentsEmptyView()
+                        is StoryDetailCommentsState.Loading ->
+                            LoadingView()
+                        is StoryDetailCommentsState.Error ->
+                            ErrorView()
                     }
-                }
+
+                is StoryDetailViewState.Loading -> LoadingView()
+                is StoryDetailViewState.Error -> ErrorView()
             }
         }
     )
@@ -117,14 +100,15 @@ fun StoryDetailView(
 
 @Composable
 fun StoryDetailToolbar(
-    storyTitle: String,
+    viewState: StoryDetailViewState,
     collapsedFraction: Float,
     height: Dp,
+    onStoryContentClick: (StoryUrl) -> Unit,
     onBackPressed: () -> Unit
 ) {
+
     Stack {
         Container(padding = EdgeInsets(4.dp)) {
-
             Ripple(bounded = false) {
                 Clickable(onClick = onBackPressed) {
                     Container(modifier = LayoutGravity.TopLeft + LayoutSize(48.dp, 48.dp)) {
@@ -141,7 +125,6 @@ fun StoryDetailToolbar(
             remember(collapsedFraction) { lerp(0.dp, 48.dp, collapsedFraction) }
         val titleCollapsedTopOffset =
             remember(collapsedFraction) { lerp(48.dp, 0.dp, collapsedFraction) }
-        val titleMaxLines = remember(collapsedFraction) { if (collapsedFraction > 0.1f) 1 else 3 }
 
         val titleFontSize: TextUnit =
             lerp(
@@ -150,21 +133,122 @@ fun StoryDetailToolbar(
                 collapsedFraction
             )
 
-        Text(
-            text = storyTitle,
-            style = MaterialTheme.typography().h6.copy(fontSize = titleFontSize),
-            modifier = LayoutGravity.CenterLeft +
-                    LayoutPadding(
-                        left = 16.dp + titleCollapsedLeftOffset,
-                        right = 16.dp,
-                        top = titleCollapsedTopOffset
-                    ) +
-                    LayoutWidth.Fill +
-                    LayoutHeight(height) +
-                    LayoutAlign.CenterLeft,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = titleMaxLines
-        )
+        val titleMaxLines = remember(collapsedFraction) { if (collapsedFraction >= 0.85f) 1 else 3 }
+        val imageSize = remember(collapsedFraction) { lerp(80.dp, 40.dp, collapsedFraction) }
+
+        when (viewState) {
+            is StoryDetailViewState.Loading ->
+                Surface(
+                    shape = RoundedCornerShape(2.dp),
+                    modifier = LayoutPadding(16.dp) + LayoutPadding(top = titleCollapsedTopOffset)
+                ) {
+                    Column {
+                        Container(expanded = true, modifier = LayoutHeight(20.dp)) {
+                            ShimmerView()
+                        }
+                        Spacer(modifier = LayoutHeight(6.dp))
+                        Container(expanded = true, modifier = LayoutHeight(20.dp)) {
+                            ShimmerView()
+                        }
+                    }
+                }
+            is StoryDetailViewState.Success -> {
+
+                val story: Story = viewState.story
+                val webPreviewState: WebPreviewState? = viewState.webPreviewState
+
+                val titleRightOffset =
+                    if (story.url != null) imageSize + 12.dp
+                    else 0.dp
+
+                RepaintBoundary {
+                    Text(
+                        text = story.title,
+                        style = MaterialTheme.typography().h6.copy(fontSize = titleFontSize),
+                        modifier = LayoutPadding(
+                            left = 16.dp + titleCollapsedLeftOffset,
+                            right = 16.dp + titleRightOffset,
+                            bottom = 8.dp,
+                            top = 8.dp + titleCollapsedTopOffset
+                        ) +
+                                LayoutHeight(height) +
+                                LayoutWidth.Fill +
+                                LayoutAlign.CenterLeft +
+                                LayoutGravity.Center,
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = titleMaxLines
+                    )
+                }
+
+                if (story.url != null) {
+                    Box(modifier = LayoutGravity.BottomRight) {
+                        StoryDetailImage(
+                            story = story,
+                            webPreviewState = webPreviewState,
+                            imageSize = imageSize,
+                            onStoryContentClick = onStoryContentClick
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun StoryDetailImage(
+    story: Story,
+    webPreviewState: WebPreviewState?,
+    imageSize: Dp,
+    onStoryContentClick: (StoryUrl) -> Unit
+) {
+
+    val clickListener: () -> Unit =
+        remember(story) {
+            { story.url?.let { onStoryContentClick(it) } }
+        }
+
+    Ripple(bounded = false) {
+        Clickable(onClick = clickListener) {
+            Stack(
+                modifier = LayoutPadding(
+                    top = 8.dp,
+                    right = 16.dp,
+                    bottom = 8.dp
+                )
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = LayoutWidth(imageSize) + LayoutHeight(imageSize)
+                ) {
+                    Stack {
+                        Surface(
+                            color = colorResource(R.color.contentMuted),
+                            modifier = LayoutWidth.Fill + LayoutHeight.Fill
+                        ) {}
+
+                        when (webPreviewState) {
+                            is WebPreviewState.Loading -> {
+                                Container(expanded = true) {
+                                    ShimmerView()
+                                }
+                            }
+                            is WebPreviewState.Success -> {
+                                val webPreview = webPreviewState.webPreview
+
+                                val imageUrl =
+                                    webPreview.imageUrl ?: webPreview.iconUrl
+                                    ?: webPreview.favIconUrl
+
+                                UrlImage(imageUrl)
+                            }
+                            is WebPreviewState.Error -> {
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -232,7 +316,8 @@ fun StoryDetailPreview() {
         val viewState =
             StoryDetailViewState.Success(
                 story = Story.dummy,
-                commentState = StoryDetailCommentsState.Success(
+                webPreviewState = null,
+                commentsState = StoryDetailCommentsState.Success(
                     listOf(
                         FlatComment(Comment.dummy, 0),
                         FlatComment(Comment.dummy, 1),

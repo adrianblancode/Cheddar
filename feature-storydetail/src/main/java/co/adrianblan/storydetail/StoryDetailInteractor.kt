@@ -3,12 +3,13 @@ package co.adrianblan.storydetail
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.DispatcherProvider
-import co.adrianblan.common.ParentScope
 import co.adrianblan.ui.node.Interactor
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.api.CommentId
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
+import co.adrianblan.hackernews.api.StoryUrl
+import co.adrianblan.webpreview.WebPreviewRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
@@ -18,6 +19,7 @@ class StoryDetailInteractor
 @Inject constructor(
     @StoryDetailInternal private val storyId: StoryId,
     private val hackerNewsRepository: HackerNewsRepository,
+    private val webPreviewRepository: WebPreviewRepository,
     override val dispatcherProvider: DispatcherProvider,
     @StoryDetailInternal scope: CoroutineScope
 ) : Interactor(scope) {
@@ -56,41 +58,60 @@ class StoryDetailInteractor
             listOf(FlatComment(comment = comment, depthIndex = depthIndex)) + children
         }
 
+    private fun observeCommentsViewState(story: Story): Flow<StoryDetailCommentsState> =
+        flow {
+
+            emit(StoryDetailCommentsState.Loading)
+
+            try {
+                val flatComments: List<FlatComment> =
+                    fetchFlattenedComments(story.kids)
+
+                if (flatComments.isEmpty()) emit(StoryDetailCommentsState.Empty)
+                else emit(StoryDetailCommentsState.Success(flatComments))
+
+            } catch (t: Throwable) {
+                Timber.e(t)
+                emit(StoryDetailCommentsState.Error)
+            }
+        }
+
+    private fun observeWebPreviewState(url: StoryUrl?): Flow<WebPreviewState?> =
+        flow {
+
+            if (url == null) {
+                emit(null)
+                return@flow
+            }
+
+            emit(WebPreviewState.Loading)
+
+            try {
+                val webPreview = webPreviewRepository.fetchWebPreview(url.url)
+                emit(WebPreviewState.Success(webPreview))
+            } catch (t: Throwable) {
+                Timber.e(t)
+                emit(WebPreviewState.Error(t))
+            }
+        }
+
     init {
         scope.launch {
 
             flowOf(hackerNewsRepository.fetchStory(storyId))
                 .flatMapLatest<Story, StoryDetailViewState> { story ->
+                    combine(
+                        observeWebPreviewState(story.url),
+                        observeCommentsViewState(story)
+                    ) { webPreviewState: WebPreviewState?,
+                        storyDetailCommentsState: StoryDetailCommentsState ->
 
-                    flow {
-
-                        emit(StoryDetailCommentsState.Loading)
-
-                        try {
-                            val flatComments: List<FlatComment> =
-                                fetchFlattenedComments(story.kids)
-
-                            if (flatComments.isEmpty()) emit(StoryDetailCommentsState.Empty)
-                            else emit(StoryDetailCommentsState.Success(flatComments))
-
-                        } catch (t: Throwable) {
-
-                            Timber.e(t)
-                            emit(StoryDetailCommentsState.Error)
-                        }
+                        StoryDetailViewState.Success(
+                            story = story,
+                            webPreviewState = webPreviewState,
+                            commentsState = storyDetailCommentsState
+                        )
                     }
-                        .map { commentsState ->
-                            StoryDetailViewState.Success(story, commentsState)
-                        }
-                        .catch {
-                            Timber.e(it)
-                            emit(
-                                StoryDetailViewState.Success(
-                                    story,
-                                    StoryDetailCommentsState.Error
-                                )
-                            )
-                        }
                 }
                 .flowOn(dispatcherProvider.IO)
                 .catch {

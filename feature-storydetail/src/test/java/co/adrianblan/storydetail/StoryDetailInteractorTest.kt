@@ -42,7 +42,8 @@ class StoryDetailInteractorTest {
             storyId = StoryId(1),
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             scope = scope,
-            hackerNewsRepository = hackerNewsRepository
+            hackerNewsRepository = hackerNewsRepository,
+            webPreviewRepository = mock()
         )
     }
 

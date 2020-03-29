@@ -30,8 +30,8 @@ fun UrlImage(
         ImageState.Loading
     }
 
-    val targetWidthPx = with(DensityAmbient.current) { width.toIntPx().value }
-    val targetHeightPx = with(DensityAmbient.current) { height.toIntPx().value }
+    val targetWidthPx = with(DensityAmbient.current) { remember { width.toIntPx().value } }
+    val targetHeightPx = with(DensityAmbient.current) { remember { height.toIntPx().value } }
 
     onCommit(imageUrl) {
 

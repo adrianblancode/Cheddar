@@ -36,7 +36,7 @@ fun StoryTypePopup(
                 constraints = DpConstraints(maxWidth = 190.dp)
             ) {
                 Surface(
-                    shape = RoundedCornerShape(4.dp),
+                    shape = RoundedCornerShape(6.dp),
                     color = MaterialTheme.colors().background,
                     elevation = 4.dp
                 ) {
