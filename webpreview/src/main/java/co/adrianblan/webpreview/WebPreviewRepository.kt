@@ -35,6 +35,8 @@ class WebPreviewRepository
                 val document = Jsoup.connect(url).get()
                 val webPreview = document.toWebPreviewData(url.baseUrl())
 
+                cache.put(url, webPreview)
+
                 continuation.resume(webPreview)
             }
 
