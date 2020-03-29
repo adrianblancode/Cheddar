@@ -67,7 +67,9 @@ constructor(
                     emit(DecoratedStory(story, WebPreviewState.Success(webPreview)))
                 } catch (t: Throwable) {
                     Timber.e(t)
-                    emit(DecoratedStory(story, WebPreviewState.Error(t)))
+
+                    if (t is CancellationException) throw t
+                    else emit(DecoratedStory(story, WebPreviewState.Error(t)))
                 }
             }
         }
@@ -123,16 +125,16 @@ constructor(
                         channelFlow<StoryFeedState> {
                             offer(StoryFeedState.Loading)
 
-                            val storyIds: List<StoryId> =
-                                hackerNewsRepository.fetchStories(storyType)
-
-                            observePaginatedStories(storyIds)
+                            flow {
+                                emit(hackerNewsRepository.fetchStories(storyType))
+                            }
+                                .flatMapLatest { storyIds ->
+                                    observePaginatedStories(storyIds)
+                                }
                                 .catch { t ->
+                                    Timber.e(t)
                                     if (t is CancellationException) throw t
-                                    else {
-                                        Timber.e(t)
-                                        offer(StoryFeedState.Error(t))
-                                    }
+                                    else offer(StoryFeedState.Error(t))
                                 }
                                 .collectLatest { stories ->
                                     ensureActive()

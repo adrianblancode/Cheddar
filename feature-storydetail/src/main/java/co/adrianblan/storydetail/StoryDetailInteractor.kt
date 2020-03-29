@@ -72,7 +72,9 @@ class StoryDetailInteractor
 
             } catch (t: Throwable) {
                 Timber.e(t)
-                emit(StoryDetailCommentsState.Error)
+
+                if (t is CancellationException) throw t
+                else emit(StoryDetailCommentsState.Error)
             }
         }
 
@@ -91,14 +93,16 @@ class StoryDetailInteractor
                 emit(WebPreviewState.Success(webPreview))
             } catch (t: Throwable) {
                 Timber.e(t)
-                emit(WebPreviewState.Error(t))
+
+                if (t is CancellationException) throw t
+                else emit(WebPreviewState.Error(t))
             }
         }
 
     init {
         scope.launch {
 
-            flowOf(hackerNewsRepository.fetchStory(storyId))
+            flow { emit(hackerNewsRepository.fetchStory(storyId)) }
                 .flatMapLatest<Story, StoryDetailViewState> { story ->
                     combine(
                         observeWebPreviewState(story.url),
@@ -116,7 +120,8 @@ class StoryDetailInteractor
                 .flowOn(dispatcherProvider.IO)
                 .catch {
                     Timber.e(it)
-                    emit(StoryDetailViewState.Error(it))
+                    if (it is CancellationException) throw it
+                    else emit(StoryDetailViewState.Error(it))
                 }
                 .collect {
                     _state.value = it

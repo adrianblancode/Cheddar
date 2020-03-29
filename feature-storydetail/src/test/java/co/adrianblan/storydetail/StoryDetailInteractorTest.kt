@@ -3,9 +3,9 @@ package co.adrianblan.storydetail
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import co.adrianblan.common.ParentScope
 import co.adrianblan.hackernews.HackerNewsRepository
-import co.adrianblan.hackernews.api.Story
-import co.adrianblan.hackernews.api.StoryId
-import co.adrianblan.hackernews.api.dummy
+import co.adrianblan.hackernews.StoryType
+import co.adrianblan.hackernews.TestHackerNewsRepository
+import co.adrianblan.hackernews.api.*
 import co.adrianblan.test.CoroutineTestRule
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
@@ -13,6 +13,7 @@ import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineScope
 import org.hamcrest.CoreMatchers.instanceOf
+import org.junit.After
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
@@ -27,17 +28,25 @@ class StoryDetailInteractorTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private lateinit var hackerNewsRepository: HackerNewsRepository
     private lateinit var scope: TestCoroutineScope
     private var storyDetailInteractor: StoryDetailInteractor? = null
 
+    suspend fun delayAndThrow(delayTime: Long): Nothing =
+        coroutineScope {
+            delay(delayTime)
+            throw RuntimeException()
+        }
+
     @Before
     fun setUp() {
-        hackerNewsRepository = mock {
-            onBlocking { fetchStory(any()) } doReturn Story.dummy
-        }
         scope = TestCoroutineScope(SupervisorJob() + coroutineRule.testDispatcher)
+        buildInteractor()
+    }
 
+    private fun buildInteractor(
+        hackerNewsRepository: HackerNewsRepository =
+            TestHackerNewsRepository(1000L)
+    ) {
         storyDetailInteractor = StoryDetailInteractor(
             storyId = StoryId(1),
             dispatcherProvider = coroutineRule.testDispatcherProvider,
@@ -47,7 +56,18 @@ class StoryDetailInteractorTest {
         )
     }
 
-    // TODO add more tests
+    @After
+    fun tearDown() {
+        scope.cancel()
+    }
+
+    @Test
+    fun testInitialState() {
+        assertThat(
+            storyDetailInteractor?.state?.value,
+            instanceOf(StoryDetailViewState.Loading::class.java)
+        )
+    }
 
     @Test
     fun testSuccessStory() {
@@ -55,8 +75,36 @@ class StoryDetailInteractorTest {
         scope.advanceUntilIdle()
 
         assertThat(
-            storyDetailInteractor!!.state.value,
+            storyDetailInteractor?.state?.value,
             instanceOf(StoryDetailViewState.Success::class.java)
         )
+    }
+
+    @Test
+    fun testStoriesError() {
+
+        val evilDelay = 10000L
+
+        val evilHackerNewsRepository = object : HackerNewsRepository {
+            override suspend fun fetchStory(storyId: StoryId): Story =
+                delayAndThrow(evilDelay)
+
+            override suspend fun fetchStories(storyType: StoryType): List<StoryId> =
+                delayAndThrow(evilDelay)
+
+            override suspend fun fetchComment(commentId: CommentId): Comment =
+                delayAndThrow(evilDelay)
+        }
+
+        buildInteractor(evilHackerNewsRepository)
+
+        scope.advanceUntilIdle()
+
+        assertThat(
+            storyDetailInteractor?.state?.value,
+            instanceOf(StoryDetailViewState.Error::class.java)
+        )
+
+        assert(scope.isActive)
     }
 }

@@ -7,6 +7,7 @@ import co.adrianblan.common.DefaultDispatcherProvider
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.hackernews.HackerNewsModule
 import co.adrianblan.hackernews.HackerNewsRepository
+import co.adrianblan.hackernews.HackerNewsRepositoryImpl
 import co.adrianblan.network.NetworkModule
 import co.adrianblan.webpreview.WebPreviewRepository
 import dagger.*
@@ -17,7 +18,11 @@ interface AppModule {
 
     @Singleton
     @Binds
-    fun CustomTabsLauncherImpl.bindInterface(): CustomTabsLauncher
+    fun HackerNewsRepositoryImpl.bindHackerNewsRepository(): HackerNewsRepository
+
+    @Singleton
+    @Binds
+    fun CustomTabsLauncherImpl.bindCustomTabsLauncher(): CustomTabsLauncher
 
     companion object {
         @Singleton

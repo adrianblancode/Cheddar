@@ -8,14 +8,20 @@ import co.adrianblan.network.unwrapApiResponse
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface HackerNewsRepository {
+    suspend fun fetchStory(storyId: StoryId): Story
+    suspend fun fetchStories(storyType: StoryType): List<StoryId>
+    suspend fun fetchComment(commentId: CommentId): Comment
+}
+
 @Singleton
-class HackerNewsRepository
+class HackerNewsRepositoryImpl
 @Inject constructor(
     private val hackerNewsApiService: HackerNewsApiService
-) {
+): HackerNewsRepository {
     private val storyCache = WeakCache<StoryId, Story>()
 
-    suspend fun fetchStory(storyId: StoryId): Story =
+    override suspend fun fetchStory(storyId: StoryId): Story =
         storyCache.get(storyId)
             ?: hackerNewsApiService.fetchStory(storyId)
                 .throwIfEmptyResponse()
@@ -24,12 +30,12 @@ class HackerNewsRepository
                     storyCache.put(storyId, story)
                 }
 
-    suspend fun fetchStories(storyType: StoryType): List<StoryId> =
+    override suspend fun fetchStories(storyType: StoryType): List<StoryId> =
         hackerNewsApiService.fetchStories(storyType)
             .mapNullResponseToEmptyList()
             .unwrapApiResponse()
 
-    suspend fun fetchComment(commentId: CommentId): Comment =
+    override suspend fun fetchComment(commentId: CommentId): Comment =
         hackerNewsApiService.fetchComment(commentId)
             .throwIfEmptyResponse()
             .unwrapApiResponse()
