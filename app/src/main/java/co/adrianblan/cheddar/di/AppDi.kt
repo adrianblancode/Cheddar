@@ -1,8 +1,8 @@
 package co.adrianblan.cheddar.di
 
 import android.content.Context
-import co.adrianblan.cheddar.extensions.CustomTabsLauncher
 import co.adrianblan.cheddar.extensions.CustomTabsLauncherImpl
+import co.adrianblan.common.CustomTabsLauncher
 import co.adrianblan.common.DefaultDispatcherProvider
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.hackernews.HackerNewsModule
@@ -15,6 +15,7 @@ import javax.inject.Singleton
 @Module
 interface AppModule {
 
+    @Singleton
     @Binds
     fun CustomTabsLauncherImpl.bindInterface(): CustomTabsLauncher
 

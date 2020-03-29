@@ -58,6 +58,7 @@ dependencies {
     implementation(project(":webpreview"))
     implementation(project(':feature-storyfeed'))
     implementation(project(':feature-storydetail'))
+    implementation(project(':feature-storynavigation'))
 
     implementation(Dependencies.androidxBrowser)
     debugImplementation(Dependencies.leakcanary)

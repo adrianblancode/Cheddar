@@ -4,12 +4,9 @@ import android.content.Context
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
+import co.adrianblan.common.CustomTabsLauncher
 import javax.inject.Inject
 import javax.inject.Singleton
-
-interface CustomTabsLauncher {
-    fun launchUrl(url: String)
-}
 
 @Singleton
 class CustomTabsLauncherImpl

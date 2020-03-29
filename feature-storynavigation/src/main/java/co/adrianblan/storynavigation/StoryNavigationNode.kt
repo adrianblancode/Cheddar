@@ -1,11 +1,9 @@
-package co.adrianblan.cheddar
+package co.adrianblan.storynavigation
 
 import androidx.compose.Composable
-import androidx.compose.State
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import co.adrianblan.cheddar.di.RootInternal
-import co.adrianblan.cheddar.extensions.CustomTabsLauncher
+import co.adrianblan.common.CustomTabsLauncher
 import co.adrianblan.common.asParentScope
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
@@ -17,17 +15,15 @@ import co.adrianblan.ui.RootView
 import co.adrianblan.ui.RootViewState
 import co.adrianblan.ui.node.Node
 import co.adrianblan.ui.node.StackRouter
-import co.adrianblan.ui.observe
-import co.adrianblan.ui.observeState
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
-class RootNode
+class StoryNavigationNode
 @Inject constructor(
     private val storyFeedNodeBuilder: StoryFeedNodeBuilder,
     private val storyDetailNodeBuilder: StoryDetailNodeBuilder,
     private val customTabsLauncher: CustomTabsLauncher,
-    @RootInternal scope: CoroutineScope
+    @StoryNavigationInternal scope: CoroutineScope
 ) : Node<RootViewState>(scope), StoryFeedNode.Listener, StoryDetailNode.Listener {
 
     private val _state = MutableLiveData<RootViewState>()

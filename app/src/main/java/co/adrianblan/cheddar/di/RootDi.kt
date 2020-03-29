@@ -1,21 +1,13 @@
 package co.adrianblan.cheddar.di
 
-import co.adrianblan.cheddar.RootNode
-import co.adrianblan.common.ParentScope
-import co.adrianblan.storyfeed.StoryFeedComponent
-import co.adrianblan.storydetail.StoryDetailComponent
-import dagger.BindsInstance
+import co.adrianblan.storynavigation.StoryNavigationComponent
+import co.adrianblan.storynavigation.StoryNavigationNodeBuilder
 import dagger.Component
 import dagger.Module
-import kotlinx.coroutines.CoroutineScope
-import javax.inject.Qualifier
 import javax.inject.Scope
 
 @Module(
-    subcomponents = [
-        StoryFeedComponent::class,
-        StoryDetailComponent::class
-    ]
+    subcomponents = [StoryNavigationComponent::class]
 )
 object RootModule
 
@@ -25,21 +17,14 @@ object RootModule
     dependencies = [AppComponent::class]
 )
 interface RootComponent {
-    fun rootNode(): RootNode
+    fun rootNodeBuilder(): StoryNavigationNodeBuilder
 
     @Component.Factory
     interface Factory {
-        fun build(
-            @RootInternal @BindsInstance scope: CoroutineScope,
-            appComponent: AppComponent
-        ) : RootComponent
+        fun build(appComponent: AppComponent) : RootComponent
     }
 }
 
 @Scope
 @Retention
 internal annotation class RootScope
-
-@Qualifier
-@Retention
-internal annotation class RootInternal

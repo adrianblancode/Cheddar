@@ -164,7 +164,10 @@ fun StoryDetailToolbar(
                 RepaintBoundary {
                     Text(
                         text = story.title,
-                        style = MaterialTheme.typography().h6.copy(fontSize = titleFontSize),
+                        style = MaterialTheme.typography().h6.copy(
+                            fontSize = titleFontSize, 
+                            color = MaterialTheme.colors().onBackground
+                        ),
                         modifier = LayoutPadding(
                             left = 16.dp + titleCollapsedLeftOffset,
                             right = 16.dp + titleRightOffset,

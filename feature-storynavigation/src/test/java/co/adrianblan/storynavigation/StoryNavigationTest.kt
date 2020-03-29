@@ -1,4 +1,4 @@
-package co.adrianblan.cheddar
+package co.adrianblan.storynavigation
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import co.adrianblan.hackernews.api.StoryId
@@ -15,7 +15,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class RootNodeTest {
+class StoryNavigationTest {
 
     @get:Rule
     val executorRule = InstantTaskExecutorRule()
@@ -34,11 +34,11 @@ class RootNodeTest {
             ).thenReturn(mock())
         }
 
-    private lateinit var rootNode: RootNode
+    private lateinit var rootNode: StoryNavigationNode
 
     @Before
     fun setUp() {
-        rootNode = RootNode(
+        rootNode = StoryNavigationNode(
             storyFeedNodeBuilder,
             storyDetailNodeBuilder,
             customTabsLauncher = mock(),
