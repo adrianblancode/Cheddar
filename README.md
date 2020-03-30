@@ -1,7 +1,8 @@
 ![Cheddar logo](https://github.com/adrianblancode/Cheddar/blob/master/media/cheddar-icon.png)
 
-# [WIP] Cheddar for Hacker News ![Build status](https://github.com/adrianblancode/Cheddar/workflows/Build/badge.svg) ![Test status](https://github.com/adrianblancode/Cheddar/workflows/Tests/badge.svg)
-
+# [WIP] Cheddar for Hacker News
+![Build status](https://github.com/adrianblancode/Cheddar/workflows/Build/badge.svg) ![Test status](https://github.com/adrianblancode/Cheddar/workflows/Tests/badge.svg)
+ 
 Cheddar is a social news reader for Hacker News. Currently it's being entirely rewritten with: 
 
 *   All views written entirely in Compose.
