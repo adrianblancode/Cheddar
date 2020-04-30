@@ -13,7 +13,7 @@ import co.adrianblan.ui.node.Node
 
 class MainActivity : AppCompatActivity() {
 
-    private val rootViewModel : RootViewModel by viewModels()
+    private val rootViewModel: RootViewModel by viewModels()
     private val rootNode: Node<*> get() = rootViewModel.rootNode
 
     override fun onCreate(savedInstanceState: Bundle?) {

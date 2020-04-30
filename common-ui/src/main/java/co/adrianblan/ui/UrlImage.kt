@@ -4,19 +4,18 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import androidx.compose.*
 import androidx.ui.core.*
-import androidx.ui.foundation.DrawImage
-import androidx.ui.graphics.Color
-import androidx.ui.graphics.Image
+import androidx.ui.foundation.Box
+import androidx.ui.foundation.Image
+import androidx.ui.graphics.Canvas
+import androidx.ui.graphics.ImageAsset
+import androidx.ui.graphics.asImageAsset
 import androidx.ui.layout.*
-import androidx.ui.material.ColorPalette
-import androidx.ui.material.MaterialTheme
-import androidx.ui.material.surface.Surface
-import androidx.ui.res.colorResource
 import androidx.ui.unit.Dp
 import androidx.ui.unit.dp
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
-import timber.log.Timber
+
+private val minBitmapSizePx = 48
 
 /** Takes an image url and loads it with Picasso */
 @Composable
@@ -49,16 +48,16 @@ fun UrlImage(
                 imageState.value =
                     if (bitmap == null) ImageState.Error
                     else {
-                        val image =
-                            // Really small images are loaded without filtering to retain pixel perfect sharpness
-                            if (bitmap.height <= 48 || bitmap.width <= 48) {
-                                Bitmap.createScaledBitmap(
-                                    bitmap,
-                                    targetWidthPx,
-                                    targetHeightPx,
-                                    false
-                                ).asImageAsset()
-                            } else bitmap.asImageAsset()
+                        // Really small images are loaded without filtering to retain pixel perfect sharpness
+                        val isPixelatedIcon =
+                            bitmap.height <= minBitmapSizePx || bitmap.width <= minBitmapSizePx
+
+                        val image = Bitmap.createScaledBitmap(
+                            bitmap,
+                            targetWidthPx,
+                            targetHeightPx,
+                            !isPixelatedIcon
+                        ).asImageAsset()
 
                         ImageState.ImageSuccess(image)
                     }
@@ -82,21 +81,20 @@ fun UrlImage(
 
 @Composable
 private fun DrawImageState(state: ImageState) {
-    RepaintBoundary {
-        when (state) {
-            is ImageState.Loading ->
-                Container(expanded = true) {
-                    ShimmerView()
-                }
-            is ImageState.Error -> {}
-            is ImageState.ImageSuccess ->
-                DrawImage(image = state.image)
+    when (state) {
+        is ImageState.Loading ->
+            Box(modifier = Modifier.fillMaxSize()) {
+                ShimmerView()
+            }
+        is ImageState.Error -> {
         }
+        is ImageState.ImageSuccess ->
+            Image(asset = state.image)
     }
 }
 
 private sealed class ImageState {
-    data class ImageSuccess(val image: Image) : ImageState()
+    data class ImageSuccess(val image: ImageAsset) : ImageState()
     object Loading : ImageState()
     object Error : ImageState()
 }

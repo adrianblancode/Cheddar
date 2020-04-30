@@ -10,7 +10,7 @@ import androidx.ui.res.colorResource
 import co.adrianblan.ui.extensions.isNightModeActive
 
 @Composable
-fun AppTheme(children: @Composable() () -> Unit) {
+fun AppTheme(content: @Composable() () -> Unit) {
 
     val colors =
         if (isNightModeActive()) {
@@ -33,7 +33,7 @@ fun AppTheme(children: @Composable() () -> Unit) {
             )
         }
 
-    MaterialTheme(colors = colors, typography = themeTypography, children = children)
+    MaterialTheme(colors = colors, typography = themeTypography, content = content)
 }
 
 @Composable

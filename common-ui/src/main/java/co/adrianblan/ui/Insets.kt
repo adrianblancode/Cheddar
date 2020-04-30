@@ -5,6 +5,8 @@ import androidx.compose.*
 import androidx.core.graphics.Insets
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import timber.log.Timber
 
 // Alpha for views which have content drawn behind it
 const val overInsetAlpha = 0.8f
@@ -15,13 +17,17 @@ val InsetsAmbient = ambientOf { Insets.NONE }
 @Composable
 fun InsetsWrapper(
     view: View,
-    children: @Composable() () -> Unit
+    content: @Composable() () -> Unit
 ) {
 
-    val insetState = state { Insets.NONE }
+    val insetState = state<Insets> {
+        WindowInsetsCompat.toWindowInsetsCompat(view.rootWindowInsets)
+            .systemWindowInsets
+    }
 
-    val listener: OnApplyWindowInsetsListener =
-        remember {
+    onCommit {
+
+        val listener =
             OnApplyWindowInsetsListener { _, windowInsets ->
                 val inset = windowInsets.systemWindowInsets
 
@@ -29,14 +35,12 @@ fun InsetsWrapper(
 
                 windowInsets
             }
-        }
 
-    onCommit(view) {
         ViewCompat.setOnApplyWindowInsetsListener(view, listener)
         onDispose { ViewCompat.setOnApplyWindowInsetsListener(view, null) }
     }
 
     Providers(InsetsAmbient provides insetState.value) {
-        children()
+        content()
     }
 }

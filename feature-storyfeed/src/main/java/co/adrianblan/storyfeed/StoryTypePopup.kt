@@ -2,22 +2,22 @@ package co.adrianblan.storyfeed
 
 import androidx.compose.Composable
 import androidx.compose.remember
+import androidx.ui.core.Alignment
 import androidx.ui.core.DropdownPopup
+import androidx.ui.core.Modifier
 import androidx.ui.core.PopupProperties
-import androidx.ui.core.Text
-import androidx.ui.foundation.Clickable
+import androidx.ui.foundation.*
 import androidx.ui.foundation.shape.corner.RoundedCornerShape
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
+import androidx.ui.material.Surface
 import androidx.ui.material.icons.Icons
 import androidx.ui.material.icons.filled.Check
-import androidx.ui.material.ripple.Ripple
-import androidx.ui.material.surface.Surface
+import androidx.ui.material.ripple.ripple
 import androidx.ui.res.stringResource
 import androidx.ui.unit.dp
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.ui.AppTheme
-import co.adrianblan.ui.VectorImage
 
 @Composable
 fun StoryTypePopup(
@@ -31,13 +31,13 @@ fun StoryTypePopup(
     ) {
         // Popups require reapplication of the app theme
         AppTheme {
-            Container(
-                padding = EdgeInsets(8.dp),
-                constraints = DpConstraints(maxWidth = 190.dp)
+            Box(
+                padding = 8.dp,
+                modifier = Modifier.preferredWidthIn(maxWidth = 190.dp)
             ) {
                 Surface(
                     shape = RoundedCornerShape(6.dp),
-                    color = MaterialTheme.colors().background,
+                    color = MaterialTheme.colors.background,
                     elevation = 4.dp
                 ) {
                     Column {
@@ -69,35 +69,40 @@ fun StoryTypePopupItem(
     isSelected: Boolean,
     onClick: (StoryType) -> Unit
 ) {
-    Ripple(bounded = true) {
-        Clickable(onClick = { onClick(storyType) }) {
-            Container(modifier = LayoutWidth.Fill + LayoutAlign.BottomLeft) {
-                Row(arrangement = Arrangement.SpaceBetween) {
+    Clickable(
+        onClick = { onClick(storyType) },
+        modifier = Modifier.ripple(bounded = true)
+    ) {
+        Box(
+            gravity = ContentGravity.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(horizontalArrangement = Arrangement.SpaceBetween) {
 
-                    Text(
-                        text = stringResource(storyType.titleStringResource()),
-                        style = MaterialTheme.typography().subtitle1,
-                        modifier = LayoutFlexible(1f) +
-                                LayoutPadding(
-                                    left = 12.dp,
-                                    top = 16.dp,
-                                    bottom = 12.dp,
-                                    right = 12.dp
-                                )
-                    )
-
-                    if (isSelected) {
-                        Container(
-                            modifier = LayoutGravity.Center,
-                            padding = EdgeInsets(right = 12.dp, top = 2.dp)
-                        ) {
-                            VectorImage(
-                                vector = Icons.Default.Check,
-                                tint = MaterialTheme.colors().secondary,
-                                modifier = LayoutGravity.Center +
-                                        LayoutSize(32.dp, 32.dp)
+                Text(
+                    text = stringResource(storyType.titleStringResource()),
+                    style = MaterialTheme.typography.subtitle1,
+                    modifier = Modifier.weight(1f) +
+                            Modifier.padding(
+                                start = 12.dp,
+                                end = 12.dp,
+                                top = 16.dp,
+                                bottom = 12.dp
                             )
-                        }
+                )
+
+                if (isSelected) {
+                    Box(
+                        modifier  = Modifier.gravity(Alignment.CenterVertically),
+                        paddingEnd = 12.dp,
+                        paddingTop = 2.dp
+                    ) {
+                        Icon(
+                            asset = Icons.Default.Check,
+                            tint = MaterialTheme.colors.secondary,
+                            modifier = Modifier.gravity(Alignment.CenterVertically) +
+                                    Modifier.preferredSize(32.dp)
+                        )
                     }
                 }
             }

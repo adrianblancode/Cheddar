@@ -1,24 +1,18 @@
 package co.adrianblan.ui
 
 import androidx.compose.Composable
-import androidx.compose.key
 import androidx.compose.remember
-import androidx.ui.core.Alignment
-import androidx.ui.core.Clip
-import androidx.ui.core.DensityAmbient
-import androidx.ui.core.DrawShadow
+import androidx.ui.core.*
+import androidx.ui.foundation.Box
 import androidx.ui.foundation.Clickable
 import androidx.ui.foundation.ScrollerPosition
-import androidx.ui.foundation.VerticalScroller
-import androidx.ui.foundation.shape.RectangleShape
 import androidx.ui.geometry.Rect
-import androidx.ui.graphics.Color
 import androidx.ui.graphics.Outline
+import androidx.ui.graphics.RectangleShape
 import androidx.ui.graphics.Shape
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
-import androidx.ui.material.ripple.Ripple
-import androidx.ui.material.surface.Surface
+import androidx.ui.material.Surface
 import androidx.ui.unit.*
 import kotlin.math.min
 
@@ -27,7 +21,7 @@ fun CollapsingToolbar(
     scroller: ScrollerPosition,
     minHeight: Dp = 56.dp,
     maxHeight: Dp = 128.dp,
-    children: @Composable() (collapsedFraction: Float, height: Dp) -> Unit
+    toolbarContent: @Composable() (collapsedFraction: Float, height: Dp) -> Unit
 ) {
 
     val totalCollapseDistance: Dp = maxHeight - minHeight
@@ -47,12 +41,14 @@ fun CollapsingToolbar(
 
         // Toolbar background
         Column {
-            Surface(color = MaterialTheme.colors().primary.copy(alpha = overInsetAlpha)) {
-                Container(
-                    padding = EdgeInsets(top = topInsets),
-                    modifier = LayoutWidth.Fill + LayoutHeight(height + topInsets)
+            Surface(color = MaterialTheme.colors.primary.copy(alpha = overInsetAlpha)) {
+                Box(
+                    gravity = Alignment.BottomCenter,
+                    paddingTop = topInsets,
+                    modifier = Modifier.fillMaxWidth() +
+                            Modifier.preferredHeight(height + topInsets)
                 ) {
-                    children(collapsedFraction, height)
+                    toolbarContent(collapsedFraction, height)
                 }
             }
 
@@ -70,12 +66,12 @@ fun CollapsingToolbar(
                         )
                 }
             }
-
             // Elevation draws shadows underneath the shape, which is a problem if shape is transparent
             // We must clip the shadow to outside of the toolbar to not draw under it
-            Clip(toolbarShadowShape) {
-                DrawShadow(shape = RectangleShape, elevation = elevation)
-            }
+            Surface(
+                modifier = Modifier.drawShadow(shape = RectangleShape, elevation = elevation) +
+                        Modifier.clip(toolbarShadowShape)
+            ) {}
         }
     }
 }
@@ -89,11 +85,11 @@ fun CollapsingScaffold(
     toolbarContent: @Composable() (collapsedFraction: Float, height: Dp) -> Unit,
     bodyContent: @Composable() () -> Unit
 ) {
-    Stack(modifier = LayoutHeight.Fill) {
-        Container(expanded = true) {
+    Stack(modifier = Modifier.fillMaxHeight()) {
+        Box(modifier = Modifier.fillMaxSize()) {
             // Background color for body
-            Surface(color = MaterialTheme.colors().background) {
-                Column(modifier = LayoutHeight.Fill) {
+            Surface(color = MaterialTheme.colors.background) {
+                Column(modifier = Modifier.fillMaxHeight()) {
                     bodyContent()
                 }
             }

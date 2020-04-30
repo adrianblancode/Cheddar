@@ -5,10 +5,10 @@ import androidx.compose.Observe
 import androidx.compose.key
 import androidx.compose.onCommit
 import androidx.lifecycle.LiveData
+import androidx.ui.core.Alignment
 import androidx.ui.core.DensityAmbient
-import androidx.ui.core.Text
-import androidx.ui.foundation.ScrollerPosition
-import androidx.ui.foundation.VerticalScroller
+import androidx.ui.core.Modifier
+import androidx.ui.foundation.*
 import androidx.ui.layout.*
 import androidx.ui.material.Button
 import androidx.ui.material.MaterialTheme
@@ -48,16 +48,19 @@ fun StoryFeedView(
     onPageEndReached: () -> Unit
 ) {
     val scroller = ScrollerPosition()
+    val densityAmbient = DensityAmbient.current
 
-    with(DensityAmbient.current) {
-        onCommit(viewState.storyType) {
+    onCommit(viewState.storyType) {
 
-            val collapseDistance = (toolbarMaxHeightDp - toolbarMinHeightDp).dp
+        val collapseDistance = (toolbarMaxHeightDp - toolbarMinHeightDp).dp
 
-            // If story type is changed, revert scroll but retain toolbar collapse state
-            val scrollReset: Px = min(scroller.value.px, collapseDistance.toPx())
-            scroller.scrollTo(scrollReset.value)
-        }
+        // If story type is changed, revert scroll but retain toolbar collapse state
+        val scrollReset: Px =
+            with(densityAmbient) {
+                min(scroller.value.px, collapseDistance.toPx())
+            }
+
+        scroller.scrollTo(scrollReset.value)
     }
 
     CollapsingScaffold(
@@ -117,7 +120,9 @@ fun StoryFeedSuccessContentBody(
 ) {
     val storyFeedState = viewState.storyFeedState as StoryFeedState.Success
 
-    val scrollEndZone: Px = with(DensityAmbient.current) { 400.dp.toPx() }
+    val scrollEndZone: Px = with(DensityAmbient.current) {
+        400.dp.toPx()
+    }
 
     Observe {
         val isScrolledToEnd: Boolean =
@@ -143,7 +148,7 @@ fun StoryFeedSuccessContentBody(
                 val insets = InsetsAmbient.current
                 val topInsets = insets.top.px.toDp()
 
-                Spacer(modifier = LayoutHeight(toolbarMaxHeightDp.dp + topInsets))
+                Spacer(modifier = Modifier.preferredHeight(toolbarMaxHeightDp.dp + topInsets))
 
                 storyFeedState.stories.map { story ->
                     key(story.story.id) {
@@ -161,7 +166,7 @@ fun StoryFeedSuccessContentBody(
                     viewState.hasLoadedAllPages -> NoMoreStoriesView()
                 }
 
-                Spacer(modifier = LayoutHeight(insets.bottom.px.toDp() + 8.dp))
+                Spacer(modifier = Modifier.preferredHeight(insets.bottom.px.toDp() + 8.dp))
             }
         }
     }
@@ -169,13 +174,13 @@ fun StoryFeedSuccessContentBody(
 
 @Composable
 private fun LoadingMoreStoriesView() {
-    Container(
-        padding = EdgeInsets(8.dp),
-        modifier = LayoutWidth.Fill
+    Box(
+        padding = 8.dp,
+        gravity = ContentGravity.Center,
+        modifier = Modifier.fillMaxWidth()
     ) {
         LoadingView(
-            textStyle = MaterialTheme.typography().subtitle1,
-            modifier = LayoutAlign.Center
+            textStyle = MaterialTheme.typography.subtitle1
         )
     }
 }
@@ -184,17 +189,17 @@ private fun LoadingMoreStoriesView() {
 private fun LoadMoreStoriesButton(
     onPageEndReached: () -> Unit
 ) {
-    Container(modifier = LayoutWidth.Fill + LayoutPadding(top = 8.dp)) {
-        Button(
-            modifier = LayoutAlign.Center,
-            onClick = onPageEndReached
-        ) {
+    Box(
+        gravity = ContentGravity.Center,
+        modifier = Modifier.fillMaxSize() + Modifier.padding(top = 8.dp)
+    ) {
+        Button(onClick = onPageEndReached) {
             Text(
                 stringResource(R.string.stories_load_more_stories),
-                style = MaterialTheme.typography().subtitle2,
-                modifier = LayoutPadding(
-                    left = 16.dp,
-                    right = 16.dp,
+                style = MaterialTheme.typography.subtitle2,
+                modifier = Modifier.padding(
+                    start = 16.dp,
+                    end = 16.dp,
                     top = 12.dp,
                     bottom = 8.dp
                 )
@@ -205,21 +210,23 @@ private fun LoadMoreStoriesButton(
 
 @Composable
 private fun NoMoreStoriesView() {
-    Container(modifier = LayoutWidth.Fill) {
+    Box(
+        gravity = ContentGravity.Center,
+        modifier = Modifier.fillMaxWidth()
+    ) {
         Text(
             text = stringResource(id = R.string.stories_no_more_stories),
-            style = MaterialTheme.typography().subtitle2
+            style = MaterialTheme.typography.subtitle2
                 .copy(
-                    color = MaterialTheme.colors().onPrimary.copy(alpha = textSecondaryAlpha),
+                    color = MaterialTheme.colors.onPrimary.copy(alpha = textSecondaryAlpha),
                     textAlign = TextAlign.Center
                 ),
-            modifier = LayoutAlign.Center +
-                    LayoutPadding(
-                        left = 16.dp,
-                        right = 16.dp,
-                        top = 16.dp,
-                        bottom = 8.dp
-                    )
+            modifier = Modifier.padding(
+                start = 16.dp,
+                end = 16.dp,
+                top = 16.dp,
+                bottom = 8.dp
+            )
         )
     }
 }

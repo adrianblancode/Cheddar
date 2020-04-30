@@ -2,11 +2,14 @@ package co.adrianblan.ui
 
 import androidx.compose.Composable
 import androidx.ui.animation.Crossfade
+import androidx.ui.core.Alignment
 import androidx.ui.core.DensityAmbient
 import androidx.ui.core.Modifier
+import androidx.ui.core.Modifier.Companion
+import androidx.ui.foundation.Box
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
-import androidx.ui.material.surface.Surface
+import androidx.ui.material.Surface
 import androidx.ui.unit.px
 import co.adrianblan.ui.node.Node
 
@@ -23,17 +26,17 @@ fun RootView(rootViewState: RootViewState) {
 
             // We don't want to deal with the hassle of left-right insets, so just apply them to all screens
             with(DensityAmbient.current) {
-                Container(
-                    padding = EdgeInsets(
-                        left = insets.left.px.toDp(),
-                        right = insets.right.px.toDp()
+                Box(
+                    modifier = Modifier.padding(
+                        start = insets.left.px.toDp(),
+                        end = insets.right.px.toDp()
                     )
                 ) {
                     it.activeNode.render()
                 }
             }
 
-            NavigationBarScrim(modifier = LayoutGravity.BottomCenter)
+            NavigationBarScrim(modifier = Modifier.gravity(Alignment.BottomCenter))
         }
     }
 }
@@ -47,8 +50,10 @@ fun NavigationBarScrim(
 
     with(DensityAmbient.current) {
         Surface(
-            color = MaterialTheme.colors().background.copy(alpha = overInsetAlpha),
-            modifier = modifier + LayoutHeight(insets.bottom.px.toDp()) + LayoutWidth.Fill
+            color = MaterialTheme.colors.background.copy(alpha = overInsetAlpha),
+            modifier = modifier +
+                    Modifier.fillMaxWidth() +
+                    Modifier.preferredHeight(insets.bottom.px.toDp())
         ) {}
     }
 }

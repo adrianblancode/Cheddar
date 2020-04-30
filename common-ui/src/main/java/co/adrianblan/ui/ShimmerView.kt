@@ -1,16 +1,15 @@
 package co.adrianblan.ui
 
 import androidx.animation.*
-import androidx.compose.Composable
-import androidx.compose.mutableStateOf
-import androidx.compose.onCommit
-import androidx.compose.remember
-import androidx.ui.core.AnimationClockAmbient
-import androidx.ui.core.Draw
-import androidx.ui.core.RepaintBoundary
+import androidx.compose.*
+import androidx.ui.core.*
+import androidx.ui.core.Modifier.Companion
+import androidx.ui.foundation.Box
+import androidx.ui.graphics.Canvas
 import androidx.ui.graphics.LinearGradient
 import androidx.ui.graphics.Paint
 import androidx.ui.graphics.TileMode
+import androidx.ui.layout.fillMaxSize
 import androidx.ui.res.colorResource
 import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.Px
@@ -50,27 +49,30 @@ fun ShimmerView() {
         }
     }
 
-    RepaintBoundary {
-        Draw { canvas, parentSize ->
+    Box(
+        modifier = Modifier.fillMaxSize() +
+                Modifier.drawBehind {
 
-            val rect = parentSize.toRect()
-            val width: Px = parentSize.width
+                    val parentSize = this.size
 
-            // Convert from [0, 1] to [-1, 2]
-            val offset = lerp(-1f, 2f, progress)
-            val left = width * offset
+                    val rect = parentSize.toRect()
+                    val width: Px = parentSize.width
 
-            val shimmerGradient = LinearGradient(
-                0f to backgroundColor, 0.5f to shimmerColor, 1f to backgroundColor,
-                startX = left,
-                endX = left + width,
-                startY = 0.px,
-                endY = 0.px,
-                tileMode = TileMode.Clamp
-            )
+                    // Convert from [0, 1] to [-1, 2]
+                    val offset = lerp(-1f, 2f, progress)
+                    val left = width * offset
 
-            shimmerPaint.shader = shimmerGradient.shader
-            canvas.drawRect(rect, shimmerPaint)
-        }
-    }
+                    val shimmerGradient = LinearGradient(
+                        0f to backgroundColor, 0.5f to shimmerColor, 1f to backgroundColor,
+                        startX = left,
+                        endX = left + width,
+                        startY = 0.px,
+                        endY = 0.px,
+                        tileMode = TileMode.Clamp
+                    )
+
+                    shimmerPaint.shader = shimmerGradient.shader
+                    drawRect(rect, shimmerPaint)
+                }
+    )
 }

@@ -47,6 +47,15 @@ android {
             )
         }
     }
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerVersion Versions.composeCompiler
+        kotlinCompilerExtensionVersion Versions.compose
+    }
 }
 
 dependencies {

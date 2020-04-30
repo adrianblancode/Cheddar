@@ -4,20 +4,19 @@ import android.text.Html
 import androidx.compose.Composable
 import androidx.compose.key
 import androidx.compose.remember
+import androidx.ui.core.Alignment
 import androidx.ui.core.DensityAmbient
-import androidx.ui.core.Text
-import androidx.ui.foundation.Box
-import androidx.ui.foundation.Clickable
-import androidx.ui.foundation.ScrollerPosition
-import androidx.ui.foundation.VerticalScroller
+import androidx.ui.core.Modifier
+import androidx.ui.foundation.*
 import androidx.ui.foundation.shape.corner.RoundedCornerShape
 import androidx.ui.graphics.Color
 import androidx.ui.layout.*
+import androidx.ui.material.IconButton
 import androidx.ui.material.MaterialTheme
+import androidx.ui.material.Surface
 import androidx.ui.material.icons.Icons
 import androidx.ui.material.icons.filled.*
-import androidx.ui.material.ripple.Ripple
-import androidx.ui.material.surface.Surface
+import androidx.ui.material.ripple.ripple
 import androidx.ui.res.colorResource
 import androidx.ui.res.stringResource
 import androidx.ui.text.style.TextAlign
@@ -43,8 +42,6 @@ fun StoryDetailView(
 ) {
 
     val scroller = ScrollerPosition()
-    val insets = InsetsAmbient.current
-
 
     CollapsingScaffold(
         scroller = scroller,
@@ -60,6 +57,7 @@ fun StoryDetailView(
             )
         },
         bodyContent = {
+
             when (viewState) {
                 is StoryDetailViewState.Success -> {
 
@@ -69,30 +67,39 @@ fun StoryDetailView(
                         is StoryDetailCommentsState.Success ->
                             VerticalScroller(scroller) {
                                 Column {
-                                    with(DensityAmbient.current) {
-                                        val topInsets = insets.top.px.toDp()
-                                        Spacer(modifier = LayoutHeight(toolbarMaxHeightDp.dp + topInsets))
 
-                                        if (viewState.story.text != null) {
-                                            CommentItem(
-                                                text = story.text,
-                                                by = story.by,
-                                                depthIndex = 0,
-                                                storyAuthor = story.by
-                                            )
+                                    val topInsets =
+                                        with(DensityAmbient.current) {
+                                            InsetsAmbient.current.top.px.toDp()
                                         }
 
-                                        viewState.commentsState.comments
-                                            .map { comment ->
-                                                key(comment.comment.id) {
-                                                    CommentItem(
-                                                        comment = comment,
-                                                        storyAuthor = story.by
-                                                    )
-                                                }
-                                            }
+                                    Spacer(
+                                        modifier = Modifier.preferredHeight(
+                                            toolbarMaxHeightDp.dp + topInsets
+                                        )
+                                    )
 
-                                        Spacer(modifier = LayoutHeight(insets.bottom.px.toDp() + 8.dp))
+                                    if (viewState.story.text != null) {
+                                        CommentItem(
+                                            text = story.text,
+                                            by = story.by,
+                                            depthIndex = 0,
+                                            storyAuthor = story.by
+                                        )
+                                    }
+
+                                    viewState.commentsState.comments
+                                        .map { comment ->
+                                            key(comment.comment.id) {
+                                                CommentItem(
+                                                    comment = comment,
+                                                    storyAuthor = story.by
+                                                )
+                                            }
+                                        }
+
+                                    with(DensityAmbient.current) {
+                                        Spacer(modifier = Modifier.preferredHeight(InsetsAmbient.current.bottom.px.toDp() + 8.dp))
                                     }
                                 }
                             }
@@ -122,17 +129,14 @@ fun StoryDetailToolbar(
 ) {
 
     Stack {
-        Container(padding = EdgeInsets(4.dp)) {
-            Ripple(bounded = false) {
-                Clickable(onClick = onBackPressed) {
-                    Container(modifier = LayoutGravity.TopLeft + LayoutSize(48.dp, 48.dp)) {
-                        VectorImage(
-                            vector = Icons.Default.ArrowBack,
-                            tint = MaterialTheme.colors().onBackground
-                        )
-                    }
-                }
-            }
+        IconButton(
+            onClick = onBackPressed,
+            modifier = Modifier.padding(4.dp)
+        ) {
+            Icon(
+                asset = Icons.Default.ArrowBack,
+                tint = MaterialTheme.colors.onBackground
+            )
         }
 
         val titleCollapsedLeftOffset =
@@ -142,8 +146,8 @@ fun StoryDetailToolbar(
 
         val titleFontSize: TextUnit =
             lerp(
-                MaterialTheme.typography().h6.fontSize,
-                MaterialTheme.typography().subtitle1.fontSize,
+                MaterialTheme.typography.h6.fontSize,
+                MaterialTheme.typography.subtitle1.fontSize,
                 collapsedFraction
             )
 
@@ -154,14 +158,14 @@ fun StoryDetailToolbar(
             is StoryDetailViewState.Loading ->
                 Surface(
                     shape = RoundedCornerShape(2.dp),
-                    modifier = LayoutPadding(16.dp) + LayoutPadding(top = titleCollapsedTopOffset)
+                    modifier = Modifier.padding(16.dp) + Modifier.padding(top = titleCollapsedTopOffset)
                 ) {
                     Column {
-                        Container(expanded = true, modifier = LayoutHeight(20.dp)) {
+                        Box(modifier = Modifier.fillMaxWidth() + Modifier.preferredHeight(20.dp)) {
                             ShimmerView()
                         }
-                        Spacer(modifier = LayoutHeight(6.dp))
-                        Container(expanded = true, modifier = LayoutHeight(20.dp)) {
+                        Spacer(modifier = Modifier.preferredHeight(6.dp))
+                        Box(modifier = Modifier.fillMaxWidth() + Modifier.preferredHeight(20.dp)) {
                             ShimmerView()
                         }
                     }
@@ -177,26 +181,26 @@ fun StoryDetailToolbar(
 
                 Text(
                     text = story.title,
-                    style = MaterialTheme.typography().h6.copy(
+                    style = MaterialTheme.typography.h6.copy(
                         fontSize = titleFontSize,
-                        color = MaterialTheme.colors().onBackground
+                        color = MaterialTheme.colors.onBackground
                     ),
-                    modifier = LayoutPadding(
-                        left = 16.dp + titleCollapsedLeftOffset,
-                        right = 16.dp + titleRightOffset,
+                    modifier = Modifier.padding(
+                        start = 16.dp + titleCollapsedLeftOffset,
+                        end = 16.dp + titleRightOffset,
                         bottom = 8.dp,
                         top = 8.dp + titleCollapsedTopOffset
                     ) +
-                            LayoutHeight(height) +
-                            LayoutWidth.Fill +
-                            LayoutAlign.CenterLeft +
-                            LayoutGravity.Center,
+                            Modifier.fillMaxWidth() +
+                            Modifier.preferredHeight(height) +
+                            Modifier.gravity(Alignment.Center) +
+                            Modifier.wrapContentHeight(Alignment.CenterStart),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = titleMaxLines
                 )
 
                 if (story.url != null) {
-                    Box(modifier = LayoutGravity.BottomRight) {
+                    Box(modifier = Modifier.gravity(Alignment.BottomEnd)) {
                         StoryDetailImage(
                             story = story,
                             webPreviewState = webPreviewState,
@@ -223,42 +227,40 @@ private fun StoryDetailImage(
             { story.url?.let { onStoryContentClick(it) } }
         }
 
-    Ripple(bounded = false) {
-        Clickable(onClick = clickListener) {
-            Stack(
-                modifier = LayoutPadding(
-                    top = 8.dp,
-                    right = 16.dp,
-                    bottom = 8.dp
-                )
+    Clickable(onClick = clickListener, modifier = Modifier.ripple(bounded = false)) {
+        Stack(
+            modifier = Modifier.padding(
+                top = 8.dp,
+                end = 16.dp,
+                bottom = 8.dp
+            )
+        ) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.preferredSize(imageSize)
             ) {
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = LayoutWidth(imageSize) + LayoutHeight(imageSize)
-                ) {
-                    Stack {
-                        Surface(
-                            color = colorResource(R.color.contentMuted),
-                            modifier = LayoutWidth.Fill + LayoutHeight.Fill
-                        ) {}
+                Stack {
+                    Surface(
+                        color = colorResource(R.color.contentMuted),
+                        modifier = Modifier.fillMaxSize()
+                    ) {}
 
-                        when (webPreviewState) {
-                            is WebPreviewState.Loading -> {
-                                Container(expanded = true) {
-                                    ShimmerView()
-                                }
+                    when (webPreviewState) {
+                        is WebPreviewState.Loading -> {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                ShimmerView()
                             }
-                            is WebPreviewState.Success -> {
-                                val webPreview = webPreviewState.webPreview
+                        }
+                        is WebPreviewState.Success -> {
+                            val webPreview = webPreviewState.webPreview
 
-                                val imageUrl =
-                                    webPreview.imageUrl ?: webPreview.iconUrl
-                                    ?: webPreview.favIconUrl
+                            val imageUrl =
+                                webPreview.imageUrl ?: webPreview.iconUrl
+                                ?: webPreview.favIconUrl
 
-                                UrlImage(imageUrl)
-                            }
-                            is WebPreviewState.Error -> {
-                            }
+                            UrlImage(imageUrl)
+                        }
+                        is WebPreviewState.Error -> {
                         }
                     }
                 }
@@ -285,48 +287,46 @@ fun CommentItem(
     storyAuthor: String?
 ) {
 
-    Container(
-        padding = EdgeInsets(
-            left = 16.dp,
-            right = 16.dp,
-            top = 8.dp,
-            bottom = 6.dp
-        )
+    Box(
+        paddingStart = 16.dp,
+        paddingEnd = 16.dp,
+        paddingTop = 8.dp,
+        paddingBottom = 6.dp
     ) {
-        Row(modifier = LayoutHeight.Fill) {
+        Row(modifier = Modifier.fillMaxHeight()) {
 
             // TODO fill all height
             repeat(depthIndex) {
                 Surface(
                     color = Color.Transparent,
-                    modifier = LayoutHeight.Fill +
-                            LayoutPadding(right = 12.dp) +
-                            LayoutWidth(1.dp)
+                    modifier = Modifier.fillMaxHeight() +
+                            Modifier.preferredWidth(1.dp) +
+                            Modifier.padding(end = 12.dp)
                 ) {}
             }
 
             Column(
-                arrangement = Arrangement.Begin,
-                modifier = LayoutWidth.Fill + LayoutFlexible(1f)
+                verticalArrangement = Arrangement.Top,
+                modifier = Modifier.fillMaxWidth() + Modifier.weight(1f)
             ) {
 
                 // Comments can be deleted
                 val isDeleted = by == null
 
                 if (isDeleted) {
-                    Spacer(LayoutHeight(12.dp))
+                    Spacer(Modifier.preferredHeight(12.dp))
                     Text(
                         text = stringResource(R.string.comment_deleted_title),
-                        style = MaterialTheme.typography().subtitle2
+                        style = MaterialTheme.typography.subtitle2
                     )
-                    Spacer(LayoutHeight(16.dp))
+                    Spacer(Modifier.preferredHeight(16.dp))
                 } else {
 
                     val isStoryAuthor = by == storyAuthor
 
                     val authorColor: Color =
-                        if (isStoryAuthor) MaterialTheme.colors().secondary
-                        else MaterialTheme.colors().onBackground
+                        if (isStoryAuthor) MaterialTheme.colors.secondary
+                        else MaterialTheme.colors.onBackground
 
                     val authorSuffix =
                         if (isStoryAuthor) " [op]"
@@ -334,12 +334,12 @@ fun CommentItem(
 
                     Text(
                         text = by.orEmpty() + authorSuffix,
-                        style = MaterialTheme.typography().subtitle2.copy(color = authorColor)
+                        style = MaterialTheme.typography.subtitle2.copy(color = authorColor)
                     )
-                    Spacer(LayoutHeight(2.dp))
+                    Spacer(Modifier.preferredHeight(2.dp))
                     Text(
                         text = Html.fromHtml(text.orEmpty()).toString().trimEnd(),
-                        style = MaterialTheme.typography().body2
+                        style = MaterialTheme.typography.body2
                     )
                 }
             }
@@ -375,14 +375,14 @@ fun StoryDetailPreview() {
 @Preview
 @Composable
 fun CommentsEmptyView() {
-    Container(
-        expanded = true,
-        padding = EdgeInsets(32.dp)
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        padding = 32.dp,
+        gravity = ContentGravity.Center
     ) {
         Text(
             text = stringResource(id = R.string.comments_empty),
-            style = MaterialTheme.typography().h6.copy(textAlign = TextAlign.Center),
-            modifier = LayoutAlign.Center
+            style = MaterialTheme.typography.h6.copy(textAlign = TextAlign.Center)
         )
     }
 }

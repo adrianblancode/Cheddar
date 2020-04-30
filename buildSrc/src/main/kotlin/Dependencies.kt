@@ -2,12 +2,13 @@ object Versions {
     const val minSdk = 23
     const val targetSdk = 29
 
-    const val kotlin = "1.3.70"
+    const val kotlin = "1.3.72"
     const val coroutines = "1.3.4"
 
     const val androidxAppcompat = "1.1.0"
     const val androidxCore = "1.2.0"
-    const val compose = "0.1.0-dev05"
+    const val compose = "0.1.0-dev10"
+    const val composeCompiler = "1.3.70-dev-withExperimentalGoogleExtensions-20200424"
     const val androidxActivity = "1.1.0-rc02"
 
     const val dagger = "2.26"

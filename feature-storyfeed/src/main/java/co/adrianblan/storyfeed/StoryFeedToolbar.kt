@@ -1,27 +1,23 @@
 package co.adrianblan.storyfeed
 
-import androidx.compose.Composable
-import androidx.compose.Recompose
-import androidx.compose.mutableStateOf
-import androidx.compose.remember
+import androidx.compose.*
 import androidx.ui.core.Alignment
-import androidx.ui.core.Text
-import androidx.ui.foundation.Clickable
+import androidx.ui.core.Modifier
+import androidx.ui.foundation.*
 import androidx.ui.foundation.shape.corner.RoundedCornerShape
 import androidx.ui.graphics.Color
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
+import androidx.ui.material.Surface
 import androidx.ui.material.icons.Icons
 import androidx.ui.material.icons.filled.ArrowDropDown
-import androidx.ui.material.ripple.Ripple
-import androidx.ui.material.surface.Surface
+import androidx.ui.material.ripple.ripple
 import androidx.ui.res.stringResource
 import androidx.ui.unit.Dp
 import androidx.ui.unit.TextUnit
 import androidx.ui.unit.dp
 import androidx.ui.unit.lerp
 import co.adrianblan.hackernews.StoryType
-import co.adrianblan.ui.VectorImage
 
 @Composable
 fun StoryFeedToolbar(
@@ -31,16 +27,16 @@ fun StoryFeedToolbar(
     onStoryTypeClick: (StoryType) -> Unit
 ) {
 
-    Container(
-        padding = EdgeInsets(12.dp),
-        alignment = Alignment.BottomLeft,
-        modifier = LayoutHeight(height)
+    Box(
+        padding = 12.dp,
+        gravity = ContentGravity.BottomCenter,
+        modifier = Modifier.preferredHeight(height) + Modifier.fillMaxWidth()
     ) {
 
         val headerTextSize =
             lerp(
-                MaterialTheme.typography().h4.fontSize,
-                MaterialTheme.typography().h6.fontSize,
+                MaterialTheme.typography.h4.fontSize,
+                MaterialTheme.typography.h6.fontSize,
                 collapsedFraction
             )
 
@@ -77,35 +73,39 @@ fun StoryFeedToolbar(
 @Composable
 fun StoryFeedHeader(
     storyType: StoryType,
-    headerTextSize: TextUnit = MaterialTheme.typography().h6.fontSize,
+    headerTextSize: TextUnit = MaterialTheme.typography.h6.fontSize,
     onClick: () -> Unit
 ) {
+
     Surface(
         shape = RoundedCornerShape(4.dp),
         color = Color.Transparent
     ) {
-        Ripple(true) {
-            Clickable(onClick = onClick) {
-                Container(padding = EdgeInsets(4.dp)) {
-                    Row {
-                        val title = remember(storyType) {
-                            stringResource(storyType.titleStringResource())
-                        }
+        Clickable(
+            onClick = onClick,
+            modifier = Modifier.ripple(bounded = true)
+        ) {
+            Box(
+                gravity = ContentGravity.Center,
+                padding = 4.dp
+            ) {
+                Row(verticalGravity = Alignment.CenterVertically) {
 
-                        Text(
-                            text = title,
-                            style = MaterialTheme.typography().h4
-                                .copy(
-                                    fontSize = headerTextSize,
-                                    color = MaterialTheme.colors().onPrimary
-                                )
-                        )
-                        VectorImage(
-                            vector = Icons.Default.ArrowDropDown,
-                            tint = MaterialTheme.colors().onBackground,
-                            modifier = LayoutGravity.Center
-                        )
-                    }
+                    // TODO memo
+                    val title = stringResource(storyType.titleStringResource())
+
+                    Text(
+                        text = title,
+                        style = MaterialTheme.typography.h4
+                            .copy(
+                                fontSize = headerTextSize,
+                                color = MaterialTheme.colors.onPrimary
+                            )
+                    )
+                    Icon(
+                        asset = Icons.Default.ArrowDropDown,
+                        tint = MaterialTheme.colors.onBackground
+                    )
                 }
             }
         }

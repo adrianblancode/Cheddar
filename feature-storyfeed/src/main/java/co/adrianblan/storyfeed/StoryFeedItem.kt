@@ -3,15 +3,17 @@ package co.adrianblan.storyfeed
 import android.text.Html
 import androidx.compose.Composable
 import androidx.compose.remember
-import androidx.ui.animation.Crossfade
-import androidx.ui.core.Text
+import androidx.ui.core.Alignment
+import androidx.ui.core.Modifier
+import androidx.ui.core.Modifier.Companion
+import androidx.ui.foundation.Box
 import androidx.ui.foundation.Clickable
+import androidx.ui.foundation.Text
 import androidx.ui.foundation.shape.corner.RoundedCornerShape
-import androidx.ui.graphics.Color
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
-import androidx.ui.material.ripple.Ripple
-import androidx.ui.material.surface.Surface
+import androidx.ui.material.Surface
+import androidx.ui.material.ripple.ripple
 import androidx.ui.res.colorResource
 import androidx.ui.text.AnnotatedString
 import androidx.ui.text.SpanStyle
@@ -42,50 +44,42 @@ fun StoryFeedItem(
     val webPreviewState: WebPreviewState? = decoratedStory.webPreviewState
 
     val storyClick: () -> Unit =
-        remember(story) {
-            { onStoryClick(story.id) }
-        }
+        { onStoryClick(story.id) }
 
     val storyContentClick: () -> Unit =
-        remember(story) {
-            { story.url?.let { onStoryContentClick(it) } }
-        }
+        { story.url?.let { onStoryContentClick(it) } }
 
     Row {
         Surface(
             shape = RoundedCornerShape(3.dp),
-            modifier = LayoutFlexible(1f) +
-                    LayoutWidth.Fill +
-                    LayoutHeight.Min(110.dp) +
-                    LayoutAlign.Start
+            modifier = Modifier.weight(1f) +
+                    Modifier.fillMaxWidth() +
+                    Modifier.preferredHeightIn(minHeight = 110.dp) +
+                    Modifier.wrapContentWidth(Alignment.CenterStart)
         ) {
-            Ripple(bounded = true) {
-                Clickable(onClick = storyClick) {
+            Clickable(onClick = storyClick, modifier = Modifier.ripple(bounded = true)) {
 
-                    // If there is a story image, we must share the space
-                    val rightPadding: Dp =
-                        if (story.url != null) 10.dp
-                        else 16.dp
+                // If there is a story image, we must share the space
+                val rightPadding: Dp =
+                    if (story.url != null) 10.dp
+                    else 16.dp
 
-                    Container(
-                        modifier = LayoutWidth.Fill,
-                        padding = EdgeInsets(
-                            left = 16.dp,
-                            right = rightPadding,
-                            top = 16.dp,
-                            bottom = 12.dp
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    paddingStart = 16.dp,
+                    paddingEnd = rightPadding,
+                    paddingTop = 16.dp,
+                    paddingBottom = 12.dp
+                ) {
+                    Column(modifier = Modifier.wrapContentWidth(Alignment.CenterStart) + Modifier.fillMaxWidth()) {
+                        Text(
+                            text = story.title,
+                            style = MaterialTheme.typography.subtitle1
                         )
-                    ) {
-                        Column(modifier = LayoutAlign.Start + LayoutWidth.Fill) {
-                            Text(
-                                text = story.title,
-                                style = MaterialTheme.typography().subtitle1
-                            )
-                            StoryFeedItemDescription(
-                                story = story,
-                                webPreviewState = webPreviewState
-                            )
-                        }
+                        StoryFeedItemDescription(
+                            story = story,
+                            webPreviewState = webPreviewState
+                        )
                     }
                 }
             }
@@ -102,28 +96,29 @@ fun StoryFeedItem(
 }
 
 // Concatenates a subtitle string from the site name and description
-private fun buildSubtitleString(
+@Composable
+internal fun buildSubtitleString(
     siteName: String?,
     description: String?
 ): AnnotatedString {
     val stringBuilder = AnnotatedString.Builder()
 
     if (siteName != null) {
-        val emphStyle = MaterialTheme.typography().subtitle2
+        val emphStyle = MaterialTheme.typography.subtitle2
 
         stringBuilder.pushStyle(
             SpanStyle(
                 fontWeight = emphStyle.fontWeight,
                 fontFamily = emphStyle.fontFamily,
                 fontStyle = emphStyle.fontStyle,
-                color = MaterialTheme.colors().onPrimary
+                color = MaterialTheme.colors.onPrimary
             )
         )
 
         stringBuilder.append(siteName)
         if (description != null) stringBuilder.append(" - ")
 
-        stringBuilder.popStyle()
+        stringBuilder.pop()
     }
 
     if (description != null) {
@@ -143,16 +138,16 @@ fun StoryFeedItemDescription(
 
     // Only show shimmer if we are loading preview for an url
     if (storyUrl != null && webPreviewState is WebPreviewState.Loading) {
-        Spacer(modifier = LayoutHeight(8.dp))
+        Spacer(modifier = Modifier.preferredHeight(8.dp))
 
         Surface(shape = RoundedCornerShape(2.dp)) {
-            Container(expanded = true, modifier = LayoutHeight(16.dp)) {
+            Box(modifier = Modifier.fillMaxWidth() + Modifier.preferredHeight(16.dp)) {
                 ShimmerView()
             }
         }
-        Spacer(modifier = LayoutHeight(6.dp))
+        Spacer(modifier = Modifier.preferredHeight(6.dp))
         Surface(shape = RoundedCornerShape(2.dp)) {
-            Container(expanded = true, modifier = LayoutHeight(16.dp)) {
+            Box(modifier = Modifier.fillMaxWidth() + Modifier.preferredHeight(16.dp)) {
                 ShimmerView()
             }
         }
@@ -176,11 +171,11 @@ fun StoryFeedItemDescription(
         val subtitle = buildSubtitleString(siteName, description)
 
         if (subtitle.length > 0) {
-            Spacer(modifier = LayoutHeight(3.dp))
+            Spacer(modifier = Modifier.preferredHeight(3.dp))
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography().body2.copy(
-                    color = MaterialTheme.colors().onPrimary.copy(alpha = textSecondaryAlpha)
+                style = MaterialTheme.typography.body2.copy(
+                    color = MaterialTheme.colors.onPrimary.copy(alpha = textSecondaryAlpha)
                 ),
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
@@ -197,43 +192,39 @@ private fun StoryFeedItemImage(
 ) {
 
     Surface(shape = RoundedCornerShape(3.dp), modifier = LayoutHeight.Fill) {
-        Ripple(bounded = true) {
-            Clickable(onClick = onClick) {
-                Container(
-                    padding = EdgeInsets(
-                        left = 10.dp,
-                        right = 16.dp,
-                        top = (16 + 1).dp,
-                        bottom = 14.dp
-                    )
+        Clickable(onClick = onClick, modifier = Modifier.ripple(bounded = true)) {
+            Box(
+                paddingStart = 10.dp,
+                paddingEnd = 16.dp,
+                paddingTop = (16 + 1).dp,
+                paddingBottom = 14.dp
+            ) {
+                Surface(
+                    shape = RoundedCornerShape(8.dp),
+                    modifier = Modifier.preferredSize(80.dp)
                 ) {
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        modifier = LayoutWidth(80.dp) + LayoutHeight(80.dp)
-                    ) {
-                        Stack {
-                            Surface(
-                                color = colorResource(R.color.contentMuted),
-                                modifier = LayoutWidth.Fill + LayoutHeight.Fill
-                            ) {}
+                    Stack {
+                        Surface(
+                            color = colorResource(R.color.contentMuted),
+                            modifier = Modifier.fillMaxSize()
+                        ) {}
 
-                            when (webPreviewState) {
-                                is WebPreviewState.Loading -> {
-                                    Container(expanded = true) {
-                                        ShimmerView()
-                                    }
+                        when (webPreviewState) {
+                            is WebPreviewState.Loading -> {
+                                Box(modifier = Modifier.fillMaxSize()) {
+                                    ShimmerView()
                                 }
-                                is WebPreviewState.Success -> {
-                                    val webPreview = webPreviewState.webPreview
+                            }
+                            is WebPreviewState.Success -> {
+                                val webPreview = webPreviewState.webPreview
 
-                                    val imageUrl =
-                                        webPreview.imageUrl ?: webPreview.iconUrl
-                                        ?: webPreview.favIconUrl
+                                val imageUrl =
+                                    webPreview.imageUrl ?: webPreview.iconUrl
+                                    ?: webPreview.favIconUrl
 
-                                    UrlImage(imageUrl)
-                                }
-                                is WebPreviewState.Error -> {
-                                }
+                                UrlImage(imageUrl)
+                            }
+                            is WebPreviewState.Error -> {
                             }
                         }
                     }

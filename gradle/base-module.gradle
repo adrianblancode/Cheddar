@@ -9,11 +9,8 @@ dependencies {
     implementation(Dependencies.timber)
     implementation(Dependencies.androidxCore)
 
-    // TODO remove once kapt works with compose
-    if (path != ":common-ui") {
-        implementation(Dependencies.dagger)
-        kapt(Dependencies.daggerCompiler)
-    }
+    implementation(Dependencies.dagger)
+    kapt(Dependencies.daggerCompiler)
 
     coreLibraryDesugaring(Dependencies.desugar)
 
