@@ -30,7 +30,7 @@ fun StoryFeedToolbar(
     Box(
         padding = 12.dp,
         gravity = ContentGravity.BottomCenter,
-        modifier = Modifier.preferredHeight(height) + Modifier.fillMaxWidth()
+        modifier = Modifier.preferredHeight(height)
     ) {
 
         val headerTextSize =
