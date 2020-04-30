@@ -7,9 +7,12 @@ import androidx.compose.remember
 import androidx.ui.core.Alignment
 import androidx.ui.core.DensityAmbient
 import androidx.ui.core.Modifier
+import androidx.ui.core.drawBehind
 import androidx.ui.foundation.*
 import androidx.ui.foundation.shape.corner.RoundedCornerShape
+import androidx.ui.geometry.Offset
 import androidx.ui.graphics.Color
+import androidx.ui.graphics.Paint
 import androidx.ui.layout.*
 import androidx.ui.material.IconButton
 import androidx.ui.material.MaterialTheme
@@ -263,84 +266,6 @@ private fun StoryDetailImage(
                         is WebPreviewState.Error -> {
                         }
                     }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun CommentItem(comment: FlatComment, storyAuthor: String?) {
-    CommentItem(
-        text = comment.comment.text,
-        by = comment.comment.by,
-        depthIndex = comment.depthIndex,
-        storyAuthor = storyAuthor
-    )
-}
-
-@Composable
-fun CommentItem(
-    text: String?,
-    by: String?,
-    depthIndex: Int,
-    storyAuthor: String?
-) {
-
-    Box(
-        paddingStart = 16.dp,
-        paddingEnd = 16.dp,
-        paddingTop = 8.dp,
-        paddingBottom = 6.dp
-    ) {
-        Row(modifier = Modifier.fillMaxHeight()) {
-
-            // TODO fill all height
-            repeat(depthIndex) {
-                Surface(
-                    color = Color.Transparent,
-                    modifier = Modifier.fillMaxHeight() +
-                            Modifier.preferredWidth(1.dp) +
-                            Modifier.padding(end = 12.dp)
-                ) {}
-            }
-
-            Column(
-                verticalArrangement = Arrangement.Top,
-                modifier = Modifier.fillMaxWidth() + Modifier.weight(1f)
-            ) {
-
-                // Comments can be deleted
-                val isDeleted = by == null
-
-                if (isDeleted) {
-                    Spacer(Modifier.preferredHeight(12.dp))
-                    Text(
-                        text = stringResource(R.string.comment_deleted_title),
-                        style = MaterialTheme.typography.subtitle2
-                    )
-                    Spacer(Modifier.preferredHeight(16.dp))
-                } else {
-
-                    val isStoryAuthor = by == storyAuthor
-
-                    val authorColor: Color =
-                        if (isStoryAuthor) MaterialTheme.colors.secondary
-                        else MaterialTheme.colors.onBackground
-
-                    val authorSuffix =
-                        if (isStoryAuthor) " [op]"
-                        else ""
-
-                    Text(
-                        text = by.orEmpty() + authorSuffix,
-                        style = MaterialTheme.typography.subtitle2.copy(color = authorColor)
-                    )
-                    Spacer(Modifier.preferredHeight(2.dp))
-                    Text(
-                        text = Html.fromHtml(text.orEmpty()).toString().trimEnd(),
-                        style = MaterialTheme.typography.body2
-                    )
                 }
             }
         }

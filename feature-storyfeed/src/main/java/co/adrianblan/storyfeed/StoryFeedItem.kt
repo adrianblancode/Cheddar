@@ -54,8 +54,7 @@ fun StoryFeedItem(
             shape = RoundedCornerShape(3.dp),
             modifier = Modifier.weight(1f) +
                     Modifier.fillMaxWidth() +
-                    Modifier.preferredHeightIn(minHeight = 110.dp) +
-                    Modifier.wrapContentWidth(Alignment.CenterStart)
+                    Modifier.preferredHeightIn(minHeight = 110.dp)
         ) {
             Clickable(onClick = storyClick, modifier = Modifier.ripple(bounded = true)) {
 
@@ -71,7 +70,7 @@ fun StoryFeedItem(
                     paddingTop = 16.dp,
                     paddingBottom = 12.dp
                 ) {
-                    Column(modifier = Modifier.wrapContentWidth(Alignment.CenterStart) + Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.fillMaxWidth()) {
                         Text(
                             text = story.title,
                             style = MaterialTheme.typography.subtitle1

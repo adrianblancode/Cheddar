@@ -21,8 +21,10 @@ fun InsetsWrapper(
 ) {
 
     val insetState = state<Insets> {
-        WindowInsetsCompat.toWindowInsetsCompat(view.rootWindowInsets)
-            .systemWindowInsets
+        view.rootWindowInsets?.let {
+            WindowInsetsCompat.toWindowInsetsCompat(it)
+                .systemWindowInsets
+        } ?: Insets.NONE
     }
 
     onCommit {
