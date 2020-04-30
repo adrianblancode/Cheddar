@@ -1,8 +1,8 @@
 package co.adrianblan.ui.node
 
 import androidx.compose.Composable
-import androidx.lifecycle.LiveData
-import co.adrianblan.ui.observeState
+import co.adrianblan.common.StateFlow
+import co.adrianblan.ui.collectAsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 
@@ -11,14 +11,13 @@ abstract class Node<T>(
     protected val scope: CoroutineScope
 ) {
 
-    // TODO convert to StateFlow when suspending works with compose
-    abstract val state: LiveData<T>
+    abstract val state: StateFlow<T>
 
     @Composable
     abstract fun viewDef(state: T)
 
     @Composable
-    fun render() = viewDef(state.observeState())
+    fun render() = viewDef(state.collectAsState().value)
 
     open fun detach() = scope.cancel()
 

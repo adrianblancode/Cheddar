@@ -1,13 +1,11 @@
 package co.adrianblan.storyfeed
 
 import androidx.compose.Composable
-import androidx.lifecycle.LiveData
+import co.adrianblan.common.StateFlow
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.ui.node.Node
-import co.adrianblan.ui.observeState
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
 import javax.inject.Inject
 
 class StoryFeedNode
@@ -22,7 +20,7 @@ class StoryFeedNode
         fun onStoryContentClicked(storyUrl: StoryUrl)
     }
 
-    override val state: LiveData<StoryFeedViewState> =
+    override val state: StateFlow<StoryFeedViewState> =
         storyFeedInteractor.state
 
     @Composable

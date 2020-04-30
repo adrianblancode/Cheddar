@@ -1,14 +1,13 @@
 package co.adrianblan.storydetail
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import co.adrianblan.common.ParentScope
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.TestHackerNewsRepository
-import co.adrianblan.hackernews.api.*
+import co.adrianblan.hackernews.api.Comment
+import co.adrianblan.hackernews.api.CommentId
+import co.adrianblan.hackernews.api.Story
+import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.test.CoroutineTestRule
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineScope
@@ -23,13 +22,10 @@ import org.junit.Test
 class StoryDetailInteractorTest {
 
     @get:Rule
-    val executorRule = InstantTaskExecutorRule()
-
-    @get:Rule
     val coroutineRule = CoroutineTestRule()
 
     private lateinit var scope: TestCoroutineScope
-    private var storyDetailInteractor: StoryDetailInteractor? = null
+    private lateinit var storyDetailInteractor: StoryDetailInteractor
 
     suspend fun delayAndThrow(delayTime: Long): Nothing =
         coroutineScope {
@@ -64,7 +60,7 @@ class StoryDetailInteractorTest {
     @Test
     fun testInitialState() {
         assertThat(
-            storyDetailInteractor?.state?.value,
+            storyDetailInteractor.state.value,
             instanceOf(StoryDetailViewState.Loading::class.java)
         )
     }
@@ -75,7 +71,7 @@ class StoryDetailInteractorTest {
         scope.advanceUntilIdle()
 
         assertThat(
-            storyDetailInteractor?.state?.value,
+            storyDetailInteractor.state.value,
             instanceOf(StoryDetailViewState.Success::class.java)
         )
     }
@@ -101,7 +97,7 @@ class StoryDetailInteractorTest {
         scope.advanceUntilIdle()
 
         assertThat(
-            storyDetailInteractor?.state?.value,
+            storyDetailInteractor.state.value,
             instanceOf(StoryDetailViewState.Error::class.java)
         )
 

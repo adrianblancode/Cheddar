@@ -31,4 +31,3 @@ class CoroutineTestRule(
         testDispatcher.cleanupTestCoroutines()
     }
 }
-

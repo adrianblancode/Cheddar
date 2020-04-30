@@ -61,13 +61,10 @@ object Dependencies {
 
     const val leakcanary = "com.squareup.leakcanary:leakcanary-android:2.2"
     const val timber = "com.jakewharton.timber:timber:4.7.1"
-
-
-    // Needed to test LiveData
-    const val androidxCoreTesting = "androidx.arch.core:core-testing:2.1.0"
-
     const val junit = "junit:junit:${Versions.junit}"
     const val androidTestJunit = "androidx.test.ext:junit:${Versions.androidTestJunit}"
+    const val androidxCoreTesting = "androidx.arch.core:core-testing:2.1.0"
+
     const val mockito = "org.mockito:mockito-core:${Versions.mockito}"
     const val mockitoInline = "org.mockito:mockito-inline:${Versions.mockito}"
     const val mockitoKotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0"

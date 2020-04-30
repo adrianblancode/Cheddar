@@ -4,7 +4,9 @@ import androidx.compose.Composable
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.CustomTabsLauncher
+import co.adrianblan.common.StateFlow
 import co.adrianblan.common.asParentScope
+import co.adrianblan.common.asStateFlow
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.storydetail.StoryDetailNode
@@ -16,6 +18,7 @@ import co.adrianblan.ui.RootViewState
 import co.adrianblan.ui.node.Node
 import co.adrianblan.ui.node.StackRouter
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import javax.inject.Inject
 
 class StoryNavigationNode
@@ -26,8 +29,8 @@ class StoryNavigationNode
     @StoryNavigationInternal scope: CoroutineScope
 ) : Node<RootViewState>(scope), StoryFeedNode.Listener, StoryDetailNode.Listener {
 
-    private val _state = MutableLiveData<RootViewState>()
-    override val state: LiveData<RootViewState> = _state
+    private val _state = ConflatedBroadcastChannel<RootViewState>()
+    override val state: StateFlow<RootViewState> = _state.asStateFlow()
 
     private val storyFeedNode: StoryFeedNode =
         storyFeedNodeBuilder
@@ -37,7 +40,7 @@ class StoryNavigationNode
             )
 
     private val router = StackRouter(listOf(storyFeedNode)) { nodes ->
-        _state.value = RootViewState(nodes.last())
+        _state.offer(RootViewState(nodes.last()))
     }
 
     @Composable

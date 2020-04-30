@@ -1,5 +1,4 @@
 // Base for modules used as features inside the app
-
 apply from: rootProject.file("gradle/library.gradle")
 
 android {
@@ -15,5 +14,4 @@ android {
 
 dependencies {
     implementation(project(":common-ui"))
-    implementation(project(":common-test"))
 }

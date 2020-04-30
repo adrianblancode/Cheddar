@@ -1,6 +1,5 @@
 package co.adrianblan.storyfeed
 
-import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.TestHackerNewsRepository
@@ -24,13 +23,10 @@ import org.junit.Test
 class StoryFeedInteractorTest {
 
     @get:Rule
-    val executorRule = InstantTaskExecutorRule()
-
-    @get:Rule
     val coroutineRule = CoroutineTestRule()
 
     private lateinit var scope: TestCoroutineScope
-    private var storyFeedInteractor: StoryFeedInteractor? = null
+    private lateinit var storyFeedInteractor: StoryFeedInteractor
 
     suspend fun delayAndThrow(delayTime: Long): Nothing =
         coroutineScope {
@@ -69,7 +65,7 @@ class StoryFeedInteractorTest {
     @Test
     fun testInitialState() {
         assertThat(
-            storyFeedInteractor?.state?.value?.storyFeedState,
+            storyFeedInteractor.state.value.storyFeedState,
             instanceOf(StoryFeedState.Loading::class.java)
         )
     }
@@ -79,7 +75,7 @@ class StoryFeedInteractorTest {
         scope.advanceUntilIdle()
 
         assertThat(
-            storyFeedInteractor?.state?.value?.storyFeedState,
+            storyFeedInteractor.state.value.storyFeedState,
             instanceOf(StoryFeedState.Success::class.java)
         )
 
@@ -107,7 +103,7 @@ class StoryFeedInteractorTest {
         scope.advanceUntilIdle()
 
         assertThat(
-            storyFeedInteractor?.state?.value?.storyFeedState,
+            storyFeedInteractor.state.value.storyFeedState,
             instanceOf(StoryFeedState.Error::class.java)
         )
 
@@ -119,30 +115,30 @@ class StoryFeedInteractorTest {
         scope.advanceUntilIdle()
 
         assertThat(
-            storyFeedInteractor?.state?.value?.storyFeedState,
+            storyFeedInteractor.state.value.storyFeedState,
             instanceOf(StoryFeedState.Success::class.java)
         )
 
         val initialStories: Int =
-            (storyFeedInteractor?.state?.value?.storyFeedState as StoryFeedState.Success).stories.size
+            (storyFeedInteractor.state.value.storyFeedState as StoryFeedState.Success).stories.size
 
         assert(initialStories > 0)
 
-        storyFeedInteractor?.onPageEndReached()
+        storyFeedInteractor.onPageEndReached()
 
-        assert(storyFeedInteractor?.state?.value?.isLoadingMorePages!!)
+        assert(storyFeedInteractor.state.value.isLoadingMorePages)
 
         scope.advanceUntilIdle()
 
-        assertFalse(storyFeedInteractor?.state?.value?.isLoadingMorePages!!)
+        assertFalse(storyFeedInteractor.state.value.isLoadingMorePages)
 
         assertThat(
-            storyFeedInteractor?.state?.value?.storyFeedState as StoryFeedState.Success,
+            storyFeedInteractor.state.value.storyFeedState as StoryFeedState.Success,
             instanceOf(StoryFeedState.Success::class.java)
         )
 
         val nextStories: Int =
-            (storyFeedInteractor?.state?.value?.storyFeedState as StoryFeedState.Success).stories.size
+            (storyFeedInteractor.state.value.storyFeedState as StoryFeedState.Success).stories.size
 
         assertEquals(initialStories * 2, nextStories)
 
@@ -154,33 +150,28 @@ class StoryFeedInteractorTest {
         scope.advanceUntilIdle()
 
         val initialStories: Int =
-            (storyFeedInteractor?.state?.value?.storyFeedState as StoryFeedState.Success).stories.size
+            (storyFeedInteractor.state.value.storyFeedState as StoryFeedState.Success).stories.size
 
         assert(initialStories > 0)
 
-        storyFeedInteractor?.onPageEndReached()
+        storyFeedInteractor.onPageEndReached()
 
         scope.advanceTimeBy(100L)
 
-        storyFeedInteractor?.onPageEndReached()
+        storyFeedInteractor.onPageEndReached()
 
         scope.advanceUntilIdle()
 
         assertThat(
-            storyFeedInteractor?.state?.value?.storyFeedState as StoryFeedState.Success,
+            storyFeedInteractor.state.value.storyFeedState as StoryFeedState.Success,
             instanceOf(StoryFeedState.Success::class.java)
         )
 
         val nextStories: Int =
-            (storyFeedInteractor?.state?.value?.storyFeedState as StoryFeedState.Success).stories.size
+            (storyFeedInteractor.state.value.storyFeedState as StoryFeedState.Success).stories.size
 
         assertEquals(initialStories * 2, nextStories)
 
         assert(scope.isActive)
-    }
-
-    @Test
-    fun testFetchStoryFail() {
-
     }
 }

@@ -1,5 +1,4 @@
-apply plugin: "com.android.library"
-apply from: rootProject.file("gradle/base-configuration.gradle")
+apply from: rootProject.file("gradle/library.gradle")
 
 android {
     buildTypes {
@@ -11,15 +10,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":common"))
-    implementation(Dependencies.kotlinStdlib)
-    implementation(Dependencies.coroutinesCore)
-    implementation(Dependencies.coroutinesAndroid)
-    implementation(Dependencies.timber)
-    implementation(Dependencies.androidxCore)
-
-    coreLibraryDesugaring(Dependencies.desugar)
-
     implementation(Dependencies.androidxCoreTesting)
     implementation(Dependencies.coroutinesTest)
 }

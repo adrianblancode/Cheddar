@@ -15,5 +15,9 @@ android {
 dependencies {
     if (path != ":common") {
         implementation(project(":common"))
+
+        if (path != ":common-test") {
+            implementation(project(":common-test"))
+        }
     }
 }
