@@ -30,7 +30,9 @@ fun StoryFeedToolbar(
     Box(
         padding = 12.dp,
         gravity = ContentGravity.BottomCenter,
-        modifier = Modifier.preferredHeight(height)
+        modifier = Modifier.preferredHeight(height) +
+                // Set min width to align popup in center
+                Modifier.preferredWidthIn(minWidth = storyTypePopupWidth)
     ) {
 
         val headerTextSize =
