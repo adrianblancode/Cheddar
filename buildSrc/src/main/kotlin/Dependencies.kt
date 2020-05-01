@@ -3,17 +3,17 @@ object Versions {
     const val targetSdk = 29
 
     const val kotlin = "1.3.72"
-    const val coroutines = "1.3.4"
+    const val coroutines = "1.3.5"
 
     const val androidxAppcompat = "1.1.0"
     const val androidxCore = "1.2.0"
+    const val androidxActivity = "1.1.0-rc02"
     const val compose = "0.1.0-dev10"
     const val composeCompiler = "1.3.70-dev-withExperimentalGoogleExtensions-20200424"
-    const val androidxActivity = "1.1.0-rc02"
 
-    const val dagger = "2.26"
-    const val okhttp = "4.4.0"
-    const val retrofit = "2.7.1"
+    const val dagger = "2.27"
+    const val okhttp = "4.6.0"
+    const val retrofit = "2.8.1"
 
     const val junit = "4.13"
     const val androidTestJunit = "1.1.1"
@@ -54,7 +54,7 @@ object Dependencies {
     const val okhttpCore = "com.squareup.okhttp3:okhttp:${Versions.okhttp}"
     const val okhttpLoggingInterceptor =  "com.squareup.okhttp3:logging-interceptor:${Versions.okhttp}"
     const val retrofitCore = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
-    const val retrofitSerializationConverter = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.4.0"
+    const val retrofitSerializationConverter = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.5.0"
 
     const val picasso = "com.squareup.picasso:picasso:2.71828"
     const val jsoup = "org.jsoup:jsoup:1.13.1"
