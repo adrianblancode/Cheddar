@@ -7,11 +7,8 @@ import co.adrianblan.cheddar.di.DaggerRootComponent
 import co.adrianblan.cheddar.extensions.appComponent
 import co.adrianblan.common.asParentScope
 import co.adrianblan.ui.node.Node
-import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.plus
-import timber.log.Timber
 
 class RootViewModel(
     application: Application,
@@ -19,11 +16,7 @@ class RootViewModel(
     savedStateHandle: SavedStateHandle
 ): AndroidViewModel(application) {
 
-    private val scope = MainScope() + CoroutineExceptionHandler { _, t: Throwable ->
-        // TODO external error reporting
-        Timber.e(t, "Unhandled exception rethrown at root")
-        if (BuildConfig.DEBUG) throw t
-    }
+    private val scope = MainScope()
 
     val rootNode: Node =
         DaggerRootComponent.factory()

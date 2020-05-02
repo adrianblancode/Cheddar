@@ -1,9 +1,6 @@
 package co.adrianblan.storydetail.ui
 
 import android.text.Html
-import android.text.Spannable
-import android.text.SpannableString
-import android.text.style.AbsoluteSizeSpan
 import androidx.compose.Composable
 import androidx.ui.core.DensityAmbient
 import androidx.ui.core.Modifier

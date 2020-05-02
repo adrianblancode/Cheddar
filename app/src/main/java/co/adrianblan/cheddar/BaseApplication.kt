@@ -17,6 +17,13 @@ class BaseApplication: Application() {
             Timber.plant(Timber.DebugTree())
         }
 
+        val handler = Thread.getDefaultUncaughtExceptionHandler()
+        Thread.setDefaultUncaughtExceptionHandler { thread, e ->
+            // TODO external error reporting
+            Timber.e(e, "Uncaught exception!")
+            handler?.uncaughtException(thread, e)
+        }
+
         appComponent = DaggerAppComponent.factory()
             .build(this)
     }

@@ -58,7 +58,6 @@ fun StoryFeedView(
                 min(scroller.value.px, collapseDistance.toPx())
             }
 
-        Timber.d("On story type changed!: ${viewState.storyType.name}")
         scroller.scrollTo(scrollReset.value)
     }
 
