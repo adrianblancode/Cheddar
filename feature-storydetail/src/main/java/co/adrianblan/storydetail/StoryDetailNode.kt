@@ -1,7 +1,6 @@
 package co.adrianblan.storydetail
 
 import androidx.compose.Composable
-import co.adrianblan.common.StateFlow
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.storydetail.ui.StoryDetailView
 import co.adrianblan.ui.collectAsState
@@ -25,7 +24,7 @@ class StoryDetailNode
     @Composable
     override fun render() =
         StoryDetailView(
-            viewState = storyDetailInteractor.state.collectAsState(),
+            viewState = storyDetailInteractor.state.collectAsState().value,
             onStoryContentClick = { listener.onStoryContentClicked(it) },
             onBackPressed = { listener.onStoryDetailFinished() }
         )

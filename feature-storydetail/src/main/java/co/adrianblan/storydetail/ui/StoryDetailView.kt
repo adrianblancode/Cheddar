@@ -33,7 +33,7 @@ private const val toolbarMaxHeightDp = 148
 
 @Composable
 fun StoryDetailView(
-    viewState: State<StoryDetailViewState>,
+    viewState: StoryDetailViewState,
     onStoryContentClick: (StoryUrl) -> Unit,
     onBackPressed: () -> Unit
 ) {
@@ -46,7 +46,7 @@ fun StoryDetailView(
         maxHeight = toolbarMaxHeightDp.dp,
         toolbarContent = { collapsedFraction, height ->
             StoryDetailToolbar(
-                viewState = viewState.value,
+                viewState = viewState,
                 collapsedFraction = collapsedFraction,
                 height = height,
                 onStoryContentClick = onStoryContentClick,
@@ -55,12 +55,12 @@ fun StoryDetailView(
         },
         bodyContent = {
 
-            when (val state = viewState.value) {
+            when (viewState) {
                 is StoryDetailViewState.Success -> {
 
-                    val story = state.story
+                    val story = viewState.story
 
-                    when (state.commentsState) {
+                    when (viewState.commentsState) {
                         is StoryDetailCommentsState.Success ->
                             VerticalScroller(scroller) {
                                 Column {
@@ -76,7 +76,7 @@ fun StoryDetailView(
                                         )
                                     )
 
-                                    if (state.story.text != null) {
+                                    if (viewState.story.text != null) {
                                         CommentItem(
                                             text = story.text,
                                             by = story.by,
@@ -85,7 +85,7 @@ fun StoryDetailView(
                                         )
                                     }
 
-                                    state.commentsState.comments
+                                    viewState.commentsState.comments
                                         .map { comment ->
                                             key(comment.comment.id) {
                                                 CommentItem(
@@ -284,7 +284,7 @@ fun StoryDetailPreview() {
                 )
             )
         StoryDetailView(
-            viewState = state { viewState },
+            viewState = viewState,
             onStoryContentClick = {},
             onBackPressed = {}
         )

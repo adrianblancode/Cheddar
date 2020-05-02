@@ -22,6 +22,7 @@ import co.adrianblan.hackernews.api.dummy
 import co.adrianblan.storyfeed.*
 import co.adrianblan.storyfeed.R
 import co.adrianblan.ui.*
+import timber.log.Timber
 
 private const val toolbarMinHeightDp = 56
 private const val toolbarMaxHeightDp = 128
@@ -38,7 +39,7 @@ internal fun StoryType.titleStringResource(): Int =
 
 @Composable
 fun StoryFeedView(
-    viewState: State<StoryFeedViewState>,
+    viewState: StoryFeedViewState,
     onStoryTypeClick: (StoryType) -> Unit,
     onStoryClick: (StoryId) -> Unit,
     onStoryContentClick: (StoryUrl) -> Unit,
@@ -47,7 +48,7 @@ fun StoryFeedView(
     val scroller = ScrollerPosition()
     val densityAmbient = DensityAmbient.current
 
-    onCommit(viewState.value.storyType) {
+    onCommit(viewState.storyType) {
 
         val collapseDistance = (toolbarMaxHeightDp - toolbarMinHeightDp).dp
 
@@ -57,6 +58,7 @@ fun StoryFeedView(
                 min(scroller.value.px, collapseDistance.toPx())
             }
 
+        Timber.d("On story type changed!: ${viewState.storyType.name}")
         scroller.scrollTo(scrollReset.value)
     }
 
@@ -67,14 +69,14 @@ fun StoryFeedView(
             StoryFeedToolbar(
                 collapsedFraction = collapseFraction,
                 height = height,
-                storyType = viewState.value.storyType,
+                storyType = viewState.storyType,
                 onStoryTypeClick = onStoryTypeClick
             )
         },
         bodyContent = {
             StoryFeedBodyContent(
                 scroller = scroller,
-                viewState = viewState.value,
+                viewState = viewState,
                 onStoryClick = onStoryClick,
                 onStoryContentClick = onStoryContentClick,
                 onPageEndReached = onPageEndReached
@@ -247,7 +249,7 @@ fun StoryFeedPreview() {
         )
 
         StoryFeedView(
-            state { viewState },
+            viewState,
             onStoryTypeClick = {},
             onStoryClick = {},
             onStoryContentClick = {},

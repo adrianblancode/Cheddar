@@ -31,13 +31,13 @@ class StoryNavigationNode
 
     private val router = StackRouter(listOf(storyFeedNode))
 
-    private val state: StateFlow<StoryNavigationViewState> =
+    val state: StateFlow<StoryNavigationViewState> =
         router.state
         .mapStateFlow { StoryNavigationViewState(it.last()) }
 
     @Composable
     override fun render() =
-        StoryNavigationView(state.collectAsState())
+        StoryNavigationView(state.collectAsState().value)
 
     override fun onStoryClicked(storyId: StoryId) {
 

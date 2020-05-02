@@ -1,7 +1,6 @@
 package co.adrianblan.storynavigation
 
 import androidx.compose.Composable
-import androidx.compose.State
 import androidx.ui.animation.Crossfade
 import androidx.ui.layout.Stack
 import co.adrianblan.ui.node.Node
@@ -12,8 +11,8 @@ data class StoryNavigationViewState(
 )
 
 @Composable
-fun StoryNavigationView(viewState: State<StoryNavigationViewState>) {
-    Crossfade(viewState.value) {
+fun StoryNavigationView(viewState: StoryNavigationViewState) {
+    Crossfade(viewState) {
         Stack {
             it.activeNode.render()
         }

@@ -24,7 +24,7 @@ class StoryFeedNode
     @Composable
     override fun render() =
         StoryFeedView(
-            viewState = storyFeedInteractor.state.collectAsState(),
+            viewState = storyFeedInteractor.state.collectAsState().value,
             onStoryTypeClick = { storyFeedInteractor.onStoryTypeChanged(it) },
             onStoryClick = { listener.onStoryClicked(it) },
             onStoryContentClick = { listener.onStoryContentClicked(it) },
