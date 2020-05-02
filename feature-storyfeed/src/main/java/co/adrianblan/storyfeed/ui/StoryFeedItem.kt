@@ -1,11 +1,8 @@
-package co.adrianblan.storyfeed
+package co.adrianblan.storyfeed.ui
 
 import android.text.Html
 import androidx.compose.Composable
-import androidx.compose.remember
-import androidx.ui.core.Alignment
 import androidx.ui.core.Modifier
-import androidx.ui.core.Modifier.Companion
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.Clickable
 import androidx.ui.foundation.Text
@@ -27,6 +24,9 @@ import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.hackernews.api.dummy
+import co.adrianblan.storyfeed.DecoratedStory
+import co.adrianblan.storyfeed.R
+import co.adrianblan.storyfeed.WebPreviewState
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.ShimmerView
 import co.adrianblan.ui.UrlImage
@@ -167,7 +167,8 @@ fun StoryFeedItemDescription(
                 }
                 ?: webPreview?.description
 
-        val subtitle = buildSubtitleString(siteName, description)
+        val subtitle =
+            buildSubtitleString(siteName, description)
 
         if (subtitle.length > 0) {
             Spacer(modifier = Modifier.preferredHeight(3.dp))

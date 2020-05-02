@@ -3,6 +3,7 @@ package co.adrianblan.storydetail
 import androidx.compose.Composable
 import co.adrianblan.common.StateFlow
 import co.adrianblan.hackernews.api.StoryUrl
+import co.adrianblan.storydetail.ui.StoryDetailView
 import co.adrianblan.ui.collectAsState
 import co.adrianblan.ui.node.Node
 import kotlinx.coroutines.CoroutineScope

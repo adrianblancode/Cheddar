@@ -1,8 +1,6 @@
-package co.adrianblan.storyfeed
+package co.adrianblan.storyfeed.ui
 
 import androidx.compose.*
-import androidx.lifecycle.LiveData
-import androidx.ui.core.Alignment
 import androidx.ui.core.DensityAmbient
 import androidx.ui.core.Modifier
 import androidx.ui.foundation.*
@@ -21,6 +19,8 @@ import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.hackernews.api.dummy
+import co.adrianblan.storyfeed.*
+import co.adrianblan.storyfeed.R
 import co.adrianblan.ui.*
 
 private const val toolbarMinHeightDp = 56
@@ -159,7 +159,9 @@ fun StoryFeedSuccessContentBody(
 
                 when {
                     viewState.isLoadingMorePages -> LoadingMoreStoriesView()
-                    !viewState.hasLoadedAllPages -> LoadMoreStoriesButton(onPageEndReached = onPageEndReached)
+                    !viewState.hasLoadedAllPages -> LoadMoreStoriesButton(
+                        onPageEndReached = onPageEndReached
+                    )
                     viewState.hasLoadedAllPages -> NoMoreStoriesView()
                 }
 

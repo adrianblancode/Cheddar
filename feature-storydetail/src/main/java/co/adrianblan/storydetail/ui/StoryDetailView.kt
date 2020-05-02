@@ -1,4 +1,4 @@
-package co.adrianblan.storydetail
+package co.adrianblan.storydetail.ui
 
 import androidx.compose.*
 import androidx.ui.core.Alignment
@@ -23,6 +23,8 @@ import co.adrianblan.hackernews.api.Comment
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.hackernews.api.dummy
+import co.adrianblan.storydetail.*
+import co.adrianblan.storydetail.R
 import co.adrianblan.ui.*
 
 private const val toolbarMinHeightDp = 56

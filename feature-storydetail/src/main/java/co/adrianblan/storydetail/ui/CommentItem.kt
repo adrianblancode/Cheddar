@@ -1,4 +1,4 @@
-package co.adrianblan.storydetail
+package co.adrianblan.storydetail.ui
 
 import android.text.Html
 import androidx.compose.Composable
@@ -18,6 +18,8 @@ import androidx.ui.res.stringResource
 import androidx.ui.unit.Px
 import androidx.ui.unit.dp
 import androidx.ui.unit.times
+import co.adrianblan.storydetail.FlatComment
+import co.adrianblan.storydetail.R
 
 @Composable
 fun CommentItem(comment: FlatComment, storyAuthor: String?) {

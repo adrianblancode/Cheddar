@@ -1,4 +1,4 @@
-package co.adrianblan.storyfeed
+package co.adrianblan.storyfeed.ui
 
 import androidx.compose.Composable
 import androidx.compose.remember
