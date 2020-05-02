@@ -26,7 +26,7 @@ constructor(
 
     private val initialStoryType: StoryType = StoryType.TOP
 
-    private val _state = ConflatedBroadcastChannel<StoryFeedViewState>(
+    val state = MutableStateFlow<StoryFeedViewState>(
         StoryFeedViewState(
             storyType = initialStoryType,
             storyFeedState = StoryFeedState.Loading,
@@ -34,8 +34,6 @@ constructor(
             hasLoadedAllPages = false
         )
     )
-
-    val state: StateFlow<StoryFeedViewState> = _state.asStateFlow()
 
     private val storyTypeChannel = ConflatedBroadcastChannel<StoryType>(initialStoryType)
 
@@ -164,7 +162,7 @@ constructor(
                 .flowOn(dispatcherProvider.IO)
                 .collectLatest { storyViewState ->
                     ensureActive()
-                    _state.offer(storyViewState)
+                    state.offer(storyViewState)
                 }
         }
     }

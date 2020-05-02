@@ -3,27 +3,37 @@ package co.adrianblan.common
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.map
 
+// TODO remove when StateFlow is released in Kotlin
 
 /** A StateFlow is a Flow which stores the last emitted value */
 interface StateFlow<T> : Flow<T> {
     val value: T
 }
 
-// TODO remove when Flow releases their StateFlow preview
-internal class StateFlowImpl<T>
+class MutableStateFlow<T>
 private constructor(
-    private val innerChannel: ConflatedBroadcastChannel<T>,
-    private val innerFlow: Flow<T> = innerChannel.asFlow()
-) : StateFlow<T>, Flow<T> by innerFlow {
+    private val channel: ConflatedBroadcastChannel<T>
+) : StateFlow<T>, Flow<T> by channel.asFlow() {
 
-    override val value: T get() = innerChannel.value
+    constructor(initialValue: T) : this(ConflatedBroadcastChannel(initialValue))
 
-    companion object {
-        internal fun <T> of(channel: ConflatedBroadcastChannel<T>): StateFlow<T> =
-            StateFlowImpl(channel)
-    }
+    override val value: T get() = channel.value
+
+    fun offer(value: T) = channel.offer(value)
 }
 
-fun <T> ConflatedBroadcastChannel<T>.asStateFlow(): StateFlow<T> =
-    StateFlowImpl.of(this)
+class StateFlowMapperImpl<T, V>(
+    private val stateFlow: StateFlow<T>,
+    private val transform: (T) -> V
+) : StateFlow<V>, Flow<V> by stateFlow.mapSynchronous(transform) {
+    override val value: V get() = transform(stateFlow.value)
+}
+
+fun <T, V> StateFlow<T>.mapStateFlow(transform: (T) -> V): StateFlow<V> =
+    StateFlowMapperImpl(this, transform)
+
+// Regular map transform is a suspend fun, so let's make one for synchronous only
+private fun <T, V> Flow<T>.mapSynchronous(transform: (T) -> V): Flow<V> =
+    map { transform(it) }

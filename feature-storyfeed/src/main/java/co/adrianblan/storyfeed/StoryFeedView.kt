@@ -1,9 +1,6 @@
 package co.adrianblan.storyfeed
 
-import androidx.compose.Composable
-import androidx.compose.Observe
-import androidx.compose.key
-import androidx.compose.onCommit
+import androidx.compose.*
 import androidx.lifecycle.LiveData
 import androidx.ui.core.Alignment
 import androidx.ui.core.DensityAmbient
@@ -41,7 +38,7 @@ internal fun StoryType.titleStringResource(): Int =
 
 @Composable
 fun StoryFeedView(
-    viewState: StoryFeedViewState,
+    viewState: State<StoryFeedViewState>,
     onStoryTypeClick: (StoryType) -> Unit,
     onStoryClick: (StoryId) -> Unit,
     onStoryContentClick: (StoryUrl) -> Unit,
@@ -50,7 +47,7 @@ fun StoryFeedView(
     val scroller = ScrollerPosition()
     val densityAmbient = DensityAmbient.current
 
-    onCommit(viewState.storyType) {
+    onCommit(viewState.value.storyType) {
 
         val collapseDistance = (toolbarMaxHeightDp - toolbarMinHeightDp).dp
 
@@ -70,14 +67,14 @@ fun StoryFeedView(
             StoryFeedToolbar(
                 collapsedFraction = collapseFraction,
                 height = height,
-                storyType = viewState.storyType,
+                storyType = viewState.value.storyType,
                 onStoryTypeClick = onStoryTypeClick
             )
         },
         bodyContent = {
             StoryFeedBodyContent(
                 scroller = scroller,
-                viewState = viewState,
+                viewState = viewState.value,
                 onStoryClick = onStoryClick,
                 onStoryContentClick = onStoryContentClick,
                 onPageEndReached = onPageEndReached
@@ -248,7 +245,7 @@ fun StoryFeedPreview() {
         )
 
         StoryFeedView(
-            viewState,
+            state { viewState },
             onStoryTypeClick = {},
             onStoryClick = {},
             onStoryContentClick = {},

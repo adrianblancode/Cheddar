@@ -25,7 +25,7 @@ class RootViewModel(
         if (BuildConfig.DEBUG) throw t
     }
 
-    val rootNode: Node<*> =
+    val rootNode: Node =
         DaggerRootComponent.factory()
             .build(application.appComponent)
             .rootNodeBuilder()

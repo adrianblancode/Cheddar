@@ -1,6 +1,7 @@
 package co.adrianblan.ui
 
 import androidx.compose.Composable
+import androidx.compose.State
 import androidx.ui.animation.Crossfade
 import androidx.ui.core.Alignment
 import androidx.ui.core.DensityAmbient
@@ -13,31 +14,26 @@ import androidx.ui.material.Surface
 import androidx.ui.unit.px
 import co.adrianblan.ui.node.Node
 
-data class RootViewState(
-    val activeNode: Node<*>
-)
 
 @Composable
-fun RootView(rootViewState: RootViewState) {
-    Crossfade(rootViewState) {
-        Stack {
+fun RootView(content: @Composable() () -> Unit) {
+    Stack {
 
-            val insets = InsetsAmbient.current
+        val insets = InsetsAmbient.current
 
-            // We don't want to deal with the hassle of left-right insets, so just apply them to all screens
-            with(DensityAmbient.current) {
-                Box(
-                    modifier = Modifier.padding(
-                        start = insets.left.px.toDp(),
-                        end = insets.right.px.toDp()
-                    )
-                ) {
-                    it.activeNode.render()
-                }
+        // We don't want to deal with the hassle of left-right insets, so just apply them to all screens
+        with(DensityAmbient.current) {
+            Box(
+                modifier = Modifier.padding(
+                    start = insets.left.px.toDp(),
+                    end = insets.right.px.toDp()
+                )
+            ) {
+                content()
             }
-
-            NavigationBarScrim(modifier = Modifier.gravity(Alignment.BottomCenter))
         }
+
+        NavigationBarScrim(modifier = Modifier.gravity(Alignment.BottomCenter))
     }
 }
 

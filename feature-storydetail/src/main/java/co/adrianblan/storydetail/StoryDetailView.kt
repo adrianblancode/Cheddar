@@ -1,24 +1,17 @@
 package co.adrianblan.storydetail
 
-import android.text.Html
-import androidx.compose.Composable
-import androidx.compose.key
-import androidx.compose.remember
+import androidx.compose.*
 import androidx.ui.core.Alignment
 import androidx.ui.core.DensityAmbient
 import androidx.ui.core.Modifier
-import androidx.ui.core.drawBehind
 import androidx.ui.foundation.*
 import androidx.ui.foundation.shape.corner.RoundedCornerShape
-import androidx.ui.geometry.Offset
-import androidx.ui.graphics.Color
-import androidx.ui.graphics.Paint
 import androidx.ui.layout.*
 import androidx.ui.material.IconButton
 import androidx.ui.material.MaterialTheme
 import androidx.ui.material.Surface
 import androidx.ui.material.icons.Icons
-import androidx.ui.material.icons.filled.*
+import androidx.ui.material.icons.filled.ArrowBack
 import androidx.ui.material.ripple.ripple
 import androidx.ui.res.colorResource
 import androidx.ui.res.stringResource
@@ -31,7 +24,6 @@ import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.hackernews.api.dummy
 import co.adrianblan.ui.*
-import co.adrianblan.ui.InsetsAmbient
 
 private const val toolbarMinHeightDp = 56
 private const val toolbarMaxHeightDp = 148
@@ -39,7 +31,7 @@ private const val toolbarMaxHeightDp = 148
 
 @Composable
 fun StoryDetailView(
-    viewState: StoryDetailViewState,
+    viewState: State<StoryDetailViewState>,
     onStoryContentClick: (StoryUrl) -> Unit,
     onBackPressed: () -> Unit
 ) {
@@ -52,7 +44,7 @@ fun StoryDetailView(
         maxHeight = toolbarMaxHeightDp.dp,
         toolbarContent = { collapsedFraction, height ->
             StoryDetailToolbar(
-                viewState = viewState,
+                viewState = viewState.value,
                 collapsedFraction = collapsedFraction,
                 height = height,
                 onStoryContentClick = onStoryContentClick,
@@ -61,12 +53,12 @@ fun StoryDetailView(
         },
         bodyContent = {
 
-            when (viewState) {
+            when (val state = viewState.value) {
                 is StoryDetailViewState.Success -> {
 
-                    val story = viewState.story
+                    val story = state.story
 
-                    when (viewState.commentsState) {
+                    when (state.commentsState) {
                         is StoryDetailCommentsState.Success ->
                             VerticalScroller(scroller) {
                                 Column {
@@ -82,7 +74,7 @@ fun StoryDetailView(
                                         )
                                     )
 
-                                    if (viewState.story.text != null) {
+                                    if (state.story.text != null) {
                                         CommentItem(
                                             text = story.text,
                                             by = story.by,
@@ -91,7 +83,7 @@ fun StoryDetailView(
                                         )
                                     }
 
-                                    viewState.commentsState.comments
+                                    state.commentsState.comments
                                         .map { comment ->
                                             key(comment.comment.id) {
                                                 CommentItem(
@@ -290,7 +282,7 @@ fun StoryDetailPreview() {
                 )
             )
         StoryDetailView(
-            viewState = viewState,
+            viewState = state { viewState },
             onStoryContentClick = {},
             onBackPressed = {}
         )

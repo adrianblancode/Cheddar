@@ -190,7 +190,7 @@ private fun StoryFeedItemImage(
     onClick: () -> Unit
 ) {
 
-    Surface(shape = RoundedCornerShape(3.dp), modifier = LayoutHeight.Fill) {
+    Surface(shape = RoundedCornerShape(3.dp), modifier = Modifier.fillMaxHeight()) {
         Clickable(onClick = onClick, modifier = Modifier.ripple(bounded = true)) {
             Box(
                 paddingStart = 10.dp,

@@ -1,10 +1,7 @@
 package co.adrianblan.storydetail
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import co.adrianblan.common.DispatcherProvider
-import co.adrianblan.common.StateFlow
-import co.adrianblan.common.asStateFlow
+import co.adrianblan.common.MutableStateFlow
 import co.adrianblan.ui.node.Interactor
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.api.CommentId
@@ -13,7 +10,6 @@ import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.webpreview.WebPreviewRepository
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import javax.inject.Inject
@@ -27,9 +23,7 @@ class StoryDetailInteractor
     @StoryDetailInternal scope: CoroutineScope
 ) : Interactor(scope) {
 
-    private val _state = ConflatedBroadcastChannel<StoryDetailViewState>(StoryDetailViewState.Loading)
-
-    val state: StateFlow<StoryDetailViewState> = _state.asStateFlow()
+    val state = MutableStateFlow<StoryDetailViewState>(StoryDetailViewState.Loading)
 
     private suspend fun fetchFlattenedComments(commentIds: List<CommentId>): List<FlatComment> =
         coroutineScope {
@@ -127,7 +121,7 @@ class StoryDetailInteractor
                     else emit(StoryDetailViewState.Error(it))
                 }
                 .collect {
-                    _state.offer(it)
+                    state.offer(it)
                 }
         }
     }

@@ -7,17 +7,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 
 /** A node is a composable unit of UI and business logic */
-abstract class Node<T>(
+abstract class Node(
     protected val scope: CoroutineScope
 ) {
 
-    abstract val state: StateFlow<T>
-
     @Composable
-    abstract fun viewDef(state: T)
-
-    @Composable
-    fun render() = viewDef(state.collectAsState().value)
+    abstract fun render()
 
     open fun detach() = scope.cancel()
 
