@@ -5,9 +5,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import co.adrianblan.cheddar.di.DaggerRootComponent
 import co.adrianblan.cheddar.extensions.appComponent
-import co.adrianblan.common.asParentScope
 import co.adrianblan.ui.node.AnyNode
-import co.adrianblan.ui.node.Node
+import co.adrianblan.ui.node.NodeContext
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 
@@ -23,7 +22,7 @@ class RootViewModel(
         DaggerRootComponent.factory()
             .build(application.appComponent)
             .rootNodeBuilder()
-            .build(scope.asParentScope())
+            .build(NodeContext.createRootContext(scope))
 
     override fun onCleared() {
         super.onCleared()

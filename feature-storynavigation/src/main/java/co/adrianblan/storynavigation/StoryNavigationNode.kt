@@ -10,6 +10,7 @@ import co.adrianblan.storyfeed.StoryFeedNode
 import co.adrianblan.storyfeed.StoryFeedNodeBuilder
 import co.adrianblan.ui.collectAsState
 import co.adrianblan.ui.node.Node
+import co.adrianblan.ui.node.NodeContext
 import co.adrianblan.ui.node.StackRouter
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
@@ -19,15 +20,17 @@ class StoryNavigationNode
     private val storyFeedNodeBuilder: StoryFeedNodeBuilder,
     private val storyDetailNodeBuilder: StoryDetailNodeBuilder,
     private val customTabsLauncher: CustomTabsLauncher,
-    @StoryNavigationInternal scope: CoroutineScope
-) : Node(scope), StoryFeedNode.Listener, StoryDetailNode.Listener {
+    @StoryNavigationInternal nodeContext: NodeContext
+) : Node(nodeContext), StoryFeedNode.Listener, StoryDetailNode.Listener {
 
     private val storyFeedNode: StoryFeedNode =
-        storyFeedNodeBuilder
-            .build(
-                listener = this,
-                parentScope = scope.asParentScope()
-            )
+        createChild { childContext ->
+            storyFeedNodeBuilder
+                .build(
+                    listener = this,
+                    nodeContext = childContext
+                )
+        }
 
     private val router = StackRouter(listOf(storyFeedNode))
 
@@ -47,12 +50,14 @@ class StoryNavigationNode
         }
 
         router.push(
-            storyDetailNodeBuilder
-                .build(
-                    storyId = storyId,
-                    listener = this,
-                    parentScope = scope.asParentScope()
-                )
+            createChild { childContext ->
+                storyDetailNodeBuilder
+                    .build(
+                        storyId = storyId,
+                        listener = this,
+                        nodeContext = childContext
+                    )
+            }
         )
     }
 

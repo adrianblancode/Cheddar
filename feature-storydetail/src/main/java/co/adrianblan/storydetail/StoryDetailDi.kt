@@ -1,10 +1,9 @@
 package co.adrianblan.storydetail
 
-import co.adrianblan.common.ParentScope
 import co.adrianblan.hackernews.api.StoryId
+import co.adrianblan.ui.node.NodeContext
 import dagger.BindsInstance
 import dagger.Subcomponent
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.inject.Scope
@@ -20,7 +19,7 @@ interface StoryDetailComponent {
         fun build(
             @StoryDetailInternal @BindsInstance storyId: StoryId,
             @StoryDetailInternal @BindsInstance listener: StoryDetailNode.Listener,
-            @StoryDetailInternal @BindsInstance scope: CoroutineScope
+            @StoryDetailInternal @BindsInstance nodeContext: NodeContext
         ): StoryDetailComponent
     }
 }
@@ -40,9 +39,9 @@ class StoryDetailNodeBuilder
     fun build(
         storyId: StoryId,
         listener: StoryDetailNode.Listener,
-        parentScope: ParentScope
+        nodeContext: NodeContext
     ): StoryDetailNode =
         storyDetailComponentBuilder
-            .build(storyId, listener, parentScope.createChildScope())
+            .build(storyId, listener, nodeContext)
             .storyDetailNode()
 }

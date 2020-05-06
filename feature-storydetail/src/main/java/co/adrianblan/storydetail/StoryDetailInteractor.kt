@@ -8,6 +8,7 @@ import co.adrianblan.hackernews.api.CommentId
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
+import co.adrianblan.ui.node.NodeContext
 import co.adrianblan.webpreview.WebPreviewRepository
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
@@ -20,8 +21,8 @@ class StoryDetailInteractor
     private val hackerNewsRepository: HackerNewsRepository,
     private val webPreviewRepository: WebPreviewRepository,
     override val dispatcherProvider: DispatcherProvider,
-    @StoryDetailInternal scope: CoroutineScope
-) : Interactor(scope) {
+    @StoryDetailInternal nodeContext: NodeContext
+) : Interactor(nodeContext.createChildScope()) {
 
     val state = MutableStateFlow<StoryDetailViewState>(StoryDetailViewState.Loading)
 

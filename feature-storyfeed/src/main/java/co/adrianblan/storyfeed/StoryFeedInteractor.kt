@@ -5,6 +5,7 @@ import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.ui.node.Interactor
+import co.adrianblan.ui.node.NodeContext
 import co.adrianblan.webpreview.WebPreviewRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -21,8 +22,8 @@ constructor(
     private val hackerNewsRepository: HackerNewsRepository,
     private val webPreviewRepository: WebPreviewRepository,
     override val dispatcherProvider: DispatcherProvider,
-    @StoryFeedInternal scope: CoroutineScope
-) : Interactor(scope) {
+    @StoryFeedInternal nodeContext: NodeContext
+) : Interactor(nodeContext.createChildScope()) {
 
     private val initialStoryType: StoryType = StoryType.TOP
 
