@@ -6,9 +6,7 @@ import dagger.Component
 import dagger.Module
 import javax.inject.Scope
 
-@Module(
-    subcomponents = [StoryNavigationComponent::class]
-)
+@Module(subcomponents = [StoryNavigationComponent::class])
 object RootModule
 
 @RootScope
@@ -21,7 +19,7 @@ interface RootComponent {
 
     @Component.Factory
     interface Factory {
-        fun build(appComponent: AppComponent) : RootComponent
+        fun build(appComponent: AppComponent): RootComponent
     }
 }
 

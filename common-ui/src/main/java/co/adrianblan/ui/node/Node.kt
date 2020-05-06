@@ -54,6 +54,6 @@ private constructor(internal val scope: CoroutineScope) {
 internal class NodeManager {
     private val children = mutableListOf<NodeContext>()
 
-    fun registerChild(node: AnyNode) =
+    internal fun registerChild(node: AnyNode) =
         children.add(node.nodeContext)
 }

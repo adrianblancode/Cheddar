@@ -1,7 +1,9 @@
 package co.adrianblan.storynavigation
 
 import androidx.compose.Composable
-import co.adrianblan.common.*
+import co.adrianblan.common.CustomTabsLauncher
+import co.adrianblan.common.StateFlow
+import co.adrianblan.common.mapStateFlow
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.storydetail.StoryDetailNode
@@ -12,15 +14,15 @@ import co.adrianblan.ui.collectAsState
 import co.adrianblan.ui.node.Node
 import co.adrianblan.ui.node.NodeContext
 import co.adrianblan.ui.node.StackRouter
-import kotlinx.coroutines.CoroutineScope
-import javax.inject.Inject
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 
 class StoryNavigationNode
-@Inject constructor(
+@AssistedInject constructor(
+    @Assisted nodeContext: NodeContext,
     private val storyFeedNodeBuilder: StoryFeedNodeBuilder,
     private val storyDetailNodeBuilder: StoryDetailNodeBuilder,
-    private val customTabsLauncher: CustomTabsLauncher,
-    @StoryNavigationInternal nodeContext: NodeContext
+    private val customTabsLauncher: CustomTabsLauncher
 ) : Node(nodeContext), StoryFeedNode.Listener, StoryDetailNode.Listener {
 
     private val storyFeedNode: StoryFeedNode =
@@ -71,4 +73,9 @@ class StoryNavigationNode
 
     override fun onBackPressed(): Boolean =
         router.onBackPressed()
+
+    @AssistedInject.Factory
+    interface Factory {
+        fun create(nodeContext: NodeContext): StoryNavigationNode
+    }
 }

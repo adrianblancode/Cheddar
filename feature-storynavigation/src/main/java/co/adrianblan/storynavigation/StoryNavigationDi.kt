@@ -3,32 +3,34 @@ package co.adrianblan.storynavigation
 import co.adrianblan.storyfeed.StoryFeedComponent
 import co.adrianblan.storydetail.StoryDetailComponent
 import co.adrianblan.ui.node.NodeContext
-import dagger.BindsInstance
+import com.squareup.inject.assisted.AssistedInject
+import com.squareup.inject.assisted.dagger2.AssistedModule
 import dagger.Module
 import dagger.Subcomponent
 import javax.inject.Inject
 import javax.inject.Qualifier
 import javax.inject.Scope
 
+@AssistedModule
 @Module(
     subcomponents = [
         StoryFeedComponent::class,
         StoryDetailComponent::class
-    ]
+    ],
+    includes = [AssistedInject_StoryNavigationModule::class]
 )
-object RootModule
+object StoryNavigationModule
 
 @StoryNavigationScope
 @Subcomponent(
-    modules = [RootModule::class]
+    modules = [StoryNavigationModule::class]
 )
 interface StoryNavigationComponent {
-    fun storyNavigationNode(): StoryNavigationNode
+    fun storyNavigationNodeFactory(): StoryNavigationNode.Factory
 
     @Subcomponent.Factory
     interface Factory {
         fun build(
-            @StoryNavigationInternal @BindsInstance nodeContext: NodeContext
         ) : StoryNavigationComponent
     }
 }
@@ -36,10 +38,6 @@ interface StoryNavigationComponent {
 @Scope
 @Retention
 internal annotation class StoryNavigationScope
-
-@Qualifier
-@Retention
-internal annotation class StoryNavigationInternal
 
 class StoryNavigationNodeBuilder
 @Inject constructor(
@@ -49,6 +47,7 @@ class StoryNavigationNodeBuilder
         nodeContext: NodeContext
     ): StoryNavigationNode =
         storyNavigationComponentBuilder
-            .build(nodeContext)
-            .storyNavigationNode()
+            .build()
+            .storyNavigationNodeFactory()
+            .create(nodeContext)
 }

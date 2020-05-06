@@ -12,6 +12,7 @@ object Versions {
     const val composeCompiler = "1.3.70-dev-withExperimentalGoogleExtensions-20200424"
 
     const val dagger = "2.27"
+    const val assistedInject = "0.5.2"
     const val okhttp = "4.6.0"
     const val retrofit = "2.8.1"
 
@@ -48,6 +49,8 @@ object Dependencies {
 
     const val dagger = "com.google.dagger:dagger:${Versions.dagger}"
     const val daggerCompiler = "com.google.dagger:dagger-compiler:${Versions.dagger}"
+    const val assistedInject = "com.squareup.inject:assisted-inject-annotations-dagger2:${Versions.assistedInject}"
+    const val assistedInjectProcessor = "com.squareup.inject:assisted-inject-processor-dagger2:${Versions.assistedInject}"
 
     const val desugar = "com.android.tools:desugar_jdk_libs:1.0.4"
 

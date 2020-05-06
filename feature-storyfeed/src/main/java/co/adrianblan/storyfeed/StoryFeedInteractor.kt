@@ -5,14 +5,11 @@ import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.ui.node.Interactor
-import co.adrianblan.ui.node.NodeContext
 import co.adrianblan.webpreview.WebPreviewRepository
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -21,20 +18,10 @@ class StoryFeedInteractor
 constructor(
     private val hackerNewsRepository: HackerNewsRepository,
     private val webPreviewRepository: WebPreviewRepository,
-    override val dispatcherProvider: DispatcherProvider,
-    @StoryFeedInternal nodeContext: NodeContext
-) : Interactor(nodeContext.createChildScope()) {
+    override val dispatcherProvider: DispatcherProvider
+) : Interactor() {
 
     private val initialStoryType: StoryType = StoryType.TOP
-
-    val state = MutableStateFlow<StoryFeedViewState>(
-        StoryFeedViewState(
-            storyType = initialStoryType,
-            storyFeedState = StoryFeedState.Loading,
-            isLoadingMorePages = true,
-            hasLoadedAllPages = false
-        )
-    )
 
     private val storyTypeChannel = ConflatedBroadcastChannel<StoryType>(initialStoryType)
 
@@ -47,6 +34,62 @@ constructor(
     private val isLoadingMorePagesChannel = ConflatedBroadcastChannel<Boolean>(true)
 
     private val hasLoadedAllPagesChannel = ConflatedBroadcastChannel<Boolean>(false)
+
+    val state: StateFlow<StoryFeedViewState> =
+        combine(
+            storyTypeChannel.asFlow()
+                .distinctUntilChanged()
+                .flatMapLatest { storyType ->
+                    channelFlow<StoryFeedState> {
+                        offer(StoryFeedState.Loading)
+
+                        flow {
+                            emit(hackerNewsRepository.fetchStories(storyType))
+                        }
+                            .flatMapLatest { storyIds ->
+                                observePaginatedStories(storyIds)
+                            }
+                            .catch { t ->
+                                Timber.e(t)
+                                if (t is CancellationException) throw t
+                                else offer(StoryFeedState.Error(t))
+                            }
+                            .collectLatest { stories ->
+                                ensureActive()
+                                offer(StoryFeedState.Success(stories))
+                            }
+                    }
+                        .map { storyFeedState ->
+                            storyType to storyFeedState
+                        }
+                },
+            isLoadingMorePagesChannel.asFlow()
+                .conflate()
+                .distinctUntilChanged(),
+            hasLoadedAllPagesChannel.asFlow()
+                .conflate()
+                .distinctUntilChanged()
+        ) { (storyType: StoryType, storyFeedState: StoryFeedState),
+            isLoadingMorePages: Boolean,
+            hasLoadedAllPages: Boolean ->
+
+            StoryFeedViewState(
+                storyType = storyType,
+                storyFeedState = storyFeedState,
+                isLoadingMorePages = isLoadingMorePages,
+                hasLoadedAllPages = hasLoadedAllPages
+            )
+        }
+            .distinctUntilChanged()
+            .flowOn(dispatcherProvider.IO)
+            .asStateFlow(
+                StoryFeedViewState(
+                    storyType = initialStoryType,
+                    storyFeedState = StoryFeedState.Loading,
+                    isLoadingMorePages = true,
+                    hasLoadedAllPages = false
+                )
+            )
 
     // Observes a decorated story, it will first emit the story and then try to emit decorated data as well
     private fun observeDecoratedStory(storyId: StoryId): Flow<DecoratedStory> =
@@ -112,61 +155,6 @@ constructor(
                     }
             }
             .scanReducePages()
-
-    init {
-        scope.launch {
-            combine(
-                storyTypeChannel.asFlow()
-                    .distinctUntilChanged()
-                    .flatMapLatest { storyType ->
-                        channelFlow<StoryFeedState> {
-                            offer(StoryFeedState.Loading)
-
-                            flow {
-                                emit(hackerNewsRepository.fetchStories(storyType))
-                            }
-                                .flatMapLatest { storyIds ->
-                                    observePaginatedStories(storyIds)
-                                }
-                                .catch { t ->
-                                    Timber.e(t)
-                                    if (t is CancellationException) throw t
-                                    else offer(StoryFeedState.Error(t))
-                                }
-                                .collectLatest { stories ->
-                                    ensureActive()
-                                    offer(StoryFeedState.Success(stories))
-                                }
-                        }
-                            .map { storyFeedState ->
-                                storyType to storyFeedState
-                            }
-                    },
-                isLoadingMorePagesChannel.asFlow()
-                    .conflate()
-                    .distinctUntilChanged(),
-                hasLoadedAllPagesChannel.asFlow()
-                    .conflate()
-                    .distinctUntilChanged()
-            ) { (storyType: StoryType, storyFeedState: StoryFeedState),
-                isLoadingMorePages: Boolean,
-                hasLoadedAllPages: Boolean ->
-
-                StoryFeedViewState(
-                    storyType = storyType,
-                    storyFeedState = storyFeedState,
-                    isLoadingMorePages = isLoadingMorePages,
-                    hasLoadedAllPages = hasLoadedAllPages
-                )
-            }
-                .distinctUntilChanged()
-                .flowOn(dispatcherProvider.IO)
-                .collectLatest { storyViewState ->
-                    ensureActive()
-                    state.offer(storyViewState)
-                }
-        }
-    }
 
     fun onStoryTypeChanged(storyType: StoryType) {
         storyTypeChannel.offer(storyType)

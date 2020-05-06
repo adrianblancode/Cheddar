@@ -51,7 +51,6 @@ class StoryFeedInteractorTest {
 
         storyFeedInteractor = StoryFeedInteractor(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
-            scope = scope,
             hackerNewsRepository = hackerNewsRepository,
             webPreviewRepository = webPreviewRepository
         )
