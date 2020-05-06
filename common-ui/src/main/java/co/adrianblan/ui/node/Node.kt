@@ -1,10 +1,10 @@
 package co.adrianblan.ui.node
 
 import androidx.compose.Composable
-import co.adrianblan.common.StateFlow
-import co.adrianblan.ui.collectAsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
+
+typealias AnyNode = Node
 
 /** A node is a composable unit of UI and business logic */
 abstract class Node(

@@ -5,24 +5,24 @@ import co.adrianblan.common.StateFlow
 
 /** A Router is used by a parent Node to attach and detach child Nodes */
 interface Router {
-    val state: StateFlow<List<Node>>
+    val state: StateFlow<List<AnyNode>>
     fun onBackPressed(): Boolean
 }
 
 class StackRouter constructor(
-    initialState: List<Node>
+    initialState: List<AnyNode>
 ) : Router {
 
-    override val state: MutableStateFlow<List<Node>> =
+    override val state: MutableStateFlow<List<AnyNode>> =
         MutableStateFlow(initialState)
 
-    fun push(node: Node) {
+    fun push(node: AnyNode) {
         state.offer(state.value + node)
     }
 
     fun pop() {
 
-        val nodes: MutableList<Node> = state.value.toMutableList()
+        val nodes: MutableList<AnyNode> = state.value.toMutableList()
 
         nodes.removeAt(nodes.size - 1)
             .apply {

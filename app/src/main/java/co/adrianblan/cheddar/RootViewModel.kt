@@ -6,6 +6,7 @@ import androidx.lifecycle.SavedStateHandle
 import co.adrianblan.cheddar.di.DaggerRootComponent
 import co.adrianblan.cheddar.extensions.appComponent
 import co.adrianblan.common.asParentScope
+import co.adrianblan.ui.node.AnyNode
 import co.adrianblan.ui.node.Node
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
@@ -18,7 +19,7 @@ class RootViewModel(
 
     private val scope = MainScope()
 
-    val rootNode: Node =
+    val rootNode: AnyNode =
         DaggerRootComponent.factory()
             .build(application.appComponent)
             .rootNodeBuilder()

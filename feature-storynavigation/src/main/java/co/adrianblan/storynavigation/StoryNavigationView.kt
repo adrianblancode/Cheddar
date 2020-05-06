@@ -3,11 +3,12 @@ package co.adrianblan.storynavigation
 import androidx.compose.Composable
 import androidx.ui.animation.Crossfade
 import androidx.ui.layout.Stack
+import co.adrianblan.ui.node.AnyNode
 import co.adrianblan.ui.node.Node
 
 
 data class StoryNavigationViewState(
-    val activeNode: Node
+    val activeNode: AnyNode
 )
 
 @Composable

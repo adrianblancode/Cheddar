@@ -10,12 +10,13 @@ import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.InsetsWrapper
 import co.adrianblan.ui.RootView
 import co.adrianblan.ui.extensions.isNightModeActive
+import co.adrianblan.ui.node.AnyNode
 import co.adrianblan.ui.node.Node
 
 class MainActivity : AppCompatActivity() {
 
     private val rootViewModel: RootViewModel by viewModels()
-    private val rootNode: Node get() = rootViewModel.rootNode
+    private val rootNode: AnyNode get() = rootViewModel.rootNode
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
