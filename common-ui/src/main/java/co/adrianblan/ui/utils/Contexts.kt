@@ -1,4 +1,4 @@
-package co.adrianblan.ui.extensions
+package co.adrianblan.ui.utils
 
 import android.content.res.Configuration
 import android.content.res.Resources

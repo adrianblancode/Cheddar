@@ -3,8 +3,7 @@ package co.adrianblan.storynavigation
 import androidx.compose.Composable
 import androidx.ui.animation.Crossfade
 import androidx.ui.layout.Stack
-import co.adrianblan.ui.node.AnyNode
-import co.adrianblan.ui.node.Node
+import co.adrianblan.matryoshka.AnyNode
 
 
 data class StoryNavigationViewState(

@@ -1,25 +1,25 @@
 package co.adrianblan.storyfeed
 
-import co.adrianblan.common.ParentScope
-import dagger.BindsInstance
+import co.adrianblan.matryoshka.NodeContext
+import com.squareup.inject.assisted.dagger2.AssistedModule
+import dagger.Module
 import dagger.Subcomponent
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
-import javax.inject.Qualifier
 import javax.inject.Scope
 
+@AssistedModule
+@Module(includes = [AssistedInject_StoryFeedModule::class])
+object StoryFeedModule
+
 @StoryFeedScope
-@Subcomponent
+@Subcomponent(modules = [StoryFeedModule::class])
 interface StoryFeedComponent {
 
-    fun storyFeedNode(): StoryFeedNode
+    fun storyFeedNodeFactory(): StoryFeedNode.Factory
 
     @Subcomponent.Factory
     interface Factory {
-        fun build(
-            @StoryFeedInternal @BindsInstance listener: StoryFeedNode.Listener,
-            @StoryFeedInternal @BindsInstance scope: CoroutineScope
-        ): StoryFeedComponent
+        fun build(): StoryFeedComponent
     }
 }
 
@@ -27,20 +27,16 @@ interface StoryFeedComponent {
 @Retention
 internal annotation class StoryFeedScope
 
-@Qualifier
-@Retention
-internal annotation class StoryFeedInternal
-
-
 class StoryFeedNodeBuilder
 @Inject constructor(
     private val storyFeedComponentBuilder: StoryFeedComponent.Factory
 ) {
     fun build(
-        listener: StoryFeedNode.Listener,
-        parentScope: ParentScope
+        nodeContext: NodeContext,
+        listener: StoryFeedNode.Listener
     ): StoryFeedNode =
         storyFeedComponentBuilder
-            .build(listener, parentScope.createChildScope())
-            .storyFeedNode()
+            .build()
+            .storyFeedNodeFactory()
+            .create(nodeContext, listener)
 }

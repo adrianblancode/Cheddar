@@ -1,33 +1,47 @@
 package co.adrianblan.storyfeed
 
 import androidx.compose.Composable
+import co.adrianblan.common.collectAsStateFlow
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.storyfeed.ui.StoryFeedView
 import co.adrianblan.ui.collectAsState
-import co.adrianblan.ui.node.Node
-import kotlinx.coroutines.CoroutineScope
-import javax.inject.Inject
+import co.adrianblan.matryoshka.Node
+import co.adrianblan.matryoshka.NodeContext
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
+import kotlinx.coroutines.flow.StateFlow
 
 class StoryFeedNode
-@Inject constructor(
-    private val storyFeedInteractor: StoryFeedInteractor,
-    @StoryFeedInternal private val listener: Listener,
-    @StoryFeedInternal scope: CoroutineScope
-) : Node(scope) {
+@AssistedInject constructor(
+    @Assisted private val listener: Listener,
+    @Assisted nodeContext: NodeContext,
+    private val storyFeedPresenter: StoryFeedPresenter
+) : Node(nodeContext) {
 
     interface Listener {
         fun onStoryClicked(storyId: StoryId)
         fun onStoryContentClicked(storyUrl: StoryUrl)
     }
 
+    private val state: StateFlow<StoryFeedViewState> =
+        storyFeedPresenter.state
+            .collectAsStateFlow(workScope)
+
     @Composable
     override fun render() =
         StoryFeedView(
-            viewState = storyFeedInteractor.state.collectAsState().value,
-            onStoryTypeClick = { storyFeedInteractor.onStoryTypeChanged(it) },
+            viewState = state.collectAsState().value,
+            onStoryTypeClick = { storyFeedPresenter.onStoryTypeChanged(it) },
             onStoryClick = { listener.onStoryClicked(it) },
             onStoryContentClick = { listener.onStoryContentClicked(it) },
-            onPageEndReached = { storyFeedInteractor.onPageEndReached() }
+            onPageEndReached = { storyFeedPresenter.onPageEndReached() }
         )
+
+    @AssistedInject.Factory
+    interface Factory {
+        fun create(
+            nodeContext: NodeContext, listener: Listener
+        ): StoryFeedNode
+    }
 }

@@ -7,7 +7,7 @@ import androidx.ui.material.MaterialTheme
 import androidx.ui.material.darkColorPalette
 import androidx.ui.material.lightColorPalette
 import androidx.ui.res.colorResource
-import co.adrianblan.ui.extensions.isNightModeActive
+import co.adrianblan.ui.utils.isNightModeActive
 
 @Composable
 fun AppTheme(content: @Composable() () -> Unit) {

@@ -1,9 +1,9 @@
 package co.adrianblan.ui
 
 import androidx.compose.*
-import co.adrianblan.common.StateFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
@@ -14,7 +14,7 @@ fun <T> StateFlow<T>.collectAsState(
 ): State<T> {
 
     val flow = this
-    val state: MutableState<T> = state { flow.value!! }
+    val state: MutableState<T> = state { flow.value }
 
     onPreCommit(flow, context) {
         val job = CoroutineScope(context).launch {

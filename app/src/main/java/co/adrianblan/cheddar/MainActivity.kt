@@ -9,9 +9,8 @@ import androidx.ui.core.setContent
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.InsetsWrapper
 import co.adrianblan.ui.RootView
-import co.adrianblan.ui.extensions.isNightModeActive
-import co.adrianblan.ui.node.AnyNode
-import co.adrianblan.ui.node.Node
+import co.adrianblan.ui.utils.isNightModeActive
+import co.adrianblan.matryoshka.AnyNode
 
 class MainActivity : AppCompatActivity() {
 

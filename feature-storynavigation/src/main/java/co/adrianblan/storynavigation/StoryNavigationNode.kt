@@ -1,39 +1,45 @@
 package co.adrianblan.storynavigation
 
 import androidx.compose.Composable
-import co.adrianblan.common.*
+import co.adrianblan.common.CustomTabsLauncher
+import co.adrianblan.common.mapStateFlow
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
+import co.adrianblan.matryoshka.Node
+import co.adrianblan.matryoshka.NodeContext
+import co.adrianblan.matryoshka.StackRouter
 import co.adrianblan.storydetail.StoryDetailNode
 import co.adrianblan.storydetail.StoryDetailNodeBuilder
 import co.adrianblan.storyfeed.StoryFeedNode
 import co.adrianblan.storyfeed.StoryFeedNodeBuilder
 import co.adrianblan.ui.collectAsState
-import co.adrianblan.ui.node.Node
-import co.adrianblan.ui.node.StackRouter
-import kotlinx.coroutines.CoroutineScope
-import javax.inject.Inject
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
+import kotlinx.coroutines.flow.StateFlow
 
 class StoryNavigationNode
-@Inject constructor(
+@AssistedInject constructor(
+    @Assisted nodeContext: NodeContext,
     private val storyFeedNodeBuilder: StoryFeedNodeBuilder,
     private val storyDetailNodeBuilder: StoryDetailNodeBuilder,
-    private val customTabsLauncher: CustomTabsLauncher,
-    @StoryNavigationInternal scope: CoroutineScope
-) : Node(scope), StoryFeedNode.Listener, StoryDetailNode.Listener {
+    private val customTabsLauncher: CustomTabsLauncher
+) : Node(nodeContext), StoryFeedNode.Listener, StoryDetailNode.Listener {
 
     private val storyFeedNode: StoryFeedNode =
-        storyFeedNodeBuilder
-            .build(
-                listener = this,
-                parentScope = scope.asParentScope()
-            )
+        attachChild { childContext ->
+            storyFeedNodeBuilder
+                .build(
+                    nodeContext = childContext,
+                    listener = this
+                )
+        }
 
-    private val router = StackRouter(listOf(storyFeedNode))
+    private val router =
+        StackRouter(listOf(storyFeedNode))
 
     val state: StateFlow<StoryNavigationViewState> =
         router.state
-        .mapStateFlow { StoryNavigationViewState(it.last()) }
+            .mapStateFlow { StoryNavigationViewState(it.last()) }
 
     @Composable
     override fun render() =
@@ -47,12 +53,14 @@ class StoryNavigationNode
         }
 
         router.push(
-            storyDetailNodeBuilder
-                .build(
-                    storyId = storyId,
-                    listener = this,
-                    parentScope = scope.asParentScope()
-                )
+            attachChild { childContext ->
+                storyDetailNodeBuilder
+                    .build(
+                        nodeContext = childContext,
+                        storyId = storyId,
+                        listener = this
+                    )
+            }
         )
     }
 
@@ -66,4 +74,9 @@ class StoryNavigationNode
 
     override fun onBackPressed(): Boolean =
         router.onBackPressed()
+
+    @AssistedInject.Factory
+    interface Factory {
+        fun create(nodeContext: NodeContext): StoryNavigationNode
+    }
 }

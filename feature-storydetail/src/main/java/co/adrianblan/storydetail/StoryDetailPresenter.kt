@@ -1,29 +1,52 @@
 package co.adrianblan.storydetail
 
 import co.adrianblan.common.DispatcherProvider
-import co.adrianblan.common.MutableStateFlow
-import co.adrianblan.ui.node.Interactor
+import co.adrianblan.common.toStateFlow
+import co.adrianblan.matryoshka.Presenter
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.api.CommentId
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.webpreview.WebPreviewRepository
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class StoryDetailInteractor
+class StoryDetailPresenter
 @Inject constructor(
-    @StoryDetailInternal private val storyId: StoryId,
+    private val storyId: StoryId,
     private val hackerNewsRepository: HackerNewsRepository,
     private val webPreviewRepository: WebPreviewRepository,
-    override val dispatcherProvider: DispatcherProvider,
-    @StoryDetailInternal scope: CoroutineScope
-) : Interactor(scope) {
+    override val dispatcherProvider: DispatcherProvider
+) : Presenter<StoryDetailViewState> {
 
-    val state = MutableStateFlow<StoryDetailViewState>(StoryDetailViewState.Loading)
+    override val state: StateFlow<StoryDetailViewState> =
+        flow { emit(hackerNewsRepository.fetchStory(storyId)) }
+            .flatMapLatest<Story, StoryDetailViewState> { story ->
+                combine(
+                    observeWebPreviewState(story.url),
+                    observeCommentsViewState(story)
+                ) { webPreviewState: WebPreviewState?,
+                    storyDetailCommentsState: StoryDetailCommentsState ->
+
+                    StoryDetailViewState.Success(
+                        story = story,
+                        webPreviewState = webPreviewState,
+                        commentsState = storyDetailCommentsState
+                    )
+                }
+            }
+            .flowOn(dispatcherProvider.IO)
+            .catch {
+                Timber.e(it)
+                if (it is CancellationException) throw it
+                else emit(StoryDetailViewState.Error(it))
+            }
+            .toStateFlow(StoryDetailViewState.Loading)
 
     private suspend fun fetchFlattenedComments(commentIds: List<CommentId>): List<FlatComment> =
         coroutineScope {
@@ -95,34 +118,4 @@ class StoryDetailInteractor
                 else emit(WebPreviewState.Error(t))
             }
         }
-
-    init {
-        scope.launch {
-
-            flow { emit(hackerNewsRepository.fetchStory(storyId)) }
-                .flatMapLatest<Story, StoryDetailViewState> { story ->
-                    combine(
-                        observeWebPreviewState(story.url),
-                        observeCommentsViewState(story)
-                    ) { webPreviewState: WebPreviewState?,
-                        storyDetailCommentsState: StoryDetailCommentsState ->
-
-                        StoryDetailViewState.Success(
-                            story = story,
-                            webPreviewState = webPreviewState,
-                            commentsState = storyDetailCommentsState
-                        )
-                    }
-                }
-                .flowOn(dispatcherProvider.IO)
-                .catch {
-                    Timber.e(it)
-                    if (it is CancellationException) throw it
-                    else emit(StoryDetailViewState.Error(it))
-                }
-                .collect {
-                    state.offer(it)
-                }
-        }
-    }
 }

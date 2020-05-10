@@ -1,7 +1,8 @@
-package co.adrianblan.ui.node
+package co.adrianblan.matryoshka
 
-import co.adrianblan.common.MutableStateFlow
-import co.adrianblan.common.StateFlow
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /** A Router is used by a parent Node to attach and detach child Nodes */
 interface Router {
@@ -17,7 +18,7 @@ class StackRouter constructor(
         MutableStateFlow(initialState)
 
     fun push(node: AnyNode) {
-        state.offer(state.value + node)
+        state.value = state.value + node
     }
 
     fun pop() {
@@ -25,11 +26,9 @@ class StackRouter constructor(
         val nodes: MutableList<AnyNode> = state.value.toMutableList()
 
         nodes.removeAt(nodes.size - 1)
-            .apply {
-                detach()
-            }
+            .also { it.detach() }
 
-        state.offer(nodes)
+        state.value = nodes
     }
 
     private fun canPop() = state.value.size > 1

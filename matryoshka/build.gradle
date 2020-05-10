@@ -1,0 +1,16 @@
+apply from: rootProject.file("gradle/library.gradle")
+
+android {
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerVersion Versions.composeCompiler
+        kotlinCompilerExtensionVersion Versions.compose
+    }
+}
+
+dependencies {
+    implementation(Dependencies.composeRuntime)
+}

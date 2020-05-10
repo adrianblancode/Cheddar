@@ -1,4 +1,4 @@
-package co.adrianblan.ui.extensions
+package co.adrianblan.ui.utils
 
 import androidx.ui.unit.Px
 
