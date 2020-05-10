@@ -42,8 +42,8 @@ android {
             minifyEnabled = true
             shrinkResources = true
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "../proguard-rules.pro"
+                    getDefaultProguardFile("proguard-android-optimize.txt"),
+                    "../proguard-rules.pro"
             )
         }
     }
@@ -55,6 +55,11 @@ android {
     composeOptions {
         kotlinCompilerVersion Versions.composeCompiler
         kotlinCompilerExtensionVersion Versions.compose
+    }
+
+    packagingOptions {
+        exclude "META-INF/AL2.0"
+        exclude "META-INF/LGPL2.1"
     }
 }
 

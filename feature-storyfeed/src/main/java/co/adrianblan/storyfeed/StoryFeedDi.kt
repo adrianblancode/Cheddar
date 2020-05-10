@@ -1,11 +1,10 @@
 package co.adrianblan.storyfeed
 
-import co.adrianblan.ui.node.NodeContext
+import co.adrianblan.matryoshka.NodeContext
 import com.squareup.inject.assisted.dagger2.AssistedModule
 import dagger.Module
 import dagger.Subcomponent
 import javax.inject.Inject
-import javax.inject.Qualifier
 import javax.inject.Scope
 
 @AssistedModule

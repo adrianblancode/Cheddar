@@ -1,31 +1,30 @@
 package co.adrianblan.storydetail
 
 import co.adrianblan.common.DispatcherProvider
-import co.adrianblan.common.MutableStateFlow
-import co.adrianblan.common.StateFlow
-import co.adrianblan.common.asStateFlow
-import co.adrianblan.ui.node.Interactor
+import co.adrianblan.common.toStateFlow
+import co.adrianblan.matryoshka.Presenter
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.api.CommentId
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
-import co.adrianblan.ui.node.NodeContext
 import co.adrianblan.webpreview.WebPreviewRepository
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class StoryDetailInteractor
+class StoryDetailPresenter
 @Inject constructor(
     private val storyId: StoryId,
     private val hackerNewsRepository: HackerNewsRepository,
     private val webPreviewRepository: WebPreviewRepository,
     override val dispatcherProvider: DispatcherProvider
-) : Interactor() {
+) : Presenter<StoryDetailViewState> {
 
-    val state: StateFlow<StoryDetailViewState> =
+    override val state: StateFlow<StoryDetailViewState> =
         flow { emit(hackerNewsRepository.fetchStory(storyId)) }
             .flatMapLatest<Story, StoryDetailViewState> { story ->
                 combine(
@@ -47,7 +46,7 @@ class StoryDetailInteractor
                 if (it is CancellationException) throw it
                 else emit(StoryDetailViewState.Error(it))
             }
-            .asStateFlow(StoryDetailViewState.Loading)
+            .toStateFlow(StoryDetailViewState.Loading)
 
     private suspend fun fetchFlattenedComments(commentIds: List<CommentId>): List<FlatComment> =
         coroutineScope {

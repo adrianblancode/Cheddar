@@ -2,20 +2,20 @@ package co.adrianblan.storynavigation
 
 import androidx.compose.Composable
 import co.adrianblan.common.CustomTabsLauncher
-import co.adrianblan.common.StateFlow
 import co.adrianblan.common.mapStateFlow
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
+import co.adrianblan.matryoshka.Node
+import co.adrianblan.matryoshka.NodeContext
+import co.adrianblan.matryoshka.StackRouter
 import co.adrianblan.storydetail.StoryDetailNode
 import co.adrianblan.storydetail.StoryDetailNodeBuilder
 import co.adrianblan.storyfeed.StoryFeedNode
 import co.adrianblan.storyfeed.StoryFeedNodeBuilder
 import co.adrianblan.ui.collectAsState
-import co.adrianblan.ui.node.Node
-import co.adrianblan.ui.node.NodeContext
-import co.adrianblan.ui.node.StackRouter
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
+import kotlinx.coroutines.flow.StateFlow
 
 class StoryNavigationNode
 @AssistedInject constructor(
@@ -26,19 +26,20 @@ class StoryNavigationNode
 ) : Node(nodeContext), StoryFeedNode.Listener, StoryDetailNode.Listener {
 
     private val storyFeedNode: StoryFeedNode =
-        createChild { childContext ->
+        attachChild { childContext ->
             storyFeedNodeBuilder
                 .build(
-                    listener = this,
-                    nodeContext = childContext
+                    nodeContext = childContext,
+                    listener = this
                 )
         }
 
-    private val router = StackRouter(listOf(storyFeedNode))
+    private val router =
+        StackRouter(listOf(storyFeedNode))
 
     val state: StateFlow<StoryNavigationViewState> =
         router.state
-        .mapStateFlow { StoryNavigationViewState(it.last()) }
+            .mapStateFlow { StoryNavigationViewState(it.last()) }
 
     @Composable
     override fun render() =
@@ -52,12 +53,12 @@ class StoryNavigationNode
         }
 
         router.push(
-            createChild { childContext ->
+            attachChild { childContext ->
                 storyDetailNodeBuilder
                     .build(
+                        nodeContext = childContext,
                         storyId = storyId,
-                        listener = this,
-                        nodeContext = childContext
+                        listener = this
                     )
             }
         )

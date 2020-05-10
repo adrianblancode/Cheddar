@@ -1,23 +1,22 @@
 package co.adrianblan.storydetail
 
 import androidx.compose.Composable
-import co.adrianblan.common.MutableStateFlow
+import co.adrianblan.common.collectAsStateFlow
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.storydetail.ui.StoryDetailView
 import co.adrianblan.ui.collectAsState
-import co.adrianblan.ui.node.Node
-import co.adrianblan.ui.node.NodeContext
+import co.adrianblan.matryoshka.Node
+import co.adrianblan.matryoshka.NodeContext
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.StateFlow
 
 
 class StoryDetailNode
 @AssistedInject constructor(
     @Assisted nodeContext: NodeContext,
     @Assisted private val listener: Listener,
-    private val storyDetailInteractor: StoryDetailInteractor
+    private val storyDetailPresenter: StoryDetailPresenter
 ) : Node(nodeContext) {
 
     interface Listener {
@@ -25,16 +24,9 @@ class StoryDetailNode
         fun onStoryDetailFinished()
     }
 
-    private val state = MutableStateFlow<StoryDetailViewState>(storyDetailInteractor.state.value)
-
-    init {
-        scope.launch {
-            storyDetailInteractor.state
-                .collect {
-                    state.offer(it)
-                }
-        }
-    }
+    private val state: StateFlow<StoryDetailViewState> =
+        storyDetailPresenter.state
+            .collectAsStateFlow(workScope)
 
     @Composable
     override fun render() =

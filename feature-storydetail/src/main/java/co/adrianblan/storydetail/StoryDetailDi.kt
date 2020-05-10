@@ -1,7 +1,7 @@
 package co.adrianblan.storydetail
 
 import co.adrianblan.hackernews.api.StoryId
-import co.adrianblan.ui.node.NodeContext
+import co.adrianblan.matryoshka.NodeContext
 import com.squareup.inject.assisted.dagger2.AssistedModule
 import dagger.BindsInstance
 import dagger.Module

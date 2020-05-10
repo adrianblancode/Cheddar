@@ -8,6 +8,9 @@ import co.adrianblan.hackernews.api.CommentId
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.test.CoroutineTestRule
+import co.adrianblan.test.TestStateFlow
+import co.adrianblan.test.delayAndThrow
+import co.adrianblan.test.test
 import co.adrianblan.webpreview.WebPreviewRepository
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.*
@@ -20,27 +23,21 @@ import org.junit.Rule
 import org.junit.Test
 
 
-class StoryFeedInteractorTest {
+class StoryFeedPresenterTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
     private lateinit var scope: TestCoroutineScope
-    private lateinit var storyFeedInteractor: StoryFeedInteractor
-
-    suspend fun delayAndThrow(delayTime: Long): Nothing =
-        coroutineScope {
-            delay(delayTime)
-            throw RuntimeException()
-        }
+    private lateinit var storyFeedPresenter: StoryFeedPresenter
 
     @Before
     fun setUp() {
         scope = TestCoroutineScope(SupervisorJob() + coroutineRule.testDispatcher)
-        buildInteractor()
+        buildPresenter()
     }
 
-    private fun buildInteractor(
+    private fun buildPresenter(
         hackerNewsRepository: HackerNewsRepository =
             TestHackerNewsRepository(1000L)
     ) {
@@ -49,7 +46,7 @@ class StoryFeedInteractorTest {
             onBlocking { fetchWebPreview(any()) } doThrow (RuntimeException())
         }
 
-        storyFeedInteractor = StoryFeedInteractor(
+        storyFeedPresenter = StoryFeedPresenter(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             hackerNewsRepository = hackerNewsRepository,
             webPreviewRepository = webPreviewRepository
@@ -64,17 +61,22 @@ class StoryFeedInteractorTest {
     @Test
     fun testInitialState() {
         assertThat(
-            storyFeedInteractor.state.value.storyFeedState,
+            storyFeedPresenter.state.value.storyFeedState,
             instanceOf(StoryFeedState.Loading::class.java)
         )
     }
 
     @Test
     fun testStoriesSuccess() {
-        scope.advanceUntilIdle()
 
+        val flow: TestStateFlow<StoryFeedViewState> =
+            storyFeedPresenter.state
+                .test(scope)
+        
+        scope.advanceUntilIdle()
+        
         assertThat(
-            storyFeedInteractor.state.value.storyFeedState,
+            flow.value.storyFeedState,
             instanceOf(StoryFeedState.Success::class.java)
         )
 
@@ -97,12 +99,16 @@ class StoryFeedInteractorTest {
                 delayAndThrow(evilDelay)
         }
 
-        buildInteractor(evilHackerNewsRepository)
+        buildPresenter(evilHackerNewsRepository)
 
+        val flow: TestStateFlow<StoryFeedViewState> =
+            storyFeedPresenter.state
+                .test(scope)
+        
         scope.advanceUntilIdle()
 
         assertThat(
-            storyFeedInteractor.state.value.storyFeedState,
+            flow.value.storyFeedState,
             instanceOf(StoryFeedState.Error::class.java)
         )
 
@@ -111,33 +117,38 @@ class StoryFeedInteractorTest {
 
     @Test
     fun testPaginationOnce() {
+
+        val flow: TestStateFlow<StoryFeedViewState> =
+            storyFeedPresenter.state
+                .test(scope)
+        
         scope.advanceUntilIdle()
 
         assertThat(
-            storyFeedInteractor.state.value.storyFeedState,
+            flow.value.storyFeedState,
             instanceOf(StoryFeedState.Success::class.java)
         )
 
         val initialStories: Int =
-            (storyFeedInteractor.state.value.storyFeedState as StoryFeedState.Success).stories.size
+            (flow.value.storyFeedState as StoryFeedState.Success).stories.size
 
         assert(initialStories > 0)
 
-        storyFeedInteractor.onPageEndReached()
+        storyFeedPresenter.onPageEndReached()
 
-        assert(storyFeedInteractor.state.value.isLoadingMorePages)
+        assert(flow.value.isLoadingMorePages)
 
         scope.advanceUntilIdle()
 
-        assertFalse(storyFeedInteractor.state.value.isLoadingMorePages)
+        assertFalse(flow.value.isLoadingMorePages)
 
         assertThat(
-            storyFeedInteractor.state.value.storyFeedState as StoryFeedState.Success,
+            flow.value.storyFeedState as StoryFeedState.Success,
             instanceOf(StoryFeedState.Success::class.java)
         )
 
         val nextStories: Int =
-            (storyFeedInteractor.state.value.storyFeedState as StoryFeedState.Success).stories.size
+            (flow.value.storyFeedState as StoryFeedState.Success).stories.size
 
         assertEquals(initialStories * 2, nextStories)
 
@@ -146,28 +157,33 @@ class StoryFeedInteractorTest {
 
     @Test
     fun testPaginationDoubleIgnored() {
+
+        val flow: TestStateFlow<StoryFeedViewState> =
+            storyFeedPresenter.state
+                .test(scope)
+        
         scope.advanceUntilIdle()
 
         val initialStories: Int =
-            (storyFeedInteractor.state.value.storyFeedState as StoryFeedState.Success).stories.size
+            (flow.value.storyFeedState as StoryFeedState.Success).stories.size
 
         assert(initialStories > 0)
 
-        storyFeedInteractor.onPageEndReached()
+        storyFeedPresenter.onPageEndReached()
 
         scope.advanceTimeBy(100L)
 
-        storyFeedInteractor.onPageEndReached()
+        storyFeedPresenter.onPageEndReached()
 
         scope.advanceUntilIdle()
 
         assertThat(
-            storyFeedInteractor.state.value.storyFeedState as StoryFeedState.Success,
+            flow.value.storyFeedState as StoryFeedState.Success,
             instanceOf(StoryFeedState.Success::class.java)
         )
 
         val nextStories: Int =
-            (storyFeedInteractor.state.value.storyFeedState as StoryFeedState.Success).stories.size
+            (flow.value.storyFeedState as StoryFeedState.Success).stories.size
 
         assertEquals(initialStories * 2, nextStories)
 

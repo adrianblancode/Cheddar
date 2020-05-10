@@ -4,7 +4,7 @@ import co.adrianblan.common.*
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.StoryType
 import co.adrianblan.hackernews.api.StoryId
-import co.adrianblan.ui.node.Interactor
+import co.adrianblan.matryoshka.Presenter
 import co.adrianblan.webpreview.WebPreviewRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
@@ -13,15 +13,15 @@ import kotlinx.coroutines.flow.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class StoryFeedInteractor
+class StoryFeedPresenter
 @Inject
 constructor(
     private val hackerNewsRepository: HackerNewsRepository,
     private val webPreviewRepository: WebPreviewRepository,
     override val dispatcherProvider: DispatcherProvider
-) : Interactor() {
+) : Presenter<StoryFeedViewState> {
 
-    private val initialStoryType: StoryType = StoryType.TOP
+    private val initialStoryType = StoryType.TOP
 
     private val storyTypeChannel = ConflatedBroadcastChannel<StoryType>(initialStoryType)
 
@@ -35,7 +35,8 @@ constructor(
 
     private val hasLoadedAllPagesChannel = ConflatedBroadcastChannel<Boolean>(false)
 
-    val state: StateFlow<StoryFeedViewState> =
+
+    override val state: StateFlow<StoryFeedViewState> =
         combine(
             storyTypeChannel.asFlow()
                 .distinctUntilChanged()
@@ -82,7 +83,7 @@ constructor(
         }
             .distinctUntilChanged()
             .flowOn(dispatcherProvider.IO)
-            .asStateFlow(
+            .toStateFlow(
                 StoryFeedViewState(
                     storyType = initialStoryType,
                     storyFeedState = StoryFeedState.Loading,

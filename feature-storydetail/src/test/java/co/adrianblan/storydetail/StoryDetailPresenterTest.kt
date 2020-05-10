@@ -8,6 +8,9 @@ import co.adrianblan.hackernews.api.CommentId
 import co.adrianblan.hackernews.api.Story
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.test.CoroutineTestRule
+import co.adrianblan.test.TestStateFlow
+import co.adrianblan.test.delayAndThrow
+import co.adrianblan.test.test
 import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.*
 import kotlinx.coroutines.test.TestCoroutineScope
@@ -19,31 +22,25 @@ import org.junit.Rule
 import org.junit.Test
 
 
-class StoryDetailInteractorTest {
+class StoryDetailPresenterTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
     private lateinit var scope: TestCoroutineScope
-    private lateinit var storyDetailInteractor: StoryDetailInteractor
-
-    suspend fun delayAndThrow(delayTime: Long): Nothing =
-        coroutineScope {
-            delay(delayTime)
-            throw RuntimeException()
-        }
+    private lateinit var storyDetailPresenter: StoryDetailPresenter
 
     @Before
     fun setUp() {
         scope = TestCoroutineScope(SupervisorJob() + coroutineRule.testDispatcher)
-        buildInteractor()
+        buildPresenter()
     }
 
-    private fun buildInteractor(
+    private fun buildPresenter(
         hackerNewsRepository: HackerNewsRepository =
             TestHackerNewsRepository(1000L)
     ) {
-        storyDetailInteractor = StoryDetailInteractor(
+        storyDetailPresenter = StoryDetailPresenter(
             storyId = StoryId(1),
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             hackerNewsRepository = hackerNewsRepository,
@@ -59,7 +56,7 @@ class StoryDetailInteractorTest {
     @Test
     fun testInitialState() {
         assertThat(
-            storyDetailInteractor.state.value,
+            storyDetailPresenter.state.value,
             instanceOf(StoryDetailViewState.Loading::class.java)
         )
     }
@@ -67,10 +64,14 @@ class StoryDetailInteractorTest {
     @Test
     fun testSuccessStory() {
 
+        val flow: TestStateFlow<StoryDetailViewState> =
+            storyDetailPresenter.state
+                .test(scope)
+
         scope.advanceUntilIdle()
 
         assertThat(
-            storyDetailInteractor.state.value,
+            flow.value,
             instanceOf(StoryDetailViewState.Success::class.java)
         )
     }
@@ -91,12 +92,16 @@ class StoryDetailInteractorTest {
                 delayAndThrow(evilDelay)
         }
 
-        buildInteractor(evilHackerNewsRepository)
+        buildPresenter(evilHackerNewsRepository)
+
+        val flow: TestStateFlow<StoryDetailViewState> =
+            storyDetailPresenter.state
+                .test(scope)
 
         scope.advanceUntilIdle()
 
         assertThat(
-            storyDetailInteractor.state.value,
+            flow.value,
             instanceOf(StoryDetailViewState.Error::class.java)
         )
 

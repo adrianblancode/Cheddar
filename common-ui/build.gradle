@@ -12,6 +12,8 @@ android {
 }
 
 dependencies {
+    api(project(":matryoshka"))
+
     api(Dependencies.androidxAppcompat)
     api(Dependencies.androidxCore)
     api(Dependencies.androidxActivity)

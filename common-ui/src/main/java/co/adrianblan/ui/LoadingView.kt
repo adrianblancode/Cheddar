@@ -7,7 +7,6 @@ import androidx.animation.transitionDefinition
 import androidx.compose.Composable
 import androidx.ui.animation.Transition
 import androidx.ui.core.*
-import androidx.ui.core.Modifier.Companion
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.ContentGravity
 import androidx.ui.foundation.Text
@@ -22,7 +21,7 @@ import androidx.ui.unit.Dp
 import androidx.ui.unit.Px
 import androidx.ui.unit.TextUnit
 import androidx.ui.unit.dp
-import co.adrianblan.ui.extensions.lerp
+import co.adrianblan.ui.utils.lerp
 import kotlin.math.sin
 
 @Preview

@@ -3,9 +3,7 @@ package co.adrianblan.ui
 import androidx.animation.*
 import androidx.compose.*
 import androidx.ui.core.*
-import androidx.ui.core.Modifier.Companion
 import androidx.ui.foundation.Box
-import androidx.ui.graphics.Canvas
 import androidx.ui.graphics.LinearGradient
 import androidx.ui.graphics.Paint
 import androidx.ui.graphics.TileMode
@@ -15,7 +13,7 @@ import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.Px
 import androidx.ui.unit.px
 import androidx.ui.unit.toRect
-import co.adrianblan.ui.extensions.lerp
+import co.adrianblan.ui.utils.lerp
 
 /** View with a shimmering effect, for loading content */
 @Preview

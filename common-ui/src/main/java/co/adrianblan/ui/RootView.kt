@@ -1,18 +1,14 @@
 package co.adrianblan.ui
 
 import androidx.compose.Composable
-import androidx.compose.State
-import androidx.ui.animation.Crossfade
 import androidx.ui.core.Alignment
 import androidx.ui.core.DensityAmbient
 import androidx.ui.core.Modifier
-import androidx.ui.core.Modifier.Companion
 import androidx.ui.foundation.Box
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
 import androidx.ui.material.Surface
 import androidx.ui.unit.px
-import co.adrianblan.ui.node.Node
 
 
 @Composable

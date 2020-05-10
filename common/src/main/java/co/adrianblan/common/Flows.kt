@@ -2,9 +2,7 @@ package co.adrianblan.common
 
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 
 /** Applies action to first emission */
 fun <T> Flow<T>.onFirst(action: suspend (T) -> Unit): Flow<T> =

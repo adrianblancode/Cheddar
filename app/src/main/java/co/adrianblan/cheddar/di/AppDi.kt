@@ -1,7 +1,7 @@
 package co.adrianblan.cheddar.di
 
 import android.content.Context
-import co.adrianblan.cheddar.extensions.CustomTabsLauncherImpl
+import co.adrianblan.cheddar.utils.CustomTabsLauncherImpl
 import co.adrianblan.common.CustomTabsLauncher
 import co.adrianblan.common.DefaultDispatcherProvider
 import co.adrianblan.common.DispatcherProvider
