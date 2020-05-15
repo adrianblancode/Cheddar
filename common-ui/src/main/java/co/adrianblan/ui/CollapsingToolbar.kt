@@ -45,8 +45,8 @@ fun CollapsingToolbar(
                 Box(
                     gravity = Alignment.BottomCenter,
                     paddingTop = topInsets,
-                    modifier = Modifier.fillMaxWidth() +
-                            Modifier.preferredHeight(height + topInsets)
+                    modifier = Modifier.fillMaxWidth()
+                        .preferredHeight(height + topInsets)
                 ) {
                     toolbarContent(collapsedFraction, height)
                 }
@@ -69,8 +69,8 @@ fun CollapsingToolbar(
             // Elevation draws shadows underneath the shape, which is a problem if shape is transparent
             // We must clip the shadow to outside of the toolbar to not draw under it
             Surface(
-                modifier = Modifier.drawShadow(shape = RectangleShape, elevation = elevation) +
-                        Modifier.clip(toolbarShadowShape)
+                modifier = Modifier.drawShadow(shape = RectangleShape, elevation = elevation)
+                    .clip(toolbarShadowShape)
             ) {}
         }
     }

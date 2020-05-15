@@ -50,34 +50,34 @@ fun ShimmerView() {
     }
 
     Box(
-        modifier = Modifier.fillMaxSize() +
-                Modifier.drawBehind {
+        modifier = Modifier.fillMaxSize()
+            .drawBehind {
 
-                    val parentSize = this.size
+                val parentSize = this.size
 
-                    val rect = parentSize.toRect()
-                    val width: Px = parentSize.width.px
+                val rect = parentSize.toRect()
+                val width: Px = parentSize.width.px
 
-                    // Convert from [0, 1] to [-1, 2]
-                    val offset = lerp(-1f, 2f, progress)
-                    val left = width * offset
+                // Convert from [0, 1] to [-1, 2]
+                val offset = lerp(-1f, 2f, progress)
+                val left = width * offset
 
-                    val shimmerGradient =
-                        LinearGradient(
-                            0f to backgroundColor,
-                            0.5f to shimmerColor,
-                            1f to backgroundColor,
-                            startX = left,
-                            endX = left + width,
-                            startY = 0.px,
-                            endY = 0.px
-                        )
-
-                    drawRect(
-                        topLeft = Offset(dx = left.value, dy = 0f),
-                        size = Size(width = rect.width, height = rect.height),
-                        brush = shimmerGradient
+                val shimmerGradient =
+                    LinearGradient(
+                        0f to backgroundColor,
+                        0.5f to shimmerColor,
+                        1f to backgroundColor,
+                        startX = left,
+                        endX = left + width,
+                        startY = 0.px,
+                        endY = 0.px
                     )
-                }
+
+                drawRect(
+                    topLeft = Offset(dx = left.value, dy = 0f),
+                    size = Size(width = rect.width, height = rect.height),
+                    brush = shimmerGradient
+                )
+            }
     )
 }

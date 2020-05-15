@@ -85,26 +85,26 @@ fun StoryTypePopupItem(
                 Text(
                     text = stringResource(storyType.titleStringResource()),
                     style = MaterialTheme.typography.subtitle1,
-                    modifier = Modifier.weight(1f) +
-                            Modifier.padding(
-                                start = 12.dp,
-                                end = 12.dp,
-                                top = 16.dp,
-                                bottom = 12.dp
-                            )
+                    modifier = Modifier.weight(1f)
+                        .padding(
+                            start = 12.dp,
+                            end = 12.dp,
+                            top = 16.dp,
+                            bottom = 12.dp
+                        )
                 )
 
                 if (isSelected) {
                     Box(
-                        modifier  = Modifier.gravity(Alignment.CenterVertically),
+                        modifier = Modifier.gravity(Alignment.CenterVertically),
                         paddingEnd = 12.dp,
                         paddingTop = 2.dp
                     ) {
                         Icon(
                             asset = Icons.Default.Check,
                             tint = MaterialTheme.colors.secondary,
-                            modifier = Modifier.gravity(Alignment.CenterVertically) +
-                                    Modifier.preferredSize(32.dp)
+                            modifier = Modifier.gravity(Alignment.CenterVertically)
+                                .preferredSize(32.dp)
                         )
                     }
                 }

@@ -191,7 +191,8 @@ private fun LoadMoreStoriesButton(
 ) {
     Box(
         gravity = ContentGravity.Center,
-        modifier = Modifier.fillMaxSize() + Modifier.padding(top = 8.dp)
+        modifier = Modifier.fillMaxSize()
+            .padding(top = 8.dp)
     ) {
         Button(onClick = onPageEndReached) {
             Text(

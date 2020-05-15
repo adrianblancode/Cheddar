@@ -43,9 +43,9 @@ fun NavigationBarScrim(
     with(DensityAmbient.current) {
         Surface(
             color = MaterialTheme.colors.background.copy(alpha = overInsetAlpha),
-            modifier = modifier +
-                    Modifier.fillMaxWidth() +
-                    Modifier.preferredHeight(insets.bottom.px.toDp())
+            modifier = modifier
+                .fillMaxWidth()
+                .preferredHeight(insets.bottom.px.toDp())
         ) {}
     }
 }

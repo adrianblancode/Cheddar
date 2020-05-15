@@ -62,28 +62,28 @@ fun CommentItem(
         paddingEnd = 16.dp,
         paddingTop = 8.dp,
         paddingBottom = 8.dp,
-        modifier = Modifier.fillMaxWidth() +
-                Modifier.drawBehind {
+        modifier = Modifier.fillMaxWidth()
+            .drawBehind {
 
-                    val parentSize = this.size
-                    var depthOffset: Px = 16.dp.toPx()
+                val parentSize = this.size
+                var depthOffset: Px = 16.dp.toPx()
 
-                    repeat(depthIndex) {
-                        val o1 = Offset(depthOffset.value, 0f)
-                        val o2 = Offset(
-                            depthOffset.value,
-                            parentSize.height
-                        )
+                repeat(depthIndex) {
+                    val o1 = Offset(depthOffset.value, 0f)
+                    val o2 = Offset(
+                        depthOffset.value,
+                        parentSize.height
+                    )
 
-                        drawLine(
-                            p1 = o1,
-                            p2 = o2,
-                            color = depthIndicatorColor,
-                            stroke = depthIndicatorStroke
-                        )
-                        depthOffset += depthIndicatorWidth.toPx()
-                    }
+                    drawLine(
+                        p1 = o1,
+                        p2 = o2,
+                        color = depthIndicatorColor,
+                        stroke = depthIndicatorStroke
+                    )
+                    depthOffset += depthIndicatorWidth.toPx()
                 }
+            }
     ) {
 
         Column(

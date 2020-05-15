@@ -82,58 +82,58 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
         val progress: Float = transitionState[loadingState]
 
         Box(gravity = ContentGravity.Center,
-            modifier = Modifier.preferredSize(width = size * 1.2f, height = size) +
-                    Modifier.drawBehind {
+            modifier = Modifier.preferredSize(width = size * 1.2f, height = size)
+                .drawBehind {
 
-                        val parentSize = this.size
+                    val parentSize = this.size
 
-                        val widthStep: Px = (parentSize.width * 0.25f).px
+                    val widthStep: Px = (parentSize.width * 0.25f).px
 
-                        // Positions for the lowest and highest points in animation
-                        val circleBaseY: Px = (parentSize.height * 0.90f).px
-                        val circleTopY: Px = (parentSize.height * 0.80f).px
+                    // Positions for the lowest and highest points in animation
+                    val circleBaseY: Px = (parentSize.height * 0.90f).px
+                    val circleTopY: Px = (parentSize.height * 0.80f).px
 
-                        val progressAngleBase: Double = progress * Math.PI * 2f
-                        val maxProgressAngleOffset: Double = Math.PI * 0.7
+                    val progressAngleBase: Double = progress * Math.PI * 2f
+                    val maxProgressAngleOffset: Double = Math.PI * 0.7
 
-                        val circleRadius: Px = (parentSize.width * 0.08f).px
+                    val circleRadius: Px = (parentSize.width * 0.08f).px
 
-                        repeat(3) { index ->
+                    repeat(3) { index ->
 
-                            // Dots have increasing progress offset to give a wave look
-                            val progressAngleOffset: Double =
-                                -(maxProgressAngleOffset / 2) * index
+                        // Dots have increasing progress offset to give a wave look
+                        val progressAngleOffset: Double =
+                            -(maxProgressAngleOffset / 2) * index
 
-                            // [-1, 1]
-                            val value = sin(progressAngleBase + progressAngleOffset).toFloat()
+                        // [-1, 1]
+                        val value = sin(progressAngleBase + progressAngleOffset).toFloat()
 
-                            // Factor applied to negative values
-                            val downBounceFactor = 0.25f
+                        // Factor applied to negative values
+                        val downBounceFactor = 0.25f
 
-                            // Coercion leads to two cycles, positive one animates up and negative is small bounce
-                            // [-downBounceFactor, 1]
-                            val yFraction =
-                                if (value > 0) value
-                                else value * downBounceFactor
+                        // Coercion leads to two cycles, positive one animates up and negative is small bounce
+                        // [-downBounceFactor, 1]
+                        val yFraction =
+                            if (value > 0) value
+                            else value * downBounceFactor
 
-                            // Normalize to [0, 1]
-                            val normalizedYFraction =
-                                (yFraction + downBounceFactor / (1f + downBounceFactor))
+                        // Normalize to [0, 1]
+                        val normalizedYFraction =
+                            (yFraction + downBounceFactor / (1f + downBounceFactor))
 
-                            val circleDyValue =
-                                lerp(circleBaseY, circleTopY, normalizedYFraction)
+                        val circleDyValue =
+                            lerp(circleBaseY, circleTopY, normalizedYFraction)
 
-                            val circleDxValue = widthStep * (index + 1)
+                        val circleDxValue = widthStep * (index + 1)
 
-                            drawCircle(
-                                center = Offset(
-                                    dx = circleDxValue.value,
-                                    dy = circleDyValue.value
-                                ),
-                                color = dotColor,
-                                radius = circleRadius.value
-                            )
-                        }
-                    })
+                        drawCircle(
+                            center = Offset(
+                                dx = circleDxValue.value,
+                                dy = circleDyValue.value
+                            ),
+                            color = dotColor,
+                            radius = circleRadius.value
+                        )
+                    }
+                })
     }
 }

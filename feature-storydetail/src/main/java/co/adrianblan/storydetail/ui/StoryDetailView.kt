@@ -155,14 +155,21 @@ fun StoryDetailToolbar(
             is StoryDetailViewState.Loading ->
                 Surface(
                     shape = RoundedCornerShape(2.dp),
-                    modifier = Modifier.padding(16.dp) + Modifier.padding(top = titleCollapsedTopOffset)
+                    modifier = Modifier.padding(16.dp)
+                        .padding(top = titleCollapsedTopOffset)
                 ) {
                     Column {
-                        Box(modifier = Modifier.fillMaxWidth() + Modifier.preferredHeight(20.dp)) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth()
+                                .preferredHeight(20.dp)
+                        ) {
                             ShimmerView()
                         }
                         Spacer(modifier = Modifier.preferredHeight(6.dp))
-                        Box(modifier = Modifier.fillMaxWidth() + Modifier.preferredHeight(20.dp)) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth()
+                                .preferredHeight(20.dp)
+                        ) {
                             ShimmerView()
                         }
                     }
@@ -187,10 +194,9 @@ fun StoryDetailToolbar(
                         end = 16.dp + titleRightOffset,
                         bottom = 8.dp,
                         top = 8.dp + titleCollapsedTopOffset
-                    ) +
-                            Modifier.fillMaxWidth() +
-                            Modifier.preferredHeight(height) +
-                            Modifier.gravity(Alignment.CenterStart),
+                    ).fillMaxWidth()
+                        .preferredHeight(height)
+                        .gravity(Alignment.CenterStart),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = titleMaxLines
                 )

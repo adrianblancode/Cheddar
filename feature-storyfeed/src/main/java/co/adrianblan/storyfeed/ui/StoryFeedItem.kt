@@ -52,9 +52,9 @@ fun StoryFeedItem(
     Row {
         Surface(
             shape = RoundedCornerShape(3.dp),
-            modifier = Modifier.weight(1f) +
-                    Modifier.fillMaxWidth() +
-                    Modifier.preferredHeightIn(minHeight = 110.dp)
+            modifier = Modifier.weight(1f)
+                .fillMaxWidth()
+                .preferredHeightIn(minHeight = 110.dp)
         ) {
             Clickable(onClick = storyClick, modifier = Modifier.ripple(bounded = true)) {
 
@@ -140,13 +140,19 @@ fun StoryFeedItemDescription(
         Spacer(modifier = Modifier.preferredHeight(8.dp))
 
         Surface(shape = RoundedCornerShape(2.dp)) {
-            Box(modifier = Modifier.fillMaxWidth() + Modifier.preferredHeight(16.dp)) {
+            Box(
+                modifier = Modifier.fillMaxWidth()
+                    .preferredHeight(16.dp)
+            ) {
                 ShimmerView()
             }
         }
         Spacer(modifier = Modifier.preferredHeight(6.dp))
         Surface(shape = RoundedCornerShape(2.dp)) {
-            Box(modifier = Modifier.fillMaxWidth() + Modifier.preferredHeight(16.dp)) {
+            Box(
+                modifier = Modifier.fillMaxWidth()
+                    .preferredHeight(16.dp)
+            ) {
                 ShimmerView()
             }
         }
