@@ -196,7 +196,8 @@ fun StoryDetailToolbar(
                         top = 8.dp + titleCollapsedTopOffset
                     ).fillMaxWidth()
                         .preferredHeight(height)
-                        .gravity(Alignment.CenterStart),
+                        .gravity(Alignment.CenterStart)
+                        .wrapContentHeight(Alignment.CenterVertically),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = titleMaxLines
                 )
