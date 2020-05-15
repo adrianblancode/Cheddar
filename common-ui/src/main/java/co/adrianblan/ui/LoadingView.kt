@@ -17,10 +17,7 @@ import androidx.ui.material.MaterialTheme
 import androidx.ui.res.stringResource
 import androidx.ui.text.TextStyle
 import androidx.ui.tooling.preview.Preview
-import androidx.ui.unit.Dp
-import androidx.ui.unit.Px
-import androidx.ui.unit.TextUnit
-import androidx.ui.unit.dp
+import androidx.ui.unit.*
 import co.adrianblan.ui.utils.lerp
 import kotlin.math.sin
 
@@ -74,9 +71,7 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
 
     val size: Dp = with(DensityAmbient.current) { fontSize.toDp() }
 
-    val dotPaint = Paint().apply {
-        color = MaterialTheme.colors.onBackground
-    }
+    val dotColor = MaterialTheme.colors.onBackground
 
     Transition(
         definition = loadingDefinition,
@@ -92,16 +87,16 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
 
                         val parentSize = this.size
 
-                        val widthStep: Px = parentSize.width * 0.25f
+                        val widthStep: Px = (parentSize.width * 0.25f).px
 
                         // Positions for the lowest and highest points in animation
-                        val circleBaseY: Px = parentSize.height * 0.90f
-                        val circleTopY: Px = parentSize.height * 0.80f
+                        val circleBaseY: Px = (parentSize.height * 0.90f).px
+                        val circleTopY: Px = (parentSize.height * 0.80f).px
 
                         val progressAngleBase: Double = progress * Math.PI * 2f
                         val maxProgressAngleOffset: Double = Math.PI * 0.7
 
-                        val circleRadius = (parentSize.width * 0.08f).value
+                        val circleRadius: Px = (parentSize.width * 0.08f).px
 
                         repeat(3) { index ->
 
@@ -131,12 +126,12 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
                             val circleDxValue = widthStep * (index + 1)
 
                             drawCircle(
-                                Offset(
+                                center = Offset(
                                     dx = circleDxValue.value,
                                     dy = circleDyValue.value
                                 ),
-                                radius = circleRadius,
-                                paint = dotPaint
+                                color = dotColor,
+                                radius = circleRadius.value
                             )
                         }
                     })

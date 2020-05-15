@@ -190,8 +190,7 @@ fun StoryDetailToolbar(
                     ) +
                             Modifier.fillMaxWidth() +
                             Modifier.preferredHeight(height) +
-                            Modifier.gravity(Alignment.Center) +
-                            Modifier.wrapContentHeight(Alignment.CenterStart),
+                            Modifier.gravity(Alignment.CenterStart),
                     overflow = TextOverflow.Ellipsis,
                     maxLines = titleMaxLines
                 )

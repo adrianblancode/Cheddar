@@ -19,7 +19,6 @@ dependencies {
     api(Dependencies.androidxActivity)
 
     api(Dependencies.composeRuntime)
-    api(Dependencies.composeFramework)
     api(Dependencies.composeLayout)
     api(Dependencies.composeMaterial)
     api(Dependencies.composeFoundation)

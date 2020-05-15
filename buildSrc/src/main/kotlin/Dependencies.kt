@@ -8,7 +8,7 @@ object Versions {
     const val androidxAppcompat = "1.1.0"
     const val androidxCore = "1.2.0"
     const val androidxActivity = "1.1.0-rc02"
-    const val compose = "0.1.0-dev10"
+    const val compose = "0.1.0-dev11"
     const val composeCompiler = "1.3.70-dev-withExperimentalGoogleExtensions-20200424"
 
     const val dagger = "2.27"
@@ -39,7 +39,6 @@ object Dependencies {
     const val androidxBrowser = "androidx.browser:browser:1.2.0"
 
     const val composeRuntime = "androidx.compose:compose-runtime:${Versions.compose}"
-    const val composeFramework = "androidx.ui:ui-framework:${Versions.compose}"
     const val composeLayout = "androidx.ui:ui-layout:${Versions.compose}"
     const val composeMaterial = "androidx.ui:ui-material:${Versions.compose}"
     const val composeFoundation = "androidx.ui:ui-foundation:${Versions.compose}"

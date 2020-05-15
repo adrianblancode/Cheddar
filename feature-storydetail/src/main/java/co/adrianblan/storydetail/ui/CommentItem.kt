@@ -11,6 +11,7 @@ import androidx.ui.geometry.Offset
 import androidx.ui.graphics.Color
 import androidx.ui.graphics.Paint
 import androidx.ui.graphics.StrokeCap
+import androidx.ui.graphics.painter.Stroke
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
 import androidx.ui.res.colorResource
@@ -49,11 +50,12 @@ fun CommentItem(
         1f.dp.toPx()
     }
 
-    val depthIndicatorPaint = Paint().apply {
-        color = colorResource(id = R.color.contentMuted)
-        strokeWidth = strokeWidthPx.value
-        strokeCap = StrokeCap.round
-    }
+    val depthIndicatorColor = colorResource(id = R.color.contentMuted)
+
+    val depthIndicatorStroke = Stroke(
+        width = strokeWidthPx.value,
+        cap = StrokeCap.round
+    )
 
     Box(
         paddingStart = 16.dp + depthIndex * depthIndicatorWidth,
@@ -70,10 +72,15 @@ fun CommentItem(
                         val o1 = Offset(depthOffset.value, 0f)
                         val o2 = Offset(
                             depthOffset.value,
-                            parentSize.height.value
+                            parentSize.height
                         )
 
-                        drawLine(o1, o2, depthIndicatorPaint)
+                        drawLine(
+                            p1 = o1,
+                            p2 = o2,
+                            color = depthIndicatorColor,
+                            stroke = depthIndicatorStroke
+                        )
                         depthOffset += depthIndicatorWidth.toPx()
                     }
                 }

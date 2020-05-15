@@ -4,6 +4,9 @@ import androidx.animation.*
 import androidx.compose.*
 import androidx.ui.core.*
 import androidx.ui.foundation.Box
+import androidx.ui.geometry.Offset
+import androidx.ui.geometry.Size
+import androidx.ui.geometry.toRect
 import androidx.ui.graphics.LinearGradient
 import androidx.ui.graphics.Paint
 import androidx.ui.graphics.TileMode
@@ -23,7 +26,6 @@ fun ShimmerView() {
     val backgroundColor = colorResource(id = R.color.contentMuted)
 
     val shimmerColor = colorResource(id = R.color.contentShimmer)
-    val shimmerPaint = Paint()
 
     var progress by mutableStateOf(0f)
 
@@ -54,23 +56,28 @@ fun ShimmerView() {
                     val parentSize = this.size
 
                     val rect = parentSize.toRect()
-                    val width: Px = parentSize.width
+                    val width: Px = parentSize.width.px
 
                     // Convert from [0, 1] to [-1, 2]
                     val offset = lerp(-1f, 2f, progress)
                     val left = width * offset
 
-                    val shimmerGradient = LinearGradient(
-                        0f to backgroundColor, 0.5f to shimmerColor, 1f to backgroundColor,
-                        startX = left,
-                        endX = left + width,
-                        startY = 0.px,
-                        endY = 0.px,
-                        tileMode = TileMode.Clamp
-                    )
+                    val shimmerGradient =
+                        LinearGradient(
+                            0f to backgroundColor,
+                            0.5f to shimmerColor,
+                            1f to backgroundColor,
+                            startX = left,
+                            endX = left + width,
+                            startY = 0.px,
+                            endY = 0.px
+                        )
 
-                    shimmerPaint.shader = shimmerGradient.shader
-                    drawRect(rect, shimmerPaint)
+                    drawRect(
+                        topLeft = Offset(dx = left.value, dy = 0f),
+                        size = Size(width = rect.width, height = rect.height),
+                        brush = shimmerGradient
+                    )
                 }
     )
 }
