@@ -1,6 +1,5 @@
 package co.adrianblan.storyfeed
 
-import co.adrianblan.matryoshka.NodeContext
 import com.squareup.inject.assisted.dagger2.AssistedModule
 import dagger.Module
 import dagger.Subcomponent
@@ -24,7 +23,6 @@ interface StoryFeedComponent {
 }
 
 @Scope
-@Retention
 internal annotation class StoryFeedScope
 
 class StoryFeedNodeBuilder
@@ -32,11 +30,10 @@ class StoryFeedNodeBuilder
     private val storyFeedComponentBuilder: StoryFeedComponent.Factory
 ) {
     fun build(
-        nodeContext: NodeContext,
         listener: StoryFeedNode.Listener
     ): StoryFeedNode =
         storyFeedComponentBuilder
             .build()
             .storyFeedNodeFactory()
-            .create(nodeContext, listener)
+            .create(listener)
 }

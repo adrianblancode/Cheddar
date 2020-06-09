@@ -12,5 +12,8 @@ android {
 }
 
 dependencies {
+    implementation(Dependencies.androidxActivity)
+    implementation(Dependencies.androidxAppcompat)
+
     implementation(Dependencies.composeRuntime)
 }

@@ -3,19 +3,26 @@ package co.adrianblan.cheddar
 import android.os.Build
 import android.os.Bundle
 import android.view.View
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.ui.core.setContent
+import co.adrianblan.cheddar.di.DaggerRootComponent
+import co.adrianblan.cheddar.utils.appComponent
+import co.adrianblan.matryoshka.AnyNode
+import co.adrianblan.matryoshka.createRootNode
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.InsetsWrapper
 import co.adrianblan.ui.RootView
 import co.adrianblan.ui.utils.isNightModeActive
-import co.adrianblan.matryoshka.AnyNode
 
 class MainActivity : AppCompatActivity() {
 
-    private val rootViewModel: RootViewModel by viewModels()
-    private val rootNode: AnyNode get() = rootViewModel.rootNode
+    private val rootNode: AnyNode by createRootNode {
+            DaggerRootComponent.factory()
+                .build(application.appComponent)
+                .rootComponentFactory()
+                .build()
+                .storyNavigationNode()
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

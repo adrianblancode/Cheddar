@@ -1,7 +1,6 @@
 package co.adrianblan.storydetail
 
 import co.adrianblan.hackernews.api.StoryId
-import co.adrianblan.matryoshka.NodeContext
 import com.squareup.inject.assisted.dagger2.AssistedModule
 import dagger.BindsInstance
 import dagger.Module
@@ -26,7 +25,6 @@ interface StoryDetailComponent {
 }
 
 @Scope
-@Retention
 internal annotation class StoryDetailScope
 
 class StoryDetailNodeBuilder
@@ -35,11 +33,10 @@ class StoryDetailNodeBuilder
 ) {
     fun build(
         storyId: StoryId,
-        nodeContext: NodeContext,
         listener: StoryDetailNode.Listener
     ): StoryDetailNode =
         storyDetailComponentBuilder
             .build(storyId)
             .storyDetailNodeFactory()
-            .create(nodeContext, listener)
+            .create(listener)
 }

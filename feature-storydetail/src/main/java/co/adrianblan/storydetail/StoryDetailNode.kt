@@ -6,7 +6,6 @@ import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.storydetail.ui.StoryDetailView
 import co.adrianblan.ui.collectAsState
 import co.adrianblan.matryoshka.Node
-import co.adrianblan.matryoshka.NodeContext
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.flow.StateFlow
@@ -14,10 +13,9 @@ import kotlinx.coroutines.flow.StateFlow
 
 class StoryDetailNode
 @AssistedInject constructor(
-    @Assisted nodeContext: NodeContext,
     @Assisted private val listener: Listener,
     private val storyDetailPresenter: StoryDetailPresenter
-) : Node(nodeContext) {
+) : Node() {
 
     interface Listener {
         fun onStoryContentClicked(storyUrl: StoryUrl)
@@ -26,7 +24,7 @@ class StoryDetailNode
 
     private val state: StateFlow<StoryDetailViewState> =
         storyDetailPresenter.state
-            .collectAsStateFlow(workScope)
+            .collectAsStateFlow(scope)
 
     @Composable
     override fun render() =
@@ -39,7 +37,7 @@ class StoryDetailNode
     @AssistedInject.Factory
     interface Factory {
         fun create(
-            nodeContext: NodeContext, listener: Listener
+            listener: Listener
         ): StoryDetailNode
     }
 }

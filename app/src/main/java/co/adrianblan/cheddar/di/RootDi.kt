@@ -1,7 +1,7 @@
 package co.adrianblan.cheddar.di
 
 import co.adrianblan.storynavigation.StoryNavigationComponent
-import co.adrianblan.storynavigation.StoryNavigationNodeBuilder
+import co.adrianblan.storynavigation.StoryNavigationNode
 import dagger.Component
 import dagger.Module
 import javax.inject.Scope
@@ -15,7 +15,7 @@ object RootModule
     dependencies = [AppComponent::class]
 )
 interface RootComponent {
-    fun rootNodeBuilder(): StoryNavigationNodeBuilder
+    fun rootComponentFactory(): StoryNavigationComponent.Factory
 
     @Component.Factory
     interface Factory {
@@ -24,5 +24,4 @@ interface RootComponent {
 }
 
 @Scope
-@Retention
 internal annotation class RootScope

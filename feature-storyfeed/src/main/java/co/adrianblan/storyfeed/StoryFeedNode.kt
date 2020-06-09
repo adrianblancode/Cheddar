@@ -4,10 +4,9 @@ import androidx.compose.Composable
 import co.adrianblan.common.collectAsStateFlow
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
+import co.adrianblan.matryoshka.Node
 import co.adrianblan.storyfeed.ui.StoryFeedView
 import co.adrianblan.ui.collectAsState
-import co.adrianblan.matryoshka.Node
-import co.adrianblan.matryoshka.NodeContext
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.flow.StateFlow
@@ -15,9 +14,8 @@ import kotlinx.coroutines.flow.StateFlow
 class StoryFeedNode
 @AssistedInject constructor(
     @Assisted private val listener: Listener,
-    @Assisted nodeContext: NodeContext,
     private val storyFeedPresenter: StoryFeedPresenter
-) : Node(nodeContext) {
+) : Node() {
 
     interface Listener {
         fun onStoryClicked(storyId: StoryId)
@@ -26,7 +24,7 @@ class StoryFeedNode
 
     private val state: StateFlow<StoryFeedViewState> =
         storyFeedPresenter.state
-            .collectAsStateFlow(workScope)
+            .collectAsStateFlow(scope)
 
     @Composable
     override fun render() =
@@ -40,8 +38,6 @@ class StoryFeedNode
 
     @AssistedInject.Factory
     interface Factory {
-        fun create(
-            nodeContext: NodeContext, listener: Listener
-        ): StoryFeedNode
+        fun create(listener: Listener): StoryFeedNode
     }
 }

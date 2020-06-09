@@ -5,13 +5,12 @@ import co.adrianblan.storydetail.StoryDetailNode
 import co.adrianblan.storydetail.StoryDetailNodeBuilder
 import co.adrianblan.storyfeed.StoryFeedNode
 import co.adrianblan.storyfeed.StoryFeedNodeBuilder
-import co.adrianblan.matryoshka.NodeContext
+import co.adrianblan.matryoshka.createTestNode
 import co.adrianblan.test.CoroutineTestRule
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.test.TestCoroutineScope
 import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Assert.assertThat
@@ -27,14 +26,14 @@ class StoryNavigationTest {
     private val storyFeedNodeBuilder: StoryFeedNodeBuilder =
         mock {
             whenever(
-                it.build(any(), any())
+                it.build(any())
             ).thenReturn(mock())
         }
 
     private val storyDetailNodeBuilder: StoryDetailNodeBuilder =
         mock {
             whenever(
-                it.build(any(), any(), any())
+                it.build(any(), any())
             ).thenReturn(mock())
         }
 
@@ -45,12 +44,13 @@ class StoryNavigationTest {
     fun setUp() {
         scope = TestCoroutineScope(SupervisorJob() + coroutineRule.testDispatcher)
 
-        rootNode = StoryNavigationNode(
-            nodeContext = NodeContext.createRoot(scope),
-            storyFeedNodeBuilder = storyFeedNodeBuilder,
-            storyDetailNodeBuilder = storyDetailNodeBuilder,
-            customTabsLauncher = mock()
-        )
+        rootNode = createTestNode(scope) {
+            StoryNavigationNode(
+                storyFeedNodeBuilder = storyFeedNodeBuilder,
+                storyDetailNodeBuilder = storyDetailNodeBuilder,
+                customTabsLauncher = mock()
+            )
+        }
     }
 
     @Test
