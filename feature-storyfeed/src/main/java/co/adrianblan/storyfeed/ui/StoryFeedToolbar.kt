@@ -83,9 +83,9 @@ fun StoryFeedHeader(
         shape = RoundedCornerShape(4.dp),
         color = Color.Transparent
     ) {
-        Clickable(
-            onClick = onClick,
+        Box(
             modifier = Modifier.ripple(bounded = true)
+                .clickable(onClick = onClick)
         ) {
             Box(
                 gravity = ContentGravity.Center,

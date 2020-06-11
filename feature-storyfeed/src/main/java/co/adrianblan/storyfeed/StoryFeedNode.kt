@@ -1,12 +1,12 @@
 package co.adrianblan.storyfeed
 
 import androidx.compose.Composable
+import androidx.compose.collectAsState
 import co.adrianblan.common.collectAsStateFlow
 import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.matryoshka.Node
 import co.adrianblan.storyfeed.ui.StoryFeedView
-import co.adrianblan.ui.collectAsState
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.flow.StateFlow

@@ -21,10 +21,8 @@ fun InsetsWrapper(
 ) {
 
     val insetState = state<Insets> {
-        view.rootWindowInsets?.let {
-            WindowInsetsCompat.toWindowInsetsCompat(it)
-                .systemWindowInsets
-        } ?: Insets.NONE
+        view.rootWindowInsets?.systemWindowInsets?.toCompat()
+            ?: Insets.NONE
     }
 
     onCommit {
@@ -46,3 +44,7 @@ fun InsetsWrapper(
         content()
     }
 }
+
+// TODO remove when compose dev-13
+private fun android.graphics.Insets.toCompat() : Insets =
+    Insets.of(left, top, right, bottom)

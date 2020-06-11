@@ -5,7 +5,6 @@ import androidx.compose.remember
 import androidx.ui.core.Alignment
 import androidx.ui.core.DropdownPopup
 import androidx.ui.core.Modifier
-import androidx.ui.core.PopupProperties
 import androidx.ui.foundation.*
 import androidx.ui.foundation.shape.corner.RoundedCornerShape
 import androidx.ui.layout.*
@@ -30,7 +29,8 @@ fun StoryTypePopup(
 ) {
 
     DropdownPopup(
-        popupProperties = PopupProperties(true, onDismissRequest = onDismiss)
+        isFocusable = true,
+        onDismissRequest = onDismiss
     ) {
         // Popups require reapplication of the app theme
         AppTheme {
@@ -72,41 +72,37 @@ fun StoryTypePopupItem(
     isSelected: Boolean,
     onClick: (StoryType) -> Unit
 ) {
-    Clickable(
-        onClick = { onClick(storyType) },
-        modifier = Modifier.ripple(bounded = true)
+    Box(
+        gravity = ContentGravity.Center,
+        modifier = Modifier.fillMaxWidth()
+            .clickable(onClick = { onClick(storyType) })
     ) {
-        Box(
-            gravity = ContentGravity.Center,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Row(horizontalArrangement = Arrangement.SpaceBetween) {
+        Row(horizontalArrangement = Arrangement.SpaceBetween) {
 
-                Text(
-                    text = stringResource(storyType.titleStringResource()),
-                    style = MaterialTheme.typography.subtitle1,
-                    modifier = Modifier.weight(1f)
-                        .padding(
-                            start = 12.dp,
-                            end = 12.dp,
-                            top = 16.dp,
-                            bottom = 12.dp
-                        )
-                )
+            Text(
+                text = stringResource(storyType.titleStringResource()),
+                style = MaterialTheme.typography.subtitle1,
+                modifier = Modifier.weight(1f)
+                    .padding(
+                        start = 12.dp,
+                        end = 12.dp,
+                        top = 16.dp,
+                        bottom = 12.dp
+                    )
+            )
 
-                if (isSelected) {
-                    Box(
-                        modifier = Modifier.gravity(Alignment.CenterVertically),
-                        paddingEnd = 12.dp,
-                        paddingTop = 2.dp
-                    ) {
-                        Icon(
-                            asset = Icons.Default.Check,
-                            tint = MaterialTheme.colors.secondary,
-                            modifier = Modifier.gravity(Alignment.CenterVertically)
-                                .preferredSize(32.dp)
-                        )
-                    }
+            if (isSelected) {
+                Box(
+                    modifier = Modifier.gravity(Alignment.CenterVertically),
+                    paddingEnd = 12.dp,
+                    paddingTop = 2.dp
+                ) {
+                    Icon(
+                        asset = Icons.Default.Check,
+                        tint = MaterialTheme.colors.secondary,
+                        modifier = Modifier.gravity(Alignment.CenterVertically)
+                            .preferredSize(32.dp)
+                    )
                 }
             }
         }

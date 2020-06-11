@@ -4,8 +4,8 @@ import android.text.Html
 import androidx.compose.Composable
 import androidx.ui.core.Modifier
 import androidx.ui.foundation.Box
-import androidx.ui.foundation.Clickable
 import androidx.ui.foundation.Text
+import androidx.ui.foundation.clickable
 import androidx.ui.foundation.shape.corner.RoundedCornerShape
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
@@ -56,7 +56,9 @@ fun StoryFeedItem(
                 .fillMaxWidth()
                 .preferredHeightIn(minHeight = 110.dp)
         ) {
-            Clickable(onClick = storyClick, modifier = Modifier.ripple(bounded = true)) {
+            Box(
+                modifier = Modifier.clickable(onClick = storyClick)
+            ) {
 
                 // If there is a story image, we must share the space
                 val rightPadding: Dp =
@@ -197,41 +199,43 @@ private fun StoryFeedItemImage(
     onClick: () -> Unit
 ) {
 
-    Surface(shape = RoundedCornerShape(3.dp), modifier = Modifier.fillMaxHeight()) {
-        Clickable(onClick = onClick, modifier = Modifier.ripple(bounded = true)) {
-            Box(
-                paddingStart = 10.dp,
-                paddingEnd = 16.dp,
-                paddingTop = (16 + 1).dp,
-                paddingBottom = 14.dp
+    Surface(
+        shape = RoundedCornerShape(3.dp),
+        modifier = Modifier.fillMaxHeight()
+            .clickable(onClick = onClick)
+    ) {
+        Box(
+            paddingStart = 10.dp,
+            paddingEnd = 16.dp,
+            paddingTop = (16 + 1).dp,
+            paddingBottom = 14.dp
+        ) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                modifier = Modifier.preferredSize(80.dp)
             ) {
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.preferredSize(80.dp)
-                ) {
-                    Stack {
-                        Surface(
-                            color = colorResource(R.color.contentMuted),
-                            modifier = Modifier.fillMaxSize()
-                        ) {}
+                Stack {
+                    Surface(
+                        color = colorResource(R.color.contentMuted),
+                        modifier = Modifier.fillMaxSize()
+                    ) {}
 
-                        when (webPreviewState) {
-                            is WebPreviewState.Loading -> {
-                                Box(modifier = Modifier.fillMaxSize()) {
-                                    ShimmerView()
-                                }
+                    when (webPreviewState) {
+                        is WebPreviewState.Loading -> {
+                            Box(modifier = Modifier.fillMaxSize()) {
+                                ShimmerView()
                             }
-                            is WebPreviewState.Success -> {
-                                val webPreview = webPreviewState.webPreview
+                        }
+                        is WebPreviewState.Success -> {
+                            val webPreview = webPreviewState.webPreview
 
-                                val imageUrl =
-                                    webPreview.imageUrl ?: webPreview.iconUrl
-                                    ?: webPreview.favIconUrl
+                            val imageUrl =
+                                webPreview.imageUrl ?: webPreview.iconUrl
+                                ?: webPreview.favIconUrl
 
-                                UrlImage(imageUrl)
-                            }
-                            is WebPreviewState.Error -> {
-                            }
+                            UrlImage(imageUrl)
+                        }
+                        is WebPreviewState.Error -> {
                         }
                     }
                 }

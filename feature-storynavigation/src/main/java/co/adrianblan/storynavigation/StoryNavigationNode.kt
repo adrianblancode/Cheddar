@@ -1,6 +1,7 @@
 package co.adrianblan.storynavigation
 
 import androidx.compose.Composable
+import androidx.compose.collectAsState
 import co.adrianblan.common.CustomTabsLauncher
 import co.adrianblan.common.mapStateFlow
 import co.adrianblan.hackernews.api.StoryId
@@ -10,7 +11,6 @@ import co.adrianblan.storydetail.StoryDetailNode
 import co.adrianblan.storydetail.StoryDetailNodeBuilder
 import co.adrianblan.storyfeed.StoryFeedNode
 import co.adrianblan.storyfeed.StoryFeedNodeBuilder
-import co.adrianblan.ui.collectAsState
 import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 

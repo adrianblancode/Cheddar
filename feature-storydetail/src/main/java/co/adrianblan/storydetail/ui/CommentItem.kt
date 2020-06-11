@@ -9,9 +9,8 @@ import androidx.ui.foundation.Box
 import androidx.ui.foundation.Text
 import androidx.ui.geometry.Offset
 import androidx.ui.graphics.Color
-import androidx.ui.graphics.Paint
 import androidx.ui.graphics.StrokeCap
-import androidx.ui.graphics.painter.Stroke
+import androidx.ui.graphics.drawscope.Stroke
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
 import androidx.ui.res.colorResource

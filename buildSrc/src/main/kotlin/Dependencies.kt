@@ -6,9 +6,9 @@ object Versions {
     const val coroutines = "1.3.6"
 
     const val androidxAppcompat = "1.1.0"
-    const val androidxCore = "1.2.0"
+    const val androidxCore = "1.2.0-alpha01"
     const val androidxActivity = "1.1.0-rc02"
-    const val compose = "0.1.0-dev11"
+    const val compose = "0.1.0-dev13"
     const val composeCompiler = "1.3.70-dev-withExperimentalGoogleExtensions-20200424"
 
     const val dagger = "2.27"

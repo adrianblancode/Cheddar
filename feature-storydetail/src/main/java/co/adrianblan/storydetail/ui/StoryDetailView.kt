@@ -230,41 +230,41 @@ private fun StoryDetailImage(
             { story.url?.let { onStoryContentClick(it) } }
         }
 
-    Clickable(onClick = clickListener, modifier = Modifier.ripple(bounded = false)) {
-        Stack(
-            modifier = Modifier.padding(
-                top = 8.dp,
-                end = 16.dp,
-                bottom = 8.dp
-            )
+    Stack(
+        modifier = Modifier.padding(
+            top = 8.dp,
+            end = 16.dp,
+            bottom = 8.dp
+        )
+    ) {
+        Surface(
+            shape = RoundedCornerShape(8.dp),
+            modifier = Modifier.preferredSize(imageSize)
+                .clickable(onClick = clickListener)
+                .ripple(bounded = true)
         ) {
-            Surface(
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.preferredSize(imageSize)
-            ) {
-                Stack {
-                    Surface(
-                        color = colorResource(R.color.contentMuted),
-                        modifier = Modifier.fillMaxSize()
-                    ) {}
+            Stack {
+                Surface(
+                    color = colorResource(R.color.contentMuted),
+                    modifier = Modifier.fillMaxSize()
+                ) {}
 
-                    when (webPreviewState) {
-                        is WebPreviewState.Loading -> {
-                            Box(modifier = Modifier.fillMaxSize()) {
-                                ShimmerView()
-                            }
+                when (webPreviewState) {
+                    is WebPreviewState.Loading -> {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            ShimmerView()
                         }
-                        is WebPreviewState.Success -> {
-                            val webPreview = webPreviewState.webPreview
+                    }
+                    is WebPreviewState.Success -> {
+                        val webPreview = webPreviewState.webPreview
 
-                            val imageUrl =
-                                webPreview.imageUrl ?: webPreview.iconUrl
-                                ?: webPreview.favIconUrl
+                        val imageUrl =
+                            webPreview.imageUrl ?: webPreview.iconUrl
+                            ?: webPreview.favIconUrl
 
-                            UrlImage(imageUrl)
-                        }
-                        is WebPreviewState.Error -> {
-                        }
+                        UrlImage(imageUrl)
+                    }
+                    is WebPreviewState.Error -> {
                     }
                 }
             }

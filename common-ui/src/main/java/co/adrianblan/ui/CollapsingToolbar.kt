@@ -4,8 +4,8 @@ import androidx.compose.Composable
 import androidx.compose.remember
 import androidx.ui.core.*
 import androidx.ui.foundation.Box
-import androidx.ui.foundation.Clickable
 import androidx.ui.foundation.ScrollerPosition
+import androidx.ui.foundation.clickable
 import androidx.ui.geometry.Rect
 import androidx.ui.graphics.Outline
 import androidx.ui.graphics.RectangleShape
@@ -95,15 +95,17 @@ fun CollapsingScaffold(
             }
         }
 
-        // Prevent children being clickable from behind toolbar
-        Clickable(onClick = {}) {
-            CollapsingToolbar(
-                scroller = scroller,
-                minHeight = minHeight,
-                maxHeight = maxHeight
-            ) { collapsedFraction, height ->
-                toolbarContent(collapsedFraction, height)
-            }
-        }
+        Box(
+            // Prevent children being clickable from behind toolbar
+            modifier = Modifier.clickable(indication = null, onClick = {}),
+            children = {
+                CollapsingToolbar(
+                    scroller = scroller,
+                    minHeight = minHeight,
+                    maxHeight = maxHeight
+                ) { collapsedFraction, height ->
+                    toolbarContent(collapsedFraction, height)
+                }
+            })
     }
 }

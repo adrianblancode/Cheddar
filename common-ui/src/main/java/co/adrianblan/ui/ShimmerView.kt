@@ -67,10 +67,10 @@ fun ShimmerView() {
                         0f to backgroundColor,
                         0.5f to shimmerColor,
                         1f to backgroundColor,
-                        startX = left,
-                        endX = left + width,
-                        startY = 0.px,
-                        endY = 0.px
+                        startX = left.value,
+                        endX = left.value + width.value,
+                        startY = 0f,
+                        endY = 0f
                     )
 
                 drawRect(
