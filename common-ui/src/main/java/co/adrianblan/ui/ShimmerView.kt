@@ -74,7 +74,7 @@ fun ShimmerView() {
                     )
 
                 drawRect(
-                    topLeft = Offset(dx = left.value, dy = 0f),
+                    topLeft = Offset(dx = 0f, dy = 0f),
                     size = Size(width = rect.width, height = rect.height),
                     brush = shimmerGradient
                 )
