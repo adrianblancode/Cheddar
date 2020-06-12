@@ -14,6 +14,8 @@ import androidx.ui.unit.Dp
 import androidx.ui.unit.dp
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
 
 private val minBitmapSizePx = 48
 
@@ -32,47 +34,50 @@ fun UrlImage(
     val targetWidthPx = with(DensityAmbient.current) { remember { width.toIntPx().value } }
     val targetHeightPx = with(DensityAmbient.current) { remember { height.toIntPx().value } }
 
-    onCommit(imageUrl) {
+    launchInComposition(imageUrl) {
+        suspendCancellableCoroutine { continuation ->
 
-        val target = object : Target {
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
+            val target = object : Target {
+                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                    imageState.value = ImageState.Error
+                    continuation.resume(Unit)
+                }
+
+                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+
+                    imageState.value =
+                        if (bitmap == null) ImageState.Error
+                        else {
+                            // Really small images are loaded without filtering to retain pixel perfect sharpness
+                            val isPixelatedIcon =
+                                bitmap.height <= minBitmapSizePx || bitmap.width <= minBitmapSizePx
+
+                            val image = Bitmap.createScaledBitmap(
+                                bitmap,
+                                targetWidthPx,
+                                targetHeightPx,
+                                !isPixelatedIcon
+                            ).asImageAsset()
+
+                            ImageState.ImageSuccess(image)
+                        }
+
+                    continuation.resume(Unit)
+                }
+            }
+
+            val picasso = Picasso.get()
+
+            picasso
+                .load(imageUrl)
+                .into(target)
+
+            continuation.invokeOnCancellation {
                 imageState.value = ImageState.Loading
+                picasso.cancelRequest(target)
             }
-
-            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                imageState.value = ImageState.Error
-            }
-
-            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-
-                imageState.value =
-                    if (bitmap == null) ImageState.Error
-                    else {
-                        // Really small images are loaded without filtering to retain pixel perfect sharpness
-                        val isPixelatedIcon =
-                            bitmap.height <= minBitmapSizePx || bitmap.width <= minBitmapSizePx
-
-                        val image = Bitmap.createScaledBitmap(
-                            bitmap,
-                            targetWidthPx,
-                            targetHeightPx,
-                            !isPixelatedIcon
-                        ).asImageAsset()
-
-                        ImageState.ImageSuccess(image)
-                    }
-            }
-        }
-
-        val picasso = Picasso.get()
-
-        picasso
-            .load(imageUrl)
-            .into(target)
-
-        onDispose {
-            imageState.value = ImageState.Loading
-            picasso.cancelRequest(target)
         }
     }
 
