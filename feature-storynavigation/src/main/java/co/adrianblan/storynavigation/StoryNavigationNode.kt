@@ -4,8 +4,8 @@ import androidx.compose.Composable
 import androidx.compose.collectAsState
 import co.adrianblan.common.CustomTabsLauncher
 import co.adrianblan.common.mapStateFlow
-import co.adrianblan.hackernews.api.StoryId
-import co.adrianblan.hackernews.api.StoryUrl
+import co.adrianblan.domain.StoryId
+import co.adrianblan.domain.StoryUrl
 import co.adrianblan.matryoshka.*
 import co.adrianblan.storydetail.StoryDetailNode
 import co.adrianblan.storydetail.StoryDetailNodeBuilder

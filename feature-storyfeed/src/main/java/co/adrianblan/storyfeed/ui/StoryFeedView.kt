@@ -14,15 +14,14 @@ import androidx.ui.unit.Px
 import androidx.ui.unit.dp
 import androidx.ui.unit.min
 import androidx.ui.unit.px
-import co.adrianblan.hackernews.StoryType
-import co.adrianblan.hackernews.api.Story
-import co.adrianblan.hackernews.api.StoryId
-import co.adrianblan.hackernews.api.StoryUrl
-import co.adrianblan.hackernews.api.dummy
+import co.adrianblan.domain.Story
+import co.adrianblan.domain.StoryId
+import co.adrianblan.domain.StoryUrl
+import co.adrianblan.domain.StoryType
+import co.adrianblan.domain.dummy
 import co.adrianblan.storyfeed.*
 import co.adrianblan.storyfeed.R
 import co.adrianblan.ui.*
-import timber.log.Timber
 
 private const val toolbarMinHeightDp = 56
 private const val toolbarMaxHeightDp = 128

@@ -1,6 +1,6 @@
 package co.adrianblan.hackernews
 
-import co.adrianblan.hackernews.api.*
+import co.adrianblan.domain.*
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 

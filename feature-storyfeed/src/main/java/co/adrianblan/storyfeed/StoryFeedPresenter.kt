@@ -1,9 +1,9 @@
 package co.adrianblan.storyfeed
 
 import co.adrianblan.common.*
+import co.adrianblan.domain.StoryId
 import co.adrianblan.hackernews.HackerNewsRepository
-import co.adrianblan.hackernews.StoryType
-import co.adrianblan.hackernews.api.StoryId
+import co.adrianblan.domain.StoryType
 import co.adrianblan.matryoshka.Presenter
 import co.adrianblan.webpreview.WebPreviewRepository
 import kotlinx.coroutines.CancellationException

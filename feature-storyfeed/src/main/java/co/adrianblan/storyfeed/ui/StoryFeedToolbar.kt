@@ -17,7 +17,7 @@ import androidx.ui.unit.Dp
 import androidx.ui.unit.TextUnit
 import androidx.ui.unit.dp
 import androidx.ui.unit.lerp
-import co.adrianblan.hackernews.StoryType
+import co.adrianblan.domain.StoryType
 
 @Composable
 fun StoryFeedToolbar(

@@ -1,6 +1,6 @@
 package co.adrianblan.storydetail
 
-import co.adrianblan.hackernews.api.StoryId
+import co.adrianblan.domain.StoryId
 import com.squareup.inject.assisted.dagger2.AssistedModule
 import dagger.BindsInstance
 import dagger.Module

@@ -1,6 +1,6 @@
 package co.adrianblan.storynavigation
 
-import co.adrianblan.hackernews.api.StoryId
+import co.adrianblan.domain.StoryId
 import co.adrianblan.storydetail.StoryDetailNode
 import co.adrianblan.storydetail.StoryDetailNodeBuilder
 import co.adrianblan.storyfeed.StoryFeedNode

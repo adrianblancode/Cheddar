@@ -19,10 +19,10 @@ import androidx.ui.text.style.TextAlign
 import androidx.ui.text.style.TextOverflow
 import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.*
-import co.adrianblan.hackernews.api.Comment
-import co.adrianblan.hackernews.api.Story
-import co.adrianblan.hackernews.api.StoryUrl
-import co.adrianblan.hackernews.api.dummy
+import co.adrianblan.domain.Comment
+import co.adrianblan.domain.Story
+import co.adrianblan.domain.StoryUrl
+import co.adrianblan.domain.dummy
 import co.adrianblan.storydetail.*
 import co.adrianblan.storydetail.R
 import co.adrianblan.ui.*

@@ -3,7 +3,7 @@ package co.adrianblan.storydetail
 import androidx.compose.Composable
 import androidx.compose.collectAsState
 import co.adrianblan.common.collectAsStateFlow
-import co.adrianblan.hackernews.api.StoryUrl
+import co.adrianblan.domain.StoryUrl
 import co.adrianblan.storydetail.ui.StoryDetailView
 import co.adrianblan.matryoshka.Node
 import com.squareup.inject.assisted.Assisted

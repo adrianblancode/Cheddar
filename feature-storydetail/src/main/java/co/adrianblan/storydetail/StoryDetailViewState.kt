@@ -1,7 +1,7 @@
 package co.adrianblan.storydetail
 
-import co.adrianblan.hackernews.api.Comment
-import co.adrianblan.hackernews.api.Story
+import co.adrianblan.domain.Comment
+import co.adrianblan.domain.Story
 import co.adrianblan.webpreview.WebPreviewData
 
 sealed class StoryDetailViewState {

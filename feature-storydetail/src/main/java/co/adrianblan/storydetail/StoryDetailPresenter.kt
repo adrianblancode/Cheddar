@@ -2,15 +2,13 @@ package co.adrianblan.storydetail
 
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.toStateFlow
+import co.adrianblan.domain.CommentId
+import co.adrianblan.domain.Story
+import co.adrianblan.domain.StoryId
+import co.adrianblan.domain.StoryUrl
 import co.adrianblan.matryoshka.Presenter
 import co.adrianblan.hackernews.HackerNewsRepository
-import co.adrianblan.hackernews.api.CommentId
-import co.adrianblan.hackernews.api.Story
-import co.adrianblan.hackernews.api.StoryId
-import co.adrianblan.hackernews.api.StoryUrl
 import co.adrianblan.webpreview.WebPreviewRepository
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import timber.log.Timber

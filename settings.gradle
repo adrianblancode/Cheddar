@@ -1,3 +1,4 @@
+include ':domain'
 include ':matryoshka'
 include ':common-test'
 include ':common'

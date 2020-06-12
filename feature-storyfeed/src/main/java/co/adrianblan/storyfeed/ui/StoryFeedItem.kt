@@ -10,7 +10,6 @@ import androidx.ui.foundation.shape.corner.RoundedCornerShape
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
 import androidx.ui.material.Surface
-import androidx.ui.material.ripple.ripple
 import androidx.ui.res.colorResource
 import androidx.ui.text.AnnotatedString
 import androidx.ui.text.SpanStyle
@@ -20,10 +19,10 @@ import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.Dp
 import androidx.ui.unit.dp
 import co.adrianblan.common.urlSiteName
-import co.adrianblan.hackernews.api.Story
-import co.adrianblan.hackernews.api.StoryId
-import co.adrianblan.hackernews.api.StoryUrl
-import co.adrianblan.hackernews.api.dummy
+import co.adrianblan.domain.Story
+import co.adrianblan.domain.StoryId
+import co.adrianblan.domain.StoryUrl
+import co.adrianblan.domain.dummy
 import co.adrianblan.storyfeed.DecoratedStory
 import co.adrianblan.storyfeed.R
 import co.adrianblan.storyfeed.WebPreviewState

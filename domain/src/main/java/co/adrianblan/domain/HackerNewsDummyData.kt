@@ -1,4 +1,4 @@
-package co.adrianblan.hackernews.api
+package co.adrianblan.domain
 
 import java.time.Instant
 

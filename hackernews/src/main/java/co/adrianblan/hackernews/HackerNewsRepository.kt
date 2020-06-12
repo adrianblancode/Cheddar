@@ -1,7 +1,9 @@
 package co.adrianblan.hackernews
 
 import co.adrianblan.common.WeakCache
-import co.adrianblan.hackernews.api.*
+import co.adrianblan.domain.*
+import co.adrianblan.hackernews.api.HackerNewsApiService
+import co.adrianblan.hackernews.api.toDomain
 import co.adrianblan.network.mapNullResponseToEmptyList
 import co.adrianblan.network.throwIfEmptyResponse
 import co.adrianblan.network.unwrapApiResponse
@@ -26,6 +28,7 @@ class HackerNewsRepositoryImpl
             ?: hackerNewsApiService.fetchStory(storyId)
                 .throwIfEmptyResponse()
                 .unwrapApiResponse()
+                .toDomain()
                 .also { story ->
                     storyCache.put(storyId, story)
                 }
@@ -34,9 +37,11 @@ class HackerNewsRepositoryImpl
         hackerNewsApiService.fetchStories(storyType)
             .mapNullResponseToEmptyList()
             .unwrapApiResponse()
+            .map { StoryId(it) }
 
     override suspend fun fetchComment(commentId: CommentId): Comment =
         hackerNewsApiService.fetchComment(commentId)
             .throwIfEmptyResponse()
             .unwrapApiResponse()
+            .toDomain()
 }

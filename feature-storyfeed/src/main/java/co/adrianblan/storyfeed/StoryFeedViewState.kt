@@ -1,7 +1,7 @@
 package co.adrianblan.storyfeed
 
-import co.adrianblan.hackernews.StoryType
-import co.adrianblan.hackernews.api.Story
+import co.adrianblan.domain.Story
+import co.adrianblan.domain.StoryType
 import co.adrianblan.webpreview.WebPreviewData
 
 data class DecoratedStory(

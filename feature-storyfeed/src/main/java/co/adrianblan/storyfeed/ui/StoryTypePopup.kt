@@ -12,11 +12,10 @@ import androidx.ui.material.MaterialTheme
 import androidx.ui.material.Surface
 import androidx.ui.material.icons.Icons
 import androidx.ui.material.icons.filled.Check
-import androidx.ui.material.ripple.ripple
 import androidx.ui.res.stringResource
 import androidx.ui.unit.Dp
 import androidx.ui.unit.dp
-import co.adrianblan.hackernews.StoryType
+import co.adrianblan.domain.StoryType
 import co.adrianblan.ui.AppTheme
 
 internal val storyTypePopupWidth: Dp = 190.dp

@@ -1,12 +1,12 @@
 package co.adrianblan.storydetail
 
+import co.adrianblan.domain.Comment
+import co.adrianblan.domain.CommentId
+import co.adrianblan.domain.Story
+import co.adrianblan.domain.StoryId
 import co.adrianblan.hackernews.HackerNewsRepository
-import co.adrianblan.hackernews.StoryType
+import co.adrianblan.domain.StoryType
 import co.adrianblan.hackernews.TestHackerNewsRepository
-import co.adrianblan.hackernews.api.Comment
-import co.adrianblan.hackernews.api.CommentId
-import co.adrianblan.hackernews.api.Story
-import co.adrianblan.hackernews.api.StoryId
 import co.adrianblan.test.CoroutineTestRule
 import co.adrianblan.test.TestStateFlow
 import co.adrianblan.test.delayAndThrow
