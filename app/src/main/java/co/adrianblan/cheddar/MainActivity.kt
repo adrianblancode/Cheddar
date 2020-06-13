@@ -7,8 +7,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.ui.core.setContent
 import co.adrianblan.cheddar.di.DaggerRootComponent
 import co.adrianblan.cheddar.utils.appComponent
-import co.adrianblan.matryoshka.AnyNode
-import co.adrianblan.matryoshka.createRootNode
+import co.adrianblan.matryoshka.node.AnyNode
+import co.adrianblan.matryoshka.root.createRootNode
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.InsetsWrapper
 import co.adrianblan.ui.RootView

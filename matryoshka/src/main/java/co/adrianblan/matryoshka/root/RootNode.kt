@@ -1,11 +1,12 @@
-package co.adrianblan.matryoshka
+package co.adrianblan.matryoshka.root
 
 import androidx.activity.ComponentActivity
+import co.adrianblan.matryoshka.node.AnyNode
+import co.adrianblan.matryoshka.utils.invokeOnCompletion
 import kotlinx.coroutines.CoroutineScope
 
 /**
  * Creates a root node, backed by the scope of a ViewModel.
- * Use with
  */
 fun ComponentActivity.createRootNode(
     rootNodeBuilder: () -> AnyNode
@@ -15,12 +16,11 @@ fun ComponentActivity.createRootNode(
         .node
 }
 
-/** Creates a test node, which will be cancelled when the test scope is cancelled */
+/** Creates a test node, which will be cancelled when the test scope is cancelled. */
 fun <T : AnyNode> createTestNode(
     testScope: CoroutineScope,
     nodeBuilder: () -> T
-): T =
-    TestNodeContainer(testScope, nodeBuilder).node
+): T = TestNodeContainer(testScope, nodeBuilder).node
 
 private class TestNodeContainer<T : AnyNode>(
     testScope: CoroutineScope,
@@ -29,6 +29,8 @@ private class TestNodeContainer<T : AnyNode>(
     val node: T = nodeBuilder()
 
     init {
-        testScope.invokeOnCompletion { node.onCleared() }
+        testScope.invokeOnCompletion {
+            node.cancel()
+        }
     }
 }

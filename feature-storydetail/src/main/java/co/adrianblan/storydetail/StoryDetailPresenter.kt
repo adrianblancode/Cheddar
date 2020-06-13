@@ -6,7 +6,7 @@ import co.adrianblan.domain.CommentId
 import co.adrianblan.domain.Story
 import co.adrianblan.domain.StoryId
 import co.adrianblan.domain.StoryUrl
-import co.adrianblan.matryoshka.Presenter
+import co.adrianblan.matryoshka.presenter.Presenter
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.webpreview.WebPreviewRepository
 import kotlinx.coroutines.*

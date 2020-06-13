@@ -5,7 +5,7 @@ import androidx.compose.collectAsState
 import co.adrianblan.common.collectAsStateFlow
 import co.adrianblan.domain.StoryUrl
 import co.adrianblan.storydetail.ui.StoryDetailView
-import co.adrianblan.matryoshka.Node
+import co.adrianblan.matryoshka.node.Node
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.flow.StateFlow

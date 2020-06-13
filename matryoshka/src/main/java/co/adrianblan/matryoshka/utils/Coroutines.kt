@@ -1,4 +1,4 @@
-package co.adrianblan.matryoshka
+package co.adrianblan.matryoshka.utils
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

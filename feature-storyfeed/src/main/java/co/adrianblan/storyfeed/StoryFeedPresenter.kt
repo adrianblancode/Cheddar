@@ -4,7 +4,7 @@ import co.adrianblan.common.*
 import co.adrianblan.domain.StoryId
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.domain.StoryType
-import co.adrianblan.matryoshka.Presenter
+import co.adrianblan.matryoshka.presenter.Presenter
 import co.adrianblan.webpreview.WebPreviewRepository
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel

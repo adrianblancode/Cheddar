@@ -1,9 +1,10 @@
-package co.adrianblan.matryoshka
+package co.adrianblan.matryoshka.root
 
 import androidx.lifecycle.AbstractSavedStateViewModelFactory
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.savedstate.SavedStateRegistryOwner
+import co.adrianblan.matryoshka.node.Node
 
 internal class RootViewModel(
     // TODO use savedstate
@@ -14,7 +15,7 @@ internal class RootViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        node.onCleared()
+        node.cancel()
     }
 }
 
@@ -31,6 +32,9 @@ internal class RootViewModelFactory(
         require(modelClass.isAssignableFrom(RootViewModel::class.java))
 
         @Suppress("UNCHECKED_CAST")
-        return RootViewModel(savedStateHandle, rootNodeBuilder) as T
+        return RootViewModel(
+            savedStateHandle,
+            rootNodeBuilder
+        ) as T
     }
 }

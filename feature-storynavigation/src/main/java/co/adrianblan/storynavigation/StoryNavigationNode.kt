@@ -6,7 +6,10 @@ import co.adrianblan.common.CustomTabsLauncher
 import co.adrianblan.common.mapStateFlow
 import co.adrianblan.domain.StoryId
 import co.adrianblan.domain.StoryUrl
-import co.adrianblan.matryoshka.*
+import co.adrianblan.matryoshka.node.AnyNode
+import co.adrianblan.matryoshka.node.Node
+import co.adrianblan.matryoshka.node.child
+import co.adrianblan.matryoshka.router.StackRouter
 import co.adrianblan.storydetail.StoryDetailNode
 import co.adrianblan.storydetail.StoryDetailNodeBuilder
 import co.adrianblan.storyfeed.StoryFeedNode
@@ -39,7 +42,7 @@ class StoryNavigationNode
                     is StoryNavigationState.StoryNavigationDetail ->
                         storyDetailNodeBuilder
                             .build(
-                                storyId = this.storyId,
+                                storyId = storyId,
                                 listener = this@StoryNavigationNode
                             )
                 }

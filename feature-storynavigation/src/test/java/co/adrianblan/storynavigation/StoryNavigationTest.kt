@@ -5,7 +5,7 @@ import co.adrianblan.storydetail.StoryDetailNode
 import co.adrianblan.storydetail.StoryDetailNodeBuilder
 import co.adrianblan.storyfeed.StoryFeedNode
 import co.adrianblan.storyfeed.StoryFeedNodeBuilder
-import co.adrianblan.matryoshka.createTestNode
+import co.adrianblan.matryoshka.root.createTestNode
 import co.adrianblan.test.CoroutineTestRule
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
