@@ -22,6 +22,7 @@ fun <T> StateFlow<T>.collectAsStateFlow(scope: CoroutineScope): StateFlow<T> {
     return output
 }
 
+// TODO replace with stateIn when available
 // Takes a converts a Flow an initial value into a StateFlow
 fun <T> Flow<T>.toStateFlow(initialValue: T): StateFlow<T> =
     StateFlowWrapper(this, initialValue)

@@ -11,10 +11,10 @@ object Versions {
     const val compose = "0.1.0-dev13"
     const val composeCompiler = "1.3.70-dev-withExperimentalGoogleExtensions-20200424"
 
-    const val dagger = "2.27"
+    const val dagger = "2.28"
     const val assistedInject = "0.5.2"
-    const val okhttp = "4.6.0"
-    const val retrofit = "2.8.1"
+    const val okhttp = "4.7.2"
+    const val retrofit = "2.9.0"
 
     const val junit = "4.13"
     const val androidTestJunit = "1.1.1"
@@ -23,6 +23,7 @@ object Versions {
 
 object Dependencies {
 
+    const val androidGradlePlugin = "com.android.tools.build:gradle:4.2.0-alpha01"
     const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
     const val kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}"
 
