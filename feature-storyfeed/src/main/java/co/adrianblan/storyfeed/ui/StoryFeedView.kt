@@ -18,7 +18,7 @@ import co.adrianblan.domain.Story
 import co.adrianblan.domain.StoryId
 import co.adrianblan.domain.StoryUrl
 import co.adrianblan.domain.StoryType
-import co.adrianblan.domain.dummy
+import co.adrianblan.domain.placeholder
 import co.adrianblan.storyfeed.*
 import co.adrianblan.storyfeed.R
 import co.adrianblan.ui.*
@@ -239,7 +239,7 @@ fun StoryFeedPreview() {
             StoryType.TOP,
             StoryFeedState.Success(List(10) {
                 DecoratedStory(
-                    Story.dummy,
+                    Story.placeholder,
                     WebPreviewState.Loading
                 )
             }),

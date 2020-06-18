@@ -2,22 +2,22 @@ package co.adrianblan.domain
 
 import java.time.Instant
 
-private val dummyInstant = Instant.now()
+private val placeholderInstant = Instant.now()
 
-val Story.Companion.dummy get() =
+val Story.Companion.placeholder get() =
     Story(
         id = StoryId(1),
         title = "Test story title",
         text = "Test story text",
         by = "Test story author",
-        time = dummyInstant,
+        time = placeholderInstant,
         url = null
     )
 
-val Comment.Companion.dummy get() =
+val Comment.Companion.placeholder get() =
     Comment(
         id = CommentId(1),
         text = "Test comment text",
         by = "Test comment author",
-        time = dummyInstant
+        time = placeholderInstant
     )

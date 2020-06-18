@@ -22,7 +22,7 @@ import co.adrianblan.common.urlSiteName
 import co.adrianblan.domain.Story
 import co.adrianblan.domain.StoryId
 import co.adrianblan.domain.StoryUrl
-import co.adrianblan.domain.dummy
+import co.adrianblan.domain.placeholder
 import co.adrianblan.storyfeed.DecoratedStory
 import co.adrianblan.storyfeed.R
 import co.adrianblan.storyfeed.WebPreviewState
@@ -249,7 +249,7 @@ fun StoryFeedItemPreview() {
     AppTheme {
         StoryFeedItem(
             decoratedStory = DecoratedStory(
-                Story.dummy,
+                Story.placeholder,
                 webPreviewState = WebPreviewState.Loading
             ),
             onStoryClick = {},

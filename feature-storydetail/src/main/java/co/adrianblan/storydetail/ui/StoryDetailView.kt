@@ -22,7 +22,7 @@ import androidx.ui.unit.*
 import co.adrianblan.domain.Comment
 import co.adrianblan.domain.Story
 import co.adrianblan.domain.StoryUrl
-import co.adrianblan.domain.dummy
+import co.adrianblan.domain.placeholder
 import co.adrianblan.storydetail.*
 import co.adrianblan.storydetail.R
 import co.adrianblan.ui.*
@@ -213,6 +213,8 @@ fun StoryDetailToolbar(
                     }
                 }
             }
+            is StoryDetailViewState.Error -> {
+            }
         }
     }
 }
@@ -278,14 +280,14 @@ fun StoryDetailPreview() {
     AppTheme {
         val viewState =
             StoryDetailViewState.Success(
-                story = Story.dummy,
+                story = Story.placeholder,
                 webPreviewState = null,
                 commentsState = StoryDetailCommentsState.Success(
                     listOf(
-                        FlatComment(Comment.dummy, 0),
-                        FlatComment(Comment.dummy, 1),
-                        FlatComment(Comment.dummy, 2),
-                        FlatComment(Comment.dummy, 0)
+                        FlatComment(Comment.placeholder, 0),
+                        FlatComment(Comment.placeholder, 1),
+                        FlatComment(Comment.placeholder, 2),
+                        FlatComment(Comment.placeholder, 0)
                     )
                 )
             )

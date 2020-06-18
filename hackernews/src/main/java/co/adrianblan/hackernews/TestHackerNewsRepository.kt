@@ -11,7 +11,7 @@ class TestHackerNewsRepository(
     override suspend fun fetchStory(storyId: StoryId): Story =
         coroutineScope {
             delay(responseDelay)
-            Story.dummy.copy(id = storyId)
+            Story.placeholder.copy(id = storyId)
         }
 
     override suspend fun fetchStories(storyType: StoryType): List<StoryId> =
@@ -25,6 +25,6 @@ class TestHackerNewsRepository(
     override suspend fun fetchComment(commentId: CommentId): Comment =
         coroutineScope {
             delay(responseDelay)
-            Comment.dummy.copy(id = commentId)
+            Comment.placeholder.copy(id = commentId)
         }
 }

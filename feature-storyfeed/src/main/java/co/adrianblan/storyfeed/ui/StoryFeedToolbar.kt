@@ -27,6 +27,8 @@ fun StoryFeedToolbar(
     onStoryTypeClick: (StoryType) -> Unit
 ) {
 
+    var showStoryTypePopup by state { false }
+
     Box(
         padding = 12.dp,
         gravity = ContentGravity.BottomCenter,
@@ -42,32 +44,24 @@ fun StoryFeedToolbar(
                 collapsedFraction
             )
 
-        var showStoryTypePopup by mutableStateOf(false)
+        StoryFeedHeader(
+            headerTextSize = headerTextSize,
+            storyType = storyType
+        ) {
+            showStoryTypePopup = true
+        }
 
-        // Seems like if statement does not automatically recompose on state change
-        Recompose { recompose ->
-            StoryFeedHeader(
-                headerTextSize = headerTextSize,
-                storyType = storyType
-            ) {
-                showStoryTypePopup = true
-                recompose()
-            }
-
-            if (showStoryTypePopup) {
-                StoryTypePopup(
-                    selectedStoryType = storyType,
-                    onStoryTypeClick = { storyType ->
-                        onStoryTypeClick(storyType)
-                        showStoryTypePopup = false
-                        recompose()
-                    },
-                    onDismiss = {
-                        showStoryTypePopup = false
-                        recompose()
-                    }
-                )
-            }
+        if (showStoryTypePopup) {
+            StoryTypePopup(
+                selectedStoryType = storyType,
+                onStoryTypeClick = { storyType ->
+                    onStoryTypeClick(storyType)
+                    showStoryTypePopup = false
+                },
+                onDismiss = {
+                    showStoryTypePopup = false
+                }
+            )
         }
     }
 }
@@ -84,31 +78,28 @@ fun StoryFeedHeader(
         color = Color.Transparent
     ) {
         Box(
+            gravity = ContentGravity.Center,
+            padding = 4.dp,
             modifier = Modifier.ripple(bounded = true)
                 .clickable(onClick = onClick)
         ) {
-            Box(
-                gravity = ContentGravity.Center,
-                padding = 4.dp
-            ) {
-                Row(verticalGravity = Alignment.CenterVertically) {
 
-                    // TODO memo
-                    val title = stringResource(storyType.titleStringResource())
+            val title: String = stringResource(storyType.titleStringResource())
 
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.h4
-                            .copy(
-                                fontSize = headerTextSize,
-                                color = MaterialTheme.colors.onPrimary
-                            )
-                    )
-                    Icon(
-                        asset = Icons.Default.ArrowDropDown,
-                        tint = MaterialTheme.colors.onBackground
-                    )
-                }
+            Row(verticalGravity = Alignment.CenterVertically) {
+
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.h4
+                        .copy(
+                            fontSize = headerTextSize,
+                            color = MaterialTheme.colors.onPrimary
+                        )
+                )
+                Icon(
+                    asset = Icons.Default.ArrowDropDown,
+                    tint = MaterialTheme.colors.onBackground
+                )
             }
         }
     }
