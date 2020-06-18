@@ -64,15 +64,16 @@ android {
 }
 
 dependencies {
+    implementation(project(":feature-storyfeed"))
+    implementation(project(":feature-storydetail"))
+    implementation(project(":feature-storynavigation"))
+
     implementation(project(":common"))
     implementation(project(":common-ui"))
     implementation(project(":common-test"))
     implementation project(":network")
     implementation project(":hackernews")
     implementation(project(":webpreview"))
-    implementation(project(':feature-storyfeed'))
-    implementation(project(':feature-storydetail'))
-    implementation(project(':feature-storynavigation'))
 
     implementation(Dependencies.androidxBrowser)
     debugImplementation(Dependencies.leakcanary)
