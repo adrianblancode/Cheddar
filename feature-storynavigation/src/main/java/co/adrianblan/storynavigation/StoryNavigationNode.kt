@@ -1,5 +1,6 @@
 package co.adrianblan.storynavigation
 
+import android.net.Uri
 import androidx.compose.Composable
 import androidx.compose.collectAsState
 import co.adrianblan.common.CustomTabsLauncher
@@ -58,6 +59,10 @@ class StoryNavigationNode
 
     override fun onStoryContentClicked(storyUrl: StoryUrl) {
         customTabsLauncher.launchUrl(storyUrl.url)
+    }
+
+    override fun onCommentUrlClicked(url: Uri) {
+        customTabsLauncher.launchUrl(url.toString())
     }
 
     @Composable

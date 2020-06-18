@@ -1,11 +1,18 @@
 package co.adrianblan.storydetail.ui
 
+import android.net.Uri
 import android.text.Html
+import android.text.SpannableStringBuilder
+import android.text.Spanned
+import android.text.style.URLSpan
+import android.util.Patterns
 import androidx.compose.Composable
+import androidx.core.net.toUri
 import androidx.ui.core.DensityAmbient
 import androidx.ui.core.Modifier
 import androidx.ui.core.drawBehind
 import androidx.ui.foundation.Box
+import androidx.ui.foundation.ClickableText
 import androidx.ui.foundation.Text
 import androidx.ui.geometry.Offset
 import androidx.ui.graphics.Color
@@ -23,15 +30,21 @@ import androidx.ui.unit.dp
 import androidx.ui.unit.times
 import co.adrianblan.storydetail.FlatComment
 import co.adrianblan.storydetail.R
+import java.util.regex.Matcher
 
 
 @Composable
-fun CommentItem(comment: FlatComment, storyAuthor: String?) {
+fun CommentItem(
+    comment: FlatComment,
+    storyAuthor: String?,
+    onCommentUrlClicked: (Uri) -> Unit
+) {
     CommentItem(
         text = comment.comment.text,
         by = comment.comment.by,
         depthIndex = comment.depthIndex,
-        storyAuthor = storyAuthor
+        storyAuthor = storyAuthor,
+        onCommentUrlClicked = onCommentUrlClicked
     )
 }
 
@@ -40,7 +53,8 @@ fun CommentItem(
     text: String?,
     by: String?,
     depthIndex: Int,
-    storyAuthor: String?
+    storyAuthor: String?,
+    onCommentUrlClicked: (Uri) -> Unit
 ) {
 
     val depthIndicatorWidth = 10.dp
@@ -115,30 +129,88 @@ fun CommentItem(
                     text = by.orEmpty() + authorSuffix,
                     style = MaterialTheme.typography.subtitle2.copy(color = authorColor)
                 )
+
                 Spacer(Modifier.preferredHeight(4.dp))
-                Text(
-                    text = Html.fromHtml(text.orEmpty()).toString().trimEnd()
-                        .reduceParagraphSpacing(),
-                    style = MaterialTheme.typography.body2
+
+
+                val body: Spanned = Html.fromHtml(text.orEmpty())
+
+                val urlInfo: List<CommentUrlInfo> = body.commentUrlInfo()
+
+                ClickableText(
+                    text = body.formatCommentText(urlColor = MaterialTheme.colors.secondary),
+                    style = MaterialTheme.typography.body2,
+                    onClick = { index ->
+                        urlInfo
+                            .firstOrNull { url ->
+                                index >= url.startIndex && index < url.endIndex
+                            }
+                            ?.let { url ->
+                                onCommentUrlClicked(url.url)
+                            }
+                    }
                 )
             }
         }
     }
 }
 
+
+private data class CommentUrlInfo(
+    val url: Uri,
+    val startIndex: Int,
+    val endIndex: Int
+)
+
+// Accepts parsed html from Html.fromHtml
+private fun Spanned.commentUrlInfo(): List<CommentUrlInfo> {
+
+    val sb = SpannableStringBuilder(this)
+
+    val urlSpans: List<URLSpan> =
+        sb.getSpans(0, this.length, URLSpan::class.java)
+            .toList()
+
+    return urlSpans.map { span ->
+        CommentUrlInfo(
+            url = span.url.toUri(),
+            startIndex = sb.getSpanStart(span),
+            endIndex = sb.getSpanEnd(span)
+        )
+    }
+}
+
+// Accepts parsed html from Html.fromHtml
+private fun Spanned.formatCommentText(urlColor: Color): AnnotatedString {
+
+    val asb = AnnotatedString.Builder()
+    asb.append(this.toString().trimEnd())
+
+    val urls: List<CommentUrlInfo> = this.commentUrlInfo()
+
+    urls.forEach { url ->
+        asb.addStyle(
+            SpanStyle(color = urlColor),
+            url.startIndex,
+            url.endIndex
+        )
+    }
+
+    return asb.reduceParagraphSpacing().toAnnotatedString()
+}
+
 // Comments have a lot of whitespace between paragraphs, let's reduce it
-private fun String.reduceParagraphSpacing(): AnnotatedString {
-    val builder = AnnotatedString.Builder(this)
+private fun AnnotatedString.Builder.reduceParagraphSpacing(): AnnotatedString.Builder {
 
     Regex.fromLiteral("\n\n")
-        .findAll(this)
+        .findAll(this.toString())
         .forEach { match ->
-            builder.addStyle(
-                SpanStyle(fontSize = TextUnit.Sp(6)),
+            this.addStyle(
+                SpanStyle(fontSize = TextUnit.Sp(8)),
                 match.range.first,
                 match.range.last + 1
             )
         }
 
-    return builder.toAnnotatedString()
+    return this
 }

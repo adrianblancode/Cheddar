@@ -1,5 +1,6 @@
 package co.adrianblan.storydetail
 
+import android.net.Uri
 import androidx.compose.Composable
 import androidx.compose.collectAsState
 import co.adrianblan.common.collectAsStateFlow
@@ -19,6 +20,7 @@ class StoryDetailNode
 
     interface Listener {
         fun onStoryContentClicked(storyUrl: StoryUrl)
+        fun onCommentUrlClicked(url: Uri)
         fun onStoryDetailFinished()
     }
 
@@ -31,6 +33,7 @@ class StoryDetailNode
         StoryDetailView(
             viewState = state.collectAsState().value,
             onStoryContentClick = { listener.onStoryContentClicked(it) },
+            onCommentUrlClicked = { listener.onCommentUrlClicked(it) },
             onBackPressed = { listener.onStoryDetailFinished() }
         )
 

@@ -1,5 +1,6 @@
 package co.adrianblan.storydetail.ui
 
+import android.net.Uri
 import androidx.compose.*
 import androidx.ui.core.Alignment
 import androidx.ui.core.DensityAmbient
@@ -35,6 +36,7 @@ private const val toolbarMaxHeightDp = 148
 fun StoryDetailView(
     viewState: StoryDetailViewState,
     onStoryContentClick: (StoryUrl) -> Unit,
+    onCommentUrlClicked: (Uri) -> Unit,
     onBackPressed: () -> Unit
 ) {
 
@@ -81,7 +83,8 @@ fun StoryDetailView(
                                             text = story.text,
                                             by = story.by,
                                             depthIndex = 0,
-                                            storyAuthor = story.by
+                                            storyAuthor = story.by,
+                                            onCommentUrlClicked = onCommentUrlClicked
                                         )
                                     }
 
@@ -90,7 +93,8 @@ fun StoryDetailView(
                                             key(comment.comment.id) {
                                                 CommentItem(
                                                     comment = comment,
-                                                    storyAuthor = story.by
+                                                    storyAuthor = story.by,
+                                                    onCommentUrlClicked = onCommentUrlClicked
                                                 )
                                             }
                                         }
@@ -294,6 +298,7 @@ fun StoryDetailPreview() {
         StoryDetailView(
             viewState = viewState,
             onStoryContentClick = {},
+            onCommentUrlClicked = {},
             onBackPressed = {}
         )
     }
