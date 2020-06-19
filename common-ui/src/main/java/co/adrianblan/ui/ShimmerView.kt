@@ -27,7 +27,7 @@ fun ShimmerView() {
 
     val shimmerColor = colorResource(id = R.color.contentShimmer)
 
-    var progress by mutableStateOf(0f)
+    var progress by state { 0f }
 
     val observer = remember {
         object : AnimationClockObserver {

@@ -36,6 +36,9 @@ internal fun StoryType.titleStringResource(): Int =
         StoryType.JOB -> R.string.stories_job_title
     }
 
+// Scroll state seems to reset if the composition disposes, so save it here
+private var initialScrollPosition by mutableStateOf(0f)
+
 @Composable
 fun StoryFeedView(
     viewState: StoryFeedViewState,
@@ -44,20 +47,32 @@ fun StoryFeedView(
     onStoryContentClick: (StoryUrl) -> Unit,
     onPageEndReached: () -> Unit
 ) {
-    val scroller = ScrollerPosition()
-    val densityAmbient = DensityAmbient.current
 
+    val scroller = ScrollerPosition(initialScrollPosition)
+    val densityAmbient = DensityAmbient.current
+    
+    // Prevent resetting scroll state on first commit
+    var lastStoryType: StoryType by state { viewState.storyType }
+    
     onCommit(viewState.storyType) {
+
+        if (viewState.storyType == lastStoryType) return@onCommit
 
         val collapseDistance = (toolbarMaxHeightDp - toolbarMinHeightDp).dp
 
-        // If story type is changed, revert scroll but retain toolbar collapse state
+        // If story type is changed, reset scroll but retain toolbar collapse state
         val scrollReset: Px =
             with(densityAmbient) {
                 min(scroller.value.px, collapseDistance.toPx())
             }
 
         scroller.scrollTo(scrollReset.value)
+
+        lastStoryType = viewState.storyType
+    }
+
+    onDispose {
+        initialScrollPosition = scroller.value
     }
 
     CollapsingScaffold(
