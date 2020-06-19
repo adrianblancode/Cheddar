@@ -37,7 +37,7 @@ internal fun StoryType.titleStringResource(): Int =
     }
 
 // Scroll state seems to reset if the composition disposes, so save it here
-private var initialScrollPosition by mutableStateOf(0f)
+private var initialScrollPosition = 0f
 
 @Composable
 fun StoryFeedView(
@@ -52,7 +52,7 @@ fun StoryFeedView(
     val densityAmbient = DensityAmbient.current
     
     // Prevent resetting scroll state on first commit
-    var lastStoryType: StoryType by state { viewState.storyType }
+    var lastStoryType = viewState.storyType
     
     onCommit(viewState.storyType) {
 
