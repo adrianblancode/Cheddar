@@ -6,7 +6,6 @@ import androidx.compose.*
 import androidx.ui.core.*
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.Image
-import androidx.ui.graphics.Canvas
 import androidx.ui.graphics.ImageAsset
 import androidx.ui.graphics.asImageAsset
 import androidx.ui.layout.*
@@ -17,7 +16,7 @@ import com.squareup.picasso.Target
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
-private val minBitmapSizePx = 48
+private const val minBitmapSizePx = 48
 
 /** Takes an image url and loads it with Picasso */
 @Composable
@@ -27,12 +26,10 @@ fun UrlImage(
     width: Dp = 80.dp
 ) {
 
-    val imageState = stateFor<ImageState, String>(imageUrl) {
-        ImageState.Loading
-    }
+    val imageState = stateFor(imageUrl) { ImageState.Loading as ImageState }
 
-    val targetWidthPx = with(DensityAmbient.current) { remember { width.toIntPx().value } }
-    val targetHeightPx = with(DensityAmbient.current) { remember { height.toIntPx().value } }
+    val targetWidthPx = with(DensityAmbient.current) { remember { width.toIntPx() } }
+    val targetHeightPx = with(DensityAmbient.current) { remember { height.toIntPx() } }
 
     launchInComposition(imageUrl) {
         suspendCancellableCoroutine { continuation ->
@@ -98,7 +95,7 @@ private fun DrawImageState(state: ImageState) {
     }
 }
 
-private sealed class ImageState {
+internal sealed class ImageState {
     data class ImageSuccess(val image: ImageAsset) : ImageState()
     object Loading : ImageState()
     object Error : ImageState()

@@ -8,7 +8,6 @@ import androidx.ui.foundation.Box
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
 import androidx.ui.material.Surface
-import androidx.ui.unit.px
 
 
 @Composable
@@ -21,8 +20,8 @@ fun RootView(content: @Composable() () -> Unit) {
         with(DensityAmbient.current) {
             Box(
                 modifier = Modifier.padding(
-                    start = insets.left.px.toDp(),
-                    end = insets.right.px.toDp()
+                    start = insets.left.toDp(),
+                    end = insets.right.toDp()
                 )
             ) {
                 content()
@@ -45,7 +44,7 @@ fun NavigationBarScrim(
             color = MaterialTheme.colors.background.copy(alpha = overInsetAlpha),
             modifier = modifier
                 .fillMaxWidth()
-                .preferredHeight(insets.bottom.px.toDp())
+                .preferredHeight(insets.bottom.toDp())
         ) {}
     }
 }

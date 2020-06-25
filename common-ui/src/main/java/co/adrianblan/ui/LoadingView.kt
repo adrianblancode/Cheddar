@@ -11,7 +11,6 @@ import androidx.ui.foundation.Box
 import androidx.ui.foundation.ContentGravity
 import androidx.ui.foundation.Text
 import androidx.ui.geometry.Offset
-import androidx.ui.graphics.Paint
 import androidx.ui.layout.*
 import androidx.ui.material.MaterialTheme
 import androidx.ui.res.stringResource
@@ -87,16 +86,16 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
 
                     val parentSize = this.size
 
-                    val widthStep: Px = (parentSize.width * 0.25f).px
+                    val widthStep: Float = (parentSize.width * 0.25f)
 
                     // Positions for the lowest and highest points in animation
-                    val circleBaseY: Px = (parentSize.height * 0.90f).px
-                    val circleTopY: Px = (parentSize.height * 0.80f).px
+                    val circleBaseY: Float = (parentSize.height * 0.90f)
+                    val circleTopY: Float = (parentSize.height * 0.80f)
 
                     val progressAngleBase: Double = progress * Math.PI * 2f
                     val maxProgressAngleOffset: Double = Math.PI * 0.7
 
-                    val circleRadius: Px = (parentSize.width * 0.08f).px
+                    val circleRadius: Float = (parentSize.width * 0.08f)
 
                     repeat(3) { index ->
 
@@ -120,18 +119,15 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
                         val normalizedYFraction =
                             (yFraction + downBounceFactor / (1f + downBounceFactor))
 
-                        val circleDyValue =
+                        val circleDyValue: Float =
                             lerp(circleBaseY, circleTopY, normalizedYFraction)
 
-                        val circleDxValue = widthStep * (index + 1)
+                        val circleDxValue: Float = widthStep * (index + 1)
 
                         drawCircle(
-                            center = Offset(
-                                dx = circleDxValue.value,
-                                dy = circleDyValue.value
-                            ),
+                            center = Offset(circleDxValue, circleDyValue),
                             color = dotColor,
-                            radius = circleRadius.value
+                            radius = circleRadius
                         )
                     }
                 })

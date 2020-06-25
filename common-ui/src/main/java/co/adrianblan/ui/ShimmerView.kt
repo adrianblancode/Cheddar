@@ -1,21 +1,18 @@
 package co.adrianblan.ui
 
-import androidx.animation.*
+import androidx.animation.AnimationClockObserver
 import androidx.compose.*
-import androidx.ui.core.*
+import androidx.ui.core.AnimationClockAmbient
+import androidx.ui.core.Modifier
+import androidx.ui.core.drawBehind
 import androidx.ui.foundation.Box
 import androidx.ui.geometry.Offset
 import androidx.ui.geometry.Size
 import androidx.ui.geometry.toRect
 import androidx.ui.graphics.LinearGradient
-import androidx.ui.graphics.Paint
-import androidx.ui.graphics.TileMode
 import androidx.ui.layout.fillMaxSize
 import androidx.ui.res.colorResource
 import androidx.ui.tooling.preview.Preview
-import androidx.ui.unit.Px
-import androidx.ui.unit.px
-import androidx.ui.unit.toRect
 import co.adrianblan.ui.utils.lerp
 
 /** View with a shimmering effect, for loading content */
@@ -56,7 +53,7 @@ fun ShimmerView() {
                 val parentSize = this.size
 
                 val rect = parentSize.toRect()
-                val width: Px = parentSize.width.px
+                val width = parentSize.width
 
                 // Convert from [0, 1] to [-1, 2]
                 val offset = lerp(-1f, 2f, progress)
@@ -67,14 +64,14 @@ fun ShimmerView() {
                         0f to backgroundColor,
                         0.5f to shimmerColor,
                         1f to backgroundColor,
-                        startX = left.value,
-                        endX = left.value + width.value,
+                        startX = left,
+                        endX = left + width,
                         startY = 0f,
                         endY = 0f
                     )
 
                 drawRect(
-                    topLeft = Offset(dx = 0f, dy = 0f),
+                    topLeft = Offset(0f, 0f),
                     size = Size(width = rect.width, height = rect.height),
                     brush = shimmerGradient
                 )

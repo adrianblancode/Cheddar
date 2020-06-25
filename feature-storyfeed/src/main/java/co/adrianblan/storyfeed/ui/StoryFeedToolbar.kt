@@ -1,17 +1,21 @@
 package co.adrianblan.storyfeed.ui
 
-import androidx.compose.*
+import androidx.compose.Composable
+import androidx.compose.getValue
+import androidx.compose.setValue
+import androidx.compose.state
 import androidx.ui.core.Alignment
 import androidx.ui.core.Modifier
 import androidx.ui.foundation.*
 import androidx.ui.foundation.shape.corner.RoundedCornerShape
 import androidx.ui.graphics.Color
-import androidx.ui.layout.*
+import androidx.ui.layout.Row
+import androidx.ui.layout.preferredHeight
+import androidx.ui.layout.preferredWidthIn
 import androidx.ui.material.MaterialTheme
 import androidx.ui.material.Surface
 import androidx.ui.material.icons.Icons
 import androidx.ui.material.icons.filled.ArrowDropDown
-import androidx.ui.material.ripple.ripple
 import androidx.ui.res.stringResource
 import androidx.ui.unit.Dp
 import androidx.ui.unit.TextUnit
@@ -80,8 +84,7 @@ fun StoryFeedHeader(
         Box(
             gravity = ContentGravity.Center,
             padding = 4.dp,
-            modifier = Modifier.ripple(bounded = true)
-                .clickable(onClick = onClick)
+            modifier = Modifier.clickable(onClick = onClick)
         ) {
 
             val title: String = stringResource(storyType.titleStringResource())

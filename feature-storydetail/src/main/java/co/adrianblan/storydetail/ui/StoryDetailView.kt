@@ -1,7 +1,9 @@
 package co.adrianblan.storydetail.ui
 
 import android.net.Uri
-import androidx.compose.*
+import androidx.compose.Composable
+import androidx.compose.key
+import androidx.compose.remember
 import androidx.ui.core.Alignment
 import androidx.ui.core.DensityAmbient
 import androidx.ui.core.Modifier
@@ -13,13 +15,16 @@ import androidx.ui.material.MaterialTheme
 import androidx.ui.material.Surface
 import androidx.ui.material.icons.Icons
 import androidx.ui.material.icons.filled.ArrowBack
-import androidx.ui.material.ripple.ripple
+import androidx.ui.material.ripple.RippleIndication
 import androidx.ui.res.colorResource
 import androidx.ui.res.stringResource
 import androidx.ui.text.style.TextAlign
 import androidx.ui.text.style.TextOverflow
 import androidx.ui.tooling.preview.Preview
-import androidx.ui.unit.*
+import androidx.ui.unit.Dp
+import androidx.ui.unit.TextUnit
+import androidx.ui.unit.dp
+import androidx.ui.unit.lerp
 import co.adrianblan.domain.Comment
 import co.adrianblan.domain.Story
 import co.adrianblan.domain.StoryUrl
@@ -69,7 +74,7 @@ fun StoryDetailView(
 
                                     val topInsets =
                                         with(DensityAmbient.current) {
-                                            InsetsAmbient.current.top.px.toDp()
+                                            InsetsAmbient.current.top.toDp()
                                         }
 
                                     Spacer(
@@ -100,7 +105,7 @@ fun StoryDetailView(
                                         }
 
                                     with(DensityAmbient.current) {
-                                        Spacer(modifier = Modifier.preferredHeight(InsetsAmbient.current.bottom.px.toDp() + 8.dp))
+                                        Spacer(modifier = Modifier.preferredHeight(InsetsAmbient.current.bottom.toDp() + 8.dp))
                                     }
                                 }
                             }
@@ -195,7 +200,7 @@ fun StoryDetailToolbar(
                     ),
                     modifier = Modifier.padding(
                         start = 16.dp + titleCollapsedLeftOffset,
-                        end = 16.dp + titleRightOffset,
+                        end = 8.dp + titleRightOffset,
                         bottom = 8.dp,
                         top = 8.dp + titleCollapsedTopOffset
                     ).fillMaxWidth()
@@ -231,23 +236,21 @@ private fun StoryDetailImage(
     onStoryContentClick: (StoryUrl) -> Unit
 ) {
 
-    val clickListener: () -> Unit =
-        remember(story) {
-            { story.url?.let { onStoryContentClick(it) } }
-        }
-
-    Stack(
-        modifier = Modifier.padding(
-            top = 8.dp,
-            end = 16.dp,
-            bottom = 8.dp
+    Box(
+        modifier = Modifier.clickable(
+            onClick = { story.url?.let { onStoryContentClick(it) } }
         )
     ) {
         Surface(
             shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.preferredSize(imageSize)
-                .clickable(onClick = clickListener)
-                .ripple(bounded = true)
+            modifier = Modifier.padding(
+                start = 8.dp,
+                top = 8.dp,
+                end = 16.dp,
+                bottom = 8.dp
+            )
+                .preferredSize(imageSize)
+
         ) {
             Stack {
                 Surface(

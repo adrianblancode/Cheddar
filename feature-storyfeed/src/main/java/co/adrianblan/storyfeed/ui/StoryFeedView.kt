@@ -1,6 +1,9 @@
 package co.adrianblan.storyfeed.ui
 
-import androidx.compose.*
+import androidx.compose.Composable
+import androidx.compose.key
+import androidx.compose.onCommit
+import androidx.compose.onDispose
 import androidx.ui.core.DensityAmbient
 import androidx.ui.core.Modifier
 import androidx.ui.foundation.*
@@ -10,18 +13,12 @@ import androidx.ui.material.MaterialTheme
 import androidx.ui.res.stringResource
 import androidx.ui.text.style.TextAlign
 import androidx.ui.tooling.preview.Preview
-import androidx.ui.unit.Px
 import androidx.ui.unit.dp
-import androidx.ui.unit.min
-import androidx.ui.unit.px
-import co.adrianblan.domain.Story
-import co.adrianblan.domain.StoryId
-import co.adrianblan.domain.StoryUrl
-import co.adrianblan.domain.StoryType
-import co.adrianblan.domain.placeholder
+import co.adrianblan.domain.*
 import co.adrianblan.storyfeed.*
 import co.adrianblan.storyfeed.R
 import co.adrianblan.ui.*
+import kotlin.math.min
 
 private const val toolbarMinHeightDp = 56
 private const val toolbarMaxHeightDp = 128
@@ -50,10 +47,10 @@ fun StoryFeedView(
 
     val scroller = ScrollerPosition(initialScrollPosition)
     val densityAmbient = DensityAmbient.current
-    
+
     // Prevent resetting scroll state on first commit
     var lastStoryType = viewState.storyType
-    
+
     onCommit(viewState.storyType) {
 
         if (viewState.storyType == lastStoryType) return@onCommit
@@ -61,12 +58,12 @@ fun StoryFeedView(
         val collapseDistance = (toolbarMaxHeightDp - toolbarMinHeightDp).dp
 
         // If story type is changed, reset scroll but retain toolbar collapse state
-        val scrollReset: Px =
+        val scrollReset: Float =
             with(densityAmbient) {
-                min(scroller.value.px, collapseDistance.toPx())
+                min(scroller.value, collapseDistance.toPx())
             }
 
-        scroller.scrollTo(scrollReset.value)
+        scroller.scrollTo(scrollReset)
 
         lastStoryType = viewState.storyType
     }
@@ -132,13 +129,13 @@ fun StoryFeedSuccessContentBody(
 ) {
     val storyFeedState = viewState.storyFeedState as StoryFeedState.Success
 
-    val scrollEndZone: Px = with(DensityAmbient.current) {
+    val scrollEndZone = with(DensityAmbient.current) {
         400.dp.toPx()
     }
 
     Observe {
         val isScrolledToEnd: Boolean =
-            scroller.value > scroller.maxPosition - scrollEndZone.value
+            scroller.value > scroller.maxPosition - scrollEndZone
 
         onCommit(isScrolledToEnd) {
             if (isScrolledToEnd) {
@@ -158,7 +155,7 @@ fun StoryFeedSuccessContentBody(
 
             with(DensityAmbient.current) {
                 val insets = InsetsAmbient.current
-                val topInsets = insets.top.px.toDp()
+                val topInsets = insets.top.toDp()
 
                 Spacer(modifier = Modifier.preferredHeight(toolbarMaxHeightDp.dp + topInsets))
 
@@ -180,7 +177,7 @@ fun StoryFeedSuccessContentBody(
                     viewState.hasLoadedAllPages -> NoMoreStoriesView()
                 }
 
-                Spacer(modifier = Modifier.preferredHeight(insets.bottom.px.toDp() + 8.dp))
+                Spacer(modifier = Modifier.preferredHeight(insets.bottom.toDp() + 8.dp))
             }
         }
     }

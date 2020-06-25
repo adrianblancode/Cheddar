@@ -24,7 +24,6 @@ import androidx.ui.res.colorResource
 import androidx.ui.res.stringResource
 import androidx.ui.text.AnnotatedString
 import androidx.ui.text.SpanStyle
-import androidx.ui.unit.Px
 import androidx.ui.unit.TextUnit
 import androidx.ui.unit.dp
 import androidx.ui.unit.times
@@ -59,16 +58,11 @@ fun CommentItem(
 
     val depthIndicatorWidth = 10.dp
 
-    val strokeWidthPx: Px = with(DensityAmbient.current) {
-        1f.dp.toPx()
+    val strokeWidthPx = with(DensityAmbient.current) {
+        1.dp.toPx()
     }
 
     val depthIndicatorColor = colorResource(id = R.color.contentMuted)
-
-    val depthIndicatorStroke = Stroke(
-        width = strokeWidthPx.value,
-        cap = StrokeCap.round
-    )
 
     Box(
         paddingStart = 16.dp + depthIndex * depthIndicatorWidth,
@@ -79,20 +73,21 @@ fun CommentItem(
             .drawBehind {
 
                 val parentSize = this.size
-                var depthOffset: Px = 16.dp.toPx()
+                var depthOffset = 16.dp.toPx()
 
                 repeat(depthIndex) {
-                    val o1 = Offset(depthOffset.value, 0f)
+                    val o1 = Offset(depthOffset, 0f)
                     val o2 = Offset(
-                        depthOffset.value,
+                        depthOffset,
                         parentSize.height
                     )
 
                     drawLine(
-                        p1 = o1,
-                        p2 = o2,
+                        start = o1,
+                        end = o2,
                         color = depthIndicatorColor,
-                        stroke = depthIndicatorStroke
+                        strokeWidth = strokeWidthPx,
+                        cap = StrokeCap.round
                     )
                     depthOffset += depthIndicatorWidth.toPx()
                 }
