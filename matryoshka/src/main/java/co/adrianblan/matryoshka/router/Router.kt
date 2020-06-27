@@ -1,6 +1,7 @@
 package co.adrianblan.matryoshka.router
 
 import co.adrianblan.matryoshka.node.AnyNode
+import co.adrianblan.matryoshka.node.NodeFactory
 import co.adrianblan.matryoshka.node.NodeStore
 
 /**
@@ -11,6 +12,6 @@ abstract class Router<T : Any> {
 
     protected abstract val nodeStore: NodeStore
 
-    abstract fun T.createNode(): AnyNode
+    abstract fun T.nodeFactory(): NodeFactory<AnyNode>
 
 }

@@ -1,9 +1,14 @@
 package co.adrianblan.storyfeed
 
+import android.os.Parcelable
+import co.adrianblan.matryoshka.node.NodeFactory
+import co.adrianblan.matryoshka.node.NodeStore
 import com.squareup.inject.assisted.dagger2.AssistedModule
+import dagger.BindsInstance
 import dagger.Module
 import dagger.Subcomponent
 import javax.inject.Inject
+import javax.inject.Qualifier
 import javax.inject.Scope
 
 @AssistedModule
@@ -14,26 +19,33 @@ object StoryFeedModule
 @Subcomponent(modules = [StoryFeedModule::class])
 interface StoryFeedComponent {
 
-    fun storyFeedNodeFactory(): StoryFeedNode.Factory
+    fun storyFeedNode(): StoryFeedNode
 
     @Subcomponent.Factory
     interface Factory {
-        fun build(): StoryFeedComponent
+        fun build(
+            @BindsInstance @StoryFeedQualifier listener: StoryFeedNode.Listener
+        ): StoryFeedComponent
     }
 }
 
 @Scope
 internal annotation class StoryFeedScope
 
-class StoryFeedNodeBuilder
+@Qualifier
+internal annotation class StoryFeedQualifier
+
+class StoryFeedNodeProvider
 @Inject constructor(
     private val storyFeedComponentBuilder: StoryFeedComponent.Factory
 ) {
-    fun build(
+    fun factory(
         listener: StoryFeedNode.Listener
-    ): StoryFeedNode =
-        storyFeedComponentBuilder
-            .build()
-            .storyFeedNodeFactory()
-            .create(listener)
+    ) = object : NodeFactory<StoryFeedNode> {
+        override fun create(savedState: Parcelable?, nodeStore: NodeStore): StoryFeedNode =
+            storyFeedComponentBuilder
+                .build(listener)
+                .storyFeedNode()
+    }
+
 }

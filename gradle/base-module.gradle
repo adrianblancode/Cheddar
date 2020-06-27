@@ -29,6 +29,11 @@ kapt {
     useBuildCache = true
 }
 
+androidExtensions {
+    experimental = true
+    features = ["parcelize"]
+}
+
 dependencies {
     implementation(Dependencies.kotlinStdlib)
     implementation(Dependencies.coroutinesCore)

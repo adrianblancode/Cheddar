@@ -10,10 +10,11 @@ import co.adrianblan.storyfeed.ui.StoryFeedView
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
 class StoryFeedNode
-@AssistedInject constructor(
-    @Assisted private val listener: Listener,
+@Inject constructor(
+    @StoryFeedQualifier private val listener: Listener,
     private val storyFeedPresenter: StoryFeedPresenter
 ) : Node() {
 
@@ -35,9 +36,4 @@ class StoryFeedNode
             onStoryContentClick = { listener.onStoryContentClicked(it) },
             onPageEndReached = { storyFeedPresenter.onPageEndReached() }
         )
-
-    @AssistedInject.Factory
-    interface Factory {
-        fun create(listener: Listener): StoryFeedNode
-    }
 }

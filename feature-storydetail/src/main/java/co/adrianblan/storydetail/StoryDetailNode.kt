@@ -10,11 +10,12 @@ import co.adrianblan.matryoshka.node.Node
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import kotlinx.coroutines.flow.StateFlow
+import javax.inject.Inject
 
 
 class StoryDetailNode
-@AssistedInject constructor(
-    @Assisted private val listener: Listener,
+@Inject constructor(
+    @StoryDetailQualifier private val listener: Listener,
     private val storyDetailPresenter: StoryDetailPresenter
 ) : Node() {
 
@@ -36,11 +37,4 @@ class StoryDetailNode
             onCommentUrlClicked = { listener.onCommentUrlClicked(it) },
             onBackPressed = { listener.onStoryDetailFinished() }
         )
-
-    @AssistedInject.Factory
-    interface Factory {
-        fun create(
-            listener: Listener
-        ): StoryDetailNode
-    }
 }

@@ -8,7 +8,8 @@ import androidx.ui.core.setContent
 import co.adrianblan.cheddar.di.DaggerRootComponent
 import co.adrianblan.cheddar.utils.appComponent
 import co.adrianblan.matryoshka.node.AnyNode
-import co.adrianblan.matryoshka.root.createRootNode
+import co.adrianblan.matryoshka.node.nodeFactory
+import co.adrianblan.matryoshka.root.createVmRootNode
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.InsetsWrapper
 import co.adrianblan.ui.RootView
@@ -16,13 +17,19 @@ import co.adrianblan.ui.utils.isNightModeActive
 
 class MainActivity : AppCompatActivity() {
 
-    private val rootNode: AnyNode by createRootNode {
+    private val rootNode: AnyNode by createVmRootNode(
+        nodeFactory { savedState, nodeStore ->
             DaggerRootComponent.factory()
                 .build(application.appComponent)
                 .rootComponentFactory()
                 .build()
-                .storyNavigationNode()
+                .storyNavigationNodeFactory()
+                .create(
+                    savedState = savedState,
+                    nodeStore = nodeStore
+                )
         }
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

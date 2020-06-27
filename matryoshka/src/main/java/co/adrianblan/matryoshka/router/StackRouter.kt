@@ -14,9 +14,6 @@ abstract class StackRouter<T : Any> constructor(
     initialState: List<T>
 ) : Router<T>() {
 
-    constructor(nodeStore: NodeStore, initialState: T)
-            : this(nodeStore, listOf(initialState))
-
     init {
         require (initialState.size == initialState.distinct().size) {
             "All keys in initial state must be distinct"
@@ -34,7 +31,7 @@ abstract class StackRouter<T : Any> constructor(
             initialState.map { key ->
                 StackNode(
                     key,
-                    nodeStore.child(key.toString()) { key.createNode() }
+                    nodeStore.child(key.toString(), key.nodeFactory())
                 )
             }
         )
@@ -54,7 +51,7 @@ abstract class StackRouter<T : Any> constructor(
 
         state.value = state.value + StackNode(
             key,
-            nodeStore.child(key.toString()) { key.createNode() }
+            nodeStore.child(key.toString(), key.nodeFactory())
         )
     }
 

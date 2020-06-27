@@ -1,10 +1,14 @@
 package co.adrianblan.domain
 
+import android.os.Parcelable
+import kotlinx.android.parcel.Parcelize
 import java.time.Instant
 
-data class StoryId(val id: Long)
+@Parcelize
+data class StoryId(val id: Long): Parcelable
 
-data class StoryUrl(val url: String)
+@Parcelize
+data class StoryUrl(val url: String): Parcelable
 
 data class Story(
     val id: StoryId,

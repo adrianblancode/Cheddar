@@ -1,6 +1,7 @@
 package co.adrianblan.storynavigation
 
 import android.net.Uri
+import android.os.Parcelable
 import androidx.compose.Composable
 import androidx.compose.collectAsState
 import co.adrianblan.common.CustomTabsLauncher
@@ -9,43 +10,50 @@ import co.adrianblan.domain.StoryId
 import co.adrianblan.domain.StoryUrl
 import co.adrianblan.matryoshka.node.AnyNode
 import co.adrianblan.matryoshka.node.Node
-import co.adrianblan.matryoshka.node.child
+import co.adrianblan.matryoshka.node.NodeFactory
+import co.adrianblan.matryoshka.node.NodeStore
 import co.adrianblan.matryoshka.router.StackRouter
 import co.adrianblan.storydetail.StoryDetailNode
-import co.adrianblan.storydetail.StoryDetailNodeBuilder
+import co.adrianblan.storydetail.StoryDetailNodeProvider
 import co.adrianblan.storyfeed.StoryFeedNode
-import co.adrianblan.storyfeed.StoryFeedNodeBuilder
+import co.adrianblan.storyfeed.StoryFeedNodeProvider
+import com.squareup.inject.assisted.Assisted
+import com.squareup.inject.assisted.AssistedInject
+import kotlinx.android.parcel.Parcelize
 import kotlinx.coroutines.flow.StateFlow
-import javax.inject.Inject
 
-sealed class StoryNavigationState {
+sealed class StoryNavigationState : Parcelable {
+    @Parcelize
     object StoryNavigationFeed : StoryNavigationState()
+
+    @Parcelize
     data class StoryNavigationDetail(val storyId: StoryId) : StoryNavigationState()
 }
 
 class StoryNavigationNode
-@Inject constructor(
-    private val storyFeedNodeBuilder: StoryFeedNodeBuilder,
-    private val storyDetailNodeBuilder: StoryDetailNodeBuilder,
+@AssistedInject constructor(
+    @Assisted savedState: Parcelable?,
+    @Assisted nodeStore: NodeStore,
+    private val storyFeedNodeProvider: StoryFeedNodeProvider,
+    private val storyDetailNodeProvider: StoryDetailNodeProvider,
     private val customTabsLauncher: CustomTabsLauncher
 ) : Node(), StoryFeedNode.Listener, StoryDetailNode.Listener {
 
     private val router =
         object : StackRouter<StoryNavigationState>(
             nodeStore = nodeStore,
-            initialState = StoryNavigationState.StoryNavigationFeed
+            initialState = (savedState as SavedState?)?.state
+                ?: listOf(StoryNavigationState.StoryNavigationFeed)
         ) {
-            override fun StoryNavigationState.createNode(): AnyNode =
+            override fun StoryNavigationState.nodeFactory(): NodeFactory<AnyNode> =
                 when (this) {
                     is StoryNavigationState.StoryNavigationFeed ->
-                        storyFeedNodeBuilder
-                            .build(listener = this@StoryNavigationNode)
+                        storyFeedNodeProvider.factory(listener = this@StoryNavigationNode)
                     is StoryNavigationState.StoryNavigationDetail ->
-                        storyDetailNodeBuilder
-                            .build(
-                                storyId = storyId,
-                                listener = this@StoryNavigationNode
-                            )
+                        storyDetailNodeProvider.factory(
+                            storyId = storyId,
+                            listener = this@StoryNavigationNode
+                        )
                 }
         }
 
@@ -75,4 +83,19 @@ class StoryNavigationNode
 
     override fun onBackPressed(): Boolean =
         router.onBackPressed()
+
+    override fun saveState() = SavedState(router.state.value.map { it.key })
+
+    @Parcelize
+    data class SavedState(
+        val state: List<StoryNavigationState>
+    ) : Parcelable
+
+    @AssistedInject.Factory
+    interface Factory {
+        fun create(
+            savedState: Parcelable?,
+            nodeStore: NodeStore
+        ): StoryNavigationNode
+    }
 }

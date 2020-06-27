@@ -1,42 +1,48 @@
 package co.adrianblan.storydetail
 
+import android.os.Parcelable
 import co.adrianblan.domain.StoryId
-import com.squareup.inject.assisted.dagger2.AssistedModule
+import co.adrianblan.matryoshka.node.NodeFactory
+import co.adrianblan.matryoshka.node.NodeStore
 import dagger.BindsInstance
-import dagger.Module
 import dagger.Subcomponent
 import javax.inject.Inject
+import javax.inject.Qualifier
 import javax.inject.Scope
 
-@AssistedModule
-@Module(includes = [AssistedInject_StoryDetailModule::class])
-object StoryDetailModule
-
 @StoryDetailScope
-@Subcomponent(modules = [StoryDetailModule::class])
+@Subcomponent
 interface StoryDetailComponent {
 
-    fun storyDetailNodeFactory(): StoryDetailNode.Factory
+    fun storyDetailNode(): StoryDetailNode
 
     @Subcomponent.Factory
     interface Factory {
-        fun build(@BindsInstance storyId: StoryId): StoryDetailComponent
+        fun build(
+            @BindsInstance storyId: StoryId,
+            @BindsInstance @StoryDetailQualifier listener: StoryDetailNode.Listener
+        ): StoryDetailComponent
     }
 }
 
 @Scope
 internal annotation class StoryDetailScope
 
-class StoryDetailNodeBuilder
+@Qualifier
+internal annotation class StoryDetailQualifier
+
+class StoryDetailNodeProvider
 @Inject constructor(
     private val storyDetailComponentBuilder: StoryDetailComponent.Factory
 ) {
-    fun build(
+    fun factory(
         storyId: StoryId,
         listener: StoryDetailNode.Listener
-    ): StoryDetailNode =
-        storyDetailComponentBuilder
-            .build(storyId)
-            .storyDetailNodeFactory()
-            .create(listener)
+    ): NodeFactory<StoryDetailNode> =
+        object : NodeFactory<StoryDetailNode> {
+            override fun create(savedState: Parcelable?, nodeStore: NodeStore): StoryDetailNode =
+                storyDetailComponentBuilder
+                    .build(storyId = storyId, listener = listener)
+                    .storyDetailNode()
+        }
 }

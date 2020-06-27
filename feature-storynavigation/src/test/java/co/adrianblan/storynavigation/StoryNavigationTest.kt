@@ -1,11 +1,15 @@
 package co.adrianblan.storynavigation
 
+import android.os.Parcelable
 import co.adrianblan.domain.StoryId
+import co.adrianblan.matryoshka.node.NodeFactory
+import co.adrianblan.matryoshka.node.NodeStore
+import co.adrianblan.matryoshka.node.nodeFactory
 import co.adrianblan.storydetail.StoryDetailNode
-import co.adrianblan.storydetail.StoryDetailNodeBuilder
 import co.adrianblan.storyfeed.StoryFeedNode
-import co.adrianblan.storyfeed.StoryFeedNodeBuilder
 import co.adrianblan.matryoshka.root.createTestNode
+import co.adrianblan.storydetail.StoryDetailNodeProvider
+import co.adrianblan.storyfeed.StoryFeedNodeProvider
 import co.adrianblan.test.CoroutineTestRule
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
@@ -23,18 +27,32 @@ class StoryNavigationTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private val storyFeedNodeBuilder: StoryFeedNodeBuilder =
+    private val storyFeedNodeProvider: StoryFeedNodeProvider =
         mock {
-            whenever(
-                it.build(any())
-            ).thenReturn(mock())
+            whenever(it.factory(any()))
+                .thenReturn(
+                    object : NodeFactory<StoryFeedNode> {
+                        override fun create(savedState: Parcelable?, nodeStore: NodeStore) =
+                            StoryFeedNode(
+                                listener = mock(),
+                                storyFeedPresenter = mock()
+                            )
+                    }
+                )
         }
 
-    private val storyDetailNodeBuilder: StoryDetailNodeBuilder =
+    private val storyDetailNodeProvider: StoryDetailNodeProvider =
         mock {
-            whenever(
-                it.build(any(), any())
-            ).thenReturn(mock())
+            whenever(it.factory(any(), any()))
+                .thenReturn(
+                    object : NodeFactory<StoryDetailNode> {
+                        override fun create(savedState: Parcelable?, nodeStore: NodeStore) =
+                            StoryDetailNode(
+                                listener = mock(),
+                                storyDetailPresenter = mock()
+                            )
+                    }
+                )
         }
 
     private lateinit var scope: TestCoroutineScope
@@ -44,13 +62,17 @@ class StoryNavigationTest {
     fun setUp() {
         scope = TestCoroutineScope(SupervisorJob() + coroutineRule.testDispatcher)
 
-        rootNode = createTestNode(scope) {
-            StoryNavigationNode(
-                storyFeedNodeBuilder = storyFeedNodeBuilder,
-                storyDetailNodeBuilder = storyDetailNodeBuilder,
-                customTabsLauncher = mock()
-            )
-        }
+        rootNode = createTestNode(scope,
+            nodeFactory { savedState, nodeStore ->
+                StoryNavigationNode(
+                    savedState = savedState,
+                    nodeStore = nodeStore,
+                    storyFeedNodeProvider = storyFeedNodeProvider,
+                    storyDetailNodeProvider = storyDetailNodeProvider,
+                    customTabsLauncher = mock()
+                )
+            }
+        )
     }
 
     @Test
