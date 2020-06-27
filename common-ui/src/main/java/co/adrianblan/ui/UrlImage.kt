@@ -13,6 +13,8 @@ import androidx.ui.unit.Dp
 import androidx.ui.unit.dp
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -26,60 +28,62 @@ fun UrlImage(
     width: Dp = 80.dp
 ) {
 
-    val imageState = stateFor(imageUrl) { ImageState.Loading as ImageState }
-
     val targetWidthPx = with(DensityAmbient.current) { remember { width.toIntPx() } }
     val targetHeightPx = with(DensityAmbient.current) { remember { height.toIntPx() } }
 
+    val imageState = stateFor<ImageState, String>(imageUrl) { ImageState.Loading }
+
     launchInComposition(imageUrl) {
-        suspendCancellableCoroutine { continuation ->
-
-            val target = object : Target {
-                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                    imageState.value = ImageState.Error
-                    continuation.resume(Unit)
-                }
-
-                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-
-                    imageState.value =
-                        if (bitmap == null) ImageState.Error
-                        else {
-                            // Really small images are loaded without filtering to retain pixel perfect sharpness
-                            val isPixelatedIcon =
-                                bitmap.height <= minBitmapSizePx || bitmap.width <= minBitmapSizePx
-
-                            val image = Bitmap.createScaledBitmap(
-                                bitmap,
-                                targetWidthPx,
-                                targetHeightPx,
-                                !isPixelatedIcon
-                            ).asImageAsset()
-
-                            ImageState.ImageSuccess(image)
-                        }
-
-                    continuation.resume(Unit)
-                }
-            }
-
-            val picasso = Picasso.get()
-
-            picasso
-                .load(imageUrl)
-                .into(target)
-
-            continuation.invokeOnCancellation {
-                imageState.value = ImageState.Loading
-                picasso.cancelRequest(target)
-            }
-        }
+        imageState.value = loadImage(imageUrl, targetWidthPx, targetHeightPx)
     }
 
     DrawImageState(state = imageState.value)
 }
+
+private suspend fun loadImage(
+    imageUrl: String,
+    targetWidthPx: Int,
+    targetHeightPx: Int
+): ImageState =
+    suspendCancellableCoroutine { continuation ->
+
+        val target = object : Target {
+            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+
+            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
+                continuation.resume(ImageState.Error)
+            }
+
+            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
+
+                if (bitmap == null) continuation.resume(ImageState.Error)
+                else {
+                    // Really small images are loaded without filtering to retain pixel perfect sharpness
+                    val isPixelatedIcon =
+                        bitmap.height <= minBitmapSizePx || bitmap.width <= minBitmapSizePx
+
+                    val image = Bitmap.createScaledBitmap(
+                        bitmap,
+                        targetWidthPx,
+                        targetHeightPx,
+                        !isPixelatedIcon
+                    ).asImageAsset()
+
+                    continuation.resume(ImageState.ImageSuccess(image))
+                }
+            }
+        }
+
+        val picasso = Picasso.get()
+
+        picasso
+            .load(imageUrl)
+            .into(target)
+
+        continuation.invokeOnCancellation {
+            picasso.cancelRequest(target)
+        }
+    }
 
 @Composable
 private fun DrawImageState(state: ImageState) {
