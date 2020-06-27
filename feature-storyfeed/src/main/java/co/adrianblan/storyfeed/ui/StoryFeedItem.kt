@@ -19,13 +19,13 @@ import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.Dp
 import androidx.ui.unit.dp
 import co.adrianblan.common.urlSiteName
+import co.adrianblan.core.DecoratedStory
+import co.adrianblan.core.WebPreviewState
 import co.adrianblan.domain.Story
 import co.adrianblan.domain.StoryId
 import co.adrianblan.domain.StoryUrl
 import co.adrianblan.domain.placeholder
-import co.adrianblan.storyfeed.DecoratedStory
 import co.adrianblan.storyfeed.R
-import co.adrianblan.storyfeed.WebPreviewState
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.ShimmerView
 import co.adrianblan.ui.UrlImage

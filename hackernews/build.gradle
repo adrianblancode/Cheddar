@@ -3,7 +3,7 @@ apply plugin: "kotlinx-serialization"
 
 dependencies {
     implementation(project(":network"))
-    api(project(":domain"))
+    implementation(project(":domain"))
 
     // Implemented here because module compiler plugin is needed
     implementation(Dependencies.kotlinSerializationRuntime)

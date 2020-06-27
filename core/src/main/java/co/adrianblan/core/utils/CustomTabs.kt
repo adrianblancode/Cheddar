@@ -1,4 +1,4 @@
-package co.adrianblan.cheddar.utils
+package co.adrianblan.core.utils
 
 import android.content.Context
 import android.content.Intent

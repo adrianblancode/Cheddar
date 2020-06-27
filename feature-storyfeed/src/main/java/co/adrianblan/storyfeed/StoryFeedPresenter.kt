@@ -1,6 +1,8 @@
 package co.adrianblan.storyfeed
 
 import co.adrianblan.common.*
+import co.adrianblan.core.DecoratedStory
+import co.adrianblan.core.StoryPreviewUseCase
 import co.adrianblan.domain.StoryId
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.domain.StoryType
@@ -17,7 +19,7 @@ class StoryFeedPresenter
 @Inject
 constructor(
     private val hackerNewsRepository: HackerNewsRepository,
-    private val webPreviewRepository: WebPreviewRepository,
+    private val storyPreviewUseCase: StoryPreviewUseCase,
     override val dispatcherProvider: DispatcherProvider
 ) : Presenter<StoryFeedViewState> {
 
@@ -92,29 +94,6 @@ constructor(
                 )
             )
 
-    // Observes a decorated story, it will first emit the story and then try to emit decorated data as well
-    private fun observeDecoratedStory(storyId: StoryId): Flow<DecoratedStory> =
-        flow {
-
-            val story = hackerNewsRepository.fetchStory(storyId)
-            val storyUrl = story.url
-
-            if (storyUrl == null) emit(DecoratedStory(story, null))
-            else {
-                emit(DecoratedStory(story, WebPreviewState.Loading))
-
-                try {
-                    val webPreview = webPreviewRepository.fetchWebPreview(storyUrl.url)
-                    emit(DecoratedStory(story, WebPreviewState.Success(webPreview)))
-                } catch (t: Throwable) {
-                    Timber.e(t)
-
-                    if (t is CancellationException) throw t
-                    else emit(DecoratedStory(story, WebPreviewState.Error(t)))
-                }
-            }
-        }
-
     // Takes a page, and observes the list of stories in the page
     private fun observePage(pageIndex: Int, storyIds: List<StoryId>): Flow<List<DecoratedStory>> {
 
@@ -126,7 +105,7 @@ constructor(
             combine(
                 pageStoryIds
                     .map { storyId ->
-                        observeDecoratedStory(storyId)
+                        storyPreviewUseCase.observeDecoratedStory(storyId)
                     }
             ) { decoratedStories ->
                 decoratedStories.toList()

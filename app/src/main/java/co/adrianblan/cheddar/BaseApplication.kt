@@ -4,9 +4,10 @@ import android.app.Application
 import android.content.Context
 import co.adrianblan.cheddar.di.AppComponent
 import co.adrianblan.cheddar.di.DaggerAppComponent
+import co.adrianblan.core.di.DaggerCoreComponent
 import timber.log.Timber
 
-class BaseApplication: Application() {
+class BaseApplication : Application() {
 
     private lateinit var appComponent: AppComponent
 
@@ -25,11 +26,18 @@ class BaseApplication: Application() {
         }
 
         appComponent = DaggerAppComponent.factory()
-            .build(this)
+            .build(
+                DaggerCoreComponent.factory()
+                    .build(this)
+            )
     }
 
     companion object {
-        fun getAppComponent(context: Context) =
+        fun appComponent(context: Context) =
             (context.applicationContext as BaseApplication).appComponent
     }
 }
+
+val Context.appComponent: AppComponent
+    get() =
+        BaseApplication.appComponent(this)

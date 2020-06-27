@@ -14,6 +14,8 @@ import androidx.ui.res.stringResource
 import androidx.ui.text.style.TextAlign
 import androidx.ui.tooling.preview.Preview
 import androidx.ui.unit.dp
+import co.adrianblan.core.DecoratedStory
+import co.adrianblan.core.WebPreviewState
 import co.adrianblan.domain.*
 import co.adrianblan.storyfeed.*
 import co.adrianblan.storyfeed.R

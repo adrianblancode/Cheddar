@@ -1,0 +1,10 @@
+apply from: rootProject.file("gradle/library.gradle")
+
+dependencies {
+    api(project(":hackernews"))
+    api(project(":webpreview"))
+    api(project(":domain"))
+
+    implementation(project(":network"))
+    implementation(Dependencies.androidxBrowser)
+}

@@ -1,5 +1,6 @@
 package co.adrianblan.storydetail
 
+import co.adrianblan.core.WebPreviewState
 import co.adrianblan.domain.Comment
 import co.adrianblan.domain.Story
 import co.adrianblan.webpreview.WebPreviewData
@@ -13,12 +14,6 @@ sealed class StoryDetailViewState {
 
     object Loading : StoryDetailViewState()
     data class Error(val throwable: Throwable) : StoryDetailViewState()
-}
-
-sealed class WebPreviewState {
-    data class Success(val webPreview: WebPreviewData) : WebPreviewState()
-    object Loading : WebPreviewState()
-    data class Error(val throwable: Throwable) : WebPreviewState()
 }
 
 // A comment in the comment tree that has been flattened into a list

@@ -1,11 +1,9 @@
 package co.adrianblan.storyfeed
 
-import co.adrianblan.domain.Comment
-import co.adrianblan.domain.CommentId
-import co.adrianblan.domain.Story
-import co.adrianblan.domain.StoryId
+import co.adrianblan.core.DecoratedStory
+import co.adrianblan.core.StoryPreviewUseCase
+import co.adrianblan.domain.*
 import co.adrianblan.hackernews.HackerNewsRepository
-import co.adrianblan.domain.StoryType
 import co.adrianblan.hackernews.TestHackerNewsRepository
 import co.adrianblan.test.CoroutineTestRule
 import co.adrianblan.test.TestStateFlow
@@ -14,6 +12,9 @@ import co.adrianblan.test.test
 import co.adrianblan.webpreview.WebPreviewRepository
 import com.nhaarman.mockitokotlin2.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.TestCoroutineScope
 import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.After
@@ -31,6 +32,12 @@ class StoryFeedPresenterTest {
     private lateinit var scope: TestCoroutineScope
     private lateinit var storyFeedPresenter: StoryFeedPresenter
 
+    object TestStoryPreviewUseCase: StoryPreviewUseCase {
+        override fun observeDecoratedStory(storyId: StoryId): Flow<DecoratedStory> =
+            flowOf(DecoratedStory(story = Story.placeholder, webPreviewState = null))
+                .onEach { delay(1000L) }
+    }
+
     @Before
     fun setUp() {
         scope = TestCoroutineScope(SupervisorJob() + coroutineRule.testDispatcher)
@@ -42,14 +49,10 @@ class StoryFeedPresenterTest {
             TestHackerNewsRepository(1000L)
     ) {
 
-        val webPreviewRepository: WebPreviewRepository = mock {
-            onBlocking { fetchWebPreview(any()) } doThrow (RuntimeException())
-        }
-
         storyFeedPresenter = StoryFeedPresenter(
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             hackerNewsRepository = hackerNewsRepository,
-            webPreviewRepository = webPreviewRepository
+            storyPreviewUseCase = TestStoryPreviewUseCase
         )
     }
 

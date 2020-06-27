@@ -2,6 +2,9 @@ package co.adrianblan.storydetail
 
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.toStateFlow
+import co.adrianblan.core.DecoratedStory
+import co.adrianblan.core.StoryPreviewUseCase
+import co.adrianblan.core.WebPreviewState
 import co.adrianblan.domain.CommentId
 import co.adrianblan.domain.Story
 import co.adrianblan.domain.StoryId
@@ -18,26 +21,27 @@ class StoryDetailPresenter
 @Inject constructor(
     private val storyId: StoryId,
     private val hackerNewsRepository: HackerNewsRepository,
-    private val webPreviewRepository: WebPreviewRepository,
+    private val storyPreviewUseCase: StoryPreviewUseCase,
     override val dispatcherProvider: DispatcherProvider
 ) : Presenter<StoryDetailViewState> {
 
+    // TODO share story emission with shareIn
     override val state: StateFlow<StoryDetailViewState> =
-        flow { emit(hackerNewsRepository.fetchStory(storyId)) }
-            .flatMapLatest<Story, StoryDetailViewState> { story ->
-                combine(
-                    observeWebPreviewState(story.url),
+        combine<DecoratedStory, StoryDetailCommentsState, StoryDetailViewState>(
+            storyPreviewUseCase.observeDecoratedStory(storyId),
+            flow { emit(hackerNewsRepository.fetchStory(storyId)) }
+                .flatMapLatest { story ->
                     observeCommentsViewState(story)
-                ) { webPreviewState: WebPreviewState?,
-                    storyDetailCommentsState: StoryDetailCommentsState ->
-
-                    StoryDetailViewState.Success(
-                        story = story,
-                        webPreviewState = webPreviewState,
-                        commentsState = storyDetailCommentsState
-                    )
                 }
-            }
+        ) { decoratedStory: DecoratedStory,
+            storyDetailCommentsState: StoryDetailCommentsState ->
+
+            StoryDetailViewState.Success(
+                story = decoratedStory.story,
+                webPreviewState = decoratedStory.webPreviewState,
+                commentsState = storyDetailCommentsState
+            )
+        }
             .flowOn(dispatcherProvider.IO)
             .catch {
                 Timber.e(it)
@@ -93,27 +97,6 @@ class StoryDetailPresenter
 
                 if (t is CancellationException) throw t
                 else emit(StoryDetailCommentsState.Error)
-            }
-        }
-
-    private fun observeWebPreviewState(url: StoryUrl?): Flow<WebPreviewState?> =
-        flow {
-
-            if (url == null) {
-                emit(null)
-                return@flow
-            }
-
-            emit(WebPreviewState.Loading)
-
-            try {
-                val webPreview = webPreviewRepository.fetchWebPreview(url.url)
-                emit(WebPreviewState.Success(webPreview))
-            } catch (t: Throwable) {
-                Timber.e(t)
-
-                if (t is CancellationException) throw t
-                else emit(WebPreviewState.Error(t))
             }
         }
 }

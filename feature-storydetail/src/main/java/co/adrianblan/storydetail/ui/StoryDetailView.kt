@@ -25,6 +25,7 @@ import androidx.ui.unit.Dp
 import androidx.ui.unit.TextUnit
 import androidx.ui.unit.dp
 import androidx.ui.unit.lerp
+import co.adrianblan.core.WebPreviewState
 import co.adrianblan.domain.Comment
 import co.adrianblan.domain.Story
 import co.adrianblan.domain.StoryUrl
