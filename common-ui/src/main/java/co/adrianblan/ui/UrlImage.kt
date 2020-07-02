@@ -14,8 +14,8 @@ import androidx.ui.unit.Dp
 import androidx.ui.unit.dp
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.yield
 import kotlin.coroutines.resume
 
 private const val minBitmapSizePx = 48
@@ -34,8 +34,8 @@ fun UrlImage(
     var imageState by stateFor<ImageState, String>(imageUrl) { ImageState.Loading }
 
     launchInComposition(imageUrl) {
-        // State will not cause recomposition if changed in the same frame as creation, work around this
-        delay(1)
+        // State will not recompose if updated in the same frame as initialized
+        yield()
 
         imageState = loadImage(imageUrl, targetWidthPx, targetHeightPx)
     }
