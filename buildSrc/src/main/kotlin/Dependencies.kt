@@ -23,7 +23,7 @@ object Versions {
 
 object Dependencies {
 
-    const val androidGradlePlugin = "com.android.tools.build:gradle:4.2.0-alpha02"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:4.2.0-alpha03"
     const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
     const val kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}"
 
