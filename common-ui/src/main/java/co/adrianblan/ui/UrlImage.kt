@@ -3,18 +3,18 @@ package co.adrianblan.ui
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import androidx.compose.*
-import androidx.ui.core.*
+import androidx.ui.core.DensityAmbient
+import androidx.ui.core.Modifier
 import androidx.ui.foundation.Box
 import androidx.ui.foundation.Image
 import androidx.ui.graphics.ImageAsset
 import androidx.ui.graphics.asImageAsset
-import androidx.ui.layout.*
+import androidx.ui.layout.fillMaxSize
 import androidx.ui.unit.Dp
 import androidx.ui.unit.dp
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 
@@ -31,13 +31,16 @@ fun UrlImage(
     val targetWidthPx = with(DensityAmbient.current) { remember { width.toIntPx() } }
     val targetHeightPx = with(DensityAmbient.current) { remember { height.toIntPx() } }
 
-    val imageState = stateFor<ImageState, String>(imageUrl) { ImageState.Loading }
+    var imageState by stateFor<ImageState, String>(imageUrl) { ImageState.Loading }
 
     launchInComposition(imageUrl) {
-        imageState.value = loadImage(imageUrl, targetWidthPx, targetHeightPx)
+        // State will not cause recomposition if changed in the same frame as creation, work around this
+        delay(1)
+
+        imageState = loadImage(imageUrl, targetWidthPx, targetHeightPx)
     }
 
-    DrawImageState(state = imageState.value)
+    DrawImageState(state = imageState)
 }
 
 private suspend fun loadImage(
