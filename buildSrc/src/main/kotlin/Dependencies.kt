@@ -52,7 +52,7 @@ object Dependencies {
     const val assistedInject = "com.squareup.inject:assisted-inject-annotations-dagger2:${Versions.assistedInject}"
     const val assistedInjectProcessor = "com.squareup.inject:assisted-inject-processor-dagger2:${Versions.assistedInject}"
 
-    const val desugar = "com.android.tools:desugar_jdk_libs:1.0.4"
+    const val desugar = "com.android.tools:desugar_jdk_libs:1.0.9"
 
     const val okhttpCore = "com.squareup.okhttp3:okhttp:${Versions.okhttp}"
     const val okhttpLoggingInterceptor =  "com.squareup.okhttp3:logging-interceptor:${Versions.okhttp}"
