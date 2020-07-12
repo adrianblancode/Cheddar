@@ -14,7 +14,7 @@ object StoryFeedModule
 @Subcomponent(modules = [StoryFeedModule::class])
 interface StoryFeedComponent {
 
-    fun storyFeedNodeFactory(): StoryFeedNode.Factory
+    val storyFeedNodeFactory: StoryFeedNode.Factory
 
     @Subcomponent.Factory
     interface Factory {
@@ -34,6 +34,6 @@ class StoryFeedNodeBuilder
     ): StoryFeedNode =
         storyFeedComponentBuilder
             .build()
-            .storyFeedNodeFactory()
+            .storyFeedNodeFactory
             .create(listener)
 }

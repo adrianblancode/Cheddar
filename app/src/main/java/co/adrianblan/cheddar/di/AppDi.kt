@@ -15,7 +15,7 @@ object AppModule
     dependencies = [CoreComponent::class]
 )
 interface AppComponent {
-    fun rootComponentFactory(): StoryNavigationComponent.Factory
+    val rootComponentFactory: StoryNavigationComponent.Factory
 
     @Component.Factory
     interface Factory {

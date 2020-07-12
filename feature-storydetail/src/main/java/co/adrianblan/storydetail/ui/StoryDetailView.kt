@@ -25,6 +25,7 @@ import androidx.ui.unit.Dp
 import androidx.ui.unit.TextUnit
 import androidx.ui.unit.dp
 import androidx.ui.unit.lerp
+import co.adrianblan.common.urlSiteName
 import co.adrianblan.core.WebPreviewState
 import co.adrianblan.domain.Comment
 import co.adrianblan.domain.Story
@@ -33,6 +34,7 @@ import co.adrianblan.domain.placeholder
 import co.adrianblan.storydetail.*
 import co.adrianblan.storydetail.R
 import co.adrianblan.ui.*
+import co.adrianblan.webpreview.WebPreviewData
 
 private const val toolbarMinHeightDp = 56
 private const val toolbarMaxHeightDp = 148
@@ -188,29 +190,49 @@ fun StoryDetailToolbar(
 
                 val story: Story = viewState.story
                 val webPreviewState: WebPreviewState? = viewState.webPreviewState
+                val webPreview: WebPreviewData? = (webPreviewState as? WebPreviewState.Success)
+                    ?.webPreview
 
                 val titleRightOffset =
                     if (story.url != null) imageSize + 12.dp
                     else 0.dp
 
-                Text(
-                    text = story.title,
-                    style = MaterialTheme.typography.h6.copy(
-                        fontSize = titleFontSize,
-                        color = MaterialTheme.colors.onBackground
-                    ),
+                Column(
                     modifier = Modifier.padding(
                         start = 16.dp + titleCollapsedLeftOffset,
-                        end = 8.dp + titleRightOffset,
+                        end = 12.dp + titleRightOffset,
                         bottom = 8.dp,
                         top = 8.dp + titleCollapsedTopOffset
-                    ).fillMaxWidth()
+                    )
+                        .fillMaxWidth()
                         .preferredHeight(height)
                         .gravity(Alignment.CenterStart)
-                        .wrapContentHeight(Alignment.CenterVertically),
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = titleMaxLines
-                )
+                        .wrapContentHeight(Alignment.CenterVertically)
+                ) {
+
+                    Text(
+                        text = story.title,
+                        style = MaterialTheme.typography.h6.copy(
+                            fontSize = titleFontSize,
+                            color = MaterialTheme.colors.onBackground
+                        ),
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = titleMaxLines
+                    )
+
+                    val siteName: String? = webPreview?.siteName ?: story.url?.url?.urlSiteName()
+
+                    if (siteName != null) {
+                        Text(
+                            text = siteName,
+                            style = MaterialTheme.typography.subtitle2.copy(
+                                color = MaterialTheme.colors.onPrimary.copy(alpha = textSecondaryAlpha)
+                            ),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
 
                 if (story.url != null) {
                     Box(modifier = Modifier.gravity(Alignment.BottomEnd)) {

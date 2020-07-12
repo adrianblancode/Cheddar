@@ -19,7 +19,7 @@ object StoryNavigationModule
     modules = [StoryNavigationModule::class]
 )
 interface StoryNavigationComponent {
-    fun storyNavigationNode(): StoryNavigationNode
+    val storyNavigationNode: StoryNavigationNode
 
     @Subcomponent.Factory
     interface Factory {

@@ -16,9 +16,9 @@ class MainActivity : AppCompatActivity() {
 
     private val rootNode: AnyNode by createRootNode {
             application.appComponent
-                .rootComponentFactory()
+                .rootComponentFactory
                 .build()
-                .storyNavigationNode()
+                .storyNavigationNode
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {

@@ -44,15 +44,15 @@ interface CoreModule {
 )
 interface CoreComponent {
 
-    fun context(): Context
+    val context: Context
 
-    fun dispatcherProvider(): DispatcherProvider
-    fun customTabsLauncher(): CustomTabsLauncher
+    val dispatcherProvider: DispatcherProvider
+    val customTabsLauncher: CustomTabsLauncher
 
-    fun hackerNewsRepository(): HackerNewsRepository
-    fun webPreviewRepository(): WebPreviewRepository
+    val hackerNewsRepository: HackerNewsRepository
+    val webPreviewRepository: WebPreviewRepository
 
-    fun storyPreviewUseCase(): StoryPreviewUseCase
+    val storyPreviewUseCase: StoryPreviewUseCase
 
     @Component.Factory
     interface Factory {
