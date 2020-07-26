@@ -1,9 +1,7 @@
 package co.adrianblan.ui
 
-import androidx.animation.FloatPropKey
-import androidx.animation.Infinite
-import androidx.animation.LinearEasing
-import androidx.animation.transitionDefinition
+import androidx.animation.*
+import androidx.animation.AnimationConstants.Infinite
 import androidx.compose.Composable
 import androidx.ui.animation.Transition
 import androidx.ui.core.*
@@ -54,13 +52,13 @@ private val loadingDefinition = transitionDefinition {
     state(1) { this[loadingState] = 1f }
 
     transition {
-        loadingState using repeatable<Float> {
-            animation = tween {
-                easing = LinearEasing
-                duration = 1200
-            }
-            iterations = Infinite
-        }
+        loadingState using repeatable(
+            iterations = Infinite,
+            animation = tween(
+                easing = LinearEasing,
+                durationMillis = 1200
+            )
+        )
     }
 }
 

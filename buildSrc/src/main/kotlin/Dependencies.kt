@@ -2,14 +2,14 @@ object Versions {
     const val minSdk = 23
     const val targetSdk = 29
 
-    const val kotlin = "1.3.72"
-    const val coroutines = "1.3.6"
+    const val kotlin = "1.4-M3"
+    const val coroutines = "1.3.7-1.4-M3"
 
     const val androidxAppcompat = "1.1.0"
     const val androidxCore = "1.2.0-alpha01"
     const val androidxActivity = "1.1.0-rc02"
-    const val compose = "0.1.0-dev14"
-    const val composeCompiler = "1.3.70-dev-withExperimentalGoogleExtensions-20200424"
+    const val compose = "0.1.0-dev15"
+    const val composeCompiler = "1.4.0-dev-withExperimentalGoogleExtensions-20200720"
 
     const val dagger = "2.28"
     const val assistedInject = "0.5.2"
@@ -23,12 +23,12 @@ object Versions {
 
 object Dependencies {
 
-    const val androidGradlePlugin = "com.android.tools.build:gradle:4.2.0-alpha04"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:4.2.0-alpha05"
     const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
     const val kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}"
 
     const val kotlinSerializationPlugin = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}"
-    const val kotlinSerializationRuntime = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0"
+    const val kotlinSerializationRuntime = "org.jetbrains.kotlinx:kotlinx-serialization-runtime:0.20.0-1.4-M3"
 
     const val coroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}"
     const val coroutinesAndroid =  "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutines}"
@@ -39,13 +39,13 @@ object Dependencies {
     const val androidxActivity = "androidx.activity:activity-ktx:${Versions.androidxActivity}"
     const val androidxBrowser = "androidx.browser:browser:1.2.0"
 
-    const val composeRuntime = "androidx.compose:compose-runtime:${Versions.compose}"
-    const val composeLayout = "androidx.ui:ui-layout:${Versions.compose}"
-    const val composeMaterial = "androidx.ui:ui-material:${Versions.compose}"
-    const val composeFoundation = "androidx.ui:ui-foundation:${Versions.compose}"
-    const val composeAnimation = "androidx.ui:ui-animation:${Versions.compose}"
+    const val composeRuntime = "androidx.compose.runtime:runtime:${Versions.compose}"
+    const val composeLayout = "androidx.compose.foundation:foundation-layout:${Versions.compose}"
+    const val composeMaterial = "androidx.compose.material:material:${Versions.compose}"
+    const val composeFoundation = "androidx.compose.foundation:foundation:${Versions.compose}"
+    const val composeAnimation = "androidx.compose.animation:animation:${Versions.compose}"
     const val composeTooling = "androidx.ui:ui-tooling:${Versions.compose}"
-    const val composeIcons = "androidx.ui:ui-material-icons-extended:${Versions.compose}"
+    const val composeIcons = "androidx.compose.material:material-icons-extended:${Versions.compose}"
 
     const val dagger = "com.google.dagger:dagger:${Versions.dagger}"
     const val daggerCompiler = "com.google.dagger:dagger-compiler:${Versions.dagger}"
