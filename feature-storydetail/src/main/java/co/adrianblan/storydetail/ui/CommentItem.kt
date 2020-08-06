@@ -5,31 +5,28 @@ import android.text.Html
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.URLSpan
-import android.util.Patterns
-import androidx.compose.Composable
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.ClickableText
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import androidx.core.net.toUri
-import androidx.ui.core.DensityAmbient
-import androidx.ui.core.Modifier
-import androidx.ui.core.drawBehind
-import androidx.ui.foundation.Box
-import androidx.ui.foundation.ClickableText
-import androidx.ui.foundation.Text
-import androidx.ui.geometry.Offset
-import androidx.ui.graphics.Color
-import androidx.ui.graphics.StrokeCap
-import androidx.ui.graphics.drawscope.Stroke
-import androidx.ui.layout.*
-import androidx.ui.material.MaterialTheme
-import androidx.ui.res.colorResource
-import androidx.ui.res.stringResource
-import androidx.ui.text.AnnotatedString
-import androidx.ui.text.SpanStyle
-import androidx.ui.unit.TextUnit
-import androidx.ui.unit.dp
-import androidx.ui.unit.times
 import co.adrianblan.storydetail.FlatComment
 import co.adrianblan.storydetail.R
-import java.util.regex.Matcher
 
 
 @Composable
@@ -87,7 +84,7 @@ fun CommentItem(
                         end = o2,
                         color = depthIndicatorColor,
                         strokeWidth = strokeWidthPx,
-                        cap = StrokeCap.round
+                        cap = StrokeCap.Round
                     )
                     depthOffset += depthIndicatorWidth.toPx()
                 }

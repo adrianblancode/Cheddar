@@ -1,7 +1,6 @@
 package co.adrianblan.matryoshka.node
 
-import androidx.annotation.RestrictTo
-import androidx.compose.Composable
+import androidx.compose.runtime.Composable
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.asFlow

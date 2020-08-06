@@ -2,12 +2,10 @@ package co.adrianblan.hackernews
 
 import co.adrianblan.hackernews.api.HackerNewsApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
-import dagger.Component
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
 import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -28,7 +26,9 @@ object HackerNewsModule {
         Retrofit.Builder()
             .baseUrl("https://hacker-news.firebaseio.com/v0/")
             .addConverterFactory(
-                Json(JsonConfiguration(ignoreUnknownKeys = true))
+                Json {
+                    ignoreUnknownKeys = true
+                }
                     .asConverterFactory("application/json".toMediaType())
             )
             .callFactory(

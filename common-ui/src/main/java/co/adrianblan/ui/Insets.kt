@@ -1,12 +1,11 @@
 package co.adrianblan.ui
 
 import android.view.View
-import androidx.compose.*
+import androidx.compose.runtime.*
 import androidx.core.graphics.Insets
 import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import timber.log.Timber
 
 // Alpha for views which have content drawn behind it
 const val overInsetAlpha = 0.8f
@@ -17,12 +16,14 @@ val InsetsAmbient = ambientOf { Insets.NONE }
 @Composable
 fun InsetsWrapper(
     view: View,
-    content: @Composable() () -> Unit
+    content: @Composable () -> Unit
 ) {
 
-    val insetState = state<Insets> {
-        view.rootWindowInsets?.systemWindowInsets?.toCompat()
-            ?: Insets.NONE
+    var insets by state<Insets> {
+        view.rootWindowInsets?.let {
+            WindowInsetsCompat.toWindowInsetsCompat(it)
+                .systemWindowInsets
+        } ?: Insets.NONE
     }
 
     onCommit {
@@ -31,7 +32,7 @@ fun InsetsWrapper(
             OnApplyWindowInsetsListener { _, windowInsets ->
                 val inset = windowInsets.systemWindowInsets
 
-                insetState.value = inset
+                insets = inset
 
                 windowInsets
             }
@@ -40,11 +41,7 @@ fun InsetsWrapper(
         onDispose { ViewCompat.setOnApplyWindowInsetsListener(view, null) }
     }
 
-    Providers(InsetsAmbient provides insetState.value) {
+    Providers(InsetsAmbient provides insets) {
         content()
     }
 }
-
-// TODO remove when compose dev-13
-private fun android.graphics.Insets.toCompat() : Insets =
-    Insets.of(left, top, right, bottom)

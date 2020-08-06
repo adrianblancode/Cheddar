@@ -1,17 +1,17 @@
 package co.adrianblan.ui
 
-import androidx.animation.AnimationClockObserver
-import androidx.compose.*
-import androidx.ui.core.AnimationClockAmbient
-import androidx.ui.core.Modifier
-import androidx.ui.core.drawBehind
-import androidx.ui.foundation.Box
-import androidx.ui.geometry.Offset
-import androidx.ui.geometry.Size
-import androidx.ui.geometry.toRect
-import androidx.ui.graphics.LinearGradient
-import androidx.ui.layout.fillMaxSize
-import androidx.ui.res.colorResource
+import androidx.compose.animation.core.AnimationClockObserver
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.toRect
+import androidx.compose.ui.graphics.LinearGradient
+import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.res.colorResource
 import androidx.ui.tooling.preview.Preview
 import co.adrianblan.ui.utils.lerp
 

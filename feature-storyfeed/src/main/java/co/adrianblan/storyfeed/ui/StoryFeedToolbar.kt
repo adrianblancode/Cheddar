@@ -1,26 +1,26 @@
 package co.adrianblan.storyfeed.ui
 
-import androidx.compose.Composable
-import androidx.compose.getValue
-import androidx.compose.setValue
-import androidx.compose.state
-import androidx.ui.core.Alignment
-import androidx.ui.core.Modifier
-import androidx.ui.foundation.*
-import androidx.ui.foundation.shape.corner.RoundedCornerShape
-import androidx.ui.graphics.Color
-import androidx.ui.layout.Row
-import androidx.ui.layout.preferredHeight
-import androidx.ui.layout.preferredWidthIn
-import androidx.ui.material.MaterialTheme
-import androidx.ui.material.Surface
-import androidx.ui.material.icons.Icons
-import androidx.ui.material.icons.filled.ArrowDropDown
-import androidx.ui.res.stringResource
-import androidx.ui.unit.Dp
-import androidx.ui.unit.TextUnit
-import androidx.ui.unit.dp
-import androidx.ui.unit.lerp
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.preferredWidthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.state
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import co.adrianblan.domain.StoryType
 
 @Composable

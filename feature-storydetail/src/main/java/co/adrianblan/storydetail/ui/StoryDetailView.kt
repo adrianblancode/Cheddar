@@ -1,38 +1,39 @@
 package co.adrianblan.storydetail.ui
 
 import android.net.Uri
-import androidx.compose.Composable
-import androidx.compose.key
-import androidx.compose.remember
-import androidx.ui.core.Alignment
-import androidx.ui.core.DensityAmbient
-import androidx.ui.core.Modifier
-import androidx.ui.foundation.*
-import androidx.ui.foundation.shape.corner.RoundedCornerShape
-import androidx.ui.layout.*
-import androidx.ui.material.IconButton
-import androidx.ui.material.MaterialTheme
-import androidx.ui.material.Surface
-import androidx.ui.material.icons.Icons
-import androidx.ui.material.icons.filled.ArrowBack
-import androidx.ui.material.ripple.RippleIndication
-import androidx.ui.res.colorResource
-import androidx.ui.res.stringResource
-import androidx.ui.text.style.TextAlign
-import androidx.ui.text.style.TextOverflow
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 import androidx.ui.tooling.preview.Preview
-import androidx.ui.unit.Dp
-import androidx.ui.unit.TextUnit
-import androidx.ui.unit.dp
-import androidx.ui.unit.lerp
 import co.adrianblan.common.urlSiteName
 import co.adrianblan.core.WebPreviewState
 import co.adrianblan.domain.Comment
 import co.adrianblan.domain.Story
 import co.adrianblan.domain.StoryUrl
 import co.adrianblan.domain.placeholder
-import co.adrianblan.storydetail.*
+import co.adrianblan.storydetail.FlatComment
 import co.adrianblan.storydetail.R
+import co.adrianblan.storydetail.StoryDetailCommentsState
+import co.adrianblan.storydetail.StoryDetailViewState
 import co.adrianblan.ui.*
 import co.adrianblan.webpreview.WebPreviewData
 
@@ -48,10 +49,10 @@ fun StoryDetailView(
     onBackPressed: () -> Unit
 ) {
 
-    val scroller = ScrollerPosition()
+    val scrollState = rememberScrollState()
 
     CollapsingScaffold(
-        scroller = scroller,
+        scrollState = scrollState,
         minHeight = toolbarMinHeightDp.dp,
         maxHeight = toolbarMaxHeightDp.dp,
         toolbarContent = { collapsedFraction, height ->
@@ -72,7 +73,7 @@ fun StoryDetailView(
 
                     when (viewState.commentsState) {
                         is StoryDetailCommentsState.Success ->
-                            VerticalScroller(scroller) {
+                            ScrollableColumn(scrollState = scrollState) {
                                 Column {
 
                                     val topInsets =

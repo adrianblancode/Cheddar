@@ -1,20 +1,21 @@
 package co.adrianblan.storyfeed.ui
 
-import androidx.compose.Composable
-import androidx.compose.remember
-import androidx.ui.core.Alignment
-import androidx.ui.core.DropdownPopup
-import androidx.ui.core.Modifier
-import androidx.ui.foundation.*
-import androidx.ui.foundation.shape.corner.RoundedCornerShape
-import androidx.ui.layout.*
-import androidx.ui.material.MaterialTheme
-import androidx.ui.material.Surface
-import androidx.ui.material.icons.Icons
-import androidx.ui.material.icons.filled.Check
-import androidx.ui.res.stringResource
-import androidx.ui.unit.Dp
-import androidx.ui.unit.dp
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import co.adrianblan.domain.StoryType
 import co.adrianblan.ui.AppTheme
 
@@ -27,7 +28,7 @@ fun StoryTypePopup(
     onDismiss: () -> Unit
 ) {
 
-    DropdownPopup(
+    Popup(
         isFocusable = true,
         onDismissRequest = onDismiss
     ) {

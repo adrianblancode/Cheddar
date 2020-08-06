@@ -1,6 +1,6 @@
 package co.adrianblan.ui
 
-import androidx.compose.Composable
+import androidx.compose.runtime.Composable
 
 @Composable
-fun Observe(body: @Composable() () -> Unit) = body()
+fun Observe(body: @Composable () -> Unit) = body()

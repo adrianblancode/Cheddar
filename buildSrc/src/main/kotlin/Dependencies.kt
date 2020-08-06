@@ -1,29 +1,29 @@
 object Versions {
     const val minSdk = 23
-    const val targetSdk = 29
+    const val targetSdk = 30
 
     const val kotlin = "1.4-M3"
     const val coroutines = "1.3.7-1.4-M3"
 
     const val androidxAppcompat = "1.1.0"
-    const val androidxCore = "1.2.0-alpha01"
+    const val androidxCore = "1.5.0-alpha01"
     const val androidxActivity = "1.1.0-rc02"
-    const val compose = "0.1.0-dev15"
+    const val compose = "0.1.0-dev16"
     const val composeCompiler = "1.4.0-dev-withExperimentalGoogleExtensions-20200720"
 
-    const val dagger = "2.28"
+    const val dagger = "2.28.3"
     const val assistedInject = "0.5.2"
-    const val okhttp = "4.7.2"
+    const val okhttp = "4.8.0"
     const val retrofit = "2.9.0"
 
     const val junit = "4.13"
     const val androidTestJunit = "1.1.1"
-    const val mockito = "3.3.3"
+    const val mockito = "3.4.6"
 }
 
 object Dependencies {
 
-    const val androidGradlePlugin = "com.android.tools.build:gradle:4.2.0-alpha05"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:4.2.0-alpha07"
     const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
     const val kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.kotlin}"
 
@@ -62,7 +62,7 @@ object Dependencies {
     const val picasso = "com.squareup.picasso:picasso:2.71828"
     const val jsoup = "org.jsoup:jsoup:1.13.1"
 
-    const val leakcanary = "com.squareup.leakcanary:leakcanary-android:2.2"
+    const val leakcanary = "com.squareup.leakcanary:leakcanary-android:2.4"
     const val timber = "com.jakewharton.timber:timber:4.7.1"
     const val junit = "junit:junit:${Versions.junit}"
     const val androidTestJunit = "androidx.test.ext:junit:${Versions.androidTestJunit}"

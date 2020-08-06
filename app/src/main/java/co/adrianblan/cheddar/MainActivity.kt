@@ -4,7 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.ui.core.setContent
+import androidx.compose.ui.platform.setContent
 import co.adrianblan.matryoshka.node.AnyNode
 import co.adrianblan.matryoshka.root.createRootNode
 import co.adrianblan.ui.AppTheme

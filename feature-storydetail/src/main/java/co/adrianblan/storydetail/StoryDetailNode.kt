@@ -1,8 +1,8 @@
 package co.adrianblan.storydetail
 
 import android.net.Uri
-import androidx.compose.Composable
-import androidx.compose.collectAsState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import co.adrianblan.common.collectAsStateFlow
 import co.adrianblan.domain.StoryUrl
 import co.adrianblan.storydetail.ui.StoryDetailView

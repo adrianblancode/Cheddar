@@ -1,7 +1,7 @@
 package co.adrianblan.storyfeed
 
-import androidx.compose.Composable
-import androidx.compose.collectAsState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import co.adrianblan.common.collectAsStateFlow
 import co.adrianblan.domain.StoryId
 import co.adrianblan.domain.StoryUrl

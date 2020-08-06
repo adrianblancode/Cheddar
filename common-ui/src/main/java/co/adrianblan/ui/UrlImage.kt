@@ -2,16 +2,16 @@ package co.adrianblan.ui
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import androidx.compose.*
-import androidx.ui.core.DensityAmbient
-import androidx.ui.core.Modifier
-import androidx.ui.foundation.Box
-import androidx.ui.foundation.Image
-import androidx.ui.graphics.ImageAsset
-import androidx.ui.graphics.asImageAsset
-import androidx.ui.layout.fillMaxSize
-import androidx.ui.unit.Dp
-import androidx.ui.unit.dp
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageAsset
+import androidx.compose.ui.graphics.asImageAsset
+import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import kotlinx.coroutines.suspendCancellableCoroutine

@@ -1,24 +1,25 @@
 package co.adrianblan.storyfeed.ui
 
-import androidx.compose.Composable
-import androidx.compose.key
-import androidx.compose.onCommit
-import androidx.compose.onDispose
-import androidx.ui.core.DensityAmbient
-import androidx.ui.core.Modifier
-import androidx.ui.foundation.*
-import androidx.ui.layout.*
-import androidx.ui.material.Button
-import androidx.ui.material.MaterialTheme
-import androidx.ui.res.stringResource
-import androidx.ui.text.style.TextAlign
+import androidx.compose.foundation.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
+import androidx.compose.runtime.onCommit
+import androidx.compose.runtime.onDispose
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.ui.tooling.preview.Preview
-import androidx.ui.unit.dp
 import co.adrianblan.core.DecoratedStory
 import co.adrianblan.core.WebPreviewState
 import co.adrianblan.domain.*
-import co.adrianblan.storyfeed.*
 import co.adrianblan.storyfeed.R
+import co.adrianblan.storyfeed.StoryFeedState
+import co.adrianblan.storyfeed.StoryFeedViewState
 import co.adrianblan.ui.*
 import kotlin.math.min
 
@@ -35,9 +36,6 @@ internal fun StoryType.titleStringResource(): Int =
         StoryType.JOB -> R.string.stories_job_title
     }
 
-// Scroll state seems to reset if the composition disposes, so save it here
-private var initialScrollPosition = 0f
-
 @Composable
 fun StoryFeedView(
     viewState: StoryFeedViewState,
@@ -47,7 +45,7 @@ fun StoryFeedView(
     onPageEndReached: () -> Unit
 ) {
 
-    val scroller = ScrollerPosition(initialScrollPosition)
+    val scrollState = rememberScrollState()
     val densityAmbient = DensityAmbient.current
 
     // Prevent resetting scroll state on first commit
@@ -62,20 +60,16 @@ fun StoryFeedView(
         // If story type is changed, reset scroll but retain toolbar collapse state
         val scrollReset: Float =
             with(densityAmbient) {
-                min(scroller.value, collapseDistance.toPx())
+                min(scrollState.value, collapseDistance.toPx())
             }
 
-        scroller.scrollTo(scrollReset)
+        scrollState.scrollTo(scrollReset)
 
         lastStoryType = viewState.storyType
     }
 
-    onDispose {
-        initialScrollPosition = scroller.value
-    }
-
     CollapsingScaffold(
-        scroller = scroller,
+        scrollState = scrollState,
         maxHeight = toolbarMaxHeightDp.dp,
         toolbarContent = { collapseFraction, height ->
             StoryFeedToolbar(
@@ -87,7 +81,7 @@ fun StoryFeedView(
         },
         bodyContent = {
             StoryFeedBodyContent(
-                scroller = scroller,
+                scrollState = scrollState,
                 viewState = viewState,
                 onStoryClick = onStoryClick,
                 onStoryContentClick = onStoryContentClick,
@@ -99,7 +93,7 @@ fun StoryFeedView(
 
 @Composable
 fun StoryFeedBodyContent(
-    scroller: ScrollerPosition,
+    scrollState: ScrollState,
     viewState: StoryFeedViewState,
     onStoryClick: (StoryId) -> Unit,
     onStoryContentClick: (StoryUrl) -> Unit,
@@ -110,7 +104,7 @@ fun StoryFeedBodyContent(
         is StoryFeedState.Loading -> LoadingView()
         is StoryFeedState.Success -> {
             StoryFeedSuccessContentBody(
-                scroller = scroller,
+                scrollState = scrollState,
                 viewState = viewState,
                 onStoryClick = onStoryClick,
                 onStoryContentClick = onStoryContentClick,
@@ -123,7 +117,7 @@ fun StoryFeedBodyContent(
 
 @Composable
 fun StoryFeedSuccessContentBody(
-    scroller: ScrollerPosition,
+    scrollState: ScrollState,
     viewState: StoryFeedViewState,
     onStoryClick: (StoryId) -> Unit,
     onStoryContentClick: (StoryUrl) -> Unit,
@@ -137,13 +131,13 @@ fun StoryFeedSuccessContentBody(
 
     Observe {
         val isScrolledToEnd: Boolean =
-            scroller.value > scroller.maxPosition - scrollEndZone
+            scrollState.value > scrollState.maxValue - scrollEndZone
 
         onCommit(isScrolledToEnd) {
             if (isScrolledToEnd) {
 
                 // Stop scroll fling
-                scroller.scrollTo(scroller.value)
+                scrollState.scrollTo(scrollState.value)
 
                 onPageEndReached()
             }
@@ -151,7 +145,7 @@ fun StoryFeedSuccessContentBody(
     }
 
     // TODO change to AdapterList
-    VerticalScroller(scrollerPosition = scroller) {
+    ScrollableColumn(scrollState = scrollState) {
 
         Column {
 

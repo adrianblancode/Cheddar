@@ -1,8 +1,8 @@
 package co.adrianblan.storynavigation
 
-import androidx.compose.Composable
-import androidx.ui.animation.Crossfade
-import androidx.ui.layout.Stack
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Stack
+import androidx.compose.runtime.Composable
 import co.adrianblan.matryoshka.node.AnyNode
 
 

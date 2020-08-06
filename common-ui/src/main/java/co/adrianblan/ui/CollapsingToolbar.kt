@@ -1,31 +1,29 @@
 package co.adrianblan.ui
 
-import androidx.compose.Composable
-import androidx.compose.remember
-import androidx.ui.core.*
-import androidx.ui.foundation.Box
-import androidx.ui.foundation.ScrollerPosition
-import androidx.ui.foundation.clickable
-import androidx.ui.geometry.Rect
-import androidx.ui.geometry.Size
-import androidx.ui.graphics.Outline
-import androidx.ui.graphics.RectangleShape
-import androidx.ui.graphics.Shape
-import androidx.ui.layout.*
-import androidx.ui.material.MaterialTheme
-import androidx.ui.material.Surface
-import androidx.ui.unit.Density
-import androidx.ui.unit.Dp
-import androidx.ui.unit.dp
-import androidx.ui.unit.lerp
-import kotlin.math.min
+import androidx.compose.foundation.Box
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawShadow
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.*
+import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.unit.*
 
 @Composable
 fun CollapsingToolbar(
-    scroller: ScrollerPosition,
+    scrollState: ScrollState,
     minHeight: Dp = 56.dp,
     maxHeight: Dp = 128.dp,
-    toolbarContent: @Composable() (collapsedFraction: Float, height: Dp) -> Unit
+    toolbarContent: @Composable (collapsedFraction: Float, height: Dp) -> Unit
 ) {
 
     val totalCollapseDistance: Dp = maxHeight - minHeight
@@ -34,7 +32,7 @@ fun CollapsingToolbar(
 
         // 1f is fully collapsed
         val collapsedFraction: Float =
-            min(scroller.value.toDp() / totalCollapseDistance, 1f)
+            minOf(scrollState.value.toDp() / totalCollapseDistance, 1f)
 
         val height = minHeight + (maxHeight - minHeight) * (1f - collapsedFraction)
 
@@ -83,11 +81,11 @@ fun CollapsingToolbar(
 // Collapsing toolbar with body content drawn behind it
 @Composable
 fun CollapsingScaffold(
-    scroller: ScrollerPosition,
+    scrollState: ScrollState,
     minHeight: Dp = 56.dp,
     maxHeight: Dp = 128.dp,
-    toolbarContent: @Composable() (collapsedFraction: Float, height: Dp) -> Unit,
-    bodyContent: @Composable() () -> Unit
+    toolbarContent: @Composable (collapsedFraction: Float, height: Dp) -> Unit,
+    bodyContent: @Composable () -> Unit
 ) {
     Stack(modifier = Modifier.fillMaxHeight()) {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -104,7 +102,7 @@ fun CollapsingScaffold(
             modifier = Modifier.clickable(indication = null, onClick = {}),
             children = {
                 CollapsingToolbar(
-                    scroller = scroller,
+                    scrollState = scrollState,
                     minHeight = minHeight,
                     maxHeight = maxHeight
                 ) { collapsedFraction, height ->
