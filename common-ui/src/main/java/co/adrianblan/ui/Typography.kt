@@ -15,8 +15,8 @@ private val regular = font(R.font.avenir_roman)
 private val medium = font(R.font.avenir_heavy, FontWeight.W500)
 private val semibold = font(R.font.avenir_black, FontWeight.W600)
 
-private val appFontFamily = fontFamily(fonts = listOf(regular, medium, semibold))
-private val bodyFontFamily = appFontFamily
+private val appFontFamily = fontFamily(fonts = listOf(medium, semibold))
+private val bodyFontFamily = fontFamily(fonts = listOf(regular))
 
 val themeTypography = Typography(
     h1 = TextStyle(
@@ -61,11 +61,12 @@ val themeTypography = Typography(
     ),
     body1 = TextStyle(
         fontFamily = bodyFontFamily,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.W400,
         fontSize = 16.sp
     ),
     body2 = TextStyle(
-        fontFamily = appFontFamily,
+        fontFamily = bodyFontFamily,
+        fontWeight = FontWeight.W400,
         fontSize = 14.sp
     ),
     button = TextStyle(
@@ -75,7 +76,7 @@ val themeTypography = Typography(
     ),
     caption = TextStyle(
         fontFamily = appFontFamily,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.W400,
         fontSize = 12.sp
     ),
     overline = TextStyle(
