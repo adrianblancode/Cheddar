@@ -4,6 +4,10 @@
     <color name="colorPrimaryDark">#AFFF</color>
     <color name="colorAccent">#FF6600</color>
 
+    <color name="colorBackground">#FFF</color>
+
+    <color name="divider">#EEE</color>
     <color name="contentMuted">#DDD</color>
+    <color name="contentMutedSecondary">#999</color>
     <color name="contentShimmer">#EEE</color>
 </resources>

@@ -13,44 +13,45 @@ const val textTertiaryAlpha = 0.6f
 
 private val regular = font(R.font.avenir_roman)
 private val medium = font(R.font.avenir_heavy, FontWeight.W500)
-private val semibold = font(R.font.avenir_black, FontWeight.W600)
+private val bold = font(R.font.avenir_black, FontWeight.W600)
 
-private val appFontFamily = fontFamily(fonts = listOf(medium, semibold))
+private val appFontFamily = fontFamily(fonts = listOf(medium))
+private val boldFamily = fontFamily(fonts = listOf(bold))
 private val bodyFontFamily = fontFamily(fonts = listOf(regular))
 
 val themeTypography = Typography(
     h1 = TextStyle(
-        fontFamily = appFontFamily,
+        fontFamily = boldFamily,
         fontWeight = FontWeight.W600,
         fontSize = 72.sp
     ),
     h2 = TextStyle(
-        fontFamily = appFontFamily,
+        fontFamily = boldFamily,
         fontWeight = FontWeight.W600,
         fontSize = 60.sp
     ),
     h3 = TextStyle(
-        fontFamily = appFontFamily,
+        fontFamily = boldFamily,
         fontWeight = FontWeight.W600,
         fontSize = 48.sp
     ),
     h4 = TextStyle(
-        fontFamily = appFontFamily,
+        fontFamily = boldFamily,
         fontWeight = FontWeight.W600,
         fontSize = 30.sp
     ),
     h5 = TextStyle(
-        fontFamily = appFontFamily,
+        fontFamily = boldFamily,
         fontWeight = FontWeight.W600,
         fontSize = 24.sp
     ),
     h6 = TextStyle(
-        fontFamily = appFontFamily,
+        fontFamily = boldFamily,
         fontWeight = FontWeight.W600,
         fontSize = 20.sp
     ),
     subtitle1 = TextStyle(
-        fontFamily = appFontFamily,
+        fontFamily = boldFamily,
         fontWeight = FontWeight.W600,
         fontSize = 16.sp
     ),

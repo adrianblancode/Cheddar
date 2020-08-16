@@ -3,4 +3,11 @@
 
     <item android:drawable="@color/colorPrimary" />
 
+    <item android:right="32dp"
+        android:left="32dp">
+        <bitmap
+            android:gravity="center"
+            android:src="@drawable/cheddar_logo" />
+    </item>
+
 </layer-list>

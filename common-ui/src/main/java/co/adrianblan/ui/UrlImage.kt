@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Stack
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -14,9 +15,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
+import com.squareup.picasso.Transformation
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.yield
 import kotlin.coroutines.resume
+import kotlin.math.min
 
 private const val minBitmapSizePx = 48
 
@@ -25,7 +28,8 @@ private const val minBitmapSizePx = 48
 fun UrlImage(
     imageUrl: String,
     height: Dp = 80.dp,
-    width: Dp = 80.dp
+    width: Dp = 80.dp,
+    fallbackIcon: @Composable (() -> Unit)? = null,
 ) {
 
     val targetWidthPx = with(DensityAmbient.current) { remember { width.toIntPx() } }
@@ -40,7 +44,7 @@ fun UrlImage(
         imageState = loadImage(imageUrl, targetWidthPx, targetHeightPx)
     }
 
-    DrawImageState(state = imageState)
+    DrawImageState(state = imageState, fallbackIcon = fallbackIcon)
 }
 
 private suspend fun loadImage(
@@ -79,8 +83,8 @@ private suspend fun loadImage(
 
         val picasso = Picasso.get()
 
-        picasso
-            .load(imageUrl)
+        picasso.load(imageUrl)
+            .transform(CropSquareTransformation)
             .into(target)
 
         continuation.invokeOnCancellation {
@@ -88,14 +92,31 @@ private suspend fun loadImage(
         }
     }
 
+object CropSquareTransformation : Transformation {
+    override fun transform(source: Bitmap): Bitmap {
+        val size = min(source.width, source.height)
+        val x = (source.width - size) / 2
+        val y = (source.height - size) / 2
+        val result = Bitmap.createBitmap(source, x, y, size, size)
+        if (result != source) {
+            source.recycle()
+        }
+        return result
+    }
+
+    override fun key(): String = "square()"
+}
+
 @Composable
-private fun DrawImageState(state: ImageState) {
+private fun DrawImageState(state: ImageState, fallbackIcon: @Composable (() -> Unit)?) {
     when (state) {
         is ImageState.Loading ->
-            Box(modifier = Modifier.fillMaxSize()) {
+            Stack(modifier = Modifier.fillMaxSize()) {
                 ShimmerView()
+                fallbackIcon?.invoke()
             }
         is ImageState.Error -> {
+            fallbackIcon?.invoke()
         }
         is ImageState.ImageSuccess ->
             Image(asset = state.image)

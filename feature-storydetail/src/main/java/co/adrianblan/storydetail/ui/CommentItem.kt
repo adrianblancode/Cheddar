@@ -59,7 +59,7 @@ fun CommentItem(
         1.dp.toPx()
     }
 
-    val depthIndicatorColor = colorResource(id = R.color.contentMuted)
+    val depthIndicatorColor = colorResource(id = R.color.divider)
 
     Box(
         paddingStart = 16.dp + depthIndex * depthIndicatorWidth,

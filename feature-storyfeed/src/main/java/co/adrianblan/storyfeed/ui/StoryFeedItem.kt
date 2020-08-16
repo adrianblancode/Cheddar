@@ -1,6 +1,7 @@
 package co.adrianblan.storyfeed.ui
 
 import android.text.Html
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
@@ -21,6 +22,7 @@ import androidx.ui.tooling.preview.Preview
 import co.adrianblan.common.urlSiteName
 import co.adrianblan.core.DecoratedStory
 import co.adrianblan.core.WebPreviewState
+import co.adrianblan.core.ui.LinkIcon
 import co.adrianblan.domain.Story
 import co.adrianblan.domain.StoryId
 import co.adrianblan.domain.StoryUrl
@@ -71,7 +73,7 @@ fun StoryFeedItem(
                     paddingTop = 16.dp,
                     paddingBottom = 12.dp
                 ) {
-                    Column(modifier = Modifier.fillMaxWidth()) {
+                    Column(modifier = Modifier.fillMaxWidth().animateContentSize()) {
                         Text(
                             text = story.title,
                             style = MaterialTheme.typography.subtitle1
@@ -221,8 +223,9 @@ private fun StoryFeedItemImage(
 
                     when (webPreviewState) {
                         is WebPreviewState.Loading -> {
-                            Box(modifier = Modifier.fillMaxSize()) {
+                            Stack(modifier = Modifier.fillMaxSize()) {
                                 ShimmerView()
+                                LinkIcon()
                             }
                         }
                         is WebPreviewState.Success -> {
@@ -232,9 +235,12 @@ private fun StoryFeedItemImage(
                                 webPreview.imageUrl ?: webPreview.iconUrl
                                 ?: webPreview.favIconUrl
 
-                            UrlImage(imageUrl)
+                            UrlImage(imageUrl) {
+                                LinkIcon()
+                            }
                         }
                         is WebPreviewState.Error -> {
+                            LinkIcon()
                         }
                     }
                 }
@@ -242,6 +248,8 @@ private fun StoryFeedItemImage(
         }
     }
 }
+
+
 
 @Preview
 @Composable

@@ -1,13 +1,11 @@
 package co.adrianblan.storyfeed.ui
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
-import androidx.compose.runtime.onCommit
-import androidx.compose.runtime.onDispose
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.res.stringResource
@@ -49,7 +47,7 @@ fun StoryFeedView(
     val densityAmbient = DensityAmbient.current
 
     // Prevent resetting scroll state on first commit
-    var lastStoryType = viewState.storyType
+    var lastStoryType by state { viewState.storyType }
 
     onCommit(viewState.storyType) {
 

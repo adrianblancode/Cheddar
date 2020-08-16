@@ -29,7 +29,7 @@ abstract class StackRouter<T : Any> constructor(
     )
 
     /** List of all nodes in the stack */
-    val state: MutableStateFlow<List<StackNode<T>>> =
+    private val _state: MutableStateFlow<List<StackNode<T>>> =
         MutableStateFlow(
             initialState.map { key ->
                 StackNode(
@@ -38,6 +38,8 @@ abstract class StackRouter<T : Any> constructor(
                 )
             }
         )
+
+    val state: StateFlow<List<StackNode<T>>> = _state
 
     val activeNode: StateFlow<AnyNode> =
         state.mapStateFlow { it.last().node }
@@ -52,7 +54,7 @@ abstract class StackRouter<T : Any> constructor(
             "Cannot push a node with existing key: $key"
         }
 
-        state.value = state.value + StackNode(
+        _state.value = state.value + StackNode(
             key,
             nodeStore.child(key.toString()) { key.createNode() }
         )
@@ -71,7 +73,7 @@ abstract class StackRouter<T : Any> constructor(
         newState.removeAt(newState.size - 1)
             .also { it.node.detach() }
 
-        state.value = newState.toList()
+        _state.value = newState.toList()
     }
 
 

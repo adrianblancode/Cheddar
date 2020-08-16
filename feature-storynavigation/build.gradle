@@ -1,10 +1,5 @@
 apply from: rootProject.file("gradle/feature.gradle")
 
-dependencies {
-    implementation(project(":feature-storyfeed"))
-    implementation(project(":feature-storydetail"))
-}
-
 // Used for compose dev15
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     kotlinOptions {
@@ -12,4 +7,9 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
         jvmTarget = "1.8"
         freeCompilerArgs += ["-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check"]
     }
+}
+
+dependencies {
+    implementation(project(":feature-storyfeed"))
+    implementation(project(":feature-storydetail"))
 }

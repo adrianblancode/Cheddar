@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.lerp
 import androidx.ui.tooling.preview.Preview
 import co.adrianblan.common.urlSiteName
 import co.adrianblan.core.WebPreviewState
+import co.adrianblan.core.ui.LinkIcon
 import co.adrianblan.domain.Comment
 import co.adrianblan.domain.Story
 import co.adrianblan.domain.StoryUrl
@@ -263,18 +264,16 @@ private fun StoryDetailImage(
     Box(
         modifier = Modifier.clickable(
             onClick = { story.url?.let { onStoryContentClick(it) } }
+        ).padding(
+            start = 8.dp,
+            top = 8.dp,
+            end = 16.dp,
+            bottom = 8.dp
         )
     ) {
         Surface(
             shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.padding(
-                start = 8.dp,
-                top = 8.dp,
-                end = 16.dp,
-                bottom = 8.dp
-            )
-                .preferredSize(imageSize)
-
+            modifier = Modifier.preferredSize(imageSize)
         ) {
             Stack {
                 Surface(
@@ -284,8 +283,9 @@ private fun StoryDetailImage(
 
                 when (webPreviewState) {
                     is WebPreviewState.Loading -> {
-                        Box(modifier = Modifier.fillMaxSize()) {
+                        Stack(modifier = Modifier.fillMaxSize()) {
                             ShimmerView()
+                            LinkIcon()
                         }
                     }
                     is WebPreviewState.Success -> {
@@ -295,9 +295,10 @@ private fun StoryDetailImage(
                             webPreview.imageUrl ?: webPreview.iconUrl
                             ?: webPreview.favIconUrl
 
-                        UrlImage(imageUrl)
+                        UrlImage(imageUrl) { LinkIcon() }
                     }
                     is WebPreviewState.Error -> {
+                        LinkIcon()
                     }
                 }
             }
