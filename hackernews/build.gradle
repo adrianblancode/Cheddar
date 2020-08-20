@@ -6,6 +6,6 @@ dependencies {
     implementation(project(":domain"))
 
     // Implemented here because module compiler plugin is needed
-    implementation(Dependencies.kotlinSerializationRuntime)
+    implementation(Dependencies.kotlinSerializationCore)
     implementation(Dependencies.retrofitSerializationConverter)
 }

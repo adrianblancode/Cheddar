@@ -30,7 +30,6 @@ kapt {
 }
 
 dependencies {
-    implementation(Dependencies.kotlinStdlib)
     implementation(Dependencies.coroutinesCore)
     implementation(Dependencies.coroutinesAndroid)
 

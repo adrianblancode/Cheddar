@@ -24,13 +24,13 @@ fun ShimmerView() {
 
     val shimmerColor = colorResource(id = R.color.contentShimmer)
 
-    var progress by state { 0f }
+    val progress = remember { mutableStateOf(0f) }
 
     val observer = remember {
         object : AnimationClockObserver {
             override fun onAnimationFrame(frameTimeMillis: Long) {
                 val animationTime = 1500f
-                progress = (frameTimeMillis % animationTime) / animationTime
+                progress.value = (frameTimeMillis % animationTime) / animationTime
             }
         }
     }
@@ -56,7 +56,7 @@ fun ShimmerView() {
                 val width = parentSize.width
 
                 // Convert from [0, 1] to [-1, 2]
-                val offset = lerp(-1f, 2f, progress)
+                val offset = lerp(-1f, 2f, progress.value)
                 val left = width * offset
 
                 val shimmerGradient =

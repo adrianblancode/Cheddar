@@ -9,10 +9,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.state
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,7 +28,7 @@ fun StoryFeedToolbar(
     onStoryTypeClick: (StoryType) -> Unit
 ) {
 
-    var showStoryTypePopup by state { false }
+    val showStoryTypePopup = remember { mutableStateOf(false) }
 
     Box(
         padding = 12.dp,
@@ -52,18 +49,18 @@ fun StoryFeedToolbar(
             headerTextSize = headerTextSize,
             storyType = storyType
         ) {
-            showStoryTypePopup = true
+            showStoryTypePopup.value = true
         }
 
-        if (showStoryTypePopup) {
+        if (showStoryTypePopup.value) {
             StoryTypePopup(
                 selectedStoryType = storyType,
                 onStoryTypeClick = { storyType ->
                     onStoryTypeClick(storyType)
-                    showStoryTypePopup = false
+                    showStoryTypePopup.value = false
                 },
                 onDismiss = {
-                    showStoryTypePopup = false
+                    showStoryTypePopup.value = false
                 }
             )
         }

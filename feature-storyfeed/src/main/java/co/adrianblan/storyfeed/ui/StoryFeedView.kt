@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
+import androidx.compose.runtime.savedinstancestate.savedInstanceState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.res.stringResource
@@ -34,6 +36,9 @@ internal fun StoryType.titleStringResource(): Int =
         StoryType.JOB -> R.string.stories_job_title
     }
 
+// TODO fixme
+private var initialScrollPosition = 0f
+
 @Composable
 fun StoryFeedView(
     viewState: StoryFeedViewState,
@@ -43,15 +48,15 @@ fun StoryFeedView(
     onPageEndReached: () -> Unit
 ) {
 
-    val scrollState = rememberScrollState()
+    val scrollState = rememberScrollState(initialScrollPosition)
     val densityAmbient = DensityAmbient.current
 
     // Prevent resetting scroll state on first commit
-    var lastStoryType by state { viewState.storyType }
+    val lastStoryType = savedInstanceState { viewState.storyType }
 
     onCommit(viewState.storyType) {
 
-        if (viewState.storyType == lastStoryType) return@onCommit
+        if (viewState.storyType == lastStoryType.value) return@onCommit
 
         val collapseDistance = (toolbarMaxHeightDp - toolbarMinHeightDp).dp
 
@@ -63,7 +68,11 @@ fun StoryFeedView(
 
         scrollState.scrollTo(scrollReset)
 
-        lastStoryType = viewState.storyType
+        lastStoryType.value = viewState.storyType
+    }
+
+    onDispose {
+        initialScrollPosition = scrollState.value
     }
 
     CollapsingScaffold(

@@ -35,16 +35,13 @@ fun UrlImage(
     val targetWidthPx = with(DensityAmbient.current) { remember { width.toIntPx() } }
     val targetHeightPx = with(DensityAmbient.current) { remember { height.toIntPx() } }
 
-    var imageState by stateFor<ImageState, String>(imageUrl) { ImageState.Loading }
+    val imageState = remember(imageUrl) { mutableStateOf<ImageState>(ImageState.Loading) }
 
     launchInComposition(imageUrl) {
-        // State will not recompose if updated in the same frame as initialized
-        yield()
-
-        imageState = loadImage(imageUrl, targetWidthPx, targetHeightPx)
+        imageState.value = loadImage(imageUrl, targetWidthPx, targetHeightPx)
     }
 
-    DrawImageState(state = imageState, fallbackIcon = fallbackIcon)
+    DrawImageState(state = imageState.value, fallbackIcon = fallbackIcon)
 }
 
 private suspend fun loadImage(

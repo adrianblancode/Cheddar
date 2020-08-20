@@ -50,7 +50,7 @@ class StoryNavigationNode
 
     val state: StateFlow<StoryNavigationViewState> =
         router.state
-            .mapStateFlow { StoryNavigationViewState(it.last().node) }
+            .mapStateFlow { StoryNavigationViewState(it.map { it.node }) }
 
     override fun onStoryClicked(storyId: StoryId) {
         router.push(StoryNavigationState.StoryNavigationDetail(storyId))

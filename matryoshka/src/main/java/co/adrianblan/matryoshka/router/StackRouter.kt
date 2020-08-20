@@ -1,5 +1,6 @@
 package co.adrianblan.matryoshka.router
 
+import androidx.compose.runtime.Immutable
 import co.adrianblan.common.mapStateFlow
 import co.adrianblan.matryoshka.node.AnyNode
 import co.adrianblan.matryoshka.node.NodeStore
@@ -23,6 +24,7 @@ abstract class StackRouter<T : Any> constructor(
         }
     }
 
+    @Immutable
     data class StackNode<T>(
         val key: T,
         val node: AnyNode

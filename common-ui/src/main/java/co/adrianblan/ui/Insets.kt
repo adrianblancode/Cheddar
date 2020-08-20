@@ -19,11 +19,13 @@ fun InsetsWrapper(
     content: @Composable () -> Unit
 ) {
 
-    var insets by state<Insets> {
-        view.rootWindowInsets?.let {
-            WindowInsetsCompat.toWindowInsetsCompat(it)
-                .systemWindowInsets
-        } ?: Insets.NONE
+    val insets = remember {
+        mutableStateOf<Insets>(
+            view.rootWindowInsets?.let {
+                WindowInsetsCompat.toWindowInsetsCompat(it)
+                    .systemWindowInsets
+            } ?: Insets.NONE
+        )
     }
 
     onCommit {
@@ -32,7 +34,7 @@ fun InsetsWrapper(
             OnApplyWindowInsetsListener { _, windowInsets ->
                 val inset = windowInsets.systemWindowInsets
 
-                insets = inset
+                insets.value = inset
 
                 windowInsets
             }
@@ -41,7 +43,7 @@ fun InsetsWrapper(
         onDispose { ViewCompat.setOnApplyWindowInsetsListener(view, null) }
     }
 
-    Providers(InsetsAmbient provides insets) {
+    Providers(InsetsAmbient provides insets.value) {
         content()
     }
 }
