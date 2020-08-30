@@ -43,8 +43,8 @@ abstract class StackRouter<T : Any> constructor(
 
     val state: StateFlow<List<StackNode<T>>> = _state
 
-    val activeNode: StateFlow<AnyNode> =
-        state.mapStateFlow { it.last().node }
+    val activeNode: StateFlow<StackNode<T>> =
+        state.mapStateFlow { it.last() }
 
     /**
      * Pushes a node to the top of the stack.
