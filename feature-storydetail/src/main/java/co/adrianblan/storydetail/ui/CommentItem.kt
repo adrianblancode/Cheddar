@@ -198,7 +198,7 @@ private fun AnnotatedString.Builder.reduceParagraphSpacing(): AnnotatedString.Bu
         .findAll(this.toString())
         .forEach { match ->
             this.addStyle(
-                SpanStyle(fontSize = TextUnit.Sp(8)),
+                SpanStyle(fontSize = TextUnit.Sp(6)),
                 match.range.first,
                 match.range.last + 1
             )

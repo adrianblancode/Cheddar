@@ -19,10 +19,7 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.*
 import androidx.ui.tooling.preview.Preview
 import co.adrianblan.common.urlSiteName
 import co.adrianblan.core.WebPreviewState
@@ -36,7 +33,9 @@ import co.adrianblan.storydetail.R
 import co.adrianblan.storydetail.StoryDetailCommentsState
 import co.adrianblan.storydetail.StoryDetailViewState
 import co.adrianblan.ui.*
+import co.adrianblan.ui.utils.lerp
 import co.adrianblan.webpreview.WebPreviewData
+import kotlin.math.roundToInt
 
 private const val toolbarMinHeightDp = 56
 private const val toolbarMaxHeightDp = 148
@@ -155,14 +154,9 @@ fun StoryDetailToolbar(
         val titleCollapsedTopOffset =
             remember(collapsedFraction) { lerp(48.dp, 0.dp, collapsedFraction) }
 
-        val titleFontSize: TextUnit =
-            lerp(
-                MaterialTheme.typography.h6.fontSize,
-                MaterialTheme.typography.subtitle1.fontSize,
-                collapsedFraction
-            )
+        val titleFontSize: TextUnit = MaterialTheme.typography.subtitle1.fontSize
 
-        val titleMaxLines = remember(collapsedFraction) { if (collapsedFraction >= 0.85f) 1 else 3 }
+        val titleMaxLines = remember(collapsedFraction) { lerp(3f, 1f, collapsedFraction).roundToInt() }
         val imageSize = remember(collapsedFraction) { lerp(80.dp, 40.dp, collapsedFraction) }
 
         when (viewState) {
