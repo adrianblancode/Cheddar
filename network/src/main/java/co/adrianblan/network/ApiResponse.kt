@@ -20,7 +20,7 @@ sealed class ApiResponse<T : Any?> {
     ) : ApiResponse<T>()
 }
 
-fun <T : Any> Response<T>.wrapApiResponse(): ApiResponse<T?> {
+fun <T : Any?> Response<T>.wrapApiResponse(): ApiResponse<T?> {
 
     val response = this
 

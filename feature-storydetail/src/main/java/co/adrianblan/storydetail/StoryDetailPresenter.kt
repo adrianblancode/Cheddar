@@ -5,10 +5,7 @@ import co.adrianblan.common.toStateFlow
 import co.adrianblan.core.DecoratedStory
 import co.adrianblan.core.StoryPreviewUseCase
 import co.adrianblan.core.WebPreviewState
-import co.adrianblan.domain.CommentId
-import co.adrianblan.domain.Story
-import co.adrianblan.domain.StoryId
-import co.adrianblan.domain.StoryUrl
+import co.adrianblan.domain.*
 import co.adrianblan.matryoshka.presenter.Presenter
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.webpreview.WebPreviewRepository
@@ -67,17 +64,20 @@ class StoryDetailPresenter
     ): List<FlatComment> =
         coroutineScope {
 
-            val comment = hackerNewsRepository.fetchComment(commentId)
+            val comment: Comment? = hackerNewsRepository.fetchComment(commentId)
 
-            val children: List<FlatComment> =
-                comment.kids
-                    .map { childCommentId ->
-                        async { fetchFlattenedComments(childCommentId, depthIndex + 1) }
-                    }
-                    .awaitAll()
-                    .flatten()
+            if (comment != null) {
 
-            listOf(FlatComment(comment = comment, depthIndex = depthIndex)) + children
+                val children: List<FlatComment> =
+                    comment.kids
+                        .map { childCommentId ->
+                            async { fetchFlattenedComments(childCommentId, depthIndex + 1) }
+                        }
+                        .awaitAll()
+                        .flatten()
+
+                listOf(FlatComment(comment = comment, depthIndex = depthIndex)) + children
+            } else emptyList()
         }
 
     private fun observeCommentsViewState(story: Story): Flow<StoryDetailCommentsState> =

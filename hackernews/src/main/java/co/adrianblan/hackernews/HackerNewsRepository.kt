@@ -13,7 +13,7 @@ import javax.inject.Singleton
 interface HackerNewsRepository {
     suspend fun fetchStory(storyId: StoryId): Story
     suspend fun fetchStories(storyType: StoryType): List<StoryId>
-    suspend fun fetchComment(commentId: CommentId): Comment
+    suspend fun fetchComment(commentId: CommentId): Comment?
 }
 
 @Singleton
@@ -39,9 +39,8 @@ class HackerNewsRepositoryImpl
             .unwrapApiResponse()
             .map { StoryId(it) }
 
-    override suspend fun fetchComment(commentId: CommentId): Comment =
+    override suspend fun fetchComment(commentId: CommentId): Comment? =
         hackerNewsApiService.fetchComment(commentId)
-            .throwIfEmptyResponse()
             .unwrapApiResponse()
-            .toDomain()
+            ?.toDomain()
 }
