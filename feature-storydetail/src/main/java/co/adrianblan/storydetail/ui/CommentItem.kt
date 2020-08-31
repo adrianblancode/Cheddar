@@ -99,12 +99,12 @@ fun CommentItem(
             val isDeleted = by == null
 
             if (isDeleted) {
-                Spacer(Modifier.preferredHeight(8.dp))
+                Spacer(Modifier.preferredHeight(4.dp))
                 Text(
                     text = stringResource(R.string.comment_deleted_title),
                     style = MaterialTheme.typography.subtitle2
                 )
-                Spacer(Modifier.preferredHeight(12.dp))
+                Spacer(Modifier.preferredHeight(8.dp))
             } else {
 
                 val isStoryAuthor = by == storyAuthor
@@ -123,7 +123,6 @@ fun CommentItem(
                 )
 
                 Spacer(Modifier.preferredHeight(4.dp))
-
 
                 val body: Spanned = Html.fromHtml(text.orEmpty())
 
@@ -198,7 +197,7 @@ private fun AnnotatedString.Builder.reduceParagraphSpacing(): AnnotatedString.Bu
         .findAll(this.toString())
         .forEach { match ->
             this.addStyle(
-                SpanStyle(fontSize = TextUnit.Sp(6)),
+                SpanStyle(fontSize = TextUnit.Sp(4)),
                 match.range.first,
                 match.range.last + 1
             )
