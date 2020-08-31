@@ -11,9 +11,7 @@ Cheddar is a social news reader for Hacker News. Currently it's being entirely r
 *   Kotlin Coroutines / Flow for asynchronous work.
 *   Retrofit / OkHttp / Kotlin Serialization for networking.
 *   Tests and CI pipeline.
-*   Fancy animations, Day/Night mode, drawing behind insets, and more.
-
-As Compose hasn't even entered alpha yet, the some parts of the app might be **very** janky for now.
+*   Fancy animations, Day/Night mode, edge-to-edge content, and more.
 
 
 ## Media
@@ -27,4 +25,4 @@ Featured on [XDA-Developers](http://www.xda-developers.com/apps-of-the-week-mate
 
 
 
-[![Get it on Google Play!](http://adrianblan.co/images/google-play-badge.png)](https://play.google.com/store/apps/details?id=co.adrianblan.cheddar)
+[Get it on Google Play](https://play.google.com/store/apps/details?id=co.adrianblan.cheddar)
