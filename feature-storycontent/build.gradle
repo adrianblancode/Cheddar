@@ -8,9 +8,3 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
         freeCompilerArgs += ["-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check"]
     }
 }
-
-dependencies {
-    implementation(project(":feature-storyfeed"))
-    implementation(project(":feature-storydetail"))
-    implementation(project(":feature-storycontent"))
-}

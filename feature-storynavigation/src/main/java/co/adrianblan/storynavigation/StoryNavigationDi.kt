@@ -1,5 +1,6 @@
 package co.adrianblan.storynavigation
 
+import co.adrianblan.storycontent.StoryContentComponent
 import co.adrianblan.storyfeed.StoryFeedComponent
 import co.adrianblan.storydetail.StoryDetailComponent
 import dagger.Module
@@ -9,7 +10,8 @@ import javax.inject.Scope
 @Module(
     subcomponents = [
         StoryFeedComponent::class,
-        StoryDetailComponent::class
+        StoryDetailComponent::class,
+        StoryContentComponent::class
     ]
 )
 object StoryNavigationModule

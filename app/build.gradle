@@ -76,6 +76,7 @@ dependencies {
     implementation(project(":feature-storynavigation"))
     implementation(project(":feature-storyfeed"))
     implementation(project(":feature-storydetail"))
+    implementation(project(":feature-storycontent"))
 
     implementation(project(":core"))
     implementation(project(":common"))
