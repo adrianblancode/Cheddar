@@ -1,6 +1,5 @@
 package co.adrianblan.ui
 
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -45,10 +44,10 @@ fun CollapsingToolbar(
         Column {
             Surface(color = MaterialTheme.colors.primary.copy(alpha = overInsetAlpha)) {
                 Box(
-                    gravity = Alignment.BottomCenter,
-                    paddingTop = topInsets,
                     modifier = Modifier.fillMaxWidth()
                         .preferredHeight(height + topInsets)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(top = topInsets)
                 ) {
                     toolbarContent(collapsedFraction, height)
                 }

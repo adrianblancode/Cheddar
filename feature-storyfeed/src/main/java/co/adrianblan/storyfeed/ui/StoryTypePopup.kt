@@ -1,9 +1,10 @@
 package co.adrianblan.storyfeed.ui
 
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Icon
+import androidx.compose.foundation.Text
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.DropdownMenu
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.icons.Icons
@@ -35,8 +36,9 @@ fun StoryTypePopup(
         // Popups require reapplication of the app theme
         AppTheme {
             Box(
-                padding = 8.dp,
-                modifier = Modifier.preferredWidthIn(max = storyTypePopupWidth)
+                modifier = Modifier
+                    .preferredWidthIn(max = storyTypePopupWidth)
+                    .padding(8.dp)
             ) {
                 Surface(
                     shape = RoundedCornerShape(6.dp),
@@ -73,7 +75,7 @@ fun StoryTypePopupItem(
     onClick: (StoryType) -> Unit
 ) {
     Box(
-        gravity = ContentGravity.Center,
+        alignment = Alignment.Center,
         modifier = Modifier.fillMaxWidth()
             .clickable(onClick = { onClick(storyType) })
     ) {
@@ -93,15 +95,17 @@ fun StoryTypePopupItem(
 
             if (isSelected) {
                 Box(
-                    modifier = Modifier.gravity(Alignment.CenterVertically),
-                    paddingEnd = 12.dp,
-                    paddingTop = 2.dp
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                        .padding(
+                            end = 12.dp,
+                            top = 2.dp
+                        ),
                 ) {
                     Icon(
                         asset = Icons.Default.Check,
                         tint = MaterialTheme.colors.secondary,
-                        modifier = Modifier.gravity(Alignment.CenterVertically)
-                            .preferredSize(32.dp)
+                        // .align(Alignment.CenterVertically)
+                        modifier = Modifier.preferredSize(32.dp)
                     )
                 }
             }
