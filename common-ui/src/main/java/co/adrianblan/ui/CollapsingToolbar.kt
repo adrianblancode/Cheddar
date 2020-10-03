@@ -86,7 +86,7 @@ fun CollapsingScaffold(
     toolbarContent: @Composable (collapsedFraction: Float, height: Dp) -> Unit,
     bodyContent: @Composable () -> Unit
 ) {
-    Stack(modifier = Modifier.fillMaxHeight()) {
+    Box(modifier = Modifier.fillMaxHeight()) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Background color for body
             Surface(color = MaterialTheme.colors.background) {

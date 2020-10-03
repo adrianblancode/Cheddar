@@ -11,7 +11,7 @@ import androidx.compose.ui.platform.DensityAmbient
 
 @Composable
 fun RootView(content: @Composable() () -> Unit) {
-    Stack {
+    Box {
 
         val insets = InsetsAmbient.current
 

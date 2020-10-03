@@ -2,9 +2,8 @@ package co.adrianblan.ui
 
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -17,7 +16,6 @@ import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import com.squareup.picasso.Transformation
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.yield
 import kotlin.coroutines.resume
 import kotlin.math.min
 
@@ -108,7 +106,7 @@ object CropSquareTransformation : Transformation {
 private fun DrawImageState(state: ImageState, fallbackIcon: @Composable (() -> Unit)?) {
     when (state) {
         is ImageState.Loading ->
-            Stack(modifier = Modifier.fillMaxSize()) {
+            Box(modifier = Modifier.fillMaxSize()) {
                 ShimmerView()
                 fallbackIcon?.invoke()
             }

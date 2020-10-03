@@ -1,10 +1,8 @@
 package co.adrianblan.storynavigation
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.layout.Stack
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.key
 import co.adrianblan.matryoshka.node.AnyNode
 
 
@@ -15,7 +13,7 @@ data class StoryNavigationViewState(
 @Composable
 fun StoryNavigationView(viewState: StoryNavigationViewState) {
     Crossfade(viewState) {
-        Stack {
+        Box {
             it.nodes.forEach { node ->
                 RenderNode(node)
             }

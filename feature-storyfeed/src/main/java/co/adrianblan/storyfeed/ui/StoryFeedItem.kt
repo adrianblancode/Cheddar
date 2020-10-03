@@ -2,10 +2,10 @@ package co.adrianblan.storyfeed.ui
 
 import android.text.Html
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.Box
 import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -67,11 +67,13 @@ fun StoryFeedItem(
                     else 16.dp
 
                 Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    paddingStart = 16.dp,
-                    paddingEnd = rightPadding,
-                    paddingTop = 16.dp,
-                    paddingBottom = 12.dp
+                    modifier = Modifier.fillMaxWidth()
+                        .padding(
+                            start = 16.dp,
+                            end = rightPadding,
+                            top = 16.dp,
+                            bottom = 12.dp
+                        )
                 ) {
                     Column(modifier = Modifier.fillMaxWidth().animateContentSize()) {
                         Text(
@@ -206,16 +208,18 @@ private fun StoryFeedItemImage(
             .clickable(onClick = onClick)
     ) {
         Box(
-            paddingStart = 10.dp,
-            paddingEnd = 16.dp,
-            paddingTop = (16 + 1).dp,
-            paddingBottom = 14.dp
+            modifier = Modifier.padding(
+                start = 10.dp,
+                end = 16.dp,
+                top = (16 + 1).dp,
+                bottom = 14.dp
+            )
         ) {
             Surface(
                 shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.preferredSize(80.dp)
             ) {
-                Stack {
+                Box {
                     Surface(
                         color = colorResource(R.color.contentMuted),
                         modifier = Modifier.fillMaxSize()
@@ -223,7 +227,7 @@ private fun StoryFeedItemImage(
 
                     when (webPreviewState) {
                         is WebPreviewState.Loading -> {
-                            Stack(modifier = Modifier.fillMaxSize()) {
+                            Box(modifier = Modifier.fillMaxSize()) {
                                 ShimmerView()
                                 LinkIcon()
                             }
