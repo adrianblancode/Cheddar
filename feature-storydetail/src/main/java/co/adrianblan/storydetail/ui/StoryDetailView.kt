@@ -3,6 +3,7 @@ package co.adrianblan.storydetail.ui
 import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -156,7 +157,8 @@ fun StoryDetailToolbar(
 
         val titleFontSize: TextUnit = MaterialTheme.typography.subtitle1.fontSize
 
-        val titleMaxLines = remember(collapsedFraction) { lerp(3f, 1f, collapsedFraction).roundToInt() }
+        val titleMaxLines =
+            remember(collapsedFraction) { lerp(3f, 1f, collapsedFraction).roundToInt() }
         val imageSize = remember(collapsedFraction) { lerp(80.dp, 40.dp, collapsedFraction) }
 
         when (viewState) {
