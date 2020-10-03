@@ -3,7 +3,7 @@ package co.adrianblan.storydetail.ui
 import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.Box
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -139,7 +139,7 @@ fun StoryDetailToolbar(
     onBackPressed: () -> Unit
 ) {
 
-    Stack {
+    Box {
         IconButton(
             onClick = onBackPressed,
             modifier = Modifier.padding(4.dp)
@@ -271,7 +271,7 @@ private fun StoryDetailImage(
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.preferredSize(imageSize)
         ) {
-            Stack {
+            Box {
                 Surface(
                     color = colorResource(R.color.contentMuted),
                     modifier = Modifier.fillMaxSize()
@@ -279,7 +279,7 @@ private fun StoryDetailImage(
 
                 when (webPreviewState) {
                     is WebPreviewState.Loading -> {
-                        Stack(modifier = Modifier.fillMaxSize()) {
+                        Box(modifier = Modifier.fillMaxSize()) {
                             ShimmerView()
                             LinkIcon()
                         }
