@@ -13,8 +13,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import co.adrianblan.domain.StoryType
@@ -29,9 +31,12 @@ fun StoryTypePopup(
     onDismiss: () -> Unit
 ) {
 
+    val popupTopOffsetPx = with (DensityAmbient.current) { 40.dp.toPx().toInt() }
+
     Popup(
         isFocusable = true,
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss,
+        offset = IntOffset(0, popupTopOffsetPx)
     ) {
         // Popups require reapplication of the app theme
         AppTheme {

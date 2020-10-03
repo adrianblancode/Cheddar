@@ -32,38 +32,45 @@ fun StoryFeedToolbar(
 
     Box(
         modifier = Modifier.preferredHeight(height)
-            // Set min width to align popup in center
-            .preferredWidthIn(min = storyTypePopupWidth)
-            .padding(12.dp),
-        alignment = Alignment.BottomCenter,
+            .fillMaxWidth()
     ) {
-
-        val headerTextSize =
-            lerp(
-                MaterialTheme.typography.h4.fontSize,
-                MaterialTheme.typography.h6.fontSize,
-                collapsedFraction
-            )
-
-        StoryFeedHeader(
-            headerTextSize = headerTextSize,
-            storyType = storyType
+        Box(
+            // Set min width to align popup in center
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .preferredWidthIn(min = storyTypePopupWidth)
+                .padding(12.dp)
         ) {
-            showStoryTypePopup.value = true
+
+            val headerTextSize =
+                lerp(
+                    MaterialTheme.typography.h4.fontSize,
+                    MaterialTheme.typography.h6.fontSize,
+                    collapsedFraction
+                )
+
+            StoryFeedHeader(
+                headerTextSize = headerTextSize,
+                storyType = storyType,
+                modifier = Modifier.align(Alignment.BottomCenter)
+            ) {
+                showStoryTypePopup.value = true
+            }
+
+            if (showStoryTypePopup.value) {
+                StoryTypePopup(
+                    selectedStoryType = storyType,
+                    onStoryTypeClick = { storyType ->
+                        onStoryTypeClick(storyType)
+                        showStoryTypePopup.value = false
+                    },
+                    onDismiss = {
+                        showStoryTypePopup.value = false
+                    }
+                )
+            }
         }
 
-        if (showStoryTypePopup.value) {
-            StoryTypePopup(
-                selectedStoryType = storyType,
-                onStoryTypeClick = { storyType ->
-                    onStoryTypeClick(storyType)
-                    showStoryTypePopup.value = false
-                },
-                onDismiss = {
-                    showStoryTypePopup.value = false
-                }
-            )
-        }
     }
 }
 
@@ -71,12 +78,14 @@ fun StoryFeedToolbar(
 fun StoryFeedHeader(
     storyType: StoryType,
     headerTextSize: TextUnit = MaterialTheme.typography.h6.fontSize,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
 
     Surface(
         shape = RoundedCornerShape(4.dp),
-        color = Color.Transparent
+        color = Color.Transparent,
+        modifier = modifier
     ) {
         Box(
             alignment = Alignment.Center,
