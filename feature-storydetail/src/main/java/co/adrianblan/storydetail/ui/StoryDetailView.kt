@@ -332,9 +332,9 @@ fun StoryDetailPreview() {
 @Composable
 fun CommentsEmptyView() {
     Box(
-        modifier = Modifier.fillMaxSize(),
-        padding = 32.dp,
-        gravity = ContentGravity.Center
+        modifier = Modifier.fillMaxSize()
+            .padding(32.dp),
+        alignment = Alignment.Center
     ) {
         Text(
             text = stringResource(id = R.string.comments_empty),

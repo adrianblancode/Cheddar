@@ -1,10 +1,6 @@
 package co.adrianblan.ui
 
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.layout.Stack
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -31,7 +27,7 @@ fun RootView(content: @Composable() () -> Unit) {
             }
         }
 
-        NavigationBarScrim(modifier = Modifier.gravity(Alignment.BottomCenter))
+        NavigationBarScrim(modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 

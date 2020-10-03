@@ -1,17 +1,13 @@
 package co.adrianblan.ui
 
-import androidx.compose.animation.Transition
 import androidx.compose.animation.core.*
 import androidx.compose.animation.transition
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.ContentGravity
 import androidx.compose.foundation.Text
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.drawBehind
 import androidx.compose.ui.geometry.Offset
@@ -32,9 +28,8 @@ fun LoadingView(
     modifier: Modifier = Modifier
 ) {
     Box(
-        padding = 32.dp,
-        gravity = ContentGravity.Center,
-        modifier = Modifier.fillMaxSize() + modifier
+        alignment = Alignment.Center,
+        modifier = Modifier.fillMaxSize().padding(32.dp) + modifier
     ) {
 
         Row(
@@ -85,8 +80,9 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
 
     val progress: Float = transitionState[loadingState]
 
-    Box(gravity = ContentGravity.Center,
-        modifier = Modifier.preferredSize(width = size * 1.2f, height = size)
+    Box(
+        modifier = Modifier
+            .preferredSize(width = size * 1.2f, height = size)
             .drawBehind {
 
                 val parentSize = this.size
