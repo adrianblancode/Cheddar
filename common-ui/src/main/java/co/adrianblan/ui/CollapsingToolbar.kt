@@ -46,7 +46,6 @@ fun CollapsingToolbar(
                 Box(
                     modifier = Modifier.fillMaxWidth()
                         .preferredHeight(height + topInsets)
-                        .align(Alignment.CenterHorizontally)
                         .padding(top = topInsets)
                 ) {
                     toolbarContent(collapsedFraction, height)
@@ -98,7 +97,9 @@ fun CollapsingScaffold(
 
         Box(
             // Prevent children being clickable from behind toolbar
-            modifier = Modifier.clickable(indication = null, onClick = {}),
+            modifier = Modifier
+                .clickable(indication = null, onClick = {})
+                .fillMaxWidth(),
             children = {
                 CollapsingToolbar(
                     scrollState = scrollState,
