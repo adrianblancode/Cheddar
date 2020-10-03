@@ -36,7 +36,7 @@ fun StoryTypePopup(
         AppTheme {
             Box(
                 padding = 8.dp,
-                modifier = Modifier.preferredWidthIn(maxWidth = storyTypePopupWidth)
+                modifier = Modifier.preferredWidthIn(max = storyTypePopupWidth)
             ) {
                 Surface(
                     shape = RoundedCornerShape(6.dp),

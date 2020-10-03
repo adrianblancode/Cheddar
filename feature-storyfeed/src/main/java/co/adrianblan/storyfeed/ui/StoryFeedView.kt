@@ -8,6 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.runtime.savedinstancestate.rememberSavedInstanceState
 import androidx.compose.runtime.savedinstancestate.savedInstanceState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.DensityAmbient
 import androidx.compose.ui.res.stringResource
@@ -156,11 +157,12 @@ fun StoryFeedSuccessContentBody(
 
         Column {
 
-            with(DensityAmbient.current) {
-                val insets = InsetsAmbient.current
-                val topInsets = insets.top.toDp()
+            val insets = InsetsAmbient.current
 
-                Spacer(modifier = Modifier.preferredHeight(toolbarMaxHeightDp.dp + topInsets))
+            val topInsets = with(DensityAmbient.current) { insets.top.toDp() }
+            val bottomInsets = with(DensityAmbient.current) { insets.bottom.toDp() }
+
+            Spacer(modifier = Modifier.preferredHeight(toolbarMaxHeightDp.dp + topInsets))
 
                 storyFeedState.stories.map { story ->
                     key(story.story.id) {
@@ -180,8 +182,8 @@ fun StoryFeedSuccessContentBody(
                     viewState.hasLoadedAllPages -> NoMoreStoriesView()
                 }
 
-                Spacer(modifier = Modifier.preferredHeight(insets.bottom.toDp() + 8.dp))
-            }
+
+            Spacer(modifier = Modifier.preferredHeight(bottomInsets + 8.dp))
         }
     }
 }
@@ -189,9 +191,9 @@ fun StoryFeedSuccessContentBody(
 @Composable
 private fun LoadingMoreStoriesView() {
     Box(
-        padding = 8.dp,
-        gravity = ContentGravity.Center,
+        alignment = Alignment.Center,
         modifier = Modifier.fillMaxWidth()
+            .padding(8.dp)
     ) {
         LoadingView(
             textStyle = MaterialTheme.typography.subtitle1
@@ -204,7 +206,7 @@ private fun LoadMoreStoriesButton(
     onPageEndReached: () -> Unit
 ) {
     Box(
-        gravity = ContentGravity.Center,
+        alignment = Alignment.Center,
         modifier = Modifier.fillMaxSize()
             .padding(top = 8.dp)
     ) {
@@ -226,7 +228,7 @@ private fun LoadMoreStoriesButton(
 @Composable
 private fun NoMoreStoriesView() {
     Box(
-        gravity = ContentGravity.Center,
+        alignment = Alignment.Center,
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(

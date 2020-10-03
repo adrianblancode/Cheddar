@@ -55,7 +55,7 @@ fun StoryFeedItem(
             shape = RoundedCornerShape(3.dp),
             modifier = Modifier.weight(1f)
                 .fillMaxWidth()
-                .preferredHeightIn(minHeight = 110.dp)
+                .preferredHeightIn(min = 110.dp)
         ) {
             Box(
                 modifier = Modifier.clickable(onClick = storyClick)

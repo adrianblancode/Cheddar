@@ -8,7 +8,7 @@ object Versions {
     const val androidxAppcompat = "1.3.0-alpha02"
     const val androidxCore = "1.5.0-alpha02"
     const val androidxActivity = "1.1.0-rc02"
-    const val compose = "1.0.0-alpha01"
+    const val compose = "1.0.0-alpha04"
     const val composeCompiler = "1.4.0"
 
     const val dagger = "2.28.3"
@@ -23,7 +23,7 @@ object Versions {
 
 object Dependencies {
 
-    const val androidGradlePlugin = "com.android.tools.build:gradle:4.2.0-alpha07"
+    const val androidGradlePlugin = "com.android.tools.build:gradle:4.2.0-alpha13"
     const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
 
     const val kotlinSerializationPlugin = "org.jetbrains.kotlin:kotlin-serialization:${Versions.kotlin}"
