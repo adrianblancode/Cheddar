@@ -1,10 +1,5 @@
 apply from: rootProject.file("gradle/feature.gradle")
 
-// Used for compose dev15
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    kotlinOptions {
-        languageVersion = "1.4"
-        jvmTarget = "1.8"
-        freeCompilerArgs += ["-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check"]
-    }
+android {
+    namespace 'co.adrianblan.storydetail'
 }

@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import co.adrianblan.common.CustomTabsLauncher
-import co.adrianblan.common.mapStateFlow
+import co.adrianblan.common.map
 import co.adrianblan.domain.StoryId
 import co.adrianblan.domain.StoryUrl
 import co.adrianblan.matryoshka.node.AnyNode
@@ -50,11 +50,11 @@ class StoryNavigationNode
 
     val state: StateFlow<StoryNavigationViewState> =
         router.state
-            .mapStateFlow { StoryNavigationViewState(it.map { it.node }) }
+            .map(scope) { StoryNavigationViewState(it.map { it.node }) }
 
     override fun onStoryClicked(storyId: StoryId) {
         // Prevent double push
-        if (router.activeNode.value.key !is StoryNavigationState.StoryNavigationDetail) {
+        if (router.activeNode.key !is StoryNavigationState.StoryNavigationDetail) {
             router.push(StoryNavigationState.StoryNavigationDetail(storyId))
         }
     }

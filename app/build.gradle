@@ -3,6 +3,8 @@ apply from: rootProject.file("gradle/base-module.gradle")
 
 android {
 
+    namespace 'co.adrianblan.cheddar'
+
     defaultConfig {
         applicationId = "co.adrianblan.cheddar"
         versionCode = 1
@@ -19,7 +21,7 @@ android {
         create("release") {
             def propsFile = rootProject.file("keystore.properties")
             if (propsFile.exists()) {
-                val props = Properties()
+                def props = Properties()
                 props.load(FileInputStream(propsFile))
                 storeFile = file(props["storeFile"])
                 storePassword = props["storePassword"]
@@ -48,27 +50,19 @@ android {
         }
     }
 
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/AL2.0', 'META-INF/LGPL2.1']
+        }
+    }
+
     buildFeatures {
         compose true
+        buildConfig true
     }
 
     composeOptions {
-        kotlinCompilerVersion Versions.composeCompiler
-        kotlinCompilerExtensionVersion Versions.compose
-    }
-
-    packagingOptions {
-        exclude "META-INF/AL2.0"
-        exclude "META-INF/LGPL2.1"
-    }
-}
-
-// Used for compose dev15
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    kotlinOptions {
-        languageVersion = "1.4"
-        jvmTarget = "1.8"
-        freeCompilerArgs += ["-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check"]
+        kotlinCompilerExtensionVersion libs.versions.androidxComposeCompiler.get()
     }
 }
 
@@ -81,6 +75,7 @@ dependencies {
     implementation(project(":common"))
     implementation(project(":common-ui"))
     implementation(project(":common-test"))
+    implementation(project(":network"))
 
-    debugImplementation(Dependencies.leakcanary)
+    debugImplementation(libs.leakcanary)
 }

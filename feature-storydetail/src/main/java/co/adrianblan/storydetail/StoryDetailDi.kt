@@ -1,15 +1,13 @@
 package co.adrianblan.storydetail
 
 import co.adrianblan.domain.StoryId
-import com.squareup.inject.assisted.dagger2.AssistedModule
 import dagger.BindsInstance
 import dagger.Module
 import dagger.Subcomponent
 import javax.inject.Inject
 import javax.inject.Scope
 
-@AssistedModule
-@Module(includes = [AssistedInject_StoryDetailModule::class])
+@Module
 object StoryDetailModule
 
 @StoryDetailScope

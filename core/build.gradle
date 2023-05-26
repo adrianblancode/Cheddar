@@ -1,22 +1,7 @@
 apply from: rootProject.file("gradle/library.gradle")
 
 android {
-    buildFeatures {
-        compose true
-    }
-
-    composeOptions {
-        kotlinCompilerVersion Versions.composeCompiler
-        kotlinCompilerExtensionVersion Versions.compose
-    }
-}
-
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    kotlinOptions {
-        languageVersion = "1.4"
-        jvmTarget = "1.8"
-        freeCompilerArgs += ["-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check"]
-    }
+    namespace 'co.adrianblan.core'
 }
 
 dependencies {
@@ -26,5 +11,5 @@ dependencies {
     implementation(project(":common-ui"))
 
     implementation(project(":network"))
-    implementation(Dependencies.androidxBrowser)
+    implementation(libs.androidx.browser)
 }

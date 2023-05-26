@@ -1,24 +1,25 @@
 package co.adrianblan.storyfeed.ui
 
-import androidx.compose.foundation.Icon
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import co.adrianblan.domain.StoryType
 import co.adrianblan.ui.AppTheme
 
@@ -31,10 +32,10 @@ fun StoryTypePopup(
     onDismiss: () -> Unit
 ) {
 
-    val popupTopOffsetPx = with (DensityAmbient.current) { 40.dp.toPx().toInt() }
+    val popupTopOffsetPx = with (LocalDensity.current) { 40.dp.toPx().toInt() }
 
     Popup(
-        isFocusable = true,
+        properties = PopupProperties(focusable = true),
         onDismissRequest = onDismiss,
         offset = IntOffset(0, popupTopOffsetPx)
     ) {
@@ -42,7 +43,7 @@ fun StoryTypePopup(
         AppTheme {
             Box(
                 modifier = Modifier
-                    .preferredWidthIn(max = storyTypePopupWidth)
+                    .widthIn(max = storyTypePopupWidth)
                     .padding(8.dp)
             ) {
                 Surface(
@@ -80,7 +81,7 @@ fun StoryTypePopupItem(
     onClick: (StoryType) -> Unit
 ) {
     Box(
-        alignment = Alignment.Center,
+        contentAlignment = Alignment.Center,
         modifier = Modifier.fillMaxWidth()
             .clickable(onClick = { onClick(storyType) })
     ) {
@@ -107,10 +108,11 @@ fun StoryTypePopupItem(
                         ),
                 ) {
                     Icon(
-                        asset = Icons.Default.Check,
+                        imageVector = Icons.Default.Check,
                         tint = MaterialTheme.colors.secondary,
                         // .align(Alignment.CenterVertically)
-                        modifier = Modifier.preferredSize(32.dp)
+                        modifier = Modifier.size(32.dp),
+                        contentDescription = null
                     )
                 }
             }

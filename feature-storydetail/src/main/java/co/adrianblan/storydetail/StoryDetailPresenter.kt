@@ -1,7 +1,8 @@
 package co.adrianblan.storydetail
 
 import co.adrianblan.common.DispatcherProvider
-import co.adrianblan.common.toStateFlow
+import co.adrianblan.common.InitialFlow
+import co.adrianblan.common.withInitialValue
 import co.adrianblan.core.DecoratedStory
 import co.adrianblan.core.StoryPreviewUseCase
 import co.adrianblan.core.WebPreviewState
@@ -23,7 +24,7 @@ class StoryDetailPresenter
 ) : Presenter<StoryDetailViewState> {
 
     // TODO share story emission with shareIn
-    override val state: StateFlow<StoryDetailViewState> =
+    override val state: InitialFlow<StoryDetailViewState> =
         combine<DecoratedStory, StoryDetailCommentsState, StoryDetailViewState>(
             storyPreviewUseCase.observeDecoratedStory(storyId),
             flow { emit(hackerNewsRepository.fetchStory(storyId)) }
@@ -45,7 +46,7 @@ class StoryDetailPresenter
                 if (it is CancellationException) throw it
                 else emit(StoryDetailViewState.Error(it))
             }
-            .toStateFlow(StoryDetailViewState.Loading)
+            .withInitialValue(StoryDetailViewState.Loading)
 
     private suspend fun fetchFlattenedComments(commentIds: List<CommentId>): List<FlatComment> =
         coroutineScope {

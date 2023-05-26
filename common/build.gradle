@@ -1,1 +1,5 @@
 apply from: rootProject.file("gradle/library.gradle")
+
+android {
+    namespace 'co.adrianblan.common'
+}

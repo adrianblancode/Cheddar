@@ -1,12 +1,12 @@
 package co.adrianblan.storyfeed.ui
 
-import androidx.compose.foundation.Icon
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.*
@@ -31,14 +31,14 @@ fun StoryFeedToolbar(
     val showStoryTypePopup = remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier.preferredHeight(height)
+        modifier = Modifier.height(height)
             .fillMaxWidth()
     ) {
         Box(
             // Set min width to align popup in center
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .preferredWidthIn(min = storyTypePopupWidth)
+                .width(storyTypePopupWidth)
                 .padding(12.dp)
         ) {
 
@@ -88,7 +88,7 @@ fun StoryFeedHeader(
         modifier = modifier
     ) {
         Box(
-            alignment = Alignment.Center,
+            contentAlignment = Alignment.Center,
             modifier = Modifier.clickable(onClick = onClick)
                 .padding(4.dp)
         ) {
@@ -106,8 +106,9 @@ fun StoryFeedHeader(
                         )
                 )
                 Icon(
-                    asset = Icons.Default.ArrowDropDown,
-                    tint = MaterialTheme.colors.onBackground
+                    imageVector = Icons.Default.ArrowDropDown,
+                    tint = MaterialTheme.colors.onBackground,
+                    contentDescription = null
                 )
             }
         }

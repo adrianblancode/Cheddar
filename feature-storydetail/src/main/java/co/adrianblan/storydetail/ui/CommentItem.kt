@@ -5,28 +5,29 @@ import android.text.Html
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.URLSpan
-import androidx.compose.foundation.Box
-import androidx.compose.foundation.ClickableText
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawBehind
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.unit.TextUnit
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.times
 import androidx.core.net.toUri
 import co.adrianblan.storydetail.FlatComment
 import co.adrianblan.storydetail.R
+import co.adrianblan.ui.AppTheme
 
 
 @Composable
@@ -55,18 +56,21 @@ fun CommentItem(
 
     val depthIndicatorWidth = 10.dp
 
-    val strokeWidthPx = with(DensityAmbient.current) {
+    val strokeWidthPx = with(LocalDensity.current) {
         1.dp.toPx()
     }
 
-    val depthIndicatorColor = colorResource(id = R.color.divider)
+    val depthIndicatorColor = colorResource(id = co.adrianblan.ui.R.color.divider)
 
     Box(
-        paddingStart = 16.dp + depthIndex * depthIndicatorWidth,
-        paddingEnd = 16.dp,
-        paddingTop = 8.dp,
-        paddingBottom = 8.dp,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = 16.dp + depthIndex * depthIndicatorWidth,
+                end = 16.dp,
+                top = 8.dp,
+                bottom = 8.dp
+            )
             .drawBehind {
 
                 val parentSize = this.size
@@ -99,12 +103,12 @@ fun CommentItem(
             val isDeleted = by == null
 
             if (isDeleted) {
-                Spacer(Modifier.preferredHeight(4.dp))
+                Spacer(Modifier.height(4.dp))
                 Text(
                     text = stringResource(R.string.comment_deleted_title),
                     style = MaterialTheme.typography.subtitle2
                 )
-                Spacer(Modifier.preferredHeight(8.dp))
+                Spacer(Modifier.height(8.dp))
             } else {
 
                 val isStoryAuthor = by == storyAuthor
@@ -122,7 +126,7 @@ fun CommentItem(
                     style = MaterialTheme.typography.subtitle2.copy(color = authorColor)
                 )
 
-                Spacer(Modifier.preferredHeight(4.dp))
+                Spacer(Modifier.height(4.dp))
 
                 val body: Spanned = Html.fromHtml(text.orEmpty())
 
@@ -143,6 +147,20 @@ fun CommentItem(
                 )
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun CommentItemPreview() {
+    AppTheme {
+        CommentItem(
+            text = "Test title",
+            by = "Test source",
+            depthIndex = 0,
+            storyAuthor = "Test author",
+            onCommentUrlClicked = {}
+        )
     }
 }
 
@@ -197,7 +215,7 @@ private fun AnnotatedString.Builder.reduceParagraphSpacing(): AnnotatedString.Bu
         .findAll(this.toString())
         .forEach { match ->
             this.addStyle(
-                SpanStyle(fontSize = TextUnit.Sp(4)),
+                SpanStyle(fontSize = 4.sp),
                 match.range.first,
                 match.range.last + 1
             )

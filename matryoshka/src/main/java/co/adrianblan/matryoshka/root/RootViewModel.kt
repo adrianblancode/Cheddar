@@ -24,16 +24,16 @@ internal class RootViewModelFactory(
     private val rootNodeBuilder: () -> Node
 ) : AbstractSavedStateViewModelFactory(owner, null) {
 
-    override fun <T : ViewModel?> create(
+    override fun <T : ViewModel> create(
         key: String,
         modelClass: Class<T>,
-        savedStateHandle: SavedStateHandle
+        handle: SavedStateHandle
     ): T {
         require(modelClass.isAssignableFrom(RootViewModel::class.java))
 
         @Suppress("UNCHECKED_CAST")
         return RootViewModel(
-            savedStateHandle,
+            handle,
             rootNodeBuilder
         ) as T
     }

@@ -32,19 +32,9 @@ object NullableApiCommentSerializer : KSerializer<ApiComment?> {
     override val descriptor: SerialDescriptor
         get() = ApiCommentSerializer.descriptor
 
-    override fun serialize(encoder: Encoder, value: ApiComment?) {
-        if (value != null) {
-            ApiCommentSerializer.serialize(encoder, value)
-        } else {
-            encoder.encodeNull()
-        }
-    }
+    override fun serialize(encoder: Encoder, value: ApiComment?) =
+        encoder.encodeNullableSerializableValue(ApiCommentSerializer, value)
 
     override fun deserialize(decoder: Decoder): ApiComment? =
-        try {
-            decoder.decodeNull()
-            null
-        } catch (e: Exception) {
-            ApiCommentSerializer.deserialize(decoder)
-        }
+        decoder.decodeNullableSerializableValue(ApiCommentSerializer)
 }

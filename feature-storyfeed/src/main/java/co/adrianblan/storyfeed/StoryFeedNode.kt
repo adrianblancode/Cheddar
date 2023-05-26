@@ -3,12 +3,14 @@ package co.adrianblan.storyfeed
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import co.adrianblan.common.collectAsStateFlow
+import co.adrianblan.common.toStateFlow
 import co.adrianblan.domain.StoryId
 import co.adrianblan.domain.StoryUrl
 import co.adrianblan.matryoshka.node.Node
 import co.adrianblan.storyfeed.ui.StoryFeedView
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.StateFlow
 
 class StoryFeedNode
@@ -24,7 +26,7 @@ class StoryFeedNode
 
     private val state: StateFlow<StoryFeedViewState> =
         storyFeedPresenter.state
-            .collectAsStateFlow(scope)
+            .toStateFlow(scope)
 
     @Composable
     override fun render() =
@@ -36,7 +38,7 @@ class StoryFeedNode
             onPageEndReached = { storyFeedPresenter.onPageEndReached() }
         )
 
-    @AssistedInject.Factory
+    @AssistedFactory
     interface Factory {
         fun create(listener: Listener): StoryFeedNode
     }

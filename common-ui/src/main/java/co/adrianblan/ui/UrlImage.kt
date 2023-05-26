@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageAsset
-import androidx.compose.ui.graphics.asImageAsset
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.squareup.picasso.Picasso
@@ -30,12 +30,12 @@ fun UrlImage(
     fallbackIcon: @Composable (() -> Unit)? = null,
 ) {
 
-    val targetWidthPx = with(DensityAmbient.current) { remember { width.toIntPx() } }
-    val targetHeightPx = with(DensityAmbient.current) { remember { height.toIntPx() } }
+    val targetWidthPx = with(LocalDensity.current) { remember { width.roundToPx() } }
+    val targetHeightPx = with(LocalDensity.current) { remember { height.roundToPx() } }
 
     val imageState = remember(imageUrl) { mutableStateOf<ImageState>(ImageState.Loading) }
 
-    launchInComposition(imageUrl) {
+    LaunchedEffect(imageUrl) {
         imageState.value = loadImage(imageUrl, targetWidthPx, targetHeightPx)
     }
 
@@ -69,7 +69,7 @@ private suspend fun loadImage(
                         targetWidthPx,
                         targetHeightPx,
                         !isPixelatedIcon
-                    ).asImageAsset()
+                    ).asImageBitmap()
 
                     continuation.resume(ImageState.ImageSuccess(image))
                 }
@@ -114,12 +114,12 @@ private fun DrawImageState(state: ImageState, fallbackIcon: @Composable (() -> U
             fallbackIcon?.invoke()
         }
         is ImageState.ImageSuccess ->
-            Image(asset = state.image)
+            Image(bitmap = state.image, contentDescription = null)
     }
 }
 
 internal sealed class ImageState {
-    data class ImageSuccess(val image: ImageAsset) : ImageState()
+    data class ImageSuccess(val image: ImageBitmap) : ImageState()
     object Loading : ImageState()
     object Error : ImageState()
 }

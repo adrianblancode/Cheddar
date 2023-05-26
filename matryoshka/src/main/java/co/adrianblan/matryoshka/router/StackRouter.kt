@@ -1,11 +1,12 @@
 package co.adrianblan.matryoshka.router
 
 import androidx.compose.runtime.Immutable
-import co.adrianblan.common.mapStateFlow
 import co.adrianblan.matryoshka.node.AnyNode
 import co.adrianblan.matryoshka.node.NodeStore
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
 
 /**
  * Router for a stack of nodes.
@@ -43,8 +44,7 @@ abstract class StackRouter<T : Any> constructor(
 
     val state: StateFlow<List<StackNode<T>>> = _state
 
-    val activeNode: StateFlow<StackNode<T>> =
-        state.mapStateFlow { it.last() }
+    val activeNode: StackNode<T> = state.value.last()
 
     /**
      * Pushes a node to the top of the stack.

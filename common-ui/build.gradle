@@ -1,39 +1,33 @@
 apply from: rootProject.file("gradle/library.gradle")
 
 android {
+    namespace 'co.adrianblan.ui'
+
     buildFeatures {
         compose true
     }
 
     composeOptions {
-        kotlinCompilerVersion Versions.composeCompiler
-        kotlinCompilerExtensionVersion Versions.compose
-    }
-}
-
-// Used for compose dev15
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    kotlinOptions {
-        languageVersion = "1.4"
-        jvmTarget = "1.8"
-        freeCompilerArgs += ["-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check"]
+        kotlinCompilerExtensionVersion libs.versions.androidxComposeCompiler.get()
     }
 }
 
 dependencies {
     api(project(":matryoshka"))
 
-    api(Dependencies.androidxAppcompat)
-    api(Dependencies.androidxCore)
-    api(Dependencies.androidxActivity)
+    api(libs.androidx.appcompat)
+    api(libs.androidx.core)
+    api(libs.androidx.activity)
 
-    api(Dependencies.composeRuntime)
-    api(Dependencies.composeLayout)
-    api(Dependencies.composeMaterial)
-    api(Dependencies.composeFoundation)
-    api(Dependencies.composeAnimation)
-    api(Dependencies.composeTooling)
-    api(Dependencies.composeIcons)
+    api(platform(libs.androidx.compose.bom))
+    api(libs.androidx.compose.animation)
+    api(libs.androidx.compose.material.core)
+    implementation(libs.androidx.compose.material.icons)
+    api(libs.androidx.compose.foundation.core)
+    api(libs.androidx.compose.foundation.layout)
+    api(libs.androidx.lifecycle.viewmodel)
+    api(libs.androidx.compose.ui.tooling.core)
+    debugApi(libs.androidx.compose.ui.tooling.preview)
 
-    api(Dependencies.picasso)
+    api(libs.picasso)
 }

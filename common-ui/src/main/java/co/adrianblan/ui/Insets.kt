@@ -10,7 +10,7 @@ import androidx.core.view.WindowInsetsCompat
 // Alpha for views which have content drawn behind it
 const val overInsetAlpha = 0.8f
 
-val InsetsAmbient = ambientOf { Insets.NONE }
+val LocalInsets = compositionLocalOf { Insets.NONE }
 
 // Provides insets to children
 @Composable
@@ -28,22 +28,21 @@ fun InsetsWrapper(
         )
     }
 
-    onCommit {
+    DisposableEffect(Unit) {
 
         val listener =
             OnApplyWindowInsetsListener { _, windowInsets ->
                 val inset = windowInsets.systemWindowInsets
-
                 insets.value = inset
-
                 windowInsets
             }
 
         ViewCompat.setOnApplyWindowInsetsListener(view, listener)
+
         onDispose { ViewCompat.setOnApplyWindowInsetsListener(view, null) }
     }
 
-    Providers(InsetsAmbient provides insets.value) {
+    CompositionLocalProvider(LocalInsets provides insets.value) {
         content()
     }
 }

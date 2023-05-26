@@ -25,19 +25,13 @@ abstract class NetworkModule {
             OkHttpClient.Builder()
                 .apply {
 
-                    if (BuildConfig.DEBUG) {
-                        addInterceptor(
-                            HttpLoggingInterceptor(
-                                object : HttpLoggingInterceptor.Logger {
-                                    override fun log(message: String) {
-                                        Timber.tag("OkHttp").d(message)
-                                    }
-                                }
-                            ).apply {
-                                level = HttpLoggingInterceptor.Level.BASIC
-                            }
-                        )
-                    }
+                    addInterceptor(
+                        HttpLoggingInterceptor { message ->
+                            Timber.tag("OkHttp").d(message)
+                        }.apply {
+                            level = HttpLoggingInterceptor.Level.BASIC
+                        }
+                    )
 
                     applicationInterceptors.forEach {
                         addInterceptor(it)

@@ -33,7 +33,7 @@ abstract class Node {
     internal fun detach() {
         require(detachSignalChannel.valueOrNull == null) { "Cannot detach an already detached node" }
         cancel()
-        detachSignalChannel.offer(Unit)
+        detachSignalChannel.trySend(Unit)
     }
 
     /** Suspends until detach, or returns immediately if node has already been detached. */

@@ -1,11 +1,15 @@
 apply from: rootProject.file("gradle/library.gradle")
-apply plugin: "kotlinx-serialization"
+apply plugin: libs.plugins.kotlin.serialization.get().pluginId
+
+android {
+    namespace 'co.adrianblan.hackernews'
+}
 
 dependencies {
     implementation(project(":network"))
     implementation(project(":domain"))
 
     // Implemented here because module compiler plugin is needed
-    implementation(Dependencies.kotlinSerializationCore)
-    implementation(Dependencies.retrofitSerializationConverter)
+    implementation(libs.kotlinx.serialization)
+    implementation(libs.retrofit.serialization)
 }

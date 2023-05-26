@@ -5,6 +5,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import dagger.Lazy
 import dagger.Module
 import dagger.Provides
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaType
@@ -17,6 +18,13 @@ import javax.inject.Singleton
 @Module
 object HackerNewsModule {
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+        // Disabling alternative names to generate correct serializer for ApiComment
+        // https://github.com/Kotlin/kotlinx.serialization/issues/1512
+        useAlternativeNames = false
+    }
+
     @Provides
     @Singleton
     @HackerNewsInternal
@@ -26,17 +34,10 @@ object HackerNewsModule {
         Retrofit.Builder()
             .baseUrl("https://hacker-news.firebaseio.com/v0/")
             .addConverterFactory(
-                Json {
-                    ignoreUnknownKeys = true
-                }
-                    .asConverterFactory("application/json".toMediaType())
+                @OptIn(ExperimentalSerializationApi::class)
+                json.asConverterFactory("application/json".toMediaType())
             )
-            .callFactory(
-                object : Call.Factory {
-                    override fun newCall(request: Request): Call =
-                        okHttpClient.get().newCall(request)
-                }
-            )
+            .callFactory { request -> okHttpClient.get().newCall(request) }
             .build()
             .create(HackerNewsApi::class.java)
 }

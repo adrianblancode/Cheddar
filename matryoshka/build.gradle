@@ -1,28 +1,21 @@
 apply from: rootProject.file("gradle/library.gradle")
 
 android {
+    namespace 'co.adrianblan.matryoshka'
+
     buildFeatures {
         compose true
     }
 
     composeOptions {
-        kotlinCompilerVersion Versions.composeCompiler
-        kotlinCompilerExtensionVersion Versions.compose
+        kotlinCompilerExtensionVersion libs.versions.androidxComposeCompiler.get()
     }
 }
 
 dependencies {
-    implementation(Dependencies.androidxActivity)
-    implementation(Dependencies.androidxAppcompat)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.appcompat)
 
-    implementation(Dependencies.composeRuntime)
-}
-
-// Used for compose dev15
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
-    kotlinOptions {
-        languageVersion = "1.4"
-        jvmTarget = "1.8"
-        freeCompilerArgs += ["-Xallow-jvm-ir-dependencies", "-Xskip-prerelease-check"]
-    }
+    implementation(platform(libs.androidx.compose.bom))
+    api(libs.androidx.compose.foundation.core)
 }

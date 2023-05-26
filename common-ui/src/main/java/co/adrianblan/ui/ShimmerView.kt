@@ -1,19 +1,28 @@
 package co.adrianblan.ui
 
-import androidx.compose.animation.core.AnimationClockObserver
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.StartOffset
+import androidx.compose.animation.core.StartOffsetType
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawBehind
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
-import androidx.compose.ui.graphics.LinearGradient
-import androidx.compose.ui.platform.AnimationClockAmbient
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.res.colorResource
-import androidx.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Preview
 import co.adrianblan.ui.utils.lerp
+
+private const val AnimationTime = 1500
 
 /** View with a shimmering effect, for loading content */
 @Preview
@@ -21,33 +30,21 @@ import co.adrianblan.ui.utils.lerp
 fun ShimmerView() {
 
     val backgroundColor = colorResource(id = R.color.contentMuted)
-
     val shimmerColor = colorResource(id = R.color.contentShimmer)
 
-    val progress = remember { mutableStateOf(0f) }
+    val clock = System.currentTimeMillis()
 
-    val observer = remember {
-        object : AnimationClockObserver {
-            override fun onAnimationFrame(frameTimeMillis: Long) {
-                val animationTime = 1500f
-                progress.value = (frameTimeMillis % animationTime) / animationTime
-            }
-        }
-    }
+    val animationSpec = infiniteRepeatable(
+        tween<Float>(durationMillis = AnimationTime, easing = LinearEasing),
+        initialStartOffset = StartOffset((clock % AnimationTime).toInt(), StartOffsetType.FastForward)
+    )
 
-    // All shimmers should have synchronized animation
-    val animationClock = AnimationClockAmbient.current
-
-    onCommit(animationClock) {
-        animationClock.subscribe(observer)
-
-        onDispose {
-            animationClock.unsubscribe(observer)
-        }
-    }
+    val progress by rememberInfiniteTransition("kek")
+        .animateFloat(initialValue = 0f, targetValue = 1f, animationSpec = animationSpec)
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .drawBehind {
 
                 val parentSize = this.size
@@ -56,18 +53,14 @@ fun ShimmerView() {
                 val width = parentSize.width
 
                 // Convert from [0, 1] to [-1, 2]
-                val offset = lerp(-1f, 2f, progress.value)
+                val offset = lerp(-1f, 2f, progress)
                 val left = width * offset
 
                 val shimmerGradient =
-                    LinearGradient(
-                        0f to backgroundColor,
-                        0.5f to shimmerColor,
-                        1f to backgroundColor,
-                        startX = left,
-                        endX = left + width,
-                        startY = 0f,
-                        endY = 0f
+                    Brush.linearGradient(
+                        colors = listOf(backgroundColor, shimmerColor, backgroundColor),
+                        start = Offset(left, 0f),
+                        end = Offset(left + width, 0f)
                     )
 
                 drawRect(

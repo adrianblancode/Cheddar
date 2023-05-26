@@ -83,13 +83,11 @@ class WebPreviewRepository
     private fun List<Element>.getOgContentOrNull(propertyName: String): String? =
         firstOrNull { it.attr("property") == propertyName }
             ?.attr("content")
-            .takeIf { it != null }
 
     private fun List<Element>.getIconContentOrNull(propertyName: String): String? =
         filter { it.attr("rel") == propertyName }
-            .maxBy { it.attr("sizes") }
+            .maxByOrNull { it.attr("sizes") }
             ?.attr("href")
-            .takeIf { it != null }
 
     private fun String.takeImageUrlIfCompatible(): String? {
         val ending = this.split("?")[0]

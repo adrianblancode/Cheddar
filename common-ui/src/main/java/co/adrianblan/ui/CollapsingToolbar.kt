@@ -2,20 +2,31 @@ package co.adrianblan.ui
 
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawShadow
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.*
-import androidx.compose.ui.platform.DensityAmbient
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.lerp
 
 @Composable
 fun CollapsingToolbar(
@@ -27,7 +38,7 @@ fun CollapsingToolbar(
 
     val totalCollapseDistance: Dp = maxHeight - minHeight
 
-    with(DensityAmbient.current) {
+    with(LocalDensity.current) {
 
         // 1f is fully collapsed
         val collapsedFraction: Float =
@@ -37,7 +48,7 @@ fun CollapsingToolbar(
 
         val elevation = lerp(0.dp, 8.dp, collapsedFraction)
 
-        val insets = InsetsAmbient.current
+        val insets = LocalInsets.current
         val topInsets = insets.top.toDp()
 
         // Toolbar background
@@ -45,7 +56,7 @@ fun CollapsingToolbar(
             Surface(color = MaterialTheme.colors.primary.copy(alpha = overInsetAlpha)) {
                 Box(
                     modifier = Modifier.fillMaxWidth()
-                        .preferredHeight(height + topInsets)
+                        .height(height + topInsets)
                         .padding(top = topInsets)
                 ) {
                     toolbarContent(collapsedFraction, height)
@@ -55,7 +66,12 @@ fun CollapsingToolbar(
             // Shape which starts at bottom of toolbar, and extends a few dp
             val toolbarShadowShape: Shape = remember {
                 object : Shape {
-                    override fun createOutline(size: Size, density: Density): Outline =
+
+                    override fun createOutline(
+                        size: Size,
+                        layoutDirection: LayoutDirection,
+                        density: Density
+                    ): Outline =
                         Outline.Rectangle(
                             Rect(
                                 0f,
@@ -69,7 +85,7 @@ fun CollapsingToolbar(
             // Elevation draws shadows underneath the shape, which is a problem if shape is transparent
             // We must clip the shadow to outside of the toolbar to not draw under it
             Surface(
-                modifier = Modifier.drawShadow(shape = RectangleShape, elevation = elevation)
+                modifier = Modifier.shadow(shape = RectangleShape, elevation = elevation)
                     .clip(toolbarShadowShape)
             ) {}
         }
@@ -98,9 +114,9 @@ fun CollapsingScaffold(
         Box(
             // Prevent children being clickable from behind toolbar
             modifier = Modifier
-                .clickable(indication = null, onClick = {})
+                .clickable(enabled = false) {}
                 .fillMaxWidth(),
-            children = {
+            content = {
                 CollapsingToolbar(
                     scrollState = scrollState,
                     minHeight = minHeight,

@@ -5,7 +5,7 @@ import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.ContextAmbient
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import co.adrianblan.ui.utils.isNightModeActive
 
@@ -40,6 +40,5 @@ fun AppTheme(content: @Composable () -> Unit) {
 
 @Composable
 fun isNightModeActive(): Boolean {
-    val context = ContextAmbient.current
-    return context.resources.isNightModeActive()
+    return LocalContext.current.resources.isNightModeActive()
 }

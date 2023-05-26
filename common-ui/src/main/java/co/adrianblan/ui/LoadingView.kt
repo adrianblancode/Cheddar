@@ -1,35 +1,36 @@
 package co.adrianblan.ui
 
 import androidx.compose.animation.core.*
-import androidx.compose.animation.transition
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Box
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.drawBehind
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.ui.tooling.preview.Preview
 import co.adrianblan.ui.utils.lerp
 import kotlin.math.sin
 
 @Preview
 @Composable
 fun LoadingView(
+    modifier: Modifier = Modifier,
     textStyle: TextStyle = MaterialTheme.typography.h6,
-    modifier: Modifier = Modifier
 ) {
     Box(
-        alignment = Alignment.Center,
-        modifier = Modifier.fillMaxSize().padding(32.dp) + modifier
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .fillMaxSize()
+            .padding(32.dp)
     ) {
 
         Row(
@@ -46,43 +47,22 @@ fun LoadingView(
     }
 }
 
-
-private val loadingState = FloatPropKey()
-
-private val loadingDefinition = transitionDefinition<Int> {
-    state(0) { this[loadingState] = 0f }
-    state(1) { this[loadingState] = 1f }
-
-    transition {
-        loadingState using repeatable(
-            iterations = AnimationConstants.Infinite,
-            animation = tween(
-                easing = LinearEasing,
-                durationMillis = 1200
-            )
-        )
-    }
-}
-
 // Draws an ellipis which animates
 @Composable
 private fun AnimatedEllipsisView(fontSize: TextUnit) {
 
-    val size: Dp = with(DensityAmbient.current) { fontSize.toDp() }
+    val size: Dp = with(LocalDensity.current) { fontSize.toDp() }
 
     val dotColor = MaterialTheme.colors.onBackground
 
-    val transitionState = transition(
-        definition = loadingDefinition,
-        toState = 1,
-        initState = 0,
-    )
+    val animationSpec = infiniteRepeatable(tween<Float>(durationMillis = 1200, easing = LinearEasing))
 
-    val progress: Float = transitionState[loadingState]
+    val progress: Float by rememberInfiniteTransition("ellipsis")
+        .animateFloat(initialValue = 0f, targetValue = 1f, animationSpec = animationSpec)
 
     Box(
         modifier = Modifier
-            .preferredSize(width = size * 1.2f, height = size)
+            .size(width = size * 1.2f, height = size)
             .drawBehind {
 
                 val parentSize = this.size

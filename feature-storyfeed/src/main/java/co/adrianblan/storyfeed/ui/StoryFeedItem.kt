@@ -2,32 +2,30 @@ package co.adrianblan.storyfeed.ui
 
 import android.text.Html
 import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.Text
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.length
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.ui.tooling.preview.Preview
 import co.adrianblan.common.urlSiteName
 import co.adrianblan.core.DecoratedStory
 import co.adrianblan.core.WebPreviewState
-import co.adrianblan.core.ui.LinkIcon
+import co.adrianblan.ui.LinkIcon
 import co.adrianblan.domain.Story
 import co.adrianblan.domain.StoryId
 import co.adrianblan.domain.StoryUrl
 import co.adrianblan.domain.placeholder
-import co.adrianblan.storyfeed.R
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.ShimmerView
 import co.adrianblan.ui.UrlImage
@@ -55,7 +53,7 @@ fun StoryFeedItem(
             shape = RoundedCornerShape(3.dp),
             modifier = Modifier.weight(1f)
                 .fillMaxWidth()
-                .preferredHeightIn(min = 110.dp)
+                .heightIn(min = 110.dp)
         ) {
             Box(
                 modifier = Modifier.clickable(onClick = storyClick)
@@ -142,21 +140,21 @@ fun StoryFeedItemDescription(
 
     // Only show shimmer if we are loading preview for an url
     if (storyUrl != null && webPreviewState is WebPreviewState.Loading) {
-        Spacer(modifier = Modifier.preferredHeight(8.dp))
+        Spacer(modifier = Modifier.height(8.dp))
 
         Surface(shape = RoundedCornerShape(2.dp)) {
             Box(
                 modifier = Modifier.fillMaxWidth()
-                    .preferredHeight(16.dp)
+                    .height(16.dp)
             ) {
                 ShimmerView()
             }
         }
-        Spacer(modifier = Modifier.preferredHeight(6.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         Surface(shape = RoundedCornerShape(2.dp)) {
             Box(
                 modifier = Modifier.fillMaxWidth()
-                    .preferredHeight(16.dp)
+                    .height(16.dp)
             ) {
                 ShimmerView()
             }
@@ -182,7 +180,7 @@ fun StoryFeedItemDescription(
             buildSubtitleString(siteName, description)
 
         if (subtitle.length > 0) {
-            Spacer(modifier = Modifier.preferredHeight(3.dp))
+            Spacer(modifier = Modifier.height(3.dp))
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.body2.copy(
@@ -217,11 +215,11 @@ private fun StoryFeedItemImage(
         ) {
             Surface(
                 shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.preferredSize(80.dp)
+                modifier = Modifier.size(80.dp)
             ) {
                 Box {
                     Surface(
-                        color = colorResource(R.color.contentMuted),
+                        color = colorResource(co.adrianblan.ui.R.color.contentMuted),
                         modifier = Modifier.fillMaxSize()
                     ) {}
 
@@ -246,6 +244,7 @@ private fun StoryFeedItemImage(
                         is WebPreviewState.Error -> {
                             LinkIcon()
                         }
+                        null -> {}
                     }
                 }
             }

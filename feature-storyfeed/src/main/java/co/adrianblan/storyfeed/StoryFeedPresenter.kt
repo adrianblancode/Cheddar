@@ -38,13 +38,13 @@ constructor(
     private val hasLoadedAllPagesChannel = ConflatedBroadcastChannel<Boolean>(false)
 
 
-    override val state: StateFlow<StoryFeedViewState> =
+    override val state: InitialFlow<StoryFeedViewState> =
         combine(
             storyTypeChannel.asFlow()
                 .distinctUntilChanged()
                 .flatMapLatest { storyType ->
                     channelFlow<StoryFeedState> {
-                        offer(StoryFeedState.Loading)
+                        trySend(StoryFeedState.Loading)
 
                         flow {
                             emit(hackerNewsRepository.fetchStories(storyType))
@@ -55,11 +55,11 @@ constructor(
                             .catch { t ->
                                 Timber.e(t)
                                 if (t is CancellationException) throw t
-                                else offer(StoryFeedState.Error(t))
+                                else trySend(StoryFeedState.Error(t))
                             }
                             .collectLatest { stories ->
                                 ensureActive()
-                                offer(StoryFeedState.Success(stories))
+                                trySend(StoryFeedState.Success(stories))
                             }
                     }
                         .map { storyFeedState ->
@@ -85,7 +85,7 @@ constructor(
         }
             .distinctUntilChanged()
             .flowOn(dispatcherProvider.IO)
-            .toStateFlow(
+            .withInitialValue(
                 StoryFeedViewState(
                     storyType = initialStoryType,
                     storyFeedState = StoryFeedState.Loading,
@@ -121,13 +121,13 @@ constructor(
             // Unordered emissions are ok, as we collect pages after
             .flatMapMerge { pageIndex ->
 
-                isLoadingMorePagesChannel.offer(true)
+                isLoadingMorePagesChannel.trySend(true)
 
                 observePage(pageIndex, storyIds)
                     .onFirst { stories ->
-                        isLoadingMorePagesChannel.offer(false)
+                        isLoadingMorePagesChannel.trySend(false)
 
-                        if (stories.isEmpty()) hasLoadedAllPagesChannel.offer(true)
+                        if (stories.isEmpty()) hasLoadedAllPagesChannel.trySend(true)
                         else currentPageIndexGate = pageIndex
                     }
                     .map { pageStories ->
@@ -137,14 +137,14 @@ constructor(
             .scanReducePages()
 
     fun onStoryTypeChanged(storyType: StoryType) {
-        storyTypeChannel.offer(storyType)
-        isLoadingMorePagesChannel.offer(true)
-        hasLoadedAllPagesChannel.offer(false)
-        pageIndexChannel.offer(0)
+        storyTypeChannel.trySend(storyType)
+        isLoadingMorePagesChannel.trySend(true)
+        hasLoadedAllPagesChannel.trySend(false)
+        pageIndexChannel.trySend(0)
     }
 
     fun onPageEndReached() {
-        pageIndexChannel.offer(currentPageIndexGate + 1)
+        pageIndexChannel.trySend(currentPageIndexGate + 1)
     }
 
     companion object {

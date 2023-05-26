@@ -1,13 +1,11 @@
 package co.adrianblan.storyfeed
 
-import com.squareup.inject.assisted.dagger2.AssistedModule
 import dagger.Module
 import dagger.Subcomponent
 import javax.inject.Inject
 import javax.inject.Scope
 
-@AssistedModule
-@Module(includes = [AssistedInject_StoryFeedModule::class])
+@Module
 object StoryFeedModule
 
 @StoryFeedScope

@@ -1,6 +1,9 @@
 apply from: rootProject.file("gradle/library.gradle")
 
 android {
+
+    namespace 'co.adrianblan.test'
+
     buildTypes {
         release {
             minifyEnabled true
@@ -10,6 +13,6 @@ android {
 }
 
 dependencies {
-    implementation(Dependencies.androidxCoreTesting)
-    implementation(Dependencies.coroutinesTest)
+    implementation(libs.androidx.core.test)
+    implementation(libs.kotlinx.coroutines.test)
 }

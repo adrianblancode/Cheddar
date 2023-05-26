@@ -1,7 +1,11 @@
 apply from: rootProject.file("gradle/library.gradle")
 
+android {
+    namespace 'co.adrianblan.network'
+}
+
 dependencies {
-    api(Dependencies.okhttpCore)
-    implementation(Dependencies.okhttpLoggingInterceptor)
-    api(Dependencies.retrofitCore)
+    api(libs.okhttp.core)
+    implementation(libs.okhttp.interceptor)
+    api(libs.retrofit.core)
 }

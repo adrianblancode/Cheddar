@@ -3,12 +3,13 @@ package co.adrianblan.storydetail
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import co.adrianblan.common.collectAsStateFlow
+import co.adrianblan.common.toStateFlow
 import co.adrianblan.domain.StoryUrl
-import co.adrianblan.storydetail.ui.StoryDetailView
 import co.adrianblan.matryoshka.node.Node
-import com.squareup.inject.assisted.Assisted
-import com.squareup.inject.assisted.AssistedInject
+import co.adrianblan.storydetail.ui.StoryDetailView
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.StateFlow
 
 
@@ -26,7 +27,7 @@ class StoryDetailNode
 
     private val state: StateFlow<StoryDetailViewState> =
         storyDetailPresenter.state
-            .collectAsStateFlow(scope)
+            .toStateFlow(scope)
 
     @Composable
     override fun render() =
@@ -37,7 +38,7 @@ class StoryDetailNode
             onBackPressed = { listener.onStoryDetailFinished() }
         )
 
-    @AssistedInject.Factory
+    @AssistedFactory
     interface Factory {
         fun create(
             listener: Listener

@@ -1,8 +1,19 @@
 package co.adrianblan.common
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+
+class InitialFlow<T> internal constructor(flow: Flow<T>, internal val initialValue: T) :
+    Flow<T> by flow
+
+fun <T> Flow<T>.withInitialValue(initialValue: T): InitialFlow<T> = InitialFlow(this, initialValue)
+
+fun <T> InitialFlow<T>.toStateFlow(
+    scope: CoroutineScope,
+    sharingStarted: SharingStarted = SharingStarted.WhileSubscribed(500)
+): StateFlow<T> = this.stateIn(scope, sharingStarted, this.initialValue)
 
 /**
  * Launches a coroutine under scope and collects the input StateFlow, emitting it to a output StateFlow.
@@ -22,46 +33,11 @@ fun <T> StateFlow<T>.collectAsStateFlow(scope: CoroutineScope): StateFlow<T> {
     return output
 }
 
-// TODO replace with stateIn when available
-// Takes a converts a Flow an initial value into a StateFlow
-fun <T> Flow<T>.toStateFlow(initialValue: T): StateFlow<T> =
-    StateFlowWrapper(this, initialValue)
-
-private class StateFlowWrapper<T>(
-    private val flow: Flow<T>,
-    initialValue: T
-) : AbstractFlow<T>(), StateFlow<T> {
-
-    override var value: T = initialValue
-        private set
-
-    override suspend fun collectSafely(collector: FlowCollector<T>) {
-        flow.collect {
-            value = it
-
-            collector.emit(it)
-        }
-    }
-}
-
-/** Maps one StateFlow into another */
-fun <T, V> StateFlow<T>.mapStateFlow(
-    mapper: (T) -> V
-): StateFlow<V> = StateFlowMapper(this, mapper)
-
-
-private class StateFlowMapper<T, V>(
-    private val stateFlow: StateFlow<T>,
-    private val mapper: (T) -> V
-) : AbstractFlow<V>(), StateFlow<V> {
-
-    override val value: V
-        get() = mapper(stateFlow.value)
-
-    override suspend fun collectSafely(collector: FlowCollector<V>) {
-        stateFlow.collect {
-            collector.emit(mapper(it))
-        }
-    }
-}
-
+fun <T, M> StateFlow<T>.map(
+    coroutineScope: CoroutineScope,
+    mapper: (value: T) -> M
+): StateFlow<M> = map { mapper(it) }.stateIn(
+    coroutineScope,
+    SharingStarted.Eagerly,
+    mapper(value)
+)

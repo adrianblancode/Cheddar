@@ -5,9 +5,11 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
@@ -15,16 +17,16 @@ import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.DensityAmbient
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
-import androidx.ui.tooling.preview.Preview
 import co.adrianblan.common.urlSiteName
 import co.adrianblan.core.WebPreviewState
-import co.adrianblan.core.ui.LinkIcon
+import co.adrianblan.ui.LinkIcon
 import co.adrianblan.domain.Comment
 import co.adrianblan.domain.Story
 import co.adrianblan.domain.StoryUrl
@@ -74,52 +76,48 @@ fun StoryDetailView(
 
                     when (viewState.commentsState) {
                         is StoryDetailCommentsState.Success ->
-                            ScrollableColumn(scrollState = scrollState) {
-                                Column {
+                            Column(modifier = Modifier.verticalScroll(scrollState)) {
 
-                                    val topInsets =
-                                        with(DensityAmbient.current) {
-                                            InsetsAmbient.current.top.toDp()
-                                        }
+                                val topInsets =
+                                    with(LocalDensity.current) {
+                                        LocalInsets.current.top.toDp()
+                                    }
 
-                                    Spacer(
-                                        modifier = Modifier.preferredHeight(
-                                            toolbarMaxHeightDp.dp + topInsets
-                                        )
+                                Spacer(
+                                    modifier = Modifier.height(
+                                        toolbarMaxHeightDp.dp + topInsets
                                     )
+                                )
 
-                                    if (viewState.story.text != null) {
-                                        CommentItem(
-                                            text = story.text,
-                                            by = story.by,
-                                            depthIndex = 0,
-                                            storyAuthor = story.by,
-                                            onCommentUrlClicked = onCommentUrlClicked
-                                        )
-                                    }
+                                if (viewState.story.text != null) {
+                                    CommentItem(
+                                        text = story.text,
+                                        by = story.by,
+                                        depthIndex = 0,
+                                        storyAuthor = story.by,
+                                        onCommentUrlClicked = onCommentUrlClicked
+                                    )
+                                }
 
-                                    viewState.commentsState.comments
-                                        .map { comment ->
-                                            key(comment.comment.id) {
-                                                CommentItem(
-                                                    comment = comment,
-                                                    storyAuthor = story.by,
-                                                    onCommentUrlClicked = onCommentUrlClicked
-                                                )
-                                            }
+                                viewState.commentsState.comments
+                                    .map { comment ->
+                                        key(comment.comment.id) {
+                                            CommentItem(
+                                                comment = comment,
+                                                storyAuthor = story.by,
+                                                onCommentUrlClicked = onCommentUrlClicked
+                                            )
                                         }
-
-                                    with(DensityAmbient.current) {
-                                        Spacer(modifier = Modifier.preferredHeight(InsetsAmbient.current.bottom.toDp() + 8.dp))
                                     }
+
+                                with(LocalDensity.current) {
+                                    Spacer(modifier = Modifier.height(LocalInsets.current.bottom.toDp() + 8.dp))
                                 }
                             }
-                        is StoryDetailCommentsState.Empty ->
-                            CommentsEmptyView()
-                        is StoryDetailCommentsState.Loading ->
-                            LoadingView()
-                        is StoryDetailCommentsState.Error ->
-                            ErrorView()
+
+                        is StoryDetailCommentsState.Empty -> CommentsEmptyView()
+                        is StoryDetailCommentsState.Loading -> LoadingView()
+                        is StoryDetailCommentsState.Error -> ErrorView()
                     }
                 }
 
@@ -145,8 +143,9 @@ fun StoryDetailToolbar(
             modifier = Modifier.padding(4.dp)
         ) {
             Icon(
-                asset = Icons.Default.ArrowBack,
-                tint = MaterialTheme.colors.onBackground
+                imageVector = Icons.Default.ArrowBack,
+                tint = MaterialTheme.colors.onBackground,
+                contentDescription = null
             )
         }
 
@@ -165,25 +164,29 @@ fun StoryDetailToolbar(
             is StoryDetailViewState.Loading ->
                 Surface(
                     shape = RoundedCornerShape(2.dp),
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier
+                        .padding(16.dp)
                         .padding(top = titleCollapsedTopOffset)
                 ) {
                     Column {
                         Box(
-                            modifier = Modifier.fillMaxWidth()
-                                .preferredHeight(20.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(20.dp)
                         ) {
                             ShimmerView()
                         }
-                        Spacer(modifier = Modifier.preferredHeight(6.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
                         Box(
-                            modifier = Modifier.fillMaxWidth()
-                                .preferredHeight(20.dp)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(20.dp)
                         ) {
                             ShimmerView()
                         }
                     }
                 }
+
             is StoryDetailViewState.Success -> {
 
                 val story: Story = viewState.story
@@ -196,15 +199,16 @@ fun StoryDetailToolbar(
                     else 0.dp
 
                 Column(
-                    modifier = Modifier.padding(
-                        start = 16.dp + titleCollapsedLeftOffset,
-                        end = 12.dp + titleRightOffset,
-                        bottom = 8.dp,
-                        top = 8.dp + titleCollapsedTopOffset
-                    )
+                    modifier = Modifier
+                        .padding(
+                            start = 16.dp + titleCollapsedLeftOffset,
+                            end = 12.dp + titleRightOffset,
+                            bottom = 8.dp,
+                            top = 8.dp + titleCollapsedTopOffset
+                        )
                         .fillMaxWidth()
-                        .preferredHeight(height)
-                        .gravity(Alignment.CenterStart)
+                        .height(height)
+                        .align(Alignment.CenterStart)
                         .wrapContentHeight(Alignment.CenterVertically)
                 ) {
 
@@ -233,7 +237,7 @@ fun StoryDetailToolbar(
                 }
 
                 if (story.url != null) {
-                    Box(modifier = Modifier.gravity(Alignment.BottomEnd)) {
+                    Box(modifier = Modifier.align(Alignment.BottomEnd)) {
                         StoryDetailImage(
                             story = story,
                             webPreviewState = webPreviewState,
@@ -243,8 +247,8 @@ fun StoryDetailToolbar(
                     }
                 }
             }
-            is StoryDetailViewState.Error -> {
-            }
+
+            is StoryDetailViewState.Error -> {}
         }
     }
 }
@@ -258,22 +262,24 @@ private fun StoryDetailImage(
 ) {
 
     Box(
-        modifier = Modifier.clickable(
-            onClick = { story.url?.let { onStoryContentClick(it) } }
-        ).padding(
-            start = 8.dp,
-            top = 8.dp,
-            end = 16.dp,
-            bottom = 8.dp
-        )
+        modifier = Modifier
+            .clickable(
+                onClick = { story.url?.let { onStoryContentClick(it) } }
+            )
+            .padding(
+                start = 8.dp,
+                top = 8.dp,
+                end = 16.dp,
+                bottom = 8.dp
+            )
     ) {
         Surface(
             shape = RoundedCornerShape(8.dp),
-            modifier = Modifier.preferredSize(imageSize)
+            modifier = Modifier.size(imageSize)
         ) {
             Box {
                 Surface(
-                    color = colorResource(R.color.contentMuted),
+                    color = colorResource(co.adrianblan.ui.R.color.contentMuted),
                     modifier = Modifier.fillMaxSize()
                 ) {}
 
@@ -284,6 +290,7 @@ private fun StoryDetailImage(
                             LinkIcon()
                         }
                     }
+
                     is WebPreviewState.Success -> {
                         val webPreview = webPreviewState.webPreview
 
@@ -293,9 +300,11 @@ private fun StoryDetailImage(
 
                         UrlImage(imageUrl) { LinkIcon() }
                     }
+
                     is WebPreviewState.Error -> {
                         LinkIcon()
                     }
+                    null -> {}
                 }
             }
         }
@@ -332,9 +341,10 @@ fun StoryDetailPreview() {
 @Composable
 fun CommentsEmptyView() {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .padding(32.dp),
-        alignment = Alignment.Center
+        contentAlignment = Alignment.Center
     ) {
         Text(
             text = stringResource(id = R.string.comments_empty),
