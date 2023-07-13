@@ -1,6 +1,6 @@
 package co.adrianblan.cheddar.di
 
-import co.adrianblan.core.di.CoreComponent
+import co.adrianblan.domain.di.CoreComponent
 import co.adrianblan.storynavigation.StoryNavigationComponent
 import dagger.Component
 import dagger.Module

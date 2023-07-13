@@ -42,7 +42,7 @@ class MainActivity : AppCompatActivity() {
             AppTheme {
                 InsetsWrapper(contentView) {
                     RootView {
-                        rootNode.render()
+                        rootNode.Render()
                     }
                 }
             }

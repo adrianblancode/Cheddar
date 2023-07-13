@@ -3,13 +3,13 @@ minSdk = "23"
 compileSdk = "33"
 targetSdk = "33"
 
-androidGradlePlugin = "8.2.0-alpha05"
-androidxCore = "1.10.0"
+androidGradlePlugin = "8.2.0-alpha09"
+androidxCore = "1.10.1"
 androidxCoreTesting = "2.2.0"
-androidxActivity = "1.7.1"
+androidxActivity = "1.7.2"
 androidxAppCompat = "1.6.1"
 androidxBrowser = "1.5.0"
-androidxComposeBom = "2023.05.00"
+androidxComposeBom = "2023.05.01"
 androidxComposeCompiler = "1.4.7"
 androidxLifecycle = "2.6.1"
 
@@ -19,6 +19,7 @@ jsoup = "1.13.1"
 kotlin = "1.8.21"
 kotlinxCoroutines = "1.6.4"
 kotlinxSerializationJson = "1.5.1"
+ksp = "1.8.20-1.0.11"
 okhttp = "5.0.0-alpha.10"
 picasso = "2.8"
 retrofit = "2.9.0"
@@ -38,7 +39,8 @@ androidx-activity = { group = "androidx.activity", name = "activity-compose", ve
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppCompat" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "androidxBrowser" }
 androidx-core = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
-androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel", version.ref = "androidxLifecycle" }
+androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
+androidx-lifecycle-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 
 androidx-compose-animation = { group = "androidx.compose.animation", name = "animation" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
@@ -74,8 +76,14 @@ mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito
 mockito-inline = { group = "org.mockito", name = "mockito-inline", version.ref = "mockito" }
 mockito-kotlin = { group = "com.nhaarman.mockitokotlin2", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 
-android-gradle-plugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
-kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+android-gradleplugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
+kotlin-gradleplugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+ksp-gradleplugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
+
+[bundles]
+library = ["androidx-core", "kotlinx-coroutines-android", "timber", "dagger"]
+library-kapt = ["dagger-compiler"]
+library-test = ["androidx-core-test", "kotlinx-coroutines-test", "junit", "mockito", "mockito-inline", "mockito-kotlin"]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -85,4 +93,5 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 dependency-updates-plugin = { id = "com.github.ben-manes.versions", version.ref = "dependencyUpdatesPlugin"}

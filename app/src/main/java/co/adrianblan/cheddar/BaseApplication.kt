@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import co.adrianblan.cheddar.di.AppComponent
 import co.adrianblan.cheddar.di.DaggerAppComponent
-import co.adrianblan.core.di.DaggerCoreComponent
+import co.adrianblan.domain.di.DaggerCoreComponent
 import timber.log.Timber
 
 class BaseApplication : Application() {
