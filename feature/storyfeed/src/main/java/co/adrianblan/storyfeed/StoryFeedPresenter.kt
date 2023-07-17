@@ -3,12 +3,11 @@ package co.adrianblan.storyfeed
 import co.adrianblan.common.*
 import co.adrianblan.domain.DecoratedStory
 import co.adrianblan.domain.StoryPreviewUseCase
-import co.adrianblan.model.StoryId
 import co.adrianblan.hackernews.HackerNewsRepository
-import co.adrianblan.model.StoryType
 import co.adrianblan.matryoshka.presenter.Presenter
+import co.adrianblan.model.StoryId
+import co.adrianblan.model.StoryType
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.flow.*
 import timber.log.Timber
@@ -24,23 +23,22 @@ constructor(
 
     private val initialStoryType = StoryType.TOP
 
-    private val storyTypeChannel = ConflatedBroadcastChannel<StoryType>(initialStoryType)
+    private val storyTypeFlow = MutableStateFlow<StoryType>(initialStoryType)
 
     // Which pages we have already loaded
     // Prevents UI from constantly requesting increasing pages, must only request next gated page
     private var currentPageIndexGate = -1
 
-    private val pageIndexChannel = ConflatedBroadcastChannel<Int>(0)
+    private val pageIndexFlow = MutableStateFlow<Int>(0)
 
-    private val isLoadingMorePagesChannel = ConflatedBroadcastChannel<Boolean>(true)
+    private val isLoadingMorePagesFlow = MutableStateFlow<Boolean>(true)
 
-    private val hasLoadedAllPagesChannel = ConflatedBroadcastChannel<Boolean>(false)
+    private val hasLoadedAllPagesFlow = MutableStateFlow<Boolean>(false)
 
 
     override val state: InitialFlow<StoryFeedViewState> =
         combine(
-            storyTypeChannel.asFlow()
-                .distinctUntilChanged()
+            storyTypeFlow
                 .flatMapLatest { storyType ->
                     channelFlow<StoryFeedState> {
                         trySend(StoryFeedState.Loading)
@@ -65,12 +63,8 @@ constructor(
                             storyType to storyFeedState
                         }
                 },
-            isLoadingMorePagesChannel.asFlow()
-                .conflate()
-                .distinctUntilChanged(),
-            hasLoadedAllPagesChannel.asFlow()
-                .conflate()
-                .distinctUntilChanged()
+            isLoadingMorePagesFlow,
+            hasLoadedAllPagesFlow
         ) { (storyType: StoryType, storyFeedState: StoryFeedState),
             isLoadingMorePages: Boolean,
             hasLoadedAllPages: Boolean ->
@@ -114,19 +108,17 @@ constructor(
 
     // Takes a list of story ids, and observes the full list of stories based on pagination
     private fun observePaginatedStories(storyIds: List<StoryId>): Flow<List<DecoratedStory>> =
-        pageIndexChannel.asFlow()
-            // Block duplicate page emissions
-            .distinctUntilChanged()
+        pageIndexFlow
             // Unordered emissions are ok, as we collect pages after
             .flatMapMerge { pageIndex ->
 
-                isLoadingMorePagesChannel.trySend(true)
+                isLoadingMorePagesFlow.tryEmit(true)
 
                 observePage(pageIndex, storyIds)
                     .onFirst { stories ->
-                        isLoadingMorePagesChannel.trySend(false)
+                        isLoadingMorePagesFlow.tryEmit(false)
 
-                        if (stories.isEmpty()) hasLoadedAllPagesChannel.trySend(true)
+                        if (stories.isEmpty()) hasLoadedAllPagesFlow.tryEmit(true)
                         else currentPageIndexGate = pageIndex
                     }
                     .map { pageStories ->
@@ -136,14 +128,14 @@ constructor(
             .scanReducePages()
 
     fun onStoryTypeChanged(storyType: StoryType) {
-        storyTypeChannel.trySend(storyType)
-        isLoadingMorePagesChannel.trySend(true)
-        hasLoadedAllPagesChannel.trySend(false)
-        pageIndexChannel.trySend(0)
+        storyTypeFlow.tryEmit(storyType)
+        isLoadingMorePagesFlow.tryEmit(true)
+        hasLoadedAllPagesFlow.tryEmit(false)
+        pageIndexFlow.tryEmit(0)
     }
 
     fun onPageEndReached() {
-        pageIndexChannel.trySend(currentPageIndexGate + 1)
+        pageIndexFlow.tryEmit(currentPageIndexGate + 1)
     }
 
     companion object {

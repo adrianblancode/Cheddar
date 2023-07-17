@@ -13,6 +13,7 @@ androidxComposeBom = "2023.05.01"
 androidxComposeCompiler = "1.4.7"
 androidxLifecycle = "2.6.1"
 
+coil = "2.4.0"
 dagger = "2.44.2"
 desugar = "2.0.3"
 jsoup = "1.13.1"
@@ -21,7 +22,6 @@ kotlinxCoroutines = "1.6.4"
 kotlinxSerializationJson = "1.5.1"
 ksp = "1.8.20-1.0.11"
 okhttp = "5.0.0-alpha.10"
-picasso = "2.8"
 retrofit = "2.9.0"
 retrofitSerialization = "0.8.0"
 timber = "5.0.1"
@@ -55,6 +55,7 @@ androidx-compose-ui-tooling-core = { group = "androidx.compose.ui", name = "ui-t
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-compose-ui-util = { group = "androidx.compose.ui", name = "ui-util" }
 
+coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 dagger = { group = "com.google.dagger", name = "dagger", version.ref = "dagger" }
 dagger-compiler = { group = "com.google.dagger", name = "dagger-compiler", version.ref = "dagger" }
 desugar = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar" }
@@ -65,7 +66,6 @@ kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-seria
 leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
 okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 okhttp-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
-picasso = { group = "com.squareup.picasso", name = "picasso", version.ref = "picasso" }
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitSerialization" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
@@ -79,11 +79,6 @@ mockito-kotlin = { group = "com.nhaarman.mockitokotlin2", name = "mockito-kotlin
 android-gradleplugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 kotlin-gradleplugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
 ksp-gradleplugin = { group = "com.google.devtools.ksp", name = "com.google.devtools.ksp.gradle.plugin", version.ref = "ksp" }
-
-[bundles]
-library = ["androidx-core", "kotlinx-coroutines-android", "timber", "dagger"]
-library-kapt = ["dagger-compiler"]
-library-test = ["androidx-core-test", "kotlinx-coroutines-test", "junit", "mockito", "mockito-inline", "mockito-kotlin"]
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

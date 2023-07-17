@@ -24,5 +24,5 @@ dependencies {
     api(libs.androidx.compose.ui.tooling.core)
     debugApi(libs.androidx.compose.ui.tooling.preview)
 
-    implementation(libs.picasso)
+    implementation(libs.coil)
 }

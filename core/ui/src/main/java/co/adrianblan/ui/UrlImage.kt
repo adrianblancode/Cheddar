@@ -1,22 +1,21 @@
 package co.adrianblan.ui
 
 import android.graphics.Bitmap
-import android.graphics.drawable.Drawable
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.squareup.picasso.Picasso
-import com.squareup.picasso.Target
-import com.squareup.picasso.Transformation
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
+import coil.compose.SubcomposeAsyncImage
+import coil.compose.SubcomposeAsyncImageContent
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
+import coil.size.Size
+import coil.transform.Transformation
 import kotlin.math.min
 
 private const val minBitmapSizePx = 48
@@ -30,96 +29,75 @@ fun UrlImage(
     fallbackIcon: @Composable (() -> Unit)? = null,
 ) {
 
-    val targetWidthPx = with(LocalDensity.current) { remember { width.roundToPx() } }
-    val targetHeightPx = with(LocalDensity.current) { remember { height.roundToPx() } }
+    val density = LocalDensity.current
+    val context = LocalContext.current
 
-    val imageState = remember(imageUrl) { mutableStateOf<ImageState>(ImageState.Loading) }
+    val targetWidthPx = remember(density) { with(density) { width.roundToPx() } }
+    val targetHeightPx = remember(density) { with(density) { height.roundToPx() } }
 
-    LaunchedEffect(imageUrl) {
-        imageState.value = loadImage(imageUrl, targetWidthPx, targetHeightPx)
+    val pixelatedTransformation = remember(targetWidthPx, targetHeightPx) {
+        PixelatedTransformation(targetWidthPx, targetHeightPx)
     }
 
-    DrawImageState(state = imageState.value, fallbackIcon = fallbackIcon)
-}
-
-private suspend fun loadImage(
-    imageUrl: String,
-    targetWidthPx: Int,
-    targetHeightPx: Int
-): ImageState =
-    suspendCancellableCoroutine { continuation ->
-
-        val target = object : Target {
-            override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-
-            override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {
-                continuation.resume(ImageState.Error)
-            }
-
-            override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-
-                if (bitmap == null) continuation.resume(ImageState.Error)
-                else {
-                    // Really small images are loaded without filtering to retain pixel perfect sharpness
-                    val isPixelatedIcon =
-                        bitmap.height <= minBitmapSizePx || bitmap.width <= minBitmapSizePx
-
-                    val image = Bitmap.createScaledBitmap(
-                        bitmap,
-                        targetWidthPx,
-                        targetHeightPx,
-                        !isPixelatedIcon
-                    ).asImageBitmap()
-
-                    continuation.resume(ImageState.ImageSuccess(image))
-                }
-            }
-        }
-
-        val picasso = Picasso.get()
-
-        picasso.load(imageUrl)
-            .transform(CropSquareTransformation)
-            .into(target)
-
-        continuation.invokeOnCancellation {
-            picasso.cancelRequest(target)
-        }
+    val imageRequest = remember(context, pixelatedTransformation) {
+        ImageRequest.Builder(context)
+            .data(imageUrl)
+            .transformations(CropSquareTransformation, pixelatedTransformation)
+            .build()
     }
 
-object CropSquareTransformation : Transformation {
-    override fun transform(source: Bitmap): Bitmap {
-        val size = min(source.width, source.height)
-        val x = (source.width - size) / 2
-        val y = (source.height - size) / 2
-        val result = Bitmap.createBitmap(source, x, y, size, size)
-        if (result != source) {
-            source.recycle()
-        }
-        return result
-    }
-
-    override fun key(): String = "square()"
-}
-
-@Composable
-private fun DrawImageState(state: ImageState, fallbackIcon: @Composable (() -> Unit)?) {
-    when (state) {
-        is ImageState.Loading ->
+    SubcomposeAsyncImage(
+        model = imageRequest,
+        contentDescription = null,
+        loading = {
             Box(modifier = Modifier.fillMaxSize()) {
                 ShimmerView()
                 fallbackIcon?.invoke()
             }
-        is ImageState.Error -> {
+        },
+        success = {
+            SubcomposeAsyncImageContent()
+        },
+        error = {
             fallbackIcon?.invoke()
         }
-        is ImageState.ImageSuccess ->
-            Image(bitmap = state.image, contentDescription = null)
+    )
+}
+
+object CropSquareTransformation : Transformation {
+    override val cacheKey: String = "square"
+
+    override suspend fun transform(input: Bitmap, size: Size): Bitmap {
+        val minSize = min(input.width, input.height)
+        val x = (input.width - minSize) / 2
+        val y = (input.height - minSize) / 2
+        val result = Bitmap.createBitmap(input, x, y, minSize, minSize)
+        if (result != input) {
+            input.recycle()
+        }
+        return result
     }
 }
 
-internal sealed class ImageState {
-    data class ImageSuccess(val image: ImageBitmap) : ImageState()
-    object Loading : ImageState()
-    object Error : ImageState()
+// Really small images are loaded as pixelated to not introduce blurriness through filtering
+class PixelatedTransformation(private val targetWidthPx: Int, private val targetHeightPx: Int) :
+    Transformation {
+    override val cacheKey: String = "pixelated"
+
+    override suspend fun transform(input: Bitmap, size: Size): Bitmap {
+        val isPixelatedIcon =
+            input.height <= minBitmapSizePx || input.width <= minBitmapSizePx
+
+        val result = Bitmap.createScaledBitmap(
+            input,
+            targetWidthPx,
+            targetHeightPx,
+            !isPixelatedIcon
+        )
+
+        if (result != input) {
+            input.recycle()
+        }
+        return result
+    }
 }
