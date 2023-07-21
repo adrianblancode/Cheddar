@@ -6,3 +6,8 @@ plugins {
 android {
     namespace = "co.adrianblan.storydetail"
 }
+
+dependencies {
+    implementation(project(":core:hackernews"))
+    implementation(project(":core:webpreview"))
+}

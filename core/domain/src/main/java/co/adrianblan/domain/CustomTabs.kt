@@ -1,17 +1,21 @@
-package co.adrianblan.domain.utils
+package co.adrianblan.domain
 
 import android.content.Context
 import android.content.Intent
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.core.net.toUri
-import co.adrianblan.common.CustomTabsLauncher
+import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
+
+interface CustomTabsLauncher {
+    fun launchUrl(url: String)
+}
 
 @Singleton
 class CustomTabsLauncherImpl
 @Inject constructor(
-    private val context: Context
+    @ApplicationContext private val context: Context
 ) : CustomTabsLauncher {
     override fun launchUrl(url: String) {
         CustomTabsIntent.Builder()

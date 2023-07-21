@@ -1,25 +1,17 @@
 package co.adrianblan.domain.di
 
-import android.content.Context
-import co.adrianblan.common.CustomTabsLauncher
 import co.adrianblan.common.DefaultDispatcherProvider
 import co.adrianblan.common.DispatcherProvider
-import co.adrianblan.domain.StoryPreviewUseCase
-import co.adrianblan.domain.utils.CustomTabsLauncherImpl
-import co.adrianblan.hackernews.HackerNewsModule
-import co.adrianblan.hackernews.HackerNewsRepository
-import co.adrianblan.hackernews.HackerNewsRepositoryImpl
-import co.adrianblan.network.NetworkModule
-import co.adrianblan.webpreview.WebPreviewRepository
+import co.adrianblan.domain.CustomTabsLauncher
+import co.adrianblan.domain.CustomTabsLauncherImpl
 import dagger.*
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
+@InstallIn(SingletonComponent::class)
 interface CoreModule {
-
-    @Singleton
-    @Binds
-    fun HackerNewsRepositoryImpl.bindHackerNewsRepository(): HackerNewsRepository
 
     @Singleton
     @Binds
@@ -28,34 +20,6 @@ interface CoreModule {
     companion object {
         @Singleton
         @Provides
-        fun dispatcherProvider(): DispatcherProvider =
-            DefaultDispatcherProvider
-    }
-}
-
-@Singleton
-@Component(
-    modules = [
-        CoreModule::class,
-        UseCaseModule::class,
-        NetworkModule::class,
-        HackerNewsModule::class
-    ]
-)
-interface CoreComponent {
-
-    val context: Context
-
-    val dispatcherProvider: DispatcherProvider
-    val customTabsLauncher: CustomTabsLauncher
-
-    val hackerNewsRepository: HackerNewsRepository
-    val webPreviewRepository: WebPreviewRepository
-
-    val storyPreviewUseCase: StoryPreviewUseCase
-
-    @Component.Factory
-    interface Factory {
-        fun build(@BindsInstance context: Context): CoreComponent
+        fun dispatcherProvider(): DispatcherProvider = DefaultDispatcherProvider
     }
 }

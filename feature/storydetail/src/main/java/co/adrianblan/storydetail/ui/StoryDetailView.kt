@@ -13,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,6 +25,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.*
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.adrianblan.common.urlSiteName
 import co.adrianblan.domain.WebPreviewState
 import co.adrianblan.ui.LinkIcon
@@ -34,6 +37,7 @@ import co.adrianblan.model.placeholder
 import co.adrianblan.storydetail.FlatComment
 import co.adrianblan.storydetail.R
 import co.adrianblan.storydetail.StoryDetailCommentsState
+import co.adrianblan.storydetail.StoryDetailViewModel
 import co.adrianblan.storydetail.StoryDetailViewState
 import co.adrianblan.ui.*
 import co.adrianblan.ui.utils.lerp
@@ -43,12 +47,28 @@ import kotlin.math.roundToInt
 private const val toolbarMinHeightDp = 56
 private const val toolbarMaxHeightDp = 148
 
+@Composable
+fun StoryDetailViewWrapper(
+    viewModel: StoryDetailViewModel = hiltViewModel(),
+    onStoryContentClick: (StoryUrl) -> Unit,
+    onCommentUrlClick: (Uri) -> Unit,
+    onBackPressed: () -> Unit
+) {
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+
+    StoryDetailView(
+        viewState = viewState,
+        onStoryContentClick = onStoryContentClick,
+        onCommentUrlClick = onCommentUrlClick,
+        onBackPressed = onBackPressed
+    )
+}
 
 @Composable
 fun StoryDetailView(
     viewState: StoryDetailViewState,
     onStoryContentClick: (StoryUrl) -> Unit,
-    onCommentUrlClicked: (Uri) -> Unit,
+    onCommentUrlClick: (Uri) -> Unit,
     onBackPressed: () -> Unit
 ) {
 
@@ -95,7 +115,7 @@ fun StoryDetailView(
                                         by = story.by,
                                         depthIndex = 0,
                                         storyAuthor = story.by,
-                                        onCommentUrlClicked = onCommentUrlClicked
+                                        onCommentUrlClick = onCommentUrlClick
                                     )
                                 }
 
@@ -105,7 +125,7 @@ fun StoryDetailView(
                                             CommentItem(
                                                 comment = comment,
                                                 storyAuthor = story.by,
-                                                onCommentUrlClicked = onCommentUrlClicked
+                                                onCommentUrlClick = onCommentUrlClick
                                             )
                                         }
                                     }
@@ -331,7 +351,7 @@ fun StoryDetailPreview() {
         StoryDetailView(
             viewState = viewState,
             onStoryContentClick = {},
-            onCommentUrlClicked = {},
+            onCommentUrlClick = {},
             onBackPressed = {}
         )
     }

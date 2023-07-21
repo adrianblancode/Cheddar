@@ -94,7 +94,7 @@ class StoryFeedPresenterTest {
             override suspend fun fetchStory(storyId: StoryId): Story =
                 delayAndThrow(evilDelay)
 
-            override suspend fun fetchStories(storyType: StoryType): List<StoryId> =
+            override suspend fun fetchStoryIds(storyType: StoryType): List<StoryId> =
                 delayAndThrow(evilDelay)
 
             override suspend fun fetchComment(commentId: CommentId): Comment =

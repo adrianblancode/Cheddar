@@ -1,7 +1,11 @@
 package co.adrianblan.storyfeed.ui
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -9,7 +13,12 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -28,7 +37,7 @@ fun StoryFeedToolbar(
     onStoryTypeClick: (StoryType) -> Unit
 ) {
 
-    val showStoryTypePopup = remember { mutableStateOf(false) }
+    var showStoryTypePopup by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.height(height)
@@ -38,34 +47,38 @@ fun StoryFeedToolbar(
             // Set min width to align popup in center
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .width(storyTypePopupWidth)
                 .padding(12.dp)
         ) {
 
-            val headerTextSize =
-                lerp(
-                    MaterialTheme.typography.h4.fontSize,
-                    MaterialTheme.typography.h6.fontSize,
-                    collapsedFraction
-                )
+            val typography = MaterialTheme.typography
+
+            val headerTextSize by remember(collapsedFraction) {
+                derivedStateOf {
+                    lerp(
+                        typography.h4.fontSize,
+                        typography.h6.fontSize,
+                        collapsedFraction
+                    )
+                }
+            }
 
             StoryFeedHeader(
                 headerTextSize = headerTextSize,
                 storyType = storyType,
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
-                showStoryTypePopup.value = true
+                showStoryTypePopup = true
             }
 
-            if (showStoryTypePopup.value) {
+            if (showStoryTypePopup) {
                 StoryTypePopup(
                     selectedStoryType = storyType,
                     onStoryTypeClick = { storyType ->
                         onStoryTypeClick(storyType)
-                        showStoryTypePopup.value = false
+                        showStoryTypePopup = false
                     },
                     onDismiss = {
-                        showStoryTypePopup.value = false
+                        showStoryTypePopup = false
                     }
                 )
             }

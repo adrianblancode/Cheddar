@@ -8,13 +8,12 @@ android {
 }
 
 dependencies {
-    api(project(":core:common"))
-    api(project(":core:model"))
-    // TODO fix with hilt
-    api(project(":core:hackernews"))
-    api(project(":core:webpreview"))
-
+    implementation(project(":core:common"))
+    implementation(project(":core:model"))
     implementation(project(":core:network"))
+    implementation(project(":core:hackernews"))
+    implementation(project(":core:webpreview"))
+
     implementation(libs.androidx.browser)
     implementation(libs.androidx.core)
     implementation(libs.kotlinx.coroutines.android)

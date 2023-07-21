@@ -34,14 +34,14 @@ import co.adrianblan.ui.AppTheme
 fun CommentItem(
     comment: FlatComment,
     storyAuthor: String?,
-    onCommentUrlClicked: (Uri) -> Unit
+    onCommentUrlClick: (Uri) -> Unit
 ) {
     CommentItem(
         text = comment.comment.text,
         by = comment.comment.by,
         depthIndex = comment.depthIndex,
         storyAuthor = storyAuthor,
-        onCommentUrlClicked = onCommentUrlClicked
+        onCommentUrlClick = onCommentUrlClick
     )
 }
 
@@ -51,7 +51,7 @@ fun CommentItem(
     by: String?,
     depthIndex: Int,
     storyAuthor: String?,
-    onCommentUrlClicked: (Uri) -> Unit
+    onCommentUrlClick: (Uri) -> Unit
 ) {
 
     val depthIndicatorWidth = 10.dp
@@ -141,7 +141,7 @@ fun CommentItem(
                                 index >= url.startIndex && index < url.endIndex
                             }
                             ?.let { url ->
-                                onCommentUrlClicked(url.url)
+                                onCommentUrlClick(url.url)
                             }
                     }
                 )
@@ -159,7 +159,7 @@ fun CommentItemPreview() {
             by = "Test source",
             depthIndex = 0,
             storyAuthor = "Test author",
-            onCommentUrlClicked = {}
+            onCommentUrlClick = {}
         )
     }
 }

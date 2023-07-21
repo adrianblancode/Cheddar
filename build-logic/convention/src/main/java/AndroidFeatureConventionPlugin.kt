@@ -15,8 +15,10 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
 
             dependencies {
                 implementation(project(":core:common"))
+                implementation(project(":core:model"))
                 implementation(project(":core:domain"))
                 implementation(project(":core:ui"))
+                implementation(libs.findLibrary("androidx.hilt.navigation.compose").get())
                 implementation(libs.findLibrary("androidx.lifecycle.compose").get())
                 implementation(libs.findLibrary("androidx.lifecycle.viewmodel").get())
                 implementation(libs.findLibrary("kotlinx.coroutines.android").get())

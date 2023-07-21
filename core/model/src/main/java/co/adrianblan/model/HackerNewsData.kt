@@ -1,8 +1,11 @@
 package co.adrianblan.model
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.time.Instant
 
-data class StoryId(val id: Long)
+@Parcelize
+data class StoryId(val id: Long): Parcelable
 
 data class StoryUrl(val url: String)
 

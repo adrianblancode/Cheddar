@@ -18,7 +18,6 @@ dependencyResolutionManagement {
 rootProject.name = "Cheddar"
 
 include(":app")
-include(":feature:storynavigation")
 include(":feature:storyfeed")
 include(":feature:storydetail")
 include(":core:common")
@@ -28,6 +27,5 @@ include(":core:domain")
 include(":core:network")
 include(":core:hackernews")
 include(":core:webpreview")
-include(":core:matryoshka")
 include(":core:testing")
 include(":convention")

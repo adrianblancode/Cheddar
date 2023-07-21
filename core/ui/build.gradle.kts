@@ -8,8 +8,6 @@ android {
 }
 
 dependencies {
-    api(project(":core:matryoshka"))
-
     api(libs.androidx.appcompat)
     api(libs.androidx.core)
     api(libs.androidx.activity)

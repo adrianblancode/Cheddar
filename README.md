@@ -6,7 +6,7 @@
 Cheddar is a social news reader for Hacker News. Currently it's being entirely rewritten with: 
 
 *   UI layer entirely in Compose.
-*   Single activity fully Compose first architecture, based on composable units of business logic to drive both app behavior and the UI layer.
+*   Single activity fully Compose first architecture.
 *   Dagger with high modularization.
 *   Kotlin Coroutines / Flow for asynchronous work.
 *   Retrofit / OkHttp / Kotlin Serialization for networking.

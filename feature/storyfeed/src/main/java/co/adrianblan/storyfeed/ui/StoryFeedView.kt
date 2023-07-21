@@ -1,15 +1,20 @@
 package co.adrianblan.storyfeed.ui
 
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
@@ -23,16 +28,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.adrianblan.domain.DecoratedStory
 import co.adrianblan.domain.WebPreviewState
-import co.adrianblan.model.*
+import co.adrianblan.model.Story
+import co.adrianblan.model.StoryId
+import co.adrianblan.model.StoryType
+import co.adrianblan.model.StoryUrl
+import co.adrianblan.model.placeholder
 import co.adrianblan.storyfeed.R
-import co.adrianblan.ui.R as UiR
 import co.adrianblan.storyfeed.StoryFeedState
+import co.adrianblan.storyfeed.StoryFeedViewModel
 import co.adrianblan.storyfeed.StoryFeedViewState
-import co.adrianblan.ui.*
+import co.adrianblan.ui.AppTheme
+import co.adrianblan.ui.CollapsingScaffold
+import co.adrianblan.ui.ErrorView
+import co.adrianblan.ui.LoadingView
+import co.adrianblan.ui.LocalInsets
+import co.adrianblan.ui.textSecondaryAlpha
 import kotlinx.coroutines.launch
 import kotlin.math.min
+import co.adrianblan.ui.R as UiR
 
 private const val toolbarMinHeightDp = 56
 private const val toolbarMaxHeightDp = 128
@@ -49,6 +66,23 @@ internal fun StoryType.titleStringResource(): Int =
 
 // TODO fixme
 private var initialScrollPosition = 0
+
+@Composable
+fun StoryFeedViewWrapper(
+    viewModel: StoryFeedViewModel = hiltViewModel(),
+    onStoryClick: (StoryId) -> Unit,
+    onStoryContentClick: (StoryUrl) -> Unit
+) {
+
+    val viewState by viewModel.viewState.collectAsStateWithLifecycle()
+    StoryFeedView(
+        viewState,
+        onStoryTypeClick = { storyType -> viewModel.onStoryTypeChanged(storyType) },
+        onStoryClick = onStoryClick,
+        onStoryContentClick = onStoryContentClick,
+        onPageEndReached = { viewModel.onPageEndReached() }
+    )
+}
 
 @Composable
 fun StoryFeedView(
@@ -79,7 +113,7 @@ fun StoryFeedView(
                 min(scrollState.value, collapseDistance.roundToPx())
             }
 
-        scope.launch {  scrollState.scrollTo(scrollReset) }
+        scope.launch { scrollState.scrollTo(scrollReset) }
 
         lastStoryType = viewState.storyType
 
@@ -148,14 +182,14 @@ fun StoryFeedSuccessContentBody(
         400.dp.toPx()
     }
 
-    val isScrolledToEnd: Boolean =
-        scrollState.value > (scrollState.maxValue - scrollEndZone)
+    val isScrolledToEnd: Boolean by remember(scrollState.value, scrollState.maxValue) {
+        derivedStateOf {
+            scrollState.value > (scrollState.maxValue - scrollEndZone)
+        }
+    }
 
     LaunchedEffect(isScrolledToEnd) {
         if (isScrolledToEnd) {
-            // Stop scroll fling
-            scrollState.scrollTo(scrollState.value)
-
             onPageEndReached()
         }
     }
@@ -170,7 +204,7 @@ fun StoryFeedSuccessContentBody(
 
         Spacer(modifier = Modifier.height(toolbarMaxHeightDp.dp + topInsets))
 
-        storyFeedState.stories.map { story ->
+        storyFeedState.stories.forEach { story ->
             key(story.story.id) {
                 StoryFeedItem(
                     decoratedStory = story,
@@ -180,15 +214,8 @@ fun StoryFeedSuccessContentBody(
             }
         }
 
-        when {
-            viewState.isLoadingMorePages -> LoadingMoreStoriesView()
-            !viewState.hasLoadedAllPages -> LoadMoreStoriesButton(
-                onPageEndReached = onPageEndReached
-            )
-
-            viewState.hasLoadedAllPages -> NoMoreStoriesView()
-        }
-
+        if (viewState.hasLoadedAllPages) NoMoreStoriesView()
+        else LoadingMoreStoriesView()
 
         Spacer(modifier = Modifier.height(bottomInsets + 8.dp))
     }
@@ -205,31 +232,6 @@ private fun LoadingMoreStoriesView() {
         LoadingView(
             textStyle = MaterialTheme.typography.subtitle1
         )
-    }
-}
-
-@Composable
-private fun LoadMoreStoriesButton(
-    onPageEndReached: () -> Unit
-) {
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 8.dp)
-    ) {
-        Button(onClick = onPageEndReached) {
-            Text(
-                stringResource(R.string.stories_load_more_stories),
-                style = MaterialTheme.typography.subtitle2,
-                modifier = Modifier.padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 12.dp,
-                    bottom = 8.dp
-                )
-            )
-        }
     }
 }
 
@@ -268,7 +270,6 @@ fun StoryFeedPreview() {
                     WebPreviewState.Loading
                 )
             }),
-            isLoadingMorePages = true,
             hasLoadedAllPages = false
         )
 

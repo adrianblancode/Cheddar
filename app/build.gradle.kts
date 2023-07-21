@@ -49,8 +49,8 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
-                    getDefaultProguardFile("proguard-android-optimize.txt"),
-                    "../proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "../proguard-rules.pro"
             )
         }
     }
@@ -61,16 +61,17 @@ android {
 }
 
 dependencies {
-    implementation(project(":feature:storynavigation"))
     implementation(project(":feature:storyfeed"))
     implementation(project(":feature:storydetail"))
 
     implementation(project(":core:common"))
+    implementation(project(":core:model"))
     implementation(project(":core:domain"))
     implementation(project(":core:ui"))
     implementation(project(":core:testing"))
     implementation(project(":core:network"))
 
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.timber)
     debugImplementation(libs.leakcanary)
 }

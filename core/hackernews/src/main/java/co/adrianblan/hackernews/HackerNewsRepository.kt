@@ -12,7 +12,8 @@ import javax.inject.Singleton
 
 interface HackerNewsRepository {
     suspend fun fetchStory(storyId: StoryId): Story
-    suspend fun fetchStories(storyType: StoryType): List<StoryId>
+    fun cachedStoryIds(storyType: StoryType): List<StoryId>?
+    suspend fun fetchStoryIds(storyType: StoryType): List<StoryId>
     suspend fun fetchComment(commentId: CommentId): Comment?
 }
 
@@ -20,7 +21,8 @@ interface HackerNewsRepository {
 class HackerNewsRepositoryImpl
 @Inject constructor(
     private val hackerNewsApiService: HackerNewsApiService
-): HackerNewsRepository {
+) : HackerNewsRepository {
+    private val storyIdsCache = WeakCache<StoryType, List<StoryId>>()
     private val storyCache = WeakCache<StoryId, Story>()
 
     override suspend fun fetchStory(storyId: StoryId): Story =
@@ -33,11 +35,17 @@ class HackerNewsRepositoryImpl
                     storyCache.put(storyId, story)
                 }
 
-    override suspend fun fetchStories(storyType: StoryType): List<StoryId> =
+    override fun cachedStoryIds(storyType: StoryType): List<StoryId>? =
+        storyIdsCache.get(storyType)
+
+    override suspend fun fetchStoryIds(storyType: StoryType): List<StoryId> =
         hackerNewsApiService.fetchStories(storyType)
             .mapNullResponseToEmptyList()
             .unwrapApiResponse()
             .map { StoryId(it) }
+            .also { storyIds ->
+                storyIdsCache.put(storyType, storyIds)
+            }
 
     override suspend fun fetchComment(commentId: CommentId): Comment? =
         hackerNewsApiService.fetchComment(commentId)

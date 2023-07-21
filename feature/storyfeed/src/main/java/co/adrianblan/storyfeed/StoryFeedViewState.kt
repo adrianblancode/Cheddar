@@ -8,7 +8,6 @@ import co.adrianblan.model.StoryType
 data class StoryFeedViewState(
     val storyType: StoryType,
     val storyFeedState: StoryFeedState,
-    val isLoadingMorePages: Boolean,
     val hasLoadedAllPages: Boolean
 )
 

@@ -21,13 +21,13 @@ import org.junit.Rule
 import org.junit.Test
 
 
-class StoryDetailPresenterTest {
+class StoryDetailViewModelTest {
 
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
     private lateinit var scope: TestCoroutineScope
-    private lateinit var storyDetailPresenter: StoryDetailPresenter
+    private lateinit var storyDetailViewModel: StoryDetailViewModel
 
     object TestStoryPreviewUseCase: StoryPreviewUseCase {
         override fun observeDecoratedStory(storyId: StoryId): Flow<DecoratedStory> =
@@ -44,7 +44,7 @@ class StoryDetailPresenterTest {
         hackerNewsRepository: HackerNewsRepository = FakeHackerNewsRepository(1000L)
 
     ) {
-        storyDetailPresenter = StoryDetailPresenter(
+        storyDetailViewModel = StoryDetailViewModel(
             storyId = StoryId(1),
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             hackerNewsRepository = hackerNewsRepository,
@@ -60,7 +60,7 @@ class StoryDetailPresenterTest {
     @Test
     fun testInitialState() {
         assertThat(
-            storyDetailPresenter.state.value,
+            storyDetailViewModel.viewState.value,
             instanceOf(StoryDetailViewState.Loading::class.java)
         )
     }
@@ -69,7 +69,7 @@ class StoryDetailPresenterTest {
     fun testSuccessStory() {
 
         val flow: TestStateFlow<StoryDetailViewState> =
-            storyDetailPresenter.state
+            storyDetailViewModel.viewState
                 .test(scope)
 
         scope.advanceUntilIdle()
@@ -89,7 +89,7 @@ class StoryDetailPresenterTest {
             override suspend fun fetchStory(storyId: StoryId): Story =
                 delayAndThrow(evilDelay)
 
-            override suspend fun fetchStories(storyType: StoryType): List<StoryId> =
+            override suspend fun fetchStoryIds(storyType: StoryType): List<StoryId> =
                 delayAndThrow(evilDelay)
 
             override suspend fun fetchComment(commentId: CommentId): Comment =
@@ -99,7 +99,7 @@ class StoryDetailPresenterTest {
         buildPresenter(evilHackerNewsRepository)
 
         val flow: TestStateFlow<StoryDetailViewState> =
-            storyDetailPresenter.state
+            storyDetailViewModel.viewState
                 .test(scope)
 
         scope.advanceUntilIdle()

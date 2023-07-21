@@ -1,28 +1,46 @@
 package co.adrianblan.storydetail
 
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import co.adrianblan.common.DispatcherProvider
-import co.adrianblan.common.InitialFlow
-import co.adrianblan.common.withInitialValue
+import co.adrianblan.common.WhileSubscribed
 import co.adrianblan.domain.DecoratedStory
 import co.adrianblan.domain.StoryPreviewUseCase
-import co.adrianblan.model.*
-import co.adrianblan.matryoshka.presenter.Presenter
 import co.adrianblan.hackernews.HackerNewsRepository
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
+import co.adrianblan.model.Comment
+import co.adrianblan.model.CommentId
+import co.adrianblan.model.Story
+import co.adrianblan.model.StoryId
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
 import javax.inject.Inject
 
-class StoryDetailPresenter
+@HiltViewModel
+class StoryDetailViewModel
 @Inject constructor(
-    private val storyId: StoryId,
+    savedStateHandle: SavedStateHandle,
     private val hackerNewsRepository: HackerNewsRepository,
     private val storyPreviewUseCase: StoryPreviewUseCase,
-    override val dispatcherProvider: DispatcherProvider
-) : Presenter<StoryDetailViewState> {
+    private val dispatcherProvider: DispatcherProvider
+) : ViewModel() {
+
+    private val storyId: StoryId = StoryId(savedStateHandle.get<Long>("storyId")!!)
 
     // TODO share story emission with shareIn
-    override val state: InitialFlow<StoryDetailViewState> =
+    val viewState: StateFlow<StoryDetailViewState> =
         combine<DecoratedStory, StoryDetailCommentsState, StoryDetailViewState>(
             storyPreviewUseCase.observeDecoratedStory(storyId),
             flow { emit(hackerNewsRepository.fetchStory(storyId)) }
@@ -41,10 +59,9 @@ class StoryDetailPresenter
             .flowOn(dispatcherProvider.IO)
             .catch {
                 Timber.e(it)
-                if (it is CancellationException) throw it
-                else emit(StoryDetailViewState.Error(it))
+                emit(StoryDetailViewState.Error(it))
             }
-            .withInitialValue(StoryDetailViewState.Loading)
+            .stateIn(viewModelScope, WhileSubscribed, StoryDetailViewState.Loading)
 
     private suspend fun fetchFlattenedComments(commentIds: List<CommentId>): List<FlatComment> =
         coroutineScope {
@@ -81,21 +98,14 @@ class StoryDetailPresenter
 
     private fun observeCommentsViewState(story: Story): Flow<StoryDetailCommentsState> =
         flow {
+            val flatComments: List<FlatComment> = fetchFlattenedComments(story.kids)
 
-            emit(StoryDetailCommentsState.Loading)
-
-            try {
-                val flatComments: List<FlatComment> =
-                    fetchFlattenedComments(story.kids)
-
-                if (flatComments.isEmpty()) emit(StoryDetailCommentsState.Empty)
-                else emit(StoryDetailCommentsState.Success(flatComments))
-
-            } catch (t: Throwable) {
-                Timber.e(t)
-
-                if (t is CancellationException) throw t
-                else emit(StoryDetailCommentsState.Error)
-            }
+            if (flatComments.isEmpty()) emit(StoryDetailCommentsState.Empty)
+            else emit(StoryDetailCommentsState.Success(flatComments))
         }
+            .onStart { emit(StoryDetailCommentsState.Loading) }
+            .catch {
+                Timber.e(it)
+                emit(StoryDetailCommentsState.Error)
+            }
 }
