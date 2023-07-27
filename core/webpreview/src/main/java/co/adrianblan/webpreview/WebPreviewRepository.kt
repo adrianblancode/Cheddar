@@ -4,6 +4,7 @@ import co.adrianblan.common.WeakCache
 import co.adrianblan.common.baseUrl
 import co.adrianblan.common.completePartialUrl
 import co.adrianblan.common.urlSiteName
+import co.adrianblan.model.WebPreviewData
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
@@ -12,15 +13,6 @@ import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-/** Preview data a web url using Open Graph tags */
-data class WebPreviewData(
-    val siteName: String,
-    val description: String?,
-    val imageUrl: String?,
-    val iconUrl: String?,
-    // This is just a best guess
-    val favIconUrl: String
-)
 
 @Singleton
 class WebPreviewRepository

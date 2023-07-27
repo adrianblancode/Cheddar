@@ -10,6 +10,7 @@ import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.model.StoryId
 import co.adrianblan.model.StoryType
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
@@ -51,7 +52,7 @@ class StoryFeedViewModel @Inject constructor(
                 )
                     .map { stories ->
                         if (stories.isEmpty()) StoryFeedState.Loading
-                        else StoryFeedState.Success(stories)
+                        else StoryFeedState.Success(stories.toImmutableList())
                     }
                     .onStart {
                         // If the flow restarts, don't emit loading state

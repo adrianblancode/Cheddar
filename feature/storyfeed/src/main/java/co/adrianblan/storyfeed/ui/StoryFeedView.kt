@@ -3,6 +3,7 @@ package co.adrianblan.storyfeed.ui
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -47,6 +48,7 @@ import co.adrianblan.ui.ErrorView
 import co.adrianblan.ui.LoadingView
 import co.adrianblan.ui.LocalInsets
 import co.adrianblan.ui.textSecondaryAlpha
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 import kotlin.math.min
 import co.adrianblan.ui.R as UiR
@@ -73,7 +75,6 @@ fun StoryFeedViewWrapper(
     onStoryClick: (StoryId) -> Unit,
     onStoryContentClick: (StoryUrl) -> Unit
 ) {
-
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
     StoryFeedView(
         viewState,
@@ -132,7 +133,7 @@ fun StoryFeedView(
             )
         },
         bodyContent = {
-            StoryFeedBodyContent(
+            BodyContent(
                 scrollState = scrollState,
                 viewState = viewState,
                 onStoryClick = onStoryClick,
@@ -144,7 +145,7 @@ fun StoryFeedView(
 }
 
 @Composable
-fun StoryFeedBodyContent(
+private fun BodyContent(
     scrollState: ScrollState,
     viewState: StoryFeedViewState,
     onStoryClick: (StoryId) -> Unit,
@@ -155,7 +156,7 @@ fun StoryFeedBodyContent(
     when (viewState.storyFeedState) {
         is StoryFeedState.Loading -> LoadingView()
         is StoryFeedState.Success -> {
-            StoryFeedSuccessContentBody(
+            SuccessBody(
                 scrollState = scrollState,
                 viewState = viewState,
                 onStoryClick = onStoryClick,
@@ -169,7 +170,7 @@ fun StoryFeedBodyContent(
 }
 
 @Composable
-fun StoryFeedSuccessContentBody(
+private fun SuccessBody(
     scrollState: ScrollState,
     viewState: StoryFeedViewState,
     onStoryClick: (StoryId) -> Unit,
@@ -194,13 +195,12 @@ fun StoryFeedSuccessContentBody(
         }
     }
 
+    val insets = LocalInsets.current
+    val topInsets = with(LocalDensity.current) { insets.top.toDp() }
+    val bottomInsets = with(LocalDensity.current) { insets.bottom.toDp() }
+
     // TODO change to LazyColumn
     Column(modifier = Modifier.verticalScroll(scrollState)) {
-
-        val insets = LocalInsets.current
-
-        val topInsets = with(LocalDensity.current) { insets.top.toDp() }
-        val bottomInsets = with(LocalDensity.current) { insets.bottom.toDp() }
 
         Spacer(modifier = Modifier.height(toolbarMaxHeightDp.dp + topInsets))
 
@@ -264,12 +264,14 @@ fun StoryFeedPreview() {
     AppTheme {
         val viewState = StoryFeedViewState(
             StoryType.TOP,
-            StoryFeedState.Success(List(10) {
-                DecoratedStory(
-                    Story.placeholder,
-                    WebPreviewState.Loading
-                )
-            }),
+            StoryFeedState.Success(
+                List(10) {
+                    DecoratedStory(
+                        Story.placeholder,
+                        WebPreviewState.Loading
+                    )
+                }.toImmutableList()
+            ),
             hasLoadedAllPages = false
         )
 

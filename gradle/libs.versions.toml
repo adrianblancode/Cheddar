@@ -7,12 +7,12 @@ androidGradlePlugin = "8.2.0-alpha09"
 androidxActivity = "1.7.2"
 androidxAppCompat = "1.6.1"
 androidxBrowser = "1.5.0"
-androidxComposeBom = "2023.05.01"
-androidxComposeCompiler = "1.4.7"
+androidxComposeBom = "2023.06.01"
+androidxComposeCompiler = "1.5.0"
 androidxCore = "1.10.1"
 androidxCoreTesting = "2.2.0"
 androidxLifecycle = "2.6.1"
-androidxNavigation = "2.5.3"
+androidxNavigation = "2.6.0"
 androidxHiltNavigationCompose = "1.0.0"
 
 coil = "2.4.0"
@@ -21,7 +21,8 @@ hilt = "2.46.1"
 hiltExt = "1.0.0"
 jsoup = "1.13.1"
 kotlin = "1.8.21"
-kotlinxCoroutines = "1.6.4"
+kotlinxCoroutines = "1.7.1"
+kotlinxImmutable = "0.3.5"
 kotlinxSerializationJson = "1.5.1"
 ksp = "1.8.20-1.0.11"
 okhttp = "5.0.0-alpha.10"
@@ -70,6 +71,7 @@ hilt-ext-compiler = { group = "androidx.hilt", name = "hilt-compiler", version.r
 jsoup = { group = "org.jsoup", name = "jsoup", version.ref = "jsoup"}
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
+kotlinx-immutable = { group = "org.jetbrains.kotlinx", name = "kotlinx-collections-immutable", version.ref = "kotlinxImmutable" }
 kotlinx-serialization = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 leakcanary = { group = "com.squareup.leakcanary", name = "leakcanary-android", version.ref = "leakcanary" }
 okhttp-core = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }

@@ -18,6 +18,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import co.adrianblan.ui.utils.lerp
@@ -32,15 +33,27 @@ fun ShimmerView() {
     val backgroundColor = colorResource(id = R.color.contentMuted)
     val shimmerColor = colorResource(id = R.color.contentShimmer)
 
-    val clock = System.currentTimeMillis()
+    val animationSpec = remember {
+        val clock = System.currentTimeMillis()
 
-    val animationSpec = infiniteRepeatable(
-        tween<Float>(durationMillis = AnimationTime, easing = LinearEasing),
-        initialStartOffset = StartOffset((clock % AnimationTime).toInt(), StartOffsetType.FastForward)
-    )
+        infiniteRepeatable(
+            tween<Float>(durationMillis = AnimationTime, easing = LinearEasing),
+            initialStartOffset = StartOffset(
+                (clock % AnimationTime).toInt(),
+                StartOffsetType.FastForward
+            )
+        )
+    }
 
-    val progress by rememberInfiniteTransition("kek")
+    val progress by rememberInfiniteTransition("progress")
         .animateFloat(initialValue = 0f, targetValue = 1f, animationSpec = animationSpec)
+
+    val offset by remember(progress) {
+        derivedStateOf {
+            // Convert from [0, 1] to [-1, 2]
+            lerp(-1f, 2f, progress)
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -52,8 +65,6 @@ fun ShimmerView() {
                 val rect = parentSize.toRect()
                 val width = parentSize.width
 
-                // Convert from [0, 1] to [-1, 2]
-                val offset = lerp(-1f, 2f, progress)
                 val left = width * offset
 
                 val shimmerGradient =

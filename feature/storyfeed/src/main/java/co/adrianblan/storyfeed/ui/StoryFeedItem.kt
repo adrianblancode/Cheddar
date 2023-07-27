@@ -10,6 +10,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.AnnotatedString
@@ -51,7 +52,8 @@ fun StoryFeedItem(
     Row {
         Surface(
             shape = RoundedCornerShape(3.dp),
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
                 .fillMaxWidth()
                 .heightIn(min = 110.dp)
         ) {
@@ -65,7 +67,8 @@ fun StoryFeedItem(
                     else 16.dp
 
                 Box(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
                         .padding(
                             start = 16.dp,
                             end = rightPadding,
@@ -73,7 +76,9 @@ fun StoryFeedItem(
                             bottom = 12.dp
                         )
                 ) {
-                    Column(modifier = Modifier.fillMaxWidth().animateContentSize()) {
+                    Column(modifier = Modifier
+                        .fillMaxWidth()
+                        .animateContentSize()) {
                         Text(
                             text = story.title,
                             style = MaterialTheme.typography.subtitle1
@@ -103,31 +108,40 @@ internal fun buildSubtitleString(
     siteName: String?,
     description: String?
 ): AnnotatedString {
-    val stringBuilder = AnnotatedString.Builder()
 
-    if (siteName != null) {
-        val emphStyle = MaterialTheme.typography.subtitle2
+    val typography = MaterialTheme.typography
+    val colors = MaterialTheme.colors
 
-        stringBuilder.pushStyle(
-            SpanStyle(
-                fontWeight = emphStyle.fontWeight,
-                fontFamily = emphStyle.fontFamily,
-                fontStyle = emphStyle.fontStyle,
-                color = MaterialTheme.colors.onPrimary
+    val annotatedString = remember(siteName, description) {
+
+        val stringBuilder = AnnotatedString.Builder()
+
+        if (siteName != null) {
+            val emphStyle = typography.subtitle2
+
+            stringBuilder.pushStyle(
+                SpanStyle(
+                    fontWeight = emphStyle.fontWeight,
+                    fontFamily = emphStyle.fontFamily,
+                    fontStyle = emphStyle.fontStyle,
+                    color = colors.onPrimary
+                )
             )
-        )
 
-        stringBuilder.append(siteName)
-        if (description != null) stringBuilder.append(" - ")
+            stringBuilder.append(siteName)
+            if (description != null) stringBuilder.append(" - ")
 
-        stringBuilder.pop()
+            stringBuilder.pop()
+        }
+
+        if (description != null) {
+            stringBuilder.append(description)
+        }
+
+        stringBuilder.toAnnotatedString()
     }
 
-    if (description != null) {
-        stringBuilder.append(description)
-    }
-
-    return stringBuilder.toAnnotatedString()
+    return annotatedString
 }
 
 @Composable
@@ -144,7 +158,8 @@ fun StoryFeedItemDescription(
 
         Surface(shape = RoundedCornerShape(2.dp)) {
             Box(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .height(16.dp)
             ) {
                 ShimmerView()
@@ -153,7 +168,8 @@ fun StoryFeedItemDescription(
         Spacer(modifier = Modifier.height(6.dp))
         Surface(shape = RoundedCornerShape(2.dp)) {
             Box(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
                     .height(16.dp)
             ) {
                 ShimmerView()
@@ -202,7 +218,8 @@ private fun StoryFeedItemImage(
 
     Surface(
         shape = RoundedCornerShape(3.dp),
-        modifier = Modifier.fillMaxHeight()
+        modifier = Modifier
+            .fillMaxHeight()
             .clickable(onClick = onClick)
     ) {
         Box(

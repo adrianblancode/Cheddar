@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,59 +38,68 @@ fun CollapsingToolbar(
     toolbarContent: @Composable (collapsedFraction: Float, height: Dp) -> Unit
 ) {
 
+    val colors = MaterialTheme.colors
+    val density = LocalDensity.current
     val totalCollapseDistance: Dp = maxHeight - minHeight
 
-    with(LocalDensity.current) {
-
-        // 1f is fully collapsed
-        val collapsedFraction: Float =
-            minOf(scrollState.value.toDp() / totalCollapseDistance, 1f)
-
-        val height = minHeight + (maxHeight - minHeight) * (1f - collapsedFraction)
-
-        val elevation = lerp(0.dp, 8.dp, collapsedFraction)
-
-        val insets = LocalInsets.current
-        val topInsets = insets.top.toDp()
-
-        // Toolbar background
-        Column {
-            Surface(color = MaterialTheme.colors.primary.copy(alpha = overInsetAlpha)) {
-                Box(
-                    modifier = Modifier.fillMaxWidth()
-                        .height(height + topInsets)
-                        .padding(top = topInsets)
-                ) {
-                    toolbarContent(collapsedFraction, height)
-                }
+    val collapsedFraction: Float by remember(scrollState, totalCollapseDistance, density) {
+        derivedStateOf {
+            // 1f is fully collapsed
+            with(density) {
+                minOf(scrollState.value.toDp() / totalCollapseDistance, 1f)
             }
-
-            // Shape which starts at bottom of toolbar, and extends a few dp
-            val toolbarShadowShape: Shape = remember {
-                object : Shape {
-
-                    override fun createOutline(
-                        size: Size,
-                        layoutDirection: LayoutDirection,
-                        density: Density
-                    ): Outline =
-                        Outline.Rectangle(
-                            Rect(
-                                0f,
-                                size.height,
-                                size.width,
-                                size.height + 12.dp.toPx()
-                            )
-                        )
-                }
-            }
-            // Elevation draws shadows underneath the shape, which is a problem if shape is transparent
-            // We must clip the shadow to outside of the toolbar to not draw under it
-            Surface(
-                modifier = Modifier.shadow(shape = RectangleShape, elevation = elevation)
-                    .clip(toolbarShadowShape)
-            ) {}
         }
+    }
+
+    val height = minHeight + (maxHeight - minHeight) * (1f - collapsedFraction)
+    val elevation = lerp(0.dp, 8.dp, collapsedFraction)
+
+    val insets = LocalInsets.current
+    val topInsets = with(density) { insets.top.toDp() }
+
+    val overInsetPrimaryColor = remember(overInsetAlpha) {
+        colors.primary.copy(alpha = overInsetAlpha)
+    }
+
+    // Toolbar background
+    Column {
+        Surface(color = overInsetPrimaryColor) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(height + topInsets)
+                    .padding(top = topInsets)
+            ) {
+                toolbarContent(collapsedFraction, height)
+            }
+        }
+
+        // Shape which starts at bottom of toolbar, and extends a few dp
+        val toolbarShadowShape: Shape = remember(density) {
+            object : Shape {
+
+                override fun createOutline(
+                    size: Size,
+                    layoutDirection: LayoutDirection,
+                    density: Density
+                ): Outline =
+                    Outline.Rectangle(
+                        Rect(
+                            0f,
+                            size.height,
+                            size.width,
+                            size.height + with(density) { 12.dp.toPx() }
+                        )
+                    )
+            }
+        }
+        // Elevation draws shadows underneath the shape, which is a problem if shape is transparent
+        // We must clip the shadow to outside of the toolbar to not draw under it
+        Surface(
+            modifier = Modifier
+                .shadow(shape = RectangleShape, elevation = elevation)
+                .clip(toolbarShadowShape)
+        ) {}
     }
 }
 

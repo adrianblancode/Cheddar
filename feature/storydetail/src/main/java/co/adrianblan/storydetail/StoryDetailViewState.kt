@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import co.adrianblan.domain.WebPreviewState
 import co.adrianblan.model.Comment
 import co.adrianblan.model.Story
+import kotlinx.collections.immutable.ImmutableList
 
 @Immutable
 sealed class StoryDetailViewState {
@@ -26,7 +27,7 @@ data class FlatComment(
 
 @Immutable
 sealed class StoryDetailCommentsState {
-    data class Success(val comments: List<FlatComment>) : StoryDetailCommentsState()
+    data class Success(val comments: ImmutableList<FlatComment>) : StoryDetailCommentsState()
     object Empty : StoryDetailCommentsState()
     object Loading : StoryDetailCommentsState()
     object Error : StoryDetailCommentsState()

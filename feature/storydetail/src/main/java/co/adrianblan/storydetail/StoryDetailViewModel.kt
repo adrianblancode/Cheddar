@@ -13,6 +13,7 @@ import co.adrianblan.model.CommentId
 import co.adrianblan.model.Story
 import co.adrianblan.model.StoryId
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -101,7 +102,7 @@ class StoryDetailViewModel
             val flatComments: List<FlatComment> = fetchFlattenedComments(story.kids)
 
             if (flatComments.isEmpty()) emit(StoryDetailCommentsState.Empty)
-            else emit(StoryDetailCommentsState.Success(flatComments))
+            else emit(StoryDetailCommentsState.Success(flatComments.toImmutableList()))
         }
             .onStart { emit(StoryDetailCommentsState.Loading) }
             .catch {

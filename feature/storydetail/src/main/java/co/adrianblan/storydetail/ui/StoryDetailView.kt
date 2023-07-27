@@ -33,6 +33,7 @@ import co.adrianblan.ui.LinkIcon
 import co.adrianblan.model.Comment
 import co.adrianblan.model.Story
 import co.adrianblan.model.StoryUrl
+import co.adrianblan.model.WebPreviewData
 import co.adrianblan.model.placeholder
 import co.adrianblan.storydetail.FlatComment
 import co.adrianblan.storydetail.R
@@ -41,7 +42,7 @@ import co.adrianblan.storydetail.StoryDetailViewModel
 import co.adrianblan.storydetail.StoryDetailViewState
 import co.adrianblan.ui.*
 import co.adrianblan.ui.utils.lerp
-import co.adrianblan.webpreview.WebPreviewData
+import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.roundToInt
 
 private const val toolbarMinHeightDp = 56
@@ -345,7 +346,7 @@ fun StoryDetailPreview() {
                         FlatComment(Comment.placeholder, 1),
                         FlatComment(Comment.placeholder, 2),
                         FlatComment(Comment.placeholder, 0)
-                    )
+                    ).toImmutableList()
                 )
             )
         StoryDetailView(

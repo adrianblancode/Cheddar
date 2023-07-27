@@ -1,14 +1,15 @@
 package co.adrianblan.model
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
+import androidx.compose.runtime.Immutable
 import java.time.Instant
 
-@Parcelize
-data class StoryId(val id: Long): Parcelable
+@Immutable
+data class StoryId(val id: Long)
 
+@Immutable
 data class StoryUrl(val url: String)
 
+@Immutable
 data class Story(
     val id: StoryId,
     val title: String,
@@ -23,8 +24,10 @@ data class Story(
     companion object
 }
 
+@Immutable
 data class CommentId(val id: Long)
 
+@Immutable
 data class Comment(
     val id: CommentId,
     // Comments can be deleted
