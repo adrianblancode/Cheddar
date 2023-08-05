@@ -14,6 +14,7 @@ dependencies {
     implementation(project(":core:network"))
 
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.kotlinx.immutable)
     // Implemented here because module compiler plugin is needed
     implementation(libs.kotlinx.serialization)
     implementation(libs.retrofit.serialization)

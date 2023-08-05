@@ -1,6 +1,8 @@
 package co.adrianblan.model
 
 import androidx.compose.runtime.Immutable
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import java.time.Instant
 
 @Immutable
@@ -17,7 +19,7 @@ data class Story(
     val by: String,
     val time: Instant,
     val url: StoryUrl? = null,
-    val kids: List<CommentId> = emptyList(),
+    val kids: ImmutableList<CommentId> = persistentListOf(),
     val score: Int? = null,
     val descendants: Int? = null
 ) {
@@ -34,7 +36,7 @@ data class Comment(
     val text: String? = null,
     val by: String? = null,
     val time: Instant,
-    val kids: List<CommentId> = emptyList()
+    val kids: ImmutableList<CommentId> = persistentListOf()
 ) {
     companion object
 }

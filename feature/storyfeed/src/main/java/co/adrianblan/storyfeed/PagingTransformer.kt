@@ -1,11 +1,12 @@
 package co.adrianblan.storyfeed
 
-import co.adrianblan.common.onFirst
+import androidx.annotation.VisibleForTesting
 import co.adrianblan.domain.DecoratedStory
 import co.adrianblan.model.StoryId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -50,7 +51,7 @@ private fun StateFlow<PageIndex>.observePages(
 
         // StateFlow can skip values, so emit intermediate pages
         pageIndexFlow.collect { pageIndex ->
-            emit((lastPageIndex .. pageIndex).toList())
+            emit((lastPageIndex..pageIndex).toList())
             lastPageIndex = pageIndex
         }
     }
@@ -88,10 +89,14 @@ internal fun <T> List<T>.takePage(pageIndex: PageIndex, pageSize: Int): List<T> 
  *
  * Eg [1, [A]], [2, [B]], [1, [AA]] emits [A], [A, B], [AA, B]
  */
-private fun <T> Flow<Pair<PageIndex, List<T>>>.mergePages(): Flow<List<T>> =
+@VisibleForTesting
+internal fun <T> Flow<Pair<PageIndex, List<T>>>.mergePages(): Flow<List<T>> =
     this.scan(sortedMapOf<PageIndex, List<T>>()) { map, (pageIndex: PageIndex, value: List<T>) ->
         map[pageIndex] = value
         map
-    }.map {
-        it.values.flatten()
     }
+        // Drop initial empty list
+        .drop(1)
+        .map {
+            it.values.flatten()
+        }

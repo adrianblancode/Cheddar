@@ -5,16 +5,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.WhileSubscribed
+import co.adrianblan.common.runCatchingCooperative
 import co.adrianblan.domain.StoryPreviewUseCase
 import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.model.StoryId
 import co.adrianblan.model.StoryType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -27,7 +32,7 @@ class StoryFeedViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val hackerNewsRepository: HackerNewsRepository,
     private val storyPreviewUseCase: StoryPreviewUseCase,
-    private val dispatcherProvider: DispatcherProvider
+    dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
     private val storyTypeFlow: StateFlow<StoryType> =
@@ -40,19 +45,28 @@ class StoryFeedViewModel @Inject constructor(
             .flatMapLatest { storyType ->
 
                 val cachedStoryIds: List<StoryId>? = hackerNewsRepository.cachedStoryIds(storyType)
-                val storyIds = cachedStoryIds ?: hackerNewsRepository.fetchStoryIds(storyType)
 
-                pageIndexFlow.observePages(
-                    pageStoryIdsSource = { pageIndex: Int ->
-                        storyIds.takePage(pageIndex, PAGE_SIZE)
-                    },
-                    storyFlowSource = { storyId: StoryId ->
-                        storyPreviewUseCase.observeDecoratedStory(storyId)
-                    }
-                )
-                    .map { stories ->
-                        if (stories.isEmpty()) StoryFeedState.Loading
-                        else StoryFeedState.Success(stories.toImmutableList())
+                flow {
+                    emit(cachedStoryIds ?: hackerNewsRepository.fetchStoryIds(storyType))
+                }
+                    .flatMapLatest { storyIds: List<StoryId> ->
+                        pageIndexFlow.observePages(
+                            pageStoryIdsSource = { pageIndex: Int ->
+                                storyIds.takePage(pageIndex, PAGE_SIZE)
+                            },
+                            storyFlowSource = { storyId: StoryId ->
+                                storyPreviewUseCase.observeDecoratedStory(storyId)
+                            }
+                        )
+                            .map { stories ->
+                                if (stories.isEmpty()) StoryFeedState.Loading
+                                else {
+                                    StoryFeedState.Success(
+                                        stories.toImmutableList(),
+                                        hasLoadedAllPages = stories.size == storyIds.size
+                                    )
+                                }
+                            }
                     }
                     .onStart {
                         // If the flow restarts, don't emit loading state
@@ -63,14 +77,9 @@ class StoryFeedViewModel @Inject constructor(
                         emit(StoryFeedState.Error(t))
                     }
                     .map { storyFeedState ->
-                        val hasLoadedAllPages =
-                            storyFeedState is StoryFeedState.Success
-                                    && storyFeedState.stories.size == storyIds.size
-
                         StoryFeedViewState(
                             storyType = storyType,
-                            storyFeedState = storyFeedState,
-                            hasLoadedAllPages = hasLoadedAllPages
+                            storyFeedState = storyFeedState
                         )
                     }
             }
@@ -80,8 +89,7 @@ class StoryFeedViewModel @Inject constructor(
                 WhileSubscribed,
                 StoryFeedViewState(
                     storyType = storyTypeFlow.value,
-                    storyFeedState = StoryFeedState.Loading,
-                    hasLoadedAllPages = false
+                    storyFeedState = StoryFeedState.Loading
                 )
             )
 

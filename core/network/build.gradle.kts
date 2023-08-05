@@ -8,7 +8,7 @@ android {
 }
 
 dependencies {
-    api(libs.retrofit.core)
-    api(libs.okhttp.core)
+    implementation(libs.retrofit.core)
+    implementation(libs.okhttp.core)
     implementation(libs.okhttp.interceptor)
 }

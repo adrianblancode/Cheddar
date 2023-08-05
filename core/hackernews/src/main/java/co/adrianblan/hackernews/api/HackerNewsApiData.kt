@@ -5,6 +5,7 @@ package co.adrianblan.hackernews.api
 import co.adrianblan.model.CommentId
 import co.adrianblan.model.StoryId
 import co.adrianblan.model.StoryUrl
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.serialization.*
 import java.time.Instant
 
@@ -29,7 +30,7 @@ fun ApiStory.toDomain() =
         by = by,
         time = time,
         url = url?.takeIf { it.isNotEmpty() }?.let { StoryUrl((url)) },
-        kids = kids.map { CommentId(it) }
+        kids = kids.map { CommentId(it) }.toImmutableList()
     )
 
 @Serializable(with = NullableApiCommentSerializer::class)
@@ -48,5 +49,5 @@ fun ApiComment.toDomain() =
         text = text,
         by = by,
         time = time,
-        kids = kids.map { CommentId(it) }
+        kids = kids.map { CommentId(it) }.toImmutableList()
     )

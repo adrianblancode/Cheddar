@@ -1,24 +1,30 @@
 package co.adrianblan.storydetail
 
+import app.cash.turbine.test
 import co.adrianblan.domain.DecoratedStory
 import co.adrianblan.domain.StoryPreviewUseCase
-import co.adrianblan.model.*
-import co.adrianblan.hackernews.HackerNewsRepository
 import co.adrianblan.hackernews.FakeHackerNewsRepository
+import co.adrianblan.hackernews.HackerNewsRepository
+import co.adrianblan.model.Comment
+import co.adrianblan.model.CommentId
+import co.adrianblan.model.Story
+import co.adrianblan.model.StoryId
+import co.adrianblan.model.StoryType
+import co.adrianblan.model.placeholder
 import co.adrianblan.testing.CoroutineTestRule
-import co.adrianblan.testing.TestStateFlow
 import co.adrianblan.testing.delayAndThrow
-import co.adrianblan.testing.test
-import kotlinx.coroutines.*
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.TestCoroutineScope
-import org.hamcrest.CoreMatchers.instanceOf
-import org.junit.After
-import org.junit.Assert.assertThat
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertIs
+import kotlin.time.Duration.Companion.seconds
 
 
 class StoryDetailViewModelTest {
@@ -26,23 +32,20 @@ class StoryDetailViewModelTest {
     @get:Rule
     val coroutineRule = CoroutineTestRule()
 
-    private lateinit var scope: TestCoroutineScope
     private lateinit var storyDetailViewModel: StoryDetailViewModel
 
-    object TestStoryPreviewUseCase: StoryPreviewUseCase {
+    object TestStoryPreviewUseCase : StoryPreviewUseCase {
         override fun observeDecoratedStory(storyId: StoryId): Flow<DecoratedStory> =
-           flowOf(DecoratedStory(story = Story.placeholder, webPreviewState = null))
+            flowOf(DecoratedStory(story = Story.placeholder, webPreviewState = null))
     }
 
     @Before
     fun setUp() {
-        scope = TestCoroutineScope(SupervisorJob() + coroutineRule.testDispatcher)
-        buildPresenter()
+        buildViewModel()
     }
 
-    private fun buildPresenter(
-        hackerNewsRepository: HackerNewsRepository = FakeHackerNewsRepository(1000L)
-
+    private fun buildViewModel(
+        hackerNewsRepository: HackerNewsRepository = FakeHackerNewsRepository(responseDelay = 1.seconds)
     ) {
         storyDetailViewModel = StoryDetailViewModel(
             storyId = StoryId(1),
@@ -52,42 +55,69 @@ class StoryDetailViewModelTest {
         )
     }
 
-    @After
-    fun tearDown() {
-        scope.cancel()
+    @Test
+    fun testInitialState() = runTest {
+        assertIs<StoryDetailViewState.Loading>(storyDetailViewModel.viewState.value)
     }
 
     @Test
-    fun testInitialState() {
-        assertThat(
-            storyDetailViewModel.viewState.value,
-            instanceOf(StoryDetailViewState.Loading::class.java)
+    fun testEmptySuccessStory() = runTest {
+        buildViewModel(
+            FakeHackerNewsRepository(
+                story = Story.placeholder.copy(kids = persistentListOf()),
+                responseDelay = 1.seconds
+            )
         )
+        storyDetailViewModel.viewState
+            .test {
+                assertIs<StoryDetailViewState.Loading>(this.awaitItem())
+                var item = this.awaitItem()
+                assertIs<StoryDetailViewState.Success>(item)
+                assertIs<StoryDetailCommentsState.Loading>(item.commentsState)
+                item = this.awaitItem()
+                assertIs<StoryDetailViewState.Success>(item)
+                assertIs<StoryDetailCommentsState.Empty>(item.commentsState)
+                cancelAndIgnoreRemainingEvents()
+            }
     }
 
     @Test
-    fun testSuccessStory() {
+    fun testSuccessStory() = runTest {
 
-        val flow: TestStateFlow<StoryDetailViewState> =
-            storyDetailViewModel.viewState
-                .test(scope)
+        val numComments = 10
 
-        scope.advanceUntilIdle()
-
-        assertThat(
-            flow.value,
-            instanceOf(StoryDetailViewState.Success::class.java)
+        buildViewModel(
+            FakeHackerNewsRepository(
+                story = Story.placeholder.copy(kids = List(numComments) { CommentId(it.toLong()) }.toImmutableList()),
+                responseDelay = 1.seconds
+            )
         )
+        storyDetailViewModel.viewState
+            .test {
+                assertIs<StoryDetailViewState.Loading>(this.awaitItem())
+
+                var item = this.awaitItem()
+                assertIs<StoryDetailViewState.Success>(item)
+                assertIs<StoryDetailCommentsState.Loading>(item.commentsState)
+                item = this.awaitItem()
+                assertIs<StoryDetailViewState.Success>(item)
+                val commentsState = item.commentsState
+                assertIs<StoryDetailCommentsState.Success>(commentsState)
+                assertEquals(numComments, commentsState.comments.size)
+                cancelAndIgnoreRemainingEvents()
+            }
     }
 
     @Test
     fun testStoriesError() {
 
-        val evilDelay = 10000L
+        val evilDelay = 1.seconds
 
         val evilHackerNewsRepository = object : HackerNewsRepository {
             override suspend fun fetchStory(storyId: StoryId): Story =
                 delayAndThrow(evilDelay)
+
+            override fun cachedStoryIds(storyType: StoryType): List<StoryId>? = null
 
             override suspend fun fetchStoryIds(storyType: StoryType): List<StoryId> =
                 delayAndThrow(evilDelay)
@@ -96,19 +126,15 @@ class StoryDetailViewModelTest {
                 delayAndThrow(evilDelay)
         }
 
-        buildPresenter(evilHackerNewsRepository)
+        buildViewModel(evilHackerNewsRepository)
 
-        val flow: TestStateFlow<StoryDetailViewState> =
+        runTest {
             storyDetailViewModel.viewState
-                .test(scope)
-
-        scope.advanceUntilIdle()
-
-        assertThat(
-            flow.value,
-            instanceOf(StoryDetailViewState.Error::class.java)
-        )
-
-        assert(scope.isActive)
+                .test {
+                    assertIs<StoryDetailViewState.Loading>(awaitItem())
+                    assertIs<StoryDetailViewState.Error>(awaitItem())
+                }
+            assert(this.isActive)
+        }
     }
 }

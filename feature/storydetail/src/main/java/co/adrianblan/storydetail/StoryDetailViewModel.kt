@@ -1,5 +1,6 @@
 package co.adrianblan.storydetail
 
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -38,9 +39,21 @@ class StoryDetailViewModel
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
+    @VisibleForTesting
+    internal constructor(
+        storyId: StoryId,
+        hackerNewsRepository: HackerNewsRepository,
+        storyPreviewUseCase: StoryPreviewUseCase,
+        dispatcherProvider: DispatcherProvider
+    ) : this(
+        SavedStateHandle(mapOf("storyId" to storyId.id)),
+        hackerNewsRepository,
+        storyPreviewUseCase,
+        dispatcherProvider
+    )
+
     private val storyId: StoryId = StoryId(savedStateHandle.get<Long>("storyId")!!)
 
-    // TODO share story emission with shareIn
     val viewState: StateFlow<StoryDetailViewState> =
         combine<DecoratedStory, StoryDetailCommentsState, StoryDetailViewState>(
             storyPreviewUseCase.observeDecoratedStory(storyId),

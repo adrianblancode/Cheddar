@@ -3,6 +3,7 @@ import co.adrianblan.convention.libs
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.dependencies
+import org.gradle.kotlin.dsl.kotlin
 import org.gradle.kotlin.dsl.project
 
 class AndroidFeatureConventionPlugin : Plugin<Project> {
@@ -23,6 +24,9 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 implementation(libs.findLibrary("androidx.lifecycle.viewmodel").get())
                 implementation(libs.findLibrary("kotlinx.coroutines.android").get())
                 implementation(libs.findLibrary("kotlinx.immutable").get())
+
+                add("testImplementation", kotlin("test"))
+                add("testImplementation", project(":core:testing"))
             }
         }
     }

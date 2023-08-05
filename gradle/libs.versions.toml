@@ -20,7 +20,7 @@ desugar = "2.0.3"
 hilt = "2.46.1"
 hiltExt = "1.0.0"
 jsoup = "1.13.1"
-kotlin = "1.8.21"
+kotlin = "1.9.0"
 kotlinxCoroutines = "1.7.1"
 kotlinxImmutable = "0.3.5"
 kotlinxSerializationJson = "1.5.1"
@@ -29,6 +29,7 @@ okhttp = "5.0.0-alpha.10"
 retrofit = "2.9.0"
 retrofitSerialization = "0.8.0"
 timber = "5.0.1"
+turbine = "0.12.1"
 leakcanary = "2.9.1"
 
 junit = "4.13.2"
@@ -79,12 +80,10 @@ okhttp-interceptor = { group = "com.squareup.okhttp3", name = "logging-intercept
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitSerialization" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
 
 androidx-core-test = { group = "androidx.arch.core", name = "core-testing", version.ref = "androidxCoreTesting" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
-mockito = { group = "org.mockito", name = "mockito-core", version.ref = "mockito" }
-mockito-inline = { group = "org.mockito", name = "mockito-inline", version.ref = "mockito" }
-mockito-kotlin = { group = "com.nhaarman.mockitokotlin2", name = "mockito-kotlin", version.ref = "mockitoKotlin" }
 
 android-gradleplugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 kotlin-gradleplugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }

@@ -8,13 +8,12 @@ import kotlinx.collections.immutable.ImmutableList
 @Immutable
 data class StoryFeedViewState(
     val storyType: StoryType,
-    val storyFeedState: StoryFeedState,
-    val hasLoadedAllPages: Boolean
+    val storyFeedState: StoryFeedState
 )
 
 @Immutable
 sealed class StoryFeedState {
-    data class Success(val stories: ImmutableList<DecoratedStory>) : StoryFeedState()
+    data class Success(val stories: ImmutableList<DecoratedStory>, val hasLoadedAllPages: Boolean) : StoryFeedState()
     object Loading : StoryFeedState()
     data class Error(val throwable: Throwable) : StoryFeedState()
 }

@@ -158,7 +158,7 @@ private fun BodyContent(
         is StoryFeedState.Success -> {
             SuccessBody(
                 scrollState = scrollState,
-                viewState = viewState,
+                storyFeedState = viewState.storyFeedState,
                 onStoryClick = onStoryClick,
                 onStoryContentClick = onStoryContentClick,
                 onPageEndReached = onPageEndReached
@@ -172,12 +172,11 @@ private fun BodyContent(
 @Composable
 private fun SuccessBody(
     scrollState: ScrollState,
-    viewState: StoryFeedViewState,
+    storyFeedState: StoryFeedState.Success,
     onStoryClick: (StoryId) -> Unit,
     onStoryContentClick: (StoryUrl) -> Unit,
     onPageEndReached: () -> Unit
 ) {
-    val storyFeedState = viewState.storyFeedState as StoryFeedState.Success
 
     val scrollEndZone = with(LocalDensity.current) {
         400.dp.toPx()
@@ -214,7 +213,7 @@ private fun SuccessBody(
             }
         }
 
-        if (viewState.hasLoadedAllPages) NoMoreStoriesView()
+        if (storyFeedState.hasLoadedAllPages) NoMoreStoriesView()
         else LoadingMoreStoriesView()
 
         Spacer(modifier = Modifier.height(bottomInsets + 8.dp))
@@ -270,9 +269,9 @@ fun StoryFeedPreview() {
                         Story.placeholder,
                         WebPreviewState.Loading
                     )
-                }.toImmutableList()
-            ),
-            hasLoadedAllPages = false
+                }.toImmutableList(),
+                hasLoadedAllPages = false
+            )
         )
 
         StoryFeedView(

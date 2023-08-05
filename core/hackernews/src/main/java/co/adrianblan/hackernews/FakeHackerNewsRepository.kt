@@ -8,15 +8,18 @@ import co.adrianblan.model.StoryType
 import co.adrianblan.model.placeholder
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 class FakeHackerNewsRepository(
-    private val responseDelay: Long = 1000L
+    private val story: Story = Story.placeholder,
+    private val responseDelay: Duration = 1.seconds
 ) : HackerNewsRepository {
 
     override suspend fun fetchStory(storyId: StoryId): Story =
         coroutineScope {
             delay(responseDelay)
-            Story.placeholder.copy(id = storyId)
+            story.copy(id = storyId)
         }
 
     override fun cachedStoryIds(storyType: StoryType): List<StoryId>? =
