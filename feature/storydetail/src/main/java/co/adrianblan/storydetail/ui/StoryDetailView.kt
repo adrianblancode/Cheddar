@@ -3,7 +3,6 @@ package co.adrianblan.storydetail.ui
 import android.net.Uri
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -29,7 +28,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.adrianblan.common.urlSiteName
 import co.adrianblan.domain.WebPreviewState
-import co.adrianblan.ui.LinkIcon
 import co.adrianblan.model.Comment
 import co.adrianblan.model.Story
 import co.adrianblan.model.StoryUrl
@@ -46,7 +44,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.roundToInt
 
 private const val toolbarMinHeightDp = 56
-private const val toolbarMaxHeightDp = 148
+private const val toolbarMaxHeightDp = 140
 
 @Composable
 fun StoryDetailViewWrapper(
@@ -79,11 +77,10 @@ fun StoryDetailView(
         scrollState = scrollState,
         minHeight = toolbarMinHeightDp.dp,
         maxHeight = toolbarMaxHeightDp.dp,
-        toolbarContent = { collapsedFraction, height ->
+        toolbarContent = { collapsedFraction ->
             StoryDetailToolbar(
                 viewState = viewState,
                 collapsedFraction = collapsedFraction,
-                height = height,
                 onStoryContentClick = onStoryContentClick,
                 onBackPressed = onBackPressed
             )
@@ -99,15 +96,10 @@ fun StoryDetailView(
                         is StoryDetailCommentsState.Success ->
                             Column(modifier = Modifier.verticalScroll(scrollState)) {
 
-                                val topInsets =
-                                    with(LocalDensity.current) {
-                                        LocalInsets.current.top.toDp()
-                                    }
-
                                 Spacer(
-                                    modifier = Modifier.height(
-                                        toolbarMaxHeightDp.dp + topInsets
-                                    )
+                                    modifier = Modifier
+                                        .height(toolbarMaxHeightDp.dp)
+                                        .statusBarsPadding()
                                 )
 
                                 if (viewState.story.text != null) {
@@ -131,9 +123,8 @@ fun StoryDetailView(
                                         }
                                     }
 
-                                with(LocalDensity.current) {
-                                    Spacer(modifier = Modifier.height(LocalInsets.current.bottom.toDp() + 8.dp))
-                                }
+                                Spacer(modifier = Modifier.height(8.dp)
+                                    .navigationBarsPadding())
                             }
 
                         is StoryDetailCommentsState.Empty -> CommentsEmptyView()
@@ -153,7 +144,6 @@ fun StoryDetailView(
 fun StoryDetailToolbar(
     viewState: StoryDetailViewState,
     collapsedFraction: Float,
-    height: Dp,
     onStoryContentClick: (StoryUrl) -> Unit,
     onBackPressed: () -> Unit
 ) {
@@ -227,8 +217,7 @@ fun StoryDetailToolbar(
                             bottom = 8.dp,
                             top = 8.dp + titleCollapsedTopOffset
                         )
-                        .fillMaxWidth()
-                        .height(height)
+                        .fillMaxSize()
                         .align(Alignment.CenterStart)
                         .wrapContentHeight(Alignment.CenterVertically)
                 ) {
@@ -325,6 +314,7 @@ private fun StoryDetailImage(
                     is WebPreviewState.Error -> {
                         LinkIcon()
                     }
+
                     null -> {}
                 }
             }

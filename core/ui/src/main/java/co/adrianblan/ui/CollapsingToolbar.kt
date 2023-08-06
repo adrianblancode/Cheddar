@@ -8,7 +8,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -33,9 +34,9 @@ import androidx.compose.ui.unit.lerp
 @Composable
 fun CollapsingToolbar(
     scrollState: ScrollState,
-    minHeight: Dp = 56.dp,
-    maxHeight: Dp = 128.dp,
-    toolbarContent: @Composable (collapsedFraction: Float, height: Dp) -> Unit
+    minHeight: Dp,
+    maxHeight: Dp,
+    toolbarContent: @Composable (collapsedFraction: Float) -> Unit
 ) {
 
     val colors = MaterialTheme.colors
@@ -54,23 +55,22 @@ fun CollapsingToolbar(
     val height = minHeight + (maxHeight - minHeight) * (1f - collapsedFraction)
     val elevation = lerp(0.dp, 8.dp, collapsedFraction)
 
-    val insets = LocalInsets.current
-    val topInsets = with(density) { insets.top.toDp() }
-
     val overInsetPrimaryColor = remember(overInsetAlpha) {
         colors.primary.copy(alpha = overInsetAlpha)
     }
 
     // Toolbar background
     Column {
-        Surface(color = overInsetPrimaryColor) {
+        Surface(
+            color = overInsetPrimaryColor,
+            modifier = Modifier.statusBarsPadding()
+        ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(height + topInsets)
-                    .padding(top = topInsets)
+                    .requiredHeight(height)
             ) {
-                toolbarContent(collapsedFraction, height)
+                toolbarContent(collapsedFraction)
             }
         }
 
@@ -107,16 +107,16 @@ fun CollapsingToolbar(
 @Composable
 fun CollapsingScaffold(
     scrollState: ScrollState,
-    minHeight: Dp = 56.dp,
-    maxHeight: Dp = 128.dp,
-    toolbarContent: @Composable (collapsedFraction: Float, height: Dp) -> Unit,
+    minHeight: Dp,
+    maxHeight: Dp,
+    toolbarContent: @Composable (collapsedFraction: Float) -> Unit,
     bodyContent: @Composable () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxHeight()) {
         Box(modifier = Modifier.fillMaxSize()) {
             // Background color for body
             Surface(color = MaterialTheme.colors.background) {
-                Column(modifier = Modifier.fillMaxHeight()) {
+                Column(modifier = Modifier.fillMaxHeight().statusBarsPadding()) {
                     bodyContent()
                 }
             }
@@ -132,8 +132,8 @@ fun CollapsingScaffold(
                     scrollState = scrollState,
                     minHeight = minHeight,
                     maxHeight = maxHeight
-                ) { collapsedFraction, height ->
-                    toolbarContent(collapsedFraction, height)
+                ) { collapsedFraction ->
+                    toolbarContent(collapsedFraction)
                 }
             })
     }

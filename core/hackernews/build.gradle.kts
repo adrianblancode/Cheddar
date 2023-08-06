@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "co.adrianblan.network"
+    namespace = "co.adrianblan.hackernews"
 }
 
 dependencies {

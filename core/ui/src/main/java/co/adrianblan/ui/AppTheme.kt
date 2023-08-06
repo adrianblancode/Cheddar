@@ -40,5 +40,5 @@ fun AppTheme(content: @Composable () -> Unit) {
 
 @Composable
 fun isNightModeActive(): Boolean {
-    return LocalContext.current.resources.isNightModeActive()
+    return LocalContext.current.isNightModeActive()
 }

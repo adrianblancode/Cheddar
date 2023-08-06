@@ -3,11 +3,12 @@ package co.adrianblan.storyfeed.ui
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.MaterialTheme
@@ -46,7 +47,6 @@ import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.CollapsingScaffold
 import co.adrianblan.ui.ErrorView
 import co.adrianblan.ui.LoadingView
-import co.adrianblan.ui.LocalInsets
 import co.adrianblan.ui.textSecondaryAlpha
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -123,11 +123,11 @@ fun StoryFeedView(
 
     CollapsingScaffold(
         scrollState = scrollState,
+        minHeight = toolbarMinHeightDp.dp,
         maxHeight = toolbarMaxHeightDp.dp,
-        toolbarContent = { collapseFraction, height ->
+        toolbarContent = { collapseFraction ->
             StoryFeedToolbar(
                 collapsedFraction = collapseFraction,
-                height = height,
                 storyType = viewState.storyType,
                 onStoryTypeClick = onStoryTypeClick
             )
@@ -194,14 +194,10 @@ private fun SuccessBody(
         }
     }
 
-    val insets = LocalInsets.current
-    val topInsets = with(LocalDensity.current) { insets.top.toDp() }
-    val bottomInsets = with(LocalDensity.current) { insets.bottom.toDp() }
-
     // TODO change to LazyColumn
     Column(modifier = Modifier.verticalScroll(scrollState)) {
 
-        Spacer(modifier = Modifier.height(toolbarMaxHeightDp.dp + topInsets))
+        Spacer(modifier = Modifier.height(toolbarMaxHeightDp.dp).statusBarsPadding())
 
         storyFeedState.stories.forEach { story ->
             key(story.story.id) {
@@ -216,7 +212,7 @@ private fun SuccessBody(
         if (storyFeedState.hasLoadedAllPages) NoMoreStoriesView()
         else LoadingMoreStoriesView()
 
-        Spacer(modifier = Modifier.height(bottomInsets + 8.dp))
+        Spacer(modifier = Modifier.height(8.dp).navigationBarsPadding())
     }
 }
 
