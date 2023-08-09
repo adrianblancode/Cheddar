@@ -1,19 +1,81 @@
 package co.adrianblan.ui
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
-import co.adrianblan.ui.utils.isNightModeActive
+
+val LightColorScheme = lightColorScheme(
+    primary = Color.White,
+    onPrimary = Color.Black,
+    inversePrimary = Color.Black,
+    primaryContainer = Light80,
+    onPrimaryContainer = Color.White,
+    secondary = Orange,
+    onSecondary = Color.White,
+    secondaryContainer = Orange,
+    onSecondaryContainer = Color.White,
+    tertiary = Orange,
+    onTertiary = Color.White,
+    tertiaryContainer = Orange,
+    onTertiaryContainer = Orange,
+    error = Color.Red,
+    onError = Color.White,
+    errorContainer = Color.Red,
+    onErrorContainer = Color.White,
+    background = Color.White,
+    onBackground = Color.Black,
+    surface = Color.White,
+    onSurface = Color.Black,
+    surfaceVariant = Light80,
+    onSurfaceVariant = Color.Black,
+    inverseSurface = Dark80,
+    inverseOnSurface = Color.White,
+    outline = Light70,
+    scrim = Color.White.copy(alpha = 0.8f)
+)
+
+val DarkColorScheme = darkColorScheme(
+    primary = Color.Black,
+    onPrimary = Color.White,
+    inversePrimary = Color.White,
+    primaryContainer = Dark80,
+    onPrimaryContainer = Color.Black,
+    secondary = DarkOrange,
+    onSecondary = Color.Black,
+    secondaryContainer = DarkOrange,
+    onSecondaryContainer = Color.Black,
+    tertiary = DarkOrange,
+    onTertiary = Color.Black,
+    tertiaryContainer = DarkOrange,
+    onTertiaryContainer = DarkOrange,
+    error = Color.Red,
+    onError = Color.Black,
+    errorContainer = Color.Red,
+    onErrorContainer = Color.Black,
+    background = Color.Black,
+    onBackground = Color.White,
+    surface = Color.Black,
+    onSurface = Color.White,
+    surfaceVariant = Dark80,
+    onSurfaceVariant = Color.White,
+    inverseSurface = Light80,
+    inverseOnSurface = Color.Black,
+    outline = Dark70,
+    scrim = Color.Black.copy(alpha = 0.8f)
+)
 
 @Composable
-fun AppTheme(content: @Composable () -> Unit) {
+fun AppTheme(
+    isSystemInDarkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit
+) {
 
+    /*
     val colors =
-        if (isNightModeActive()) {
+        if (isSystemInDarkTheme) {
             darkColors(
                 primary = colorResource(R.color.colorPrimary),
                 primaryVariant = colorResource(R.color.colorPrimary),
@@ -34,11 +96,11 @@ fun AppTheme(content: @Composable () -> Unit) {
                 surface = colorResource(R.color.colorBackground),
             )
         }
+    */
 
-    MaterialTheme(colors = colors, typography = themeTypography, content = content)
-}
+    val colorScheme =
+        if (isSystemInDarkTheme) DarkColorScheme
+        else LightColorScheme
 
-@Composable
-fun isNightModeActive(): Boolean {
-    return LocalContext.current.isNightModeActive()
+    MaterialTheme(colorScheme = colorScheme, typography = themeTypography, content = content)
 }

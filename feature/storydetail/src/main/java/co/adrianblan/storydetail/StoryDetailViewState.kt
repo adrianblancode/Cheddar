@@ -1,9 +1,9 @@
 package co.adrianblan.storydetail
 
 import androidx.compose.runtime.Immutable
-import co.adrianblan.domain.WebPreviewState
 import co.adrianblan.model.Comment
 import co.adrianblan.model.Story
+import co.adrianblan.model.WebPreviewState
 import kotlinx.collections.immutable.ImmutableList
 
 @Immutable

@@ -4,11 +4,21 @@ import java.time.Instant
 
 private val placeholderInstant = Instant.now()
 
-val Story.Companion.placeholder get() =
+val Story.Companion.placeholderLink get() =
     Story(
         id = StoryId(1),
         title = "Test story title",
-        text = "Test story text",
+        text = null,
+        by = "Test story author",
+        time = placeholderInstant,
+        url = StoryUrl("www.example.com")
+    )
+
+val Story.Companion.placeholderPost get() =
+    Story(
+        id = StoryId(1),
+        title = "Test story title",
+        text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
         by = "Test story author",
         time = placeholderInstant,
         url = null
@@ -17,7 +27,7 @@ val Story.Companion.placeholder get() =
 val Comment.Companion.placeholder get() =
     Comment(
         id = CommentId(1),
-        text = "Test comment text",
+        text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliquat.",
         by = "Test comment author",
         time = placeholderInstant
     )

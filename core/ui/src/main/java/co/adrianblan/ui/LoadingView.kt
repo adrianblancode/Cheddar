@@ -2,8 +2,9 @@ package co.adrianblan.ui
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -20,11 +21,10 @@ import androidx.compose.ui.unit.dp
 import co.adrianblan.ui.utils.lerp
 import kotlin.math.sin
 
-@Preview
 @Composable
 fun LoadingView(
     modifier: Modifier = Modifier,
-    textStyle: TextStyle = MaterialTheme.typography.h6,
+    textStyle: TextStyle = MaterialTheme.typography.titleMedium,
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -53,7 +53,7 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
 
     val size: Dp = with(LocalDensity.current) { fontSize.toDp() }
 
-    val dotColor = MaterialTheme.colors.onBackground
+    val dotColor = MaterialTheme.colorScheme.onBackground
 
     val animationSpec = infiniteRepeatable(tween<Float>(durationMillis = 1200, easing = LinearEasing))
 
@@ -87,13 +87,14 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
                     // [-1, 1]
                     val value = sin(progressAngleBase + progressAngleOffset).toFloat()
 
-                    // Factor applied to negative values
+                    // Factor applied to up and down bounce
+                    val upBounceFactor = 0.6f
                     val downBounceFactor = 0.25f
 
                     // Coercion leads to two cycles, positive one animates up and negative is small bounce
                     // [-downBounceFactor, 1]
                     val yFraction =
-                        if (value > 0) value
+                        if (value > 0) value * upBounceFactor
                         else value * downBounceFactor
 
                     // Normalize to [0, 1]
@@ -112,4 +113,14 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
                     )
                 }
             })
+}
+
+@Preview
+@Composable
+private fun LoadingViewPreview() {
+    AppTheme {
+        Surface {
+            LoadingView()
+        }
+    }
 }

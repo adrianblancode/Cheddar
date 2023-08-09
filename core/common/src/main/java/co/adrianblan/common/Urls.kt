@@ -1,5 +1,9 @@
 package co.adrianblan.common
 
+import co.adrianblan.model.StoryUrl
+
+fun StoryUrl.urlSiteName(): String = url.urlSiteName()
+
 fun String.urlSiteName(): String =
     baseUrl()
         .removePrefix("https://")

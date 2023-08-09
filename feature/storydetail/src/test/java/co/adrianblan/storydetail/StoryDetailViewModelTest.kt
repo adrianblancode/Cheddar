@@ -1,6 +1,7 @@
 package co.adrianblan.storydetail
 
 import app.cash.turbine.test
+import co.adrianblan.common.AsyncResource
 import co.adrianblan.domain.DecoratedStory
 import co.adrianblan.domain.StoryPreviewUseCase
 import co.adrianblan.hackernews.FakeHackerNewsRepository
@@ -10,7 +11,7 @@ import co.adrianblan.model.CommentId
 import co.adrianblan.model.Story
 import co.adrianblan.model.StoryId
 import co.adrianblan.model.StoryType
-import co.adrianblan.model.placeholder
+import co.adrianblan.model.placeholderLink
 import co.adrianblan.testing.CoroutineTestRule
 import co.adrianblan.testing.delayAndThrow
 import kotlinx.collections.immutable.persistentListOf
@@ -36,7 +37,7 @@ class StoryDetailViewModelTest {
 
     object TestStoryPreviewUseCase : StoryPreviewUseCase {
         override fun observeDecoratedStory(storyId: StoryId): Flow<DecoratedStory> =
-            flowOf(DecoratedStory(story = Story.placeholder, webPreviewState = null))
+            flowOf(DecoratedStory(story = Story.placeholderLink, webPreviewState = null))
     }
 
     @Before
@@ -64,7 +65,7 @@ class StoryDetailViewModelTest {
     fun testEmptySuccessStory() = runTest {
         buildViewModel(
             FakeHackerNewsRepository(
-                story = Story.placeholder.copy(kids = persistentListOf()),
+                story = Story.placeholderLink.copy(kids = persistentListOf()),
                 responseDelay = 1.seconds
             )
         )
@@ -88,7 +89,7 @@ class StoryDetailViewModelTest {
 
         buildViewModel(
             FakeHackerNewsRepository(
-                story = Story.placeholder.copy(kids = List(numComments) { CommentId(it.toLong()) }.toImmutableList()),
+                story = Story.placeholderLink.copy(kids = List(numComments) { CommentId(it.toLong()) }.toImmutableList()),
                 responseDelay = 1.seconds
             )
         )
@@ -117,7 +118,10 @@ class StoryDetailViewModelTest {
             override suspend fun fetchStory(storyId: StoryId): Story =
                 delayAndThrow(evilDelay)
 
-            override fun cachedStoryIds(storyType: StoryType): List<StoryId>? = null
+            override fun storyIdsResource(storyType: StoryType): AsyncResource<List<StoryId>> =
+                AsyncResource(null) {
+                    delayAndThrow(evilDelay)
+                }
 
             override suspend fun fetchStoryIds(storyType: StoryType): List<StoryId> =
                 delayAndThrow(evilDelay)

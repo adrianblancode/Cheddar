@@ -5,10 +5,17 @@ import android.text.Html
 import android.text.SpannableStringBuilder
 import android.text.Spanned
 import android.text.style.URLSpan
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -65,22 +72,18 @@ fun CommentItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(
-                start = 16.dp + depthIndex * depthIndicatorWidth,
-                end = 16.dp,
-                top = 8.dp,
-                bottom = 8.dp
-            )
             .drawBehind {
 
                 val parentSize = this.size
-                var depthOffset = 16.dp.toPx()
+                var xOffset = 16.dp.toPx()
+                val yPadding = 6.dp.toPx()
 
-                repeat(depthIndex) {
-                    val o1 = Offset(depthOffset, 0f)
+                repeat(depthIndex) { i ->
+
+                    val o1 = Offset(xOffset, yPadding)
                     val o2 = Offset(
-                        depthOffset,
-                        parentSize.height
+                        xOffset,
+                        parentSize.height - yPadding
                     )
 
                     drawLine(
@@ -90,13 +93,20 @@ fun CommentItem(
                         strokeWidth = strokeWidthPx,
                         cap = StrokeCap.Round
                     )
-                    depthOffset += depthIndicatorWidth.toPx()
+                    xOffset += depthIndicatorWidth.toPx()
                 }
             }
+            .padding(
+                start = 16.dp,
+                end = 16.dp,
+                top = 8.dp,
+                bottom = 8.dp
+            )
     ) {
 
         Column(
-            verticalArrangement = Arrangement.Top
+            verticalArrangement = Arrangement.Top,
+            modifier = Modifier.padding(start = depthIndex * depthIndicatorWidth)
         ) {
 
             // Comments can be deleted
@@ -106,7 +116,7 @@ fun CommentItem(
                 Spacer(Modifier.height(4.dp))
                 Text(
                     text = stringResource(R.string.comment_deleted_title),
-                    style = MaterialTheme.typography.subtitle2
+                    style = MaterialTheme.typography.labelLarge
                 )
                 Spacer(Modifier.height(8.dp))
             } else {
@@ -114,8 +124,8 @@ fun CommentItem(
                 val isStoryAuthor = by == storyAuthor
 
                 val authorColor: Color =
-                    if (isStoryAuthor) MaterialTheme.colors.secondary
-                    else MaterialTheme.colors.onBackground
+                    if (isStoryAuthor) MaterialTheme.colorScheme.secondary
+                    else MaterialTheme.colorScheme.onBackground
 
                 val authorSuffix =
                     if (isStoryAuthor) " [op]"
@@ -123,7 +133,7 @@ fun CommentItem(
 
                 Text(
                     text = by.orEmpty() + authorSuffix,
-                    style = MaterialTheme.typography.subtitle2.copy(color = authorColor)
+                    style = MaterialTheme.typography.labelLarge.copy(color = authorColor)
                 )
 
                 Spacer(Modifier.height(4.dp))
@@ -133,8 +143,8 @@ fun CommentItem(
                 val urlInfo: List<CommentUrlInfo> = body.commentUrlInfo()
 
                 ClickableText(
-                    text = body.formatCommentText(urlColor = MaterialTheme.colors.secondary),
-                    style = MaterialTheme.typography.body2,
+                    text = body.formatCommentText(urlColor = MaterialTheme.colorScheme.secondary),
+                    style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onBackground),
                     onClick = { index ->
                         urlInfo
                             .firstOrNull { url ->
@@ -153,14 +163,16 @@ fun CommentItem(
 @Preview
 @Composable
 fun CommentItemPreview() {
-    AppTheme {
-        CommentItem(
-            text = "Test title",
-            by = "Test source",
-            depthIndex = 0,
-            storyAuthor = "Test author",
-            onCommentUrlClick = {}
-        )
+    AppTheme(false) {
+        Surface {
+            CommentItem(
+                text = "<p>Test title<p>Test also title",
+                by = "Test source",
+                depthIndex = 3,
+                storyAuthor = "Test author",
+                onCommentUrlClick = {}
+            )
+        }
     }
 }
 
@@ -212,10 +224,10 @@ private fun Spanned.formatCommentText(urlColor: Color): AnnotatedString {
 private fun AnnotatedString.Builder.reduceParagraphSpacing(): AnnotatedString.Builder {
 
     Regex.fromLiteral("\n\n")
-        .findAll(this.toString())
+        .findAll(this.toAnnotatedString())
         .forEach { match ->
             this.addStyle(
-                SpanStyle(fontSize = 4.sp),
+                SpanStyle(fontSize = 6.sp),
                 match.range.first,
                 match.range.last + 1
             )

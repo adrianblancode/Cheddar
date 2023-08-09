@@ -4,14 +4,16 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -22,10 +24,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import co.adrianblan.model.StoryType
+import co.adrianblan.ui.AppTheme
 
 @Composable
 fun StoryFeedToolbar(
@@ -43,7 +47,7 @@ fun StoryFeedToolbar(
             // Set min width to align popup in center
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(12.dp)
+                .padding(10.dp)
         ) {
 
             val typography = MaterialTheme.typography
@@ -51,8 +55,8 @@ fun StoryFeedToolbar(
             val headerTextSize by remember(collapsedFraction) {
                 derivedStateOf {
                     lerp(
-                        typography.h4.fontSize,
-                        typography.h6.fontSize,
+                        typography.headlineLarge.fontSize,
+                        typography.headlineSmall.fontSize,
                         collapsedFraction
                     )
                 }
@@ -84,10 +88,10 @@ fun StoryFeedToolbar(
 }
 
 @Composable
-fun StoryFeedHeader(
+private fun StoryFeedHeader(
     storyType: StoryType,
-    headerTextSize: TextUnit = MaterialTheme.typography.h6.fontSize,
     modifier: Modifier = Modifier,
+    headerTextSize: TextUnit = MaterialTheme.typography.headlineLarge.fontSize,
     onClick: () -> Unit
 ) {
 
@@ -98,7 +102,8 @@ fun StoryFeedHeader(
     ) {
         Box(
             contentAlignment = Alignment.Center,
-            modifier = Modifier.clickable(onClick = onClick)
+            modifier = Modifier
+                .clickable(onClick = onClick)
                 .padding(4.dp)
         ) {
 
@@ -107,18 +112,34 @@ fun StoryFeedHeader(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
                     text = title,
-                    style = MaterialTheme.typography.h4
+                    style = MaterialTheme.typography.displaySmall
                         .copy(
                             fontSize = headerTextSize,
-                            color = MaterialTheme.colors.onPrimary
+                            color = MaterialTheme.colorScheme.onPrimary
                         )
                 )
                 Icon(
                     imageVector = Icons.Default.ArrowDropDown,
-                    tint = MaterialTheme.colors.onBackground,
-                    contentDescription = null
+                    tint = MaterialTheme.colorScheme.onPrimary,
+                    contentDescription = null,
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                        .padding(vertical = 1.dp)
                 )
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun StoryFeedToolbarPreview() {
+    AppTheme {
+        Surface(modifier = Modifier.height(300.dp)) {
+            StoryFeedToolbar(
+                collapsedFraction = 1f,
+                storyType = StoryType.TOP,
+                onStoryTypeClick = {}
+            )
         }
     }
 }

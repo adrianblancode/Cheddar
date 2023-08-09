@@ -1,18 +1,20 @@
 package co.adrianblan.hackernews
 
+import co.adrianblan.common.AsyncResource
 import co.adrianblan.model.Comment
 import co.adrianblan.model.CommentId
 import co.adrianblan.model.Story
 import co.adrianblan.model.StoryId
 import co.adrianblan.model.StoryType
 import co.adrianblan.model.placeholder
+import co.adrianblan.model.placeholderLink
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 class FakeHackerNewsRepository(
-    private val story: Story = Story.placeholder,
+    private val story: Story = Story.placeholderLink,
     private val responseDelay: Duration = 1.seconds
 ) : HackerNewsRepository {
 
@@ -22,9 +24,9 @@ class FakeHackerNewsRepository(
             story.copy(id = storyId)
         }
 
-    override fun cachedStoryIds(storyType: StoryType): List<StoryId>? =
-        List(100) {
-            StoryId(it.toLong())
+    override fun storyIdsResource(storyType: StoryType): AsyncResource<List<StoryId>> =
+        AsyncResource(List(100) { StoryId(it.toLong()) }) {
+            fetchStoryIds(storyType)
         }
 
     override suspend fun fetchStoryIds(storyType: StoryType): List<StoryId> =

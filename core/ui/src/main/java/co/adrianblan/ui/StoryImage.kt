@@ -1,18 +1,25 @@
 package co.adrianblan.ui
 
 import android.graphics.Bitmap
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import co.adrianblan.model.WebPreviewState
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
-import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import coil.size.Size
 import coil.transform.Transformation
@@ -20,9 +27,50 @@ import kotlin.math.min
 
 private const val minBitmapSizePx = 48
 
+
+@Composable
+fun StoryImage(
+    webPreviewState: WebPreviewState,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+
+    Surface(
+        color = colorResource(R.color.contentMuted),
+        shape = RoundedCornerShape(8.dp),
+        modifier = modifier
+            .clickable(onClick = onClick)
+    ) {
+
+        when (webPreviewState) {
+            is WebPreviewState.Loading -> {
+                Box {
+                    ShimmerView(Modifier.fillMaxSize())
+                    LinkIcon(Modifier.fillMaxSize())
+                }
+            }
+
+            is WebPreviewState.Success -> {
+                val webPreview = webPreviewState.webPreview
+
+                val imageUrl =
+                    webPreview.imageUrl
+                        ?: webPreview.iconUrl
+                        ?: webPreview.favIconUrl
+
+                UrlImage(imageUrl) { LinkIcon(Modifier.fillMaxSize()) }
+            }
+
+            is WebPreviewState.Error -> {
+                LinkIcon(Modifier.fillMaxSize())
+            }
+        }
+    }
+}
+
 /** Takes an image url and loads it with Picasso */
 @Composable
-fun UrlImage(
+private fun UrlImage(
     imageUrl: String,
     height: Dp = 80.dp,
     width: Dp = 80.dp,
@@ -50,8 +98,8 @@ fun UrlImage(
         model = imageRequest,
         contentDescription = null,
         loading = {
-            Box(modifier = Modifier.fillMaxSize()) {
-                ShimmerView()
+            Box {
+                ShimmerView(Modifier.fillMaxSize())
                 fallbackIcon?.invoke()
             }
         },
@@ -64,7 +112,7 @@ fun UrlImage(
     )
 }
 
-object CropSquareTransformation : Transformation {
+private object CropSquareTransformation : Transformation {
     override val cacheKey: String = "square"
 
     override suspend fun transform(input: Bitmap, size: Size): Bitmap {
@@ -80,7 +128,10 @@ object CropSquareTransformation : Transformation {
 }
 
 // Really small images are loaded as pixelated to not introduce blurriness through filtering
-class PixelatedTransformation(private val targetWidthPx: Int, private val targetHeightPx: Int) :
+private class PixelatedTransformation(
+    private val targetWidthPx: Int,
+    private val targetHeightPx: Int
+) :
     Transformation {
     override val cacheKey: String = "pixelated"
 
@@ -99,5 +150,18 @@ class PixelatedTransformation(private val targetWidthPx: Int, private val target
             input.recycle()
         }
         return result
+    }
+}
+
+@Preview
+@Composable
+private fun StoryImagePreview() {
+    AppTheme {
+        Surface {
+            val webPreviewState = WebPreviewState.Loading
+            StoryImage(webPreviewState, modifier = Modifier
+                .padding(12.dp)
+                .size(120.dp)) {}
+        }
     }
 }

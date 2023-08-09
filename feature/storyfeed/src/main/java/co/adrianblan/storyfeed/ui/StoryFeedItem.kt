@@ -1,18 +1,29 @@
 package co.adrianblan.storyfeed.ui
 
 import android.text.Html
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -21,15 +32,17 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import co.adrianblan.common.urlSiteName
 import co.adrianblan.domain.DecoratedStory
-import co.adrianblan.domain.WebPreviewState
-import co.adrianblan.ui.LinkIcon
 import co.adrianblan.model.Story
 import co.adrianblan.model.StoryId
 import co.adrianblan.model.StoryUrl
+import co.adrianblan.model.WebPreviewData
+import co.adrianblan.model.WebPreviewState
 import co.adrianblan.model.placeholder
+import co.adrianblan.model.placeholderLink
+import co.adrianblan.model.placeholderPost
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.ShimmerView
-import co.adrianblan.ui.UrlImage
+import co.adrianblan.ui.StoryImage
 import co.adrianblan.ui.textSecondaryAlpha
 
 @Composable
@@ -57,45 +70,49 @@ fun StoryFeedItem(
                 .fillMaxWidth()
                 .heightIn(min = 110.dp)
         ) {
+
+            // If there is a story image, we must share the space
+            val rightPadding: Dp =
+                if (story.url != null) 10.dp
+                else 16.dp
+
             Box(
-                modifier = Modifier.clickable(onClick = storyClick)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = storyClick)
+                    .padding(
+                        start = 16.dp,
+                        end = rightPadding,
+                        top = 16.dp,
+                        bottom = 12.dp
+                    )
             ) {
-
-                // If there is a story image, we must share the space
-                val rightPadding: Dp =
-                    if (story.url != null) 10.dp
-                    else 16.dp
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            start = 16.dp,
-                            end = rightPadding,
-                            top = 16.dp,
-                            bottom = 12.dp
-                        )
+                Column(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Column(modifier = Modifier
-                        .fillMaxWidth()
-                        .animateContentSize()) {
-                        Text(
-                            text = story.title,
-                            style = MaterialTheme.typography.subtitle1
-                        )
-                        StoryFeedItemDescription(
-                            story = story,
-                            webPreviewState = webPreviewState
-                        )
-                    }
+                    Text(
+                        text = story.title,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    StoryFeedItemDescription(
+                        story = story,
+                        webPreviewState = webPreviewState
+                    )
                 }
             }
         }
 
         if (storyUrl != null && webPreviewState != null) {
-            StoryFeedItemImage(
-                storyUrl = storyUrl,
+            StoryImage(
                 webPreviewState = webPreviewState,
+                modifier = Modifier
+                    .padding(
+                        start = 10.dp,
+                        end = 16.dp,
+                        top = (16 + 1).dp,
+                        bottom = 14.dp
+                    )
+                    .size(80.dp),
                 onClick = storyContentClick
             )
         }
@@ -110,20 +127,21 @@ internal fun buildSubtitleString(
 ): AnnotatedString {
 
     val typography = MaterialTheme.typography
-    val colors = MaterialTheme.colors
+    val colors = MaterialTheme.colorScheme
 
     val annotatedString = remember(siteName, description) {
 
         val stringBuilder = AnnotatedString.Builder()
 
         if (siteName != null) {
-            val emphStyle = typography.subtitle2
+            val emphStyle = typography.labelLarge
 
             stringBuilder.pushStyle(
                 SpanStyle(
                     fontWeight = emphStyle.fontWeight,
                     fontFamily = emphStyle.fontFamily,
                     fontStyle = emphStyle.fontStyle,
+                    fontSize = emphStyle.fontSize,
                     color = colors.onPrimary
                 )
             )
@@ -153,135 +171,127 @@ fun StoryFeedItemDescription(
     val storyUrl: StoryUrl? = story.url
 
     // Only show shimmer if we are loading preview for an url
-    if (storyUrl != null && webPreviewState is WebPreviewState.Loading) {
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Surface(shape = RoundedCornerShape(2.dp)) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(16.dp)
-            ) {
-                ShimmerView()
-            }
-        }
-        Spacer(modifier = Modifier.height(6.dp))
-        Surface(shape = RoundedCornerShape(2.dp)) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(16.dp)
-            ) {
-                ShimmerView()
-            }
-        }
-    } else {
-
-        val webPreview =
-            (webPreviewState as? WebPreviewState.Success)?.webPreview
-
-        val siteName: String? =
-            webPreview?.siteName ?: story.url?.url?.urlSiteName()
-
-        val description: String? =
-            story.text
-                .takeIf { !it.isNullOrEmpty() }
-                ?.let {
-                    Html.fromHtml(it).toString()
-                        .replace("\n\n", " ")
-                }
-                ?: webPreview?.description
-
-        val subtitle =
-            buildSubtitleString(siteName, description)
-
-        if (subtitle.length > 0) {
-            Spacer(modifier = Modifier.height(3.dp))
-            Text(
-                text = subtitle,
-                style = MaterialTheme.typography.body2.copy(
-                    color = MaterialTheme.colors.onPrimary.copy(alpha = textSecondaryAlpha)
-                ),
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
+    val storyUrlLoading: Boolean = remember(storyUrl, webPreviewState) {
+        storyUrl != null && webPreviewState is WebPreviewState.Loading
     }
-}
-
-@Composable
-private fun StoryFeedItemImage(
-    storyUrl: StoryUrl,
-    webPreviewState: WebPreviewState?,
-    onClick: () -> Unit
-) {
-
-    Surface(
-        shape = RoundedCornerShape(3.dp),
-        modifier = Modifier
-            .fillMaxHeight()
-            .clickable(onClick = onClick)
-    ) {
-        Box(
-            modifier = Modifier.padding(
-                start = 10.dp,
-                end = 16.dp,
-                top = (16 + 1).dp,
-                bottom = 14.dp
-            )
+    Box(modifier = Modifier.animateContentSize()) {
+        AnimatedVisibility(
+            visible = storyUrlLoading,
+            enter = EnterTransition.None,
+            exit = fadeOut()
         ) {
-            Surface(
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.size(80.dp)
-            ) {
-                Box {
-                    Surface(
-                        color = colorResource(co.adrianblan.ui.R.color.contentMuted),
-                        modifier = Modifier.fillMaxSize()
-                    ) {}
+            Spacer(modifier = Modifier.height(8.dp))
 
-                    when (webPreviewState) {
-                        is WebPreviewState.Loading -> {
-                            Box(modifier = Modifier.fillMaxSize()) {
-                                ShimmerView()
-                                LinkIcon()
-                            }
-                        }
-                        is WebPreviewState.Success -> {
-                            val webPreview = webPreviewState.webPreview
-
-                            val imageUrl =
-                                webPreview.imageUrl ?: webPreview.iconUrl
-                                ?: webPreview.favIconUrl
-
-                            UrlImage(imageUrl) {
-                                LinkIcon()
-                            }
-                        }
-                        is WebPreviewState.Error -> {
-                            LinkIcon()
-                        }
-                        null -> {}
-                    }
+            Column {
+                Row {
+                    Text(
+                        text = storyUrl!!.urlSiteName(),
+                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier.padding(end = 6.dp)
+                    )
+                    ShimmerView(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 1.dp)
+                            .height(16.dp)
+                    )
                 }
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                ShimmerView(
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 1.dp)
+                        .height(16.dp)
+                )
+            }
+        }
+        AnimatedVisibility(
+            visible = !storyUrlLoading,
+            enter = fadeIn(),
+            exit = ExitTransition.None
+        ) {
+            val webPreview =
+                (webPreviewState as? WebPreviewState.Success)?.webPreview
+
+            val siteName: String? =
+                webPreview?.siteName ?: story.url?.urlSiteName()
+
+            val description: String? =
+                story.text
+                    .takeIf { !it.isNullOrEmpty() }
+                    ?.let {
+                        Html.fromHtml(it).toString()
+                            .replace("\n\n", " ")
+                    }
+                    ?: webPreview?.description
+
+            val subtitle =
+                buildSubtitleString(siteName, description)
+
+            if (subtitle.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(3.dp))
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = textSecondaryAlpha)
+                    ),
+                    maxLines = 3,
+                    overflow = TextOverflow.Ellipsis
+                )
             }
         }
     }
 }
-
-
 
 @Preview
 @Composable
-fun StoryFeedItemPreview() {
+fun StoryFeedItemPostPreview() {
     AppTheme {
-        StoryFeedItem(
-            decoratedStory = DecoratedStory(
-                Story.placeholder,
-                webPreviewState = WebPreviewState.Loading
-            ),
-            onStoryClick = {},
-            onStoryContentClick = {}
-        )
+        Surface {
+            StoryFeedItem(
+                decoratedStory = DecoratedStory(
+                    story = Story.placeholderPost,
+                    webPreviewState = WebPreviewState.Loading
+                ),
+                onStoryClick = {},
+                onStoryContentClick = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun StoryFeedItemLinkPreview() {
+    AppTheme {
+        Surface {
+            StoryFeedItem(
+                decoratedStory = DecoratedStory(
+                    story = Story.placeholderLink,
+                    webPreviewState = WebPreviewState.Success(WebPreviewData.placeholder)
+                ),
+                onStoryClick = {},
+                onStoryContentClick = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun StoryFeedItemLoadingPreview() {
+    AppTheme {
+        Surface {
+            StoryFeedItem(
+                decoratedStory = DecoratedStory(
+                    story = Story.placeholderLink,
+                    webPreviewState = WebPreviewState.Loading
+                ),
+                onStoryClick = {},
+                onStoryContentClick = {}
+            )
+        }
     }
 }

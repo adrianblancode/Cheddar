@@ -10,6 +10,7 @@
         <item name="android:windowBackground">@color/colorBackground</item>
         <item name="android:windowSplashscreenContent" tools:targetApi="26">@color/colorBackground</item>
 
+        <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:enforceNavigationBarContrast" tools:targetApi="29">false</item>
     </style>

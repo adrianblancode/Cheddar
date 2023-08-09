@@ -1,5 +1,6 @@
 package co.adrianblan.hackernews
 
+import co.adrianblan.common.AsyncResource
 import co.adrianblan.common.WeakCache
 import co.adrianblan.model.*
 import co.adrianblan.hackernews.api.HackerNewsApiService
@@ -12,7 +13,7 @@ import javax.inject.Singleton
 
 interface HackerNewsRepository {
     suspend fun fetchStory(storyId: StoryId): Story
-    fun cachedStoryIds(storyType: StoryType): List<StoryId>?
+    fun storyIdsResource(storyType: StoryType): AsyncResource<List<StoryId>>
     suspend fun fetchStoryIds(storyType: StoryType): List<StoryId>
     suspend fun fetchComment(commentId: CommentId): Comment?
 }
@@ -24,6 +25,7 @@ class HackerNewsRepositoryImpl
 ) : HackerNewsRepository {
     private val storyIdsCache = WeakCache<StoryType, List<StoryId>>()
     private val storyCache = WeakCache<StoryId, Story>()
+    private val commentCache = WeakCache<CommentId, Comment>()
 
     override suspend fun fetchStory(storyId: StoryId): Story =
         storyCache.get(storyId)
@@ -35,8 +37,10 @@ class HackerNewsRepositoryImpl
                     storyCache.put(storyId, story)
                 }
 
-    override fun cachedStoryIds(storyType: StoryType): List<StoryId>? =
-        storyIdsCache.get(storyType)
+    override fun storyIdsResource(storyType: StoryType): AsyncResource<List<StoryId>> =
+        AsyncResource(storyIdsCache.get(storyType)) {
+            fetchStoryIds(storyType)
+        }
 
     override suspend fun fetchStoryIds(storyType: StoryType): List<StoryId> =
         hackerNewsApiService.fetchStories(storyType)
@@ -48,7 +52,11 @@ class HackerNewsRepositoryImpl
             }
 
     override suspend fun fetchComment(commentId: CommentId): Comment? =
-        hackerNewsApiService.fetchComment(commentId)
-            .unwrapApiResponse()
-            ?.toDomain()
+        commentCache.get(commentId)
+            ?: hackerNewsApiService.fetchComment(commentId)
+                .unwrapApiResponse()
+                ?.toDomain()
+                ?.also { comment ->
+                    commentCache.put(commentId, comment)
+                }
 }

@@ -3,10 +3,10 @@ package co.adrianblan.storyfeed.ui
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.Composable
@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -32,7 +33,7 @@ fun StoryTypePopup(
     onDismiss: () -> Unit
 ) {
 
-    val popupTopOffsetPx = with (LocalDensity.current) { 40.dp.toPx().toInt() }
+    val popupTopOffsetPx = with(LocalDensity.current) { 40.dp.toPx().toInt() }
 
     Popup(
         properties = PopupProperties(focusable = true),
@@ -48,8 +49,8 @@ fun StoryTypePopup(
             ) {
                 Surface(
                     shape = RoundedCornerShape(6.dp),
-                    color = MaterialTheme.colors.background,
-                    elevation = 4.dp
+                    color = MaterialTheme.colorScheme.background,
+                    shadowElevation = 4.dp
                 ) {
                     Column {
                         val storyTypes = remember { StoryType.values() }
@@ -75,22 +76,24 @@ fun StoryTypePopup(
 }
 
 @Composable
-fun StoryTypePopupItem(
+private fun StoryTypePopupItem(
     storyType: StoryType,
     isSelected: Boolean,
-    onClick: (StoryType) -> Unit
+    onClick: () -> Unit
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxWidth()
-            .clickable(onClick = { onClick(storyType) })
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
     ) {
         Row(horizontalArrangement = Arrangement.SpaceBetween) {
 
             Text(
                 text = stringResource(storyType.titleStringResource()),
-                style = MaterialTheme.typography.subtitle1,
-                modifier = Modifier.weight(1f)
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier
+                    .weight(1f)
                     .padding(
                         start = 12.dp,
                         end = 12.dp,
@@ -101,7 +104,8 @@ fun StoryTypePopupItem(
 
             if (isSelected) {
                 Box(
-                    modifier = Modifier.align(Alignment.CenterVertically)
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
                         .padding(
                             end = 12.dp,
                             top = 2.dp
@@ -109,13 +113,23 @@ fun StoryTypePopupItem(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
-                        tint = MaterialTheme.colors.secondary,
+                        tint = MaterialTheme.colorScheme.secondary,
                         // .align(Alignment.CenterVertically)
                         modifier = Modifier.size(32.dp),
                         contentDescription = null
                     )
                 }
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun StoryTypePopupItemPreview() {
+    AppTheme {
+        Surface {
+            StoryTypePopupItem(storyType = StoryType.TOP, isSelected = true, onClick = {})
         }
     }
 }

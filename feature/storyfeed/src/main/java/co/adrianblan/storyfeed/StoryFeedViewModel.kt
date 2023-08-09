@@ -44,10 +44,11 @@ class StoryFeedViewModel @Inject constructor(
         storyTypeFlow
             .flatMapLatest { storyType ->
 
-                val cachedStoryIds: List<StoryId>? = hackerNewsRepository.cachedStoryIds(storyType)
+                val storyIdsResource = hackerNewsRepository.storyIdsResource(storyType)
+                val cachedStoryIds: List<StoryId>? = storyIdsResource.cached
 
                 flow {
-                    emit(cachedStoryIds ?: hackerNewsRepository.fetchStoryIds(storyType))
+                    emit(cachedStoryIds ?: storyIdsResource.fetch())
                 }
                     .flatMapLatest { storyIds: List<StoryId> ->
                         pageIndexFlow.observePages(

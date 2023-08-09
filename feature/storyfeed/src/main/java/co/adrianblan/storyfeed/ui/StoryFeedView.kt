@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -33,12 +33,12 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import co.adrianblan.domain.DecoratedStory
-import co.adrianblan.domain.WebPreviewState
 import co.adrianblan.model.Story
 import co.adrianblan.model.StoryId
 import co.adrianblan.model.StoryType
 import co.adrianblan.model.StoryUrl
-import co.adrianblan.model.placeholder
+import co.adrianblan.model.WebPreviewState
+import co.adrianblan.model.placeholderLink
 import co.adrianblan.storyfeed.R
 import co.adrianblan.storyfeed.StoryFeedState
 import co.adrianblan.storyfeed.StoryFeedViewModel
@@ -53,7 +53,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.min
 import co.adrianblan.ui.R as UiR
 
-private const val toolbarMinHeightDp = 56
+private const val toolbarMinHeightDp = 60
 private const val toolbarMaxHeightDp = 128
 
 internal fun StoryType.titleStringResource(): Int =
@@ -197,7 +197,11 @@ private fun SuccessBody(
     // TODO change to LazyColumn
     Column(modifier = Modifier.verticalScroll(scrollState)) {
 
-        Spacer(modifier = Modifier.height(toolbarMaxHeightDp.dp).statusBarsPadding())
+        Spacer(
+            modifier = Modifier
+                .statusBarsPadding()
+                .height(toolbarMaxHeightDp.dp)
+        )
 
         storyFeedState.stories.forEach { story ->
             key(story.story.id) {
@@ -212,7 +216,11 @@ private fun SuccessBody(
         if (storyFeedState.hasLoadedAllPages) NoMoreStoriesView()
         else LoadingMoreStoriesView()
 
-        Spacer(modifier = Modifier.height(8.dp).navigationBarsPadding())
+        Spacer(
+            modifier = Modifier
+                .navigationBarsPadding()
+                .height(8.dp)
+        )
     }
 }
 
@@ -225,7 +233,7 @@ private fun LoadingMoreStoriesView() {
             .padding(8.dp)
     ) {
         LoadingView(
-            textStyle = MaterialTheme.typography.subtitle1
+            textStyle = MaterialTheme.typography.titleMedium
         )
     }
 }
@@ -238,9 +246,9 @@ private fun NoMoreStoriesView() {
     ) {
         Text(
             text = stringResource(id = R.string.stories_no_more_stories),
-            style = MaterialTheme.typography.subtitle2
+            style = MaterialTheme.typography.titleMedium
                 .copy(
-                    color = MaterialTheme.colors.onPrimary.copy(alpha = textSecondaryAlpha),
+                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = textSecondaryAlpha),
                     textAlign = TextAlign.Center
                 ),
             modifier = Modifier.padding(
@@ -262,7 +270,7 @@ fun StoryFeedPreview() {
             StoryFeedState.Success(
                 List(10) {
                     DecoratedStory(
-                        Story.placeholder,
+                        Story.placeholderLink,
                         WebPreviewState.Loading
                     )
                 }.toImmutableList(),

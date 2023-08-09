@@ -3,12 +3,13 @@ minSdk = "23"
 compileSdk = "33"
 targetSdk = "33"
 
-androidGradlePlugin = "8.2.0-alpha09"
+androidGradlePlugin = "8.2.0-alpha14"
 androidxActivity = "1.7.2"
 androidxAppCompat = "1.6.1"
 androidxBrowser = "1.5.0"
 androidxComposeBom = "2023.06.01"
-androidxComposeCompiler = "1.5.0"
+androidxComposeCompiler = "1.5.1"
+androidxConstraintlayout = "1.1.0-alpha04"
 androidxCore = "1.10.1"
 androidxCoreTesting = "2.2.0"
 androidxLifecycle = "2.6.1"
@@ -55,13 +56,13 @@ androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", versi
 androidx-compose-compiler = { group = "androidx.compose.compiler", name = "compiler", version.ref = "androidxComposeCompiler" }
 androidx-compose-foundation-core = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout" }
-androidx-compose-material-core = { group = "androidx.compose.material", name = "material" }
-androidx-compose-material-icons = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+androidx-compose-material-icons = { group = "androidx.compose.material", name = "material-icons-extended" }
 androidx-compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 androidx-compose-ui-tooling-core = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 androidx-compose-ui-util = { group = "androidx.compose.ui", name = "ui-util" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout-compose", version.ref = "androidxConstraintlayout" }
 
 coil = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
 desugar = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar" }

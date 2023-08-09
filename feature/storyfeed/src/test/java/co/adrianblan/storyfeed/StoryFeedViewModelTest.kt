@@ -2,6 +2,7 @@ package co.adrianblan.storyfeed
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
+import co.adrianblan.common.AsyncResource
 import co.adrianblan.domain.DecoratedStory
 import co.adrianblan.domain.StoryPreviewUseCase
 import co.adrianblan.hackernews.FakeHackerNewsRepository
@@ -11,17 +12,14 @@ import co.adrianblan.model.CommentId
 import co.adrianblan.model.Story
 import co.adrianblan.model.StoryId
 import co.adrianblan.model.StoryType
-import co.adrianblan.model.placeholder
+import co.adrianblan.model.placeholderLink
 import co.adrianblan.testing.CoroutineTestRule
 import co.adrianblan.testing.delayAndThrow
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
@@ -40,7 +38,7 @@ class StoryFeedViewModelTest {
 
     object TestStoryPreviewUseCase : StoryPreviewUseCase {
         override fun observeDecoratedStory(storyId: StoryId): Flow<DecoratedStory> =
-            flowOf(DecoratedStory(story = Story.placeholder, webPreviewState = null))
+            flowOf(DecoratedStory(story = Story.placeholderLink, webPreviewState = null))
                 .onEach { delay(1000L) }
     }
 
@@ -85,7 +83,10 @@ class StoryFeedViewModelTest {
             override suspend fun fetchStory(storyId: StoryId): Story =
                 delayAndThrow(evilDelay)
 
-            override fun cachedStoryIds(storyType: StoryType): List<StoryId>? = null
+            override fun storyIdsResource(storyType: StoryType): AsyncResource<List<StoryId>> =
+                AsyncResource(null) {
+                    delayAndThrow(evilDelay)
+                }
 
             override suspend fun fetchStoryIds(storyType: StoryType): List<StoryId> =
                 delayAndThrow(evilDelay)
