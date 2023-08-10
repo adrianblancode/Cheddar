@@ -36,8 +36,6 @@ class MainActivity : AppCompatActivity() {
                 isAppearanceLightNavigationBars = !isNightModeActive()
             }
 
-        
-
         setContent {
             AppTheme {
                 Surface {

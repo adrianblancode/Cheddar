@@ -4,11 +4,13 @@ import co.adrianblan.common.AsyncResource
 import co.adrianblan.common.DispatcherProvider
 import co.adrianblan.common.WeakCache
 import co.adrianblan.common.baseUrl
+import co.adrianblan.common.runCatchingCooperative
 import co.adrianblan.common.urlSiteName
 import co.adrianblan.model.WebPreviewData
 import kotlinx.coroutines.runInterruptible
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,20 +30,25 @@ class WebPreviewRepository
             fetchWebPreview(url)
         }
 
-    private suspend fun fetchWebPreview(url: String): WebPreviewData =
-        runInterruptible(dispatcherProvider.IO) {
-            val webPreview = try {
-                val document = Jsoup.connect(url).get()
-                document.toWebPreviewData(url)
+    private suspend fun fetchWebPreview(url: String): WebPreviewData {
+
+        val webPreview = if (url.endsWith(".pdf")) {
+            createEmptyWebPreviewData(url)
+        } else {
+            try {
+                runInterruptible(dispatcherProvider.IO) {
+                    Jsoup.connect(url).get()
+                }.toWebPreviewData(url)
             } catch (t: Throwable) {
-                Timber.e("Webpreview error for $url ", t)
+                Timber.e(t, "Webpreview error for $url ")
                 if (t is HttpStatusException || t is SSLHandshakeException) {
                     createEmptyWebPreviewData(url)
                 } else throw t
             }
-            cache.put(url, webPreview)
-            webPreview
         }
+        cache.put(url, webPreview)
+        return webPreview
+    }
 
     private fun createEmptyWebPreviewData(url: String) =
         WebPreviewData(
@@ -49,6 +56,6 @@ class WebPreviewRepository
             description = null,
             imageUrl = null,
             iconUrl = null,
-            favIconUrl = "${url.baseUrl()}/favicon.ico"
+            favIconUrl = null
         )
 }

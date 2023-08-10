@@ -68,10 +68,11 @@ dependencies {
     implementation(project(":core:model"))
     implementation(project(":core:domain"))
     implementation(project(":core:ui"))
-    implementation(project(":core:testing"))
     implementation(project(":core:network"))
+    testImplementation(project(":core:testing"))
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.timber)
+    implementation(libs.coil)
     debugImplementation(libs.leakcanary)
 }

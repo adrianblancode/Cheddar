@@ -18,8 +18,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import co.adrianblan.model.WebPreviewState
+import co.adrianblan.ui.coil.IcoDecoder
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
+import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.size.Size
 import coil.transform.Transformation
@@ -53,12 +55,16 @@ fun StoryImage(
             is WebPreviewState.Success -> {
                 val webPreview = webPreviewState.webPreview
 
-                val imageUrl =
+                val imageUrl: String? =
                     webPreview.imageUrl
                         ?: webPreview.iconUrl
                         ?: webPreview.favIconUrl
 
-                UrlImage(imageUrl) { LinkIcon(Modifier.fillMaxSize()) }
+                if (imageUrl != null) {
+                    UrlImage(imageUrl) { LinkIcon(Modifier.fillMaxSize()) }
+                } else {
+                    LinkIcon(Modifier.fillMaxSize())
+                }
             }
 
             is WebPreviewState.Error -> {

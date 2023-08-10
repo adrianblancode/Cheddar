@@ -34,7 +34,8 @@ import co.adrianblan.storydetail.StoryDetailViewState
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.CollapsingScaffold
 import co.adrianblan.ui.ErrorView
-import co.adrianblan.ui.LoadingView
+import co.adrianblan.ui.LoadingText
+import co.adrianblan.ui.LoadingVisual
 
 private const val toolbarMinHeightDp = 56
 private const val toolbarMaxHeightDp = 156
@@ -84,8 +85,8 @@ fun StoryDetailView(
                 is StoryDetailViewState.Success -> CommentsSuccessBody(
                     viewState, scrollState, onCommentUrlClick
                 )
-                is StoryDetailViewState.Loading -> LoadingView()
-                is StoryDetailViewState.Error -> ErrorView()
+                is StoryDetailViewState.Loading -> LoadingVisual(modifier = Modifier.fillMaxSize())
+                is StoryDetailViewState.Error -> ErrorView(modifier = Modifier.fillMaxSize())
             }
         }
     )
@@ -138,8 +139,8 @@ private fun CommentsSuccessBody(
             }
 
         is StoryDetailCommentsState.Empty -> CommentsEmptyView()
-        is StoryDetailCommentsState.Loading -> LoadingView()
-        is StoryDetailCommentsState.Error -> ErrorView()
+        is StoryDetailCommentsState.Loading -> LoadingVisual(modifier = Modifier.fillMaxSize())
+        is StoryDetailCommentsState.Error -> ErrorView(modifier = Modifier.fillMaxSize())
     }
 }
 

@@ -2,6 +2,7 @@ package co.adrianblan.ui
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -22,15 +23,13 @@ import co.adrianblan.ui.utils.lerp
 import kotlin.math.sin
 
 @Composable
-fun LoadingView(
+fun LoadingText(
     modifier: Modifier = Modifier,
     textStyle: TextStyle = MaterialTheme.typography.titleMedium,
 ) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = modifier
-            .fillMaxSize()
-            .padding(32.dp)
+        modifier = modifier.fillMaxWidth()
     ) {
 
         Row(
@@ -44,6 +43,25 @@ fun LoadingView(
                 fontSize = textStyle.fontSize
             )
         }
+    }
+}
+
+@Composable
+fun LoadingVisual(
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = MaterialTheme.typography.titleLarge,
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .padding(8.dp)
+            .fillMaxWidth()
+    ) {
+
+        CircularProgressIndicator(
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.size(54.dp)
+        )
     }
 }
 
@@ -117,10 +135,20 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
 
 @Preview
 @Composable
-private fun LoadingViewPreview() {
+private fun LoadingTextPreview() {
     AppTheme {
         Surface {
-            LoadingView()
+            LoadingText()
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun LoadingVisualPreview() {
+    AppTheme {
+        Surface {
+            LoadingVisual()
         }
     }
 }

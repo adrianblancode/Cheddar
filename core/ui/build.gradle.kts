@@ -25,4 +25,5 @@ dependencies {
     api(libs.androidx.constraintlayout)
 
     implementation(libs.coil)
+    implementation(libs.coil.svg)
 }

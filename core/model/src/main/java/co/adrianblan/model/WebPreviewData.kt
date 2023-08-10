@@ -10,7 +10,7 @@ data class WebPreviewData(
     val imageUrl: String?,
     val iconUrl: String?,
     // This is just a best guess
-    val favIconUrl: String
+    val favIconUrl: String?
 ) {
     companion object
 }

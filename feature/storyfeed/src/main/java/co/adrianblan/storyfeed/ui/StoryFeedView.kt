@@ -4,14 +4,17 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -46,7 +49,8 @@ import co.adrianblan.storyfeed.StoryFeedViewState
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.CollapsingScaffold
 import co.adrianblan.ui.ErrorView
-import co.adrianblan.ui.LoadingView
+import co.adrianblan.ui.LoadingText
+import co.adrianblan.ui.LoadingVisual
 import co.adrianblan.ui.textSecondaryAlpha
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
@@ -154,7 +158,7 @@ private fun BodyContent(
 ) {
 
     when (viewState.storyFeedState) {
-        is StoryFeedState.Loading -> LoadingView()
+        is StoryFeedState.Loading -> LoadingVisual(modifier = Modifier.fillMaxSize())
         is StoryFeedState.Success -> {
             SuccessBody(
                 scrollState = scrollState,
@@ -165,7 +169,7 @@ private fun BodyContent(
             )
         }
 
-        is StoryFeedState.Error -> ErrorView()
+        is StoryFeedState.Error -> ErrorView(modifier = Modifier.fillMaxSize())
     }
 }
 
@@ -226,23 +230,31 @@ private fun SuccessBody(
 
 @Composable
 private fun LoadingMoreStoriesView() {
-    Box(
-        contentAlignment = Alignment.Center,
+
+    LoadingText(
         modifier = Modifier
+            .padding(
+                start = 16.dp,
+                end = 16.dp,
+                top = 16.dp,
+                bottom = 12.dp
+            )
             .fillMaxWidth()
-            .padding(8.dp)
-    ) {
-        LoadingView(
-            textStyle = MaterialTheme.typography.titleMedium
-        )
-    }
+    )
 }
 
 @Composable
 private fun NoMoreStoriesView() {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .padding(
+                start = 16.dp,
+                end = 16.dp,
+                top = 16.dp,
+                bottom = 12.dp
+            )
+            .fillMaxWidth()
     ) {
         Text(
             text = stringResource(id = R.string.stories_no_more_stories),
@@ -251,19 +263,13 @@ private fun NoMoreStoriesView() {
                     color = MaterialTheme.colorScheme.onPrimary.copy(alpha = textSecondaryAlpha),
                     textAlign = TextAlign.Center
                 ),
-            modifier = Modifier.padding(
-                start = 16.dp,
-                end = 16.dp,
-                top = 16.dp,
-                bottom = 8.dp
             )
-        )
     }
 }
 
 @Preview
 @Composable
-fun StoryFeedPreview() {
+private fun StoryFeedPreview() {
     AppTheme {
         val viewState = StoryFeedViewState(
             StoryType.TOP,
@@ -285,5 +291,25 @@ fun StoryFeedPreview() {
             onStoryContentClick = {},
             onPageEndReached = {}
         )
+    }
+}
+
+@Preview
+@Composable
+private fun LoadingMoreStoriesPreview() {
+    AppTheme {
+        Surface {
+            LoadingMoreStoriesView()
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun NoMoreStoriesPreview() {
+    AppTheme {
+        Surface {
+            NoMoreStoriesView()
+        }
     }
 }

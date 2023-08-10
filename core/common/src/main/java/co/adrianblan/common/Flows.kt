@@ -4,7 +4,7 @@ import kotlinx.coroutines.CancellationException
 import kotlin.Result
 
 
-fun runCatchingCooperative(block: () -> R): Result<R> {
+fun <R> runCatchingCooperative(block: () -> R): Result<R> {
     return try {
         Result.success(block())
     } catch (t: Throwable) {

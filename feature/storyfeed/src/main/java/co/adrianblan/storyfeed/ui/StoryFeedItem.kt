@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -56,11 +58,13 @@ fun StoryFeedItem(
 
     val webPreviewState: WebPreviewState? = decoratedStory.webPreviewState
 
-    val storyClick: () -> Unit =
+    val storyClick: () -> Unit = remember {
         { onStoryClick(story.id) }
+    }
 
-    val storyContentClick: () -> Unit =
+    val storyContentClick: () -> Unit = remember {
         { story.url?.let { onStoryContentClick(it) } }
+    }
 
     Row {
         Surface(
@@ -183,16 +187,18 @@ fun StoryFeedItemDescription(
             Spacer(modifier = Modifier.height(8.dp))
 
             Column {
-                Row {
+                Row(modifier = Modifier.padding(top = 1.dp)) {
                     Text(
                         text = storyUrl!!.urlSiteName(),
                         style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier.padding(end = 6.dp)
+                        modifier = Modifier
+                            // Shorter spacer
+                            .padding(end = 6.dp)
+                            .align(Alignment.CenterVertically)
                     )
                     ShimmerView(
                         Modifier
                             .fillMaxWidth()
-                            .padding(top = 1.dp)
                             .height(16.dp)
                     )
                 }

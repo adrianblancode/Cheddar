@@ -126,53 +126,55 @@ private fun SuccessToolbar(
             val imageRef = createRefFor("image")
             defaultTransition(
                 from = constraintSet {
-                    createVerticalChain(titleRef, subtitleRef, chainStyle = ChainStyle.Packed(0.5f))
-                    createHorizontalChain(titleRef, imageRef, chainStyle = ChainStyle.SpreadInside)
+                    createVerticalChain(
+                        titleRef.withChainParams(topMargin = 56.dp),
+                        subtitleRef.withChainParams(bottomMargin = 8.dp),
+                        chainStyle = ChainStyle.Packed(0.5f)
+                    )
+                    createHorizontalChain(
+                        titleRef.withChainParams(startMargin = 16.dp, endMargin = 16.dp, endGoneMargin = 16.dp),
+                        imageRef.withChainParams(endMargin = 8.dp),
+                        chainStyle = ChainStyle.SpreadInside
+                    )
                     constrain(titleRef) {
-                        start.linkTo(parent.start, margin = 16.dp)
-                        end.linkTo(imageRef.start, margin = 16.dp, goneMargin = 16.dp)
-                        top.linkTo(parent.top, margin = 56.dp)
                         width = Dimension.fillToConstraints
                     }
                     constrain(subtitleRef) {
                         start.linkTo(titleRef.start)
                         end.linkTo(titleRef.end)
-                        bottom.linkTo(parent.bottom, margin = 8.dp)
                         width = Dimension.fillToConstraints
                     }
                     constrain(imageRef) {
                         start.linkTo(titleRef.end)
-                        end.linkTo(parent.end, margin = 8.dp)
                         top.linkTo(parent.top, margin = 56.dp)
                         bottom.linkTo(parent.bottom, margin = 8.dp)
                     }
                 },
                 to = constraintSet {
-                    createVerticalChain(titleRef, subtitleRef, chainStyle = ChainStyle.Packed(0f))
+                    val toolbarMiddleGuideline = createGuidelineFromTop(56.dp / 2)
+                    createVerticalChain(
+                        toolbarMiddleGuideline.reference,
+                        titleRef.withChainParams(topMargin = 8.dp, bottomGoneMargin = 8.dp),
+                        subtitleRef.withChainParams(bottomMargin = 8.dp),
+                        toolbarMiddleGuideline.reference,
+                        chainStyle = ChainStyle.Packed(0f)
+                    )
                     createHorizontalChain(
-                        titleRef,
-                        subtitleRef,
-                        imageRef,
+                        titleRef.withChainParams(startMargin = 72.dp, endMargin = 16.dp),
+                        imageRef.withChainParams(endMargin = 8.dp),
                         chainStyle = ChainStyle.SpreadInside
                     )
-                    val toolbarMiddleGuideline = createGuidelineFromTop(56.dp / 2)
                     constrain(titleRef) {
-                        top.linkTo(toolbarMiddleGuideline, margin = 8.dp)
-                        bottom.linkTo(subtitleRef.top, goneMargin = 8.dp)
-                        start.linkTo(parent.start, margin = 72.dp)
-                        end.linkTo(imageRef.start, margin = 16.dp)
                         width = Dimension.fillToConstraints
                     }
                     constrain(subtitleRef) {
                         start.linkTo(titleRef.start)
                         end.linkTo(titleRef.end)
-                        bottom.linkTo(toolbarMiddleGuideline)
                         width = Dimension.fillToConstraints
                     }
                     constrain(imageRef) {
-                        start.linkTo(titleRef.end)
-                        end.linkTo(parent.end, margin = 8.dp)
-                        linkTo(top = parent.top, bottom = parent.bottom, bottomMargin = 8.dp, topMargin = 8.dp, bias = 0f)
+                        top.linkTo(toolbarMiddleGuideline, margin = 8.dp)
+                        bottom.linkTo(toolbarMiddleGuideline, margin = 8.dp)
                     }
                 }
             )

@@ -6,6 +6,7 @@ import co.adrianblan.common.urlSiteName
 import co.adrianblan.model.WebPreviewData
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
+import timber.log.Timber
 
 
 private const val OG_SITE_NAME = "og:site_name"
@@ -33,21 +34,23 @@ internal fun Document.toWebPreviewData(url: String): WebPreviewData {
         ?.takeIf { it.isNotEmpty() }
 
     val imageUrl = ogTags.getOgContentOrNull(OG_IMAGE)
-        ?.takeImageUrlIfCompatible()
         ?.completePartialUrl(baseUrl)
         ?.takeIf { it.isNotEmpty() }
 
     // Make best effort to get icon tags
-    val iconTags = head()
-        .select("link[rel]")
+    val iconTags = head().select("link[rel]")
 
     val iconUrl =
-        (iconTags.getIconContentOrNull(APPLE_ICON_PRECOMPOSED)?.takeImageUrlIfCompatible()
-            ?: iconTags.getIconContentOrNull(APPLE_ICON)?.takeImageUrlIfCompatible()
-            ?: iconTags.getIconContentOrNull(ICON)?.takeImageUrlIfCompatible()
-            ?: iconTags.getIconContentOrNull(SHORTCUT_ICON)?.takeImageUrlIfCompatible())
+        (iconTags.getIconContentOrNull(APPLE_ICON_PRECOMPOSED)
+            ?: iconTags.getIconContentOrNull(APPLE_ICON)
+            ?: iconTags.getIconContentOrNull(ICON)
+            ?: iconTags.getIconContentOrNull(SHORTCUT_ICON))
             ?.completePartialUrl(baseUrl)
             ?.takeIf { it.isNotEmpty() }
+
+    if (url.baseUrl().contains("papers.ssrn.com")) {
+        Timber.d("Document example: $imageUrl, $iconUrl")
+    }
 
     return WebPreviewData(
         siteName = siteName,
@@ -66,13 +69,3 @@ private fun List<Element>.getIconContentOrNull(propertyName: String): String? =
     filter { it.attr("rel") == propertyName }
         .maxByOrNull { it.attr("sizes") }
         ?.attr("href")
-
-private fun String.takeImageUrlIfCompatible(): String? {
-    val ending = this.split("?")[0]
-
-    // We can't render svg as is
-    val forbiddenTypes = listOf(".svg")
-
-    return if (forbiddenTypes.any { ending.endsWith(it) }) null
-    else this
-}

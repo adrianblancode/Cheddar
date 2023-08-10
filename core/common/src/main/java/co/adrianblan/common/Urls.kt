@@ -30,11 +30,15 @@ fun String.baseUrl(): String {
     return protocol.orEmpty() + tail
 }
 
-// Takes a possibly partial url eg "/image.png" and completes it
 fun String.completePartialUrl(baseUrl: String): String {
 
     val url = this.removePrefix(".")
 
-    return if (url.startsWith("/")) baseUrl + url
-    else url
+    return when {
+        // Adds protocol to eg //example.com/image.png
+        url.startsWith("//") -> baseUrl.substringBefore("//") + url
+        // Adds base url to eg /image.png
+        url.startsWith("/") || url.startsWith("./") -> baseUrl + url
+        else -> url
+    }
 }
