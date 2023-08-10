@@ -23,6 +23,7 @@ dependencies {
     api(libs.androidx.compose.ui.tooling.core)
     debugApi(libs.androidx.compose.ui.tooling.preview)
     api(libs.androidx.constraintlayout)
+    implementation(libs.androidx.splashscreen)
 
     implementation(libs.coil)
     implementation(libs.coil.svg)

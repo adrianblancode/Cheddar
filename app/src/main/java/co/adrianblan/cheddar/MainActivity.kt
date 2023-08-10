@@ -12,6 +12,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import co.adrianblan.domain.CustomTabsLauncher
@@ -27,6 +28,7 @@ class MainActivity : AppCompatActivity() {
     lateinit var customTabsLauncher: CustomTabsLauncher
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
 
         WindowCompat.setDecorFitsSystemWindows(window, false)

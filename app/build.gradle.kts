@@ -72,6 +72,7 @@ dependencies {
     testImplementation(project(":core:testing"))
 
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.splashscreen)
     implementation(libs.timber)
     implementation(libs.coil)
     debugImplementation(libs.leakcanary)

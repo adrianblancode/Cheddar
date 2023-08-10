@@ -15,6 +15,7 @@ androidxCoreTesting = "2.2.0"
 androidxLifecycle = "2.6.1"
 androidxNavigation = "2.6.0"
 androidxHiltNavigationCompose = "1.0.0"
+androidxSplashscreen = "1.0.0-beta02"
 
 coil = "2.4.0"
 desugar = "2.0.3"
@@ -50,6 +51,7 @@ androidx-lifecycle-viewmodel = { group = "androidx.lifecycle", name = "lifecycle
 androidx-lifecycle-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidxNavigation" }
 androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "androidxNavigation" }
+androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxSplashscreen" }
 
 androidx-compose-animation = { group = "androidx.compose.animation", name = "animation" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }

@@ -4,7 +4,7 @@
     <color name="colorPrimaryDark">#111</color>
     <color name="colorAccent">#FF5555</color>
 
-    <color name="colorBackground">#111</color>
+    <color name="colorBackground">#000</color>
 
     <color name="divider">#333</color>
     <color name="contentMuted">#333</color>
