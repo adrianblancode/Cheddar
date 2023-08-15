@@ -35,8 +35,8 @@ import co.adrianblan.ui.CollapsingScaffold
 import co.adrianblan.ui.ErrorView
 import co.adrianblan.ui.LoadingVisual
 
-private const val toolbarMinHeightDp = 56
-private const val toolbarMaxHeightDp = 156
+private val toolbarMinHeight = 56.dp
+private val toolbarMaxHeight = 156.dp
 
 @Composable
 internal fun StoryDetailRoute(
@@ -67,8 +67,8 @@ internal fun StoryDetailScreen(
 
     CollapsingScaffold(
         scrollState = scrollState,
-        minHeight = toolbarMinHeightDp.dp,
-        maxHeight = toolbarMaxHeightDp.dp,
+        minHeight = toolbarMinHeight,
+        maxHeight = toolbarMaxHeight,
         toolbarContent = { collapsedFraction ->
             StoryDetailToolbar(
                 viewState = viewState,
@@ -107,7 +107,7 @@ private fun CommentsSuccessBody(
                 Spacer(
                     modifier = Modifier
                         .statusBarsPadding()
-                        .height(toolbarMaxHeightDp.dp)
+                        .height(toolbarMaxHeight)
                 )
 
                 if (viewState.story.text != null) {

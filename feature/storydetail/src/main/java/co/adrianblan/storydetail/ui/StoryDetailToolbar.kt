@@ -8,13 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -26,9 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.Dimension
-import androidx.constraintlayout.compose.ExperimentalMotionApi
 import androidx.constraintlayout.compose.MotionLayout
-import androidx.constraintlayout.compose.MotionLayoutDebugFlags
 import androidx.constraintlayout.compose.MotionScene
 import co.adrianblan.common.urlSiteName
 import co.adrianblan.model.Story
@@ -44,14 +40,13 @@ import co.adrianblan.ui.ShimmerView
 import co.adrianblan.ui.StoryImage
 import co.adrianblan.ui.textSecondaryAlpha
 import co.adrianblan.ui.utils.lerp
-import java.util.*
 import kotlin.math.roundToInt
 
 
 @Composable
 internal fun StoryDetailToolbar(
     viewState: StoryDetailViewState,
-    collapsedFraction: Float,
+    collapsedFraction: () -> Float,
     onStoryContentClick: (StoryUrl) -> Unit,
     onBackPressed: () -> Unit
 ) {
@@ -103,20 +98,16 @@ private fun LoadingToolbar(modifier: Modifier = Modifier) {
     }
 }
 
-@OptIn(ExperimentalMotionApi::class)
 @Composable
 private fun SuccessToolbar(
     story: Story,
     webPreviewState: WebPreviewState?,
-    collapsedFraction: Float,
+    collapsedFraction: () -> Float,
     onStoryContentClick: (StoryUrl) -> Unit,
 ) {
 
     val webPreview: WebPreviewData? = (webPreviewState as? WebPreviewState.Success)
         ?.webPreview
-
-    val titleMaxLines =
-        remember(collapsedFraction) { lerp(3f, 1f, collapsedFraction).roundToInt() }
 
     MotionLayout(
         motionScene =
@@ -183,9 +174,13 @@ private fun SuccessToolbar(
                 }
             )
         },
-        progress = collapsedFraction,
+        progress = collapsedFraction(),
         modifier = Modifier.fillMaxSize()
     ) {
+
+
+        val titleMaxLines: Int = lerp(3f, 1f, collapsedFraction()).roundToInt()
+
         Text(
             text = story.title,
             style = MaterialTheme.typography.titleMedium,
@@ -208,7 +203,7 @@ private fun SuccessToolbar(
             )
         }
 
-        val imageSize = remember(collapsedFraction) { lerp(80.dp, 40.dp, collapsedFraction) }
+        val imageSize = lerp(80.dp, 40.dp, collapsedFraction())
         val storyUrl: StoryUrl? = story.url
         if (storyUrl != null && webPreviewState != null) {
             val onImageClick = remember(storyUrl) { { onStoryContentClick(storyUrl) } }
@@ -239,7 +234,7 @@ private fun SuccessToolbarExpandedPreview() {
             SuccessToolbar(
                 story = Story.placeholderLink,
                 webPreviewState = WebPreviewState.Success(WebPreviewData.placeholder),
-                collapsedFraction = 0.0f,
+                collapsedFraction = { 0.0f },
                 onStoryContentClick = {},
             )
         }
@@ -254,7 +249,7 @@ private fun SuccessToolbarCollapsedPreview() {
             SuccessToolbar(
                 story = Story.placeholderLink,
                 webPreviewState = WebPreviewState.Success(WebPreviewData.placeholder),
-                collapsedFraction = 1.0f,
+                collapsedFraction = { 1.0f },
                 onStoryContentClick = {},
             )
         }
@@ -269,7 +264,7 @@ private fun SuccessToolbarCollapsedPostPreview() {
             SuccessToolbar(
                 story = Story.placeholderPost,
                 webPreviewState = null,
-                collapsedFraction = 1.0f,
+                collapsedFraction = { 1.0f },
                 onStoryContentClick = {},
             )
         }

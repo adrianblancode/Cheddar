@@ -1,18 +1,11 @@
 package co.adrianblan.storyfeed.ui
 
 import android.text.Html
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
@@ -20,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -88,7 +80,7 @@ fun StoryFeedItem(
                 )
         ) {
 
-            Column {
+            Column(modifier = Modifier.align(Alignment.CenterStart)) {
                 Text(
                     text = story.title,
                     style = MaterialTheme.typography.titleMedium
@@ -119,7 +111,7 @@ fun StoryFeedItem(
 
 // Concatenates a subtitle string from the site name and description
 @Composable
-internal fun buildSubtitleString(
+internal fun rememberStoryDescriptionAnnotatedString(
     siteName: String?,
     description: String?
 ): AnnotatedString {
@@ -168,22 +160,15 @@ fun StoryFeedItemDescription(
 
     val storyUrl: StoryUrl? = story.url
 
-    // Only show shimmer if we are loading preview for an url
-    val storyUrlLoading: Boolean = remember(storyUrl, webPreviewState) {
-        storyUrl != null && webPreviewState is WebPreviewState.Loading
-    }
-    Box(modifier = Modifier.animateContentSize()) {
-        AnimatedVisibility(
-            visible = storyUrlLoading,
-            enter = EnterTransition.None,
-            exit = fadeOut()
-        ) {
+    Box {
+        // Only show shimmer if we are loading preview for an url
+        if (storyUrl != null && webPreviewState is WebPreviewState.Loading) {
             Spacer(modifier = Modifier.height(8.dp))
 
             Column {
                 Row(modifier = Modifier.padding(top = 1.dp)) {
                     Text(
-                        text = storyUrl!!.urlSiteName(),
+                        text = storyUrl.urlSiteName(),
                         style = MaterialTheme.typography.labelLarge,
                         modifier = Modifier
                             // Shorter spacer
@@ -206,12 +191,7 @@ fun StoryFeedItemDescription(
                         .height(16.dp)
                 )
             }
-        }
-        AnimatedVisibility(
-            visible = !storyUrlLoading,
-            enter = fadeIn(),
-            exit = ExitTransition.None
-        ) {
+        } else {
             val webPreview =
                 (webPreviewState as? WebPreviewState.Success)?.webPreview
 
@@ -227,8 +207,7 @@ fun StoryFeedItemDescription(
                     }
                     ?: webPreview?.description
 
-            val subtitle =
-                buildSubtitleString(siteName, description)
+            val subtitle = rememberStoryDescriptionAnnotatedString(siteName, description)
 
             if (subtitle.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(3.dp))

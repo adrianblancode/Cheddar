@@ -24,23 +24,35 @@ private fun CollapsingToolbar(
     scrollState: ScrollState,
     minHeight: Dp,
     maxHeight: Dp,
-    toolbarContent: @Composable (collapsedFraction: Float) -> Unit
+    toolbarContent: @Composable (collapsedFraction: () -> Float) -> Unit
 ) {
 
     val density = LocalDensity.current
     val totalCollapseDistance: Dp = maxHeight - minHeight
 
-    val collapsedFraction: Float by remember(scrollState, totalCollapseDistance, density) {
+    val collapsedFraction: Float by remember(density) {
         derivedStateOf {
-            // 1f is fully collapsed
-            with(density) {
-                minOf(scrollState.value.toDp() / totalCollapseDistance, 1f)
-            }
+                // 1f is fully collapsed
+                with(density) {
+                    minOf(scrollState.value.toDp() / totalCollapseDistance, 1f)
+                }
         }
     }
 
-    val height: Dp = minHeight + (maxHeight - minHeight) * (1f - collapsedFraction)
-    val elevation = lerp(0.dp, 0.5.dp, collapsedFraction)
+    val height: Dp by remember {
+        derivedStateOf {
+            minHeight + (maxHeight - minHeight) * (1f - collapsedFraction)
+        }
+    }
+    val elevation by remember {
+        derivedStateOf {
+            lerp(0.dp, 0.5.dp, collapsedFraction)
+        }
+    }
+
+    val collapsedFractionBlock = remember {
+        { collapsedFraction }
+    }
 
     Surface(
         color = MaterialTheme.colorScheme.scrim,
@@ -52,7 +64,7 @@ private fun CollapsingToolbar(
                 .statusBarsPadding()
                 .requiredHeight(height)
         ) {
-            toolbarContent(collapsedFraction)
+            toolbarContent(collapsedFractionBlock)
         }
     }
 }
@@ -63,7 +75,7 @@ fun CollapsingScaffold(
     scrollState: ScrollState,
     minHeight: Dp,
     maxHeight: Dp,
-    toolbarContent: @Composable (collapsedFraction: Float) -> Unit,
+    toolbarContent: @Composable (collapsedFraction: () -> Float) -> Unit,
     bodyContent: @Composable () -> Unit
 ) {
 

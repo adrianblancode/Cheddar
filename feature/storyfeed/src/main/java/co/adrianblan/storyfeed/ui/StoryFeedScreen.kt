@@ -15,14 +15,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,12 +49,11 @@ import co.adrianblan.ui.LoadingText
 import co.adrianblan.ui.LoadingVisual
 import co.adrianblan.ui.textSecondaryAlpha
 import kotlinx.collections.immutable.toImmutableList
-import kotlinx.coroutines.launch
 import kotlin.math.min
 import co.adrianblan.ui.R as UiR
 
-private const val toolbarMinHeightDp = 60
-private const val toolbarMaxHeightDp = 128
+private val toolbarMinHeight = 60.dp
+private val toolbarMaxHeight = 128.dp
 
 internal fun StoryType.titleStringResource(): Int =
     when (this) {
@@ -96,6 +93,19 @@ internal fun StoryFeedScreen(
     val localDensity = LocalDensity.current
     val scrollState = rememberScrollState()
 
+    val collapseDistance = with(localDensity) {
+        remember(localDensity) {
+            (toolbarMaxHeight - toolbarMinHeight).roundToPx()
+        }
+    }
+
+    // Scroll to top, but retain toolbar collapse state
+    val scrollReset: Int by remember {
+        derivedStateOf {
+            min(scrollState.value, collapseDistance)
+        }
+    }
+
     var lastStoryType: StoryType by remember { mutableStateOf(viewState.storyType) }
 
     // Scroll to top on story type change
@@ -105,20 +115,13 @@ internal fun StoryFeedScreen(
         if (lastStoryType == viewState.storyType) return@LaunchedEffect
         lastStoryType = viewState.storyType
 
-        val collapseDistance = (toolbarMaxHeightDp - toolbarMinHeightDp).dp
-
-        // Scroll to top, but retain toolbar collapse state
-        val scrollReset: Int = with(localDensity) {
-            min(scrollState.value, collapseDistance.roundToPx())
-        }
-
         scrollState.scrollTo(scrollReset)
     }
 
     CollapsingScaffold(
         scrollState = scrollState,
-        minHeight = toolbarMinHeightDp.dp,
-        maxHeight = toolbarMaxHeightDp.dp,
+        minHeight = toolbarMinHeight,
+        maxHeight = toolbarMaxHeight,
         toolbarContent = { collapseFraction ->
             StoryFeedToolbar(
                 collapsedFraction = collapseFraction,
@@ -176,7 +179,7 @@ private fun SuccessBody(
         400.dp.toPx()
     }
 
-    val isScrolledToEnd: Boolean by remember(scrollState.value, scrollState.maxValue) {
+    val isScrolledToEnd: Boolean by remember {
         derivedStateOf {
             scrollState.value > (scrollState.maxValue - scrollEndZone)
         }
@@ -194,7 +197,7 @@ private fun SuccessBody(
         Spacer(
             modifier = Modifier
                 .statusBarsPadding()
-                .height(toolbarMaxHeightDp.dp)
+                .height(toolbarMaxHeight)
         )
 
         storyFeedState.stories.forEach { story ->

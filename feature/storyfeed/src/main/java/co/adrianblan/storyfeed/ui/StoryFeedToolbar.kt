@@ -32,8 +32,8 @@ import co.adrianblan.ui.AppTheme
 
 @Composable
 fun StoryFeedToolbar(
-    collapsedFraction: Float,
     storyType: StoryType,
+    collapsedFraction: () -> Float,
     onStoryTypeClick: (StoryType) -> Unit
 ) {
 
@@ -51,19 +51,19 @@ fun StoryFeedToolbar(
 
             val typography = MaterialTheme.typography
 
-            val headerTextSize by remember(collapsedFraction) {
-                derivedStateOf {
+            val headerTextSize: () -> TextUnit = remember {
+                {
                     lerp(
                         typography.headlineLarge.fontSize,
                         typography.headlineSmall.fontSize,
-                        collapsedFraction
+                        collapsedFraction()
                     )
                 }
             }
 
             StoryFeedHeader(
-                headerTextSize = headerTextSize,
                 storyType = storyType,
+                headerTextSize = headerTextSize,
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
                 showStoryTypePopup = true
@@ -90,7 +90,7 @@ fun StoryFeedToolbar(
 private fun StoryFeedHeader(
     storyType: StoryType,
     modifier: Modifier = Modifier,
-    headerTextSize: TextUnit = MaterialTheme.typography.headlineLarge.fontSize,
+    headerTextSize: () -> TextUnit,
     onClick: () -> Unit
 ) {
 
@@ -113,7 +113,7 @@ private fun StoryFeedHeader(
                     text = title,
                     style = MaterialTheme.typography.displaySmall
                         .copy(
-                            fontSize = headerTextSize,
+                            fontSize = headerTextSize(),
                             color = MaterialTheme.colorScheme.onPrimary
                         )
                 )
@@ -121,7 +121,8 @@ private fun StoryFeedHeader(
                     imageVector = Icons.Default.ArrowDropDown,
                     tint = MaterialTheme.colorScheme.onPrimary,
                     contentDescription = null,
-                    modifier = Modifier.align(Alignment.CenterVertically)
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
                         .padding(vertical = 1.dp)
                 )
             }
@@ -135,8 +136,8 @@ private fun StoryFeedToolbarPreview() {
     AppTheme {
         Box(modifier = Modifier.height(300.dp)) {
             StoryFeedToolbar(
-                collapsedFraction = 1f,
                 storyType = StoryType.TOP,
+                collapsedFraction = { 1f },
                 onStoryTypeClick = {}
             )
         }
