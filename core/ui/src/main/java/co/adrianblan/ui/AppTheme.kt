@@ -2,6 +2,7 @@ package co.adrianblan.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
@@ -11,7 +12,7 @@ val LightColorScheme = lightColorScheme(
     primary = Color.White,
     onPrimary = Color.Black,
     inversePrimary = Color.Black,
-    primaryContainer = Light80,
+    primaryContainer = Light90,
     onPrimaryContainer = Color.White,
     secondary = Orange,
     onSecondary = Color.White,
@@ -27,13 +28,13 @@ val LightColorScheme = lightColorScheme(
     onErrorContainer = Color.White,
     background = Color.White,
     onBackground = Color.Black,
-    surface = Color.White,
-    onSurface = Color.Black,
+    surface = Light90,
+    onSurface = Light70,
     surfaceVariant = Light80,
-    onSurfaceVariant = Color.Black,
-    inverseSurface = Dark80,
+    onSurfaceVariant = Light90,
+    inverseSurface = Dark10,
     inverseOnSurface = Color.White,
-    outline = Light70,
+    outline = Light90,
     scrim = Color.White.copy(alpha = 0.8f)
 )
 
@@ -41,7 +42,7 @@ val DarkColorScheme = darkColorScheme(
     primary = Color.Black,
     onPrimary = Color.White,
     inversePrimary = Color.White,
-    primaryContainer = Dark80,
+    primaryContainer = Dark10,
     onPrimaryContainer = Color.Black,
     secondary = DarkOrange,
     onSecondary = Color.Black,
@@ -57,13 +58,13 @@ val DarkColorScheme = darkColorScheme(
     onErrorContainer = Color.Black,
     background = Color.Black,
     onBackground = Color.White,
-    surface = Color.Black,
-    onSurface = Color.White,
-    surfaceVariant = Dark80,
-    onSurfaceVariant = Color.White,
-    inverseSurface = Light80,
+    surface = Dark30,
+    onSurface = Dark10,
+    surfaceVariant = Dark20,
+    onSurfaceVariant = Dark30,
+    inverseSurface = Light90,
     inverseOnSurface = Color.Black,
-    outline = Dark70,
+    outline = Dark10,
     scrim = Color.Black.copy(alpha = 0.8f)
 )
 
@@ -72,35 +73,11 @@ fun AppTheme(
     isSystemInDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-
-    /*
-    val colors =
-        if (isSystemInDarkTheme) {
-            darkColors(
-                primary = colorResource(R.color.colorPrimary),
-                primaryVariant = colorResource(R.color.colorPrimary),
-                secondary = colorResource(R.color.colorAccent),
-                onPrimary = Color.White,
-                onSecondary = Color.White,
-                background = colorResource(R.color.colorBackground),
-                surface = colorResource(R.color.colorBackground),
-            )
-        } else {
-            lightColors(
-                primary = colorResource(R.color.colorPrimary),
-                primaryVariant = colorResource(R.color.colorPrimary),
-                secondary = colorResource(R.color.colorAccent),
-                secondaryVariant = colorResource(R.color.colorAccent),
-                onPrimary = Color.Black,
-                background = colorResource(R.color.colorBackground),
-                surface = colorResource(R.color.colorBackground),
-            )
-        }
-    */
-
     val colorScheme =
         if (isSystemInDarkTheme) DarkColorScheme
         else LightColorScheme
 
-    MaterialTheme(colorScheme = colorScheme, typography = themeTypography, content = content)
+    MaterialTheme(colorScheme = colorScheme, typography = themeTypography) {
+        Surface(color = colorScheme.background, content = content)
+    }
 }

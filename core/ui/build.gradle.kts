@@ -9,9 +9,8 @@ android {
 
 dependencies {
     implementation(project(":core:model"))
-    api(libs.androidx.appcompat)
-    api(libs.androidx.core)
     api(libs.androidx.activity)
+    api(libs.androidx.core)
     api(libs.androidx.lifecycle.viewmodel)
     api(libs.androidx.lifecycle.compose)
 

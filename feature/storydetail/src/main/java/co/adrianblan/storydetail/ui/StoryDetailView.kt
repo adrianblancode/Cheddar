@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -34,7 +33,6 @@ import co.adrianblan.storydetail.StoryDetailViewState
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.CollapsingScaffold
 import co.adrianblan.ui.ErrorView
-import co.adrianblan.ui.LoadingText
 import co.adrianblan.ui.LoadingVisual
 
 private const val toolbarMinHeightDp = 56
@@ -85,6 +83,7 @@ fun StoryDetailView(
                 is StoryDetailViewState.Success -> CommentsSuccessBody(
                     viewState, scrollState, onCommentUrlClick
                 )
+
                 is StoryDetailViewState.Loading -> LoadingVisual(modifier = Modifier.fillMaxSize())
                 is StoryDetailViewState.Error -> ErrorView(modifier = Modifier.fillMaxSize())
             }
@@ -148,18 +147,16 @@ private fun CommentsSuccessBody(
 @Composable
 fun CommentsEmptyView() {
     AppTheme {
-        Surface {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(32.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = stringResource(id = R.string.comments_empty),
-                    style = MaterialTheme.typography.titleMedium.copy(textAlign = TextAlign.Center)
-                )
-            }
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(32.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(id = R.string.comments_empty),
+                style = MaterialTheme.typography.titleMedium.copy(textAlign = TextAlign.Center)
+            )
         }
     }
 }

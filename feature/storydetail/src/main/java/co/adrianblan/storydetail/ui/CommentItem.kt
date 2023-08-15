@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -23,7 +22,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -61,13 +59,12 @@ fun CommentItem(
     onCommentUrlClick: (Uri) -> Unit
 ) {
 
+    val colors = MaterialTheme.colorScheme
     val depthIndicatorWidth = 10.dp
 
     val strokeWidthPx = with(LocalDensity.current) {
         1.dp.toPx()
     }
-
-    val depthIndicatorColor = colorResource(id = co.adrianblan.ui.R.color.divider)
 
     Box(
         modifier = Modifier
@@ -89,7 +86,7 @@ fun CommentItem(
                     drawLine(
                         start = o1,
                         end = o2,
-                        color = depthIndicatorColor,
+                        color = colors.outline,
                         strokeWidth = strokeWidthPx,
                         cap = StrokeCap.Round
                     )
@@ -163,16 +160,14 @@ fun CommentItem(
 @Preview
 @Composable
 fun CommentItemPreview() {
-    AppTheme(false) {
-        Surface {
-            CommentItem(
-                text = "<p>Test title<p>Test also title",
-                by = "Test source",
-                depthIndex = 3,
-                storyAuthor = "Test author",
-                onCommentUrlClick = {}
-            )
-        }
+    AppTheme(true) {
+        CommentItem(
+            text = "<p>Test title<p>Test also title",
+            by = "Test source",
+            depthIndex = 3,
+            storyAuthor = "Test author",
+            onCommentUrlClick = {}
+        )
     }
 }
 

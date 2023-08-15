@@ -1,5 +1,6 @@
 package co.adrianblan.hackernews
 
+import android.util.LruCache
 import co.adrianblan.common.AsyncResource
 import co.adrianblan.common.WeakCache
 import co.adrianblan.model.*
@@ -23,8 +24,8 @@ class HackerNewsRepositoryImpl
 @Inject constructor(
     private val hackerNewsApiService: HackerNewsApiService
 ) : HackerNewsRepository {
-    private val storyIdsCache = WeakCache<StoryType, List<StoryId>>()
-    private val storyCache = WeakCache<StoryId, Story>()
+    private val storyIdsCache = LruCache<StoryType, List<StoryId>>(1)
+    private val storyCache = LruCache<StoryId, Story>(200)
     private val commentCache = WeakCache<CommentId, Comment>()
 
     override suspend fun fetchStory(storyId: StoryId): Story =

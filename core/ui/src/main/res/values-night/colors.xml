@@ -1,13 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#111</color>
-    <color name="colorPrimaryDark">#111</color>
-    <color name="colorAccent">#FF5555</color>
-
     <color name="colorBackground">#000</color>
-
-    <color name="divider">#333</color>
-    <color name="contentMuted">#333</color>
-    <color name="contentMutedSecondary">#1a1a1a</color>
-    <color name="contentShimmer">#454545</color>
 </resources>

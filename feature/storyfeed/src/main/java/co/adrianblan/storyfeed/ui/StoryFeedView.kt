@@ -263,7 +263,7 @@ private fun NoMoreStoriesView() {
                     color = MaterialTheme.colorScheme.onPrimary.copy(alpha = textSecondaryAlpha),
                     textAlign = TextAlign.Center
                 ),
-            )
+        )
     }
 }
 
@@ -298,9 +298,7 @@ private fun StoryFeedPreview() {
 @Composable
 private fun LoadingMoreStoriesPreview() {
     AppTheme {
-        Surface {
-            LoadingMoreStoriesView()
-        }
+        LoadingMoreStoriesView()
     }
 }
 
@@ -308,8 +306,6 @@ private fun LoadingMoreStoriesPreview() {
 @Composable
 private fun NoMoreStoriesPreview() {
     AppTheme {
-        Surface {
-            NoMoreStoriesView()
-        }
+        NoMoreStoriesView()
     }
 }

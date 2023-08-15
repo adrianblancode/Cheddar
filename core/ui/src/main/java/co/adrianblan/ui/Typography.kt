@@ -112,28 +112,26 @@ val themeTypography: Typography =
 @Composable
 fun TypographyPreview() {
     AppTheme {
-        Surface {
-            Column {
-                Text(text = "Display Large", style = MaterialTheme.typography.displayLarge)
-                Text(text = "Display Medium", style = MaterialTheme.typography.displayMedium)
-                Text(text = "Display Small", style = MaterialTheme.typography.displaySmall)
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "Headline Large", style = MaterialTheme.typography.headlineLarge)
-                Text(text = "Headline Medium", style = MaterialTheme.typography.headlineMedium)
-                Text(text = "Headline Small", style = MaterialTheme.typography.headlineSmall)
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "Title Large", style = MaterialTheme.typography.titleLarge)
-                Text(text = "Title Medium", style = MaterialTheme.typography.titleMedium)
-                Text(text = "Title Small", style = MaterialTheme.typography.titleSmall)
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "Body Large", style = MaterialTheme.typography.bodyLarge)
-                Text(text = "Body Medium", style = MaterialTheme.typography.bodyMedium)
-                Text(text = "Body Small", style = MaterialTheme.typography.bodySmall)
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(text = "Label Large", style = MaterialTheme.typography.labelLarge)
-                Text(text = "Label Medium", style = MaterialTheme.typography.labelMedium)
-                Text(text = "Label Small", style = MaterialTheme.typography.labelSmall)
-            }
+        Column {
+            Text(text = "Display Large", style = MaterialTheme.typography.displayLarge)
+            Text(text = "Display Medium", style = MaterialTheme.typography.displayMedium)
+            Text(text = "Display Small", style = MaterialTheme.typography.displaySmall)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Headline Large", style = MaterialTheme.typography.headlineLarge)
+            Text(text = "Headline Medium", style = MaterialTheme.typography.headlineMedium)
+            Text(text = "Headline Small", style = MaterialTheme.typography.headlineSmall)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Title Large", style = MaterialTheme.typography.titleLarge)
+            Text(text = "Title Medium", style = MaterialTheme.typography.titleMedium)
+            Text(text = "Title Small", style = MaterialTheme.typography.titleSmall)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Body Large", style = MaterialTheme.typography.bodyLarge)
+            Text(text = "Body Medium", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Body Small", style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(text = "Label Large", style = MaterialTheme.typography.labelLarge)
+            Text(text = "Label Medium", style = MaterialTheme.typography.labelMedium)
+            Text(text = "Label Small", style = MaterialTheme.typography.labelSmall)
         }
     }
 }

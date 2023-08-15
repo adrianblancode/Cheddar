@@ -19,6 +19,7 @@ class CustomTabsLauncherImpl
 ) : CustomTabsLauncher {
     override fun launchUrl(url: String) {
         CustomTabsIntent.Builder()
+            .setShowTitle(true)
             .build()
             .apply {
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK

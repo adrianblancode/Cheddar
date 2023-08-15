@@ -4,7 +4,6 @@ import androidx.compose.animation.core.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -73,7 +72,8 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
 
     val dotColor = MaterialTheme.colorScheme.onBackground
 
-    val animationSpec = infiniteRepeatable(tween<Float>(durationMillis = 1200, easing = LinearEasing))
+    val animationSpec =
+        infiniteRepeatable(tween<Float>(durationMillis = 1200, easing = LinearEasing))
 
     val progress: Float by rememberInfiniteTransition("ellipsis")
         .animateFloat(initialValue = 0f, targetValue = 1f, animationSpec = animationSpec)
@@ -137,9 +137,7 @@ private fun AnimatedEllipsisView(fontSize: TextUnit) {
 @Composable
 private fun LoadingTextPreview() {
     AppTheme {
-        Surface {
-            LoadingText()
-        }
+        LoadingText()
     }
 }
 
@@ -147,8 +145,6 @@ private fun LoadingTextPreview() {
 @Composable
 private fun LoadingVisualPreview() {
     AppTheme {
-        Surface {
-            LoadingVisual()
-        }
+        LoadingVisual()
     }
 }

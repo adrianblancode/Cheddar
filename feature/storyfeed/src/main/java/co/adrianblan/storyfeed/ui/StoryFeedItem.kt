@@ -12,10 +12,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -26,6 +26,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -67,42 +68,35 @@ fun StoryFeedItem(
     }
 
     Row {
-        Surface(
-            shape = RoundedCornerShape(3.dp),
+
+        // If there is a story image, we must share the space
+        val rightPadding: Dp =
+            if (story.url != null) 10.dp
+            else 16.dp
+
+        Box(
             modifier = Modifier
+                .graphicsLayer(shape = RoundedCornerShape(4.dp), clip = true)
                 .weight(1f)
-                .fillMaxWidth()
                 .heightIn(min = 110.dp)
+                .clickable(onClick = storyClick)
+                .padding(
+                    start = 16.dp,
+                    end = rightPadding,
+                    top = 16.dp,
+                    bottom = 12.dp
+                )
         ) {
 
-            // If there is a story image, we must share the space
-            val rightPadding: Dp =
-                if (story.url != null) 10.dp
-                else 16.dp
-
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(onClick = storyClick)
-                    .padding(
-                        start = 16.dp,
-                        end = rightPadding,
-                        top = 16.dp,
-                        bottom = 12.dp
-                    )
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = story.title,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    StoryFeedItemDescription(
-                        story = story,
-                        webPreviewState = webPreviewState
-                    )
-                }
+            Column {
+                Text(
+                    text = story.title,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                StoryFeedItemDescription(
+                    story = story,
+                    webPreviewState = webPreviewState
+                )
             }
         }
 
@@ -255,16 +249,14 @@ fun StoryFeedItemDescription(
 @Composable
 fun StoryFeedItemPostPreview() {
     AppTheme {
-        Surface {
-            StoryFeedItem(
-                decoratedStory = DecoratedStory(
-                    story = Story.placeholderPost,
-                    webPreviewState = WebPreviewState.Loading
-                ),
-                onStoryClick = {},
-                onStoryContentClick = {}
-            )
-        }
+        StoryFeedItem(
+            decoratedStory = DecoratedStory(
+                story = Story.placeholderPost,
+                webPreviewState = WebPreviewState.Loading
+            ),
+            onStoryClick = {},
+            onStoryContentClick = {}
+        )
     }
 }
 
@@ -272,16 +264,14 @@ fun StoryFeedItemPostPreview() {
 @Composable
 fun StoryFeedItemLinkPreview() {
     AppTheme {
-        Surface {
-            StoryFeedItem(
-                decoratedStory = DecoratedStory(
-                    story = Story.placeholderLink,
-                    webPreviewState = WebPreviewState.Success(WebPreviewData.placeholder)
-                ),
-                onStoryClick = {},
-                onStoryContentClick = {}
-            )
-        }
+        StoryFeedItem(
+            decoratedStory = DecoratedStory(
+                story = Story.placeholderLink,
+                webPreviewState = WebPreviewState.Success(WebPreviewData.placeholder)
+            ),
+            onStoryClick = {},
+            onStoryContentClick = {}
+        )
     }
 }
 
@@ -289,15 +279,13 @@ fun StoryFeedItemLinkPreview() {
 @Composable
 fun StoryFeedItemLoadingPreview() {
     AppTheme {
-        Surface {
-            StoryFeedItem(
-                decoratedStory = DecoratedStory(
-                    story = Story.placeholderLink,
-                    webPreviewState = WebPreviewState.Loading
-                ),
-                onStoryClick = {},
-                onStoryContentClick = {}
-            )
-        }
+        StoryFeedItem(
+            decoratedStory = DecoratedStory(
+                story = Story.placeholderLink,
+                webPreviewState = WebPreviewState.Loading
+            ),
+            onStoryClick = {},
+            onStoryContentClick = {}
+        )
     }
 }

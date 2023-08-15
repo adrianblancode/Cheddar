@@ -7,21 +7,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import co.adrianblan.model.WebPreviewState
-import co.adrianblan.ui.coil.IcoDecoder
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
-import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import coil.size.Size
 import coil.transform.Transformation
@@ -38,9 +37,9 @@ fun StoryImage(
 ) {
 
     Surface(
-        color = colorResource(R.color.contentMuted),
-        shape = RoundedCornerShape(8.dp),
+        color = MaterialTheme.colorScheme.surface,
         modifier = modifier
+            .graphicsLayer(shape = RoundedCornerShape(4.dp), clip = true)
             .clickable(onClick = onClick)
     ) {
 
@@ -163,11 +162,11 @@ private class PixelatedTransformation(
 @Composable
 private fun StoryImagePreview() {
     AppTheme {
-        Surface {
-            val webPreviewState = WebPreviewState.Loading
-            StoryImage(webPreviewState, modifier = Modifier
+        StoryImage(
+            WebPreviewState.Loading,
+            modifier = Modifier
                 .padding(12.dp)
-                .size(120.dp)) {}
-        }
+                .size(120.dp)
+        ) {}
     }
 }

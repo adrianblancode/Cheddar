@@ -132,7 +132,11 @@ private fun SuccessToolbar(
                         chainStyle = ChainStyle.Packed(0.5f)
                     )
                     createHorizontalChain(
-                        titleRef.withChainParams(startMargin = 16.dp, endMargin = 16.dp, endGoneMargin = 16.dp),
+                        titleRef.withChainParams(
+                            startMargin = 16.dp,
+                            endMargin = 16.dp,
+                            endGoneMargin = 16.dp
+                        ),
                         imageRef.withChainParams(endMargin = 8.dp),
                         chainStyle = ChainStyle.SpreadInside
                     )
@@ -223,9 +227,7 @@ private fun SuccessToolbar(
 @Composable
 private fun LoadingToolbarPreview() {
     AppTheme {
-        Surface {
-            LoadingToolbar()
-        }
+        LoadingToolbar()
     }
 }
 
@@ -233,7 +235,7 @@ private fun LoadingToolbarPreview() {
 @Composable
 fun SuccessToolbarExpandedPreview() {
     AppTheme {
-        Surface(modifier = Modifier.height(140.dp)) {
+        Box(modifier = Modifier.height(140.dp)) {
             SuccessToolbar(
                 story = Story.placeholderLink,
                 webPreviewState = WebPreviewState.Success(WebPreviewData.placeholder),
@@ -248,7 +250,7 @@ fun SuccessToolbarExpandedPreview() {
 @Composable
 fun SuccessToolbarCollapsedPreview() {
     AppTheme {
-        Surface(modifier = Modifier.height(56.dp)) {
+        Box(modifier = Modifier.height(56.dp)) {
             SuccessToolbar(
                 story = Story.placeholderLink,
                 webPreviewState = WebPreviewState.Success(WebPreviewData.placeholder),
@@ -263,7 +265,7 @@ fun SuccessToolbarCollapsedPreview() {
 @Composable
 fun SuccessToolbarCollapsedPostPreview() {
     AppTheme {
-        Surface(modifier = Modifier.height(56.dp)) {
+        Box(modifier = Modifier.height(56.dp)) {
             SuccessToolbar(
                 story = Story.placeholderPost,
                 webPreviewState = null,
