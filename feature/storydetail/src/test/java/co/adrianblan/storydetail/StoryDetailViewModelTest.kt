@@ -49,7 +49,7 @@ class StoryDetailViewModelTest {
         hackerNewsRepository: HackerNewsRepository = FakeHackerNewsRepository(responseDelay = 1.seconds)
     ) {
         storyDetailViewModel = StoryDetailViewModel(
-            storyId = StoryId(1),
+            StoryDetailArgs(StoryId(1)).toSavedStateHandle(),
             dispatcherProvider = coroutineRule.testDispatcherProvider,
             hackerNewsRepository = hackerNewsRepository,
             storyPreviewUseCase = TestStoryPreviewUseCase

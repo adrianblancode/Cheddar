@@ -131,7 +131,7 @@ private fun StoryFeedHeader(
 
 @Preview
 @Composable
-fun StoryFeedToolbarPreview() {
+private fun StoryFeedToolbarPreview() {
     AppTheme {
         Box(modifier = Modifier.height(300.dp)) {
             StoryFeedToolbar(

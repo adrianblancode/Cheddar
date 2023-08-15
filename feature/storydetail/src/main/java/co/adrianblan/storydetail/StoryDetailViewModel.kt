@@ -39,20 +39,8 @@ class StoryDetailViewModel
     private val dispatcherProvider: DispatcherProvider
 ) : ViewModel() {
 
-    @VisibleForTesting
-    internal constructor(
-        storyId: StoryId,
-        hackerNewsRepository: HackerNewsRepository,
-        storyPreviewUseCase: StoryPreviewUseCase,
-        dispatcherProvider: DispatcherProvider
-    ) : this(
-        SavedStateHandle(mapOf("storyId" to storyId.id)),
-        hackerNewsRepository,
-        storyPreviewUseCase,
-        dispatcherProvider
-    )
-
-    private val storyId: StoryId = StoryId(savedStateHandle.get<Long>("storyId")!!)
+    private val storyDetailArgs = StoryDetailArgs(savedStateHandle)
+    private val storyId: StoryId = storyDetailArgs.storyId
 
     val viewState: StateFlow<StoryDetailViewState> =
         combine<DecoratedStory, StoryDetailCommentsState, StoryDetailViewState>(

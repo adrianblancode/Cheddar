@@ -39,15 +39,15 @@ private const val toolbarMinHeightDp = 56
 private const val toolbarMaxHeightDp = 156
 
 @Composable
-fun StoryDetailViewWrapper(
-    viewModel: StoryDetailViewModel = hiltViewModel(),
+internal fun StoryDetailRoute(
     onStoryContentClick: (StoryUrl) -> Unit,
     onCommentUrlClick: (Uri) -> Unit,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    viewModel: StoryDetailViewModel = hiltViewModel(),
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
 
-    StoryDetailView(
+    StoryDetailScreen(
         viewState = viewState,
         onStoryContentClick = onStoryContentClick,
         onCommentUrlClick = onCommentUrlClick,
@@ -56,7 +56,7 @@ fun StoryDetailViewWrapper(
 }
 
 @Composable
-fun StoryDetailView(
+internal fun StoryDetailScreen(
     viewState: StoryDetailViewState,
     onStoryContentClick: (StoryUrl) -> Unit,
     onCommentUrlClick: (Uri) -> Unit,
@@ -145,7 +145,7 @@ private fun CommentsSuccessBody(
 
 @Preview
 @Composable
-fun CommentsEmptyView() {
+private fun CommentsEmptyView() {
     AppTheme {
         Box(
             modifier = Modifier

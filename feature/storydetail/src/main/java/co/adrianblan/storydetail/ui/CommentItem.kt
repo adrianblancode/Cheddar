@@ -159,7 +159,7 @@ fun CommentItem(
 
 @Preview
 @Composable
-fun CommentItemPreview() {
+private fun CommentItemPreview() {
     AppTheme(true) {
         CommentItem(
             text = "<p>Test title<p>Test also title",

@@ -247,7 +247,7 @@ fun StoryFeedItemDescription(
 
 @Preview
 @Composable
-fun StoryFeedItemPostPreview() {
+private fun StoryFeedItemPostPreview() {
     AppTheme {
         StoryFeedItem(
             decoratedStory = DecoratedStory(
@@ -262,7 +262,7 @@ fun StoryFeedItemPostPreview() {
 
 @Preview
 @Composable
-fun StoryFeedItemLinkPreview() {
+private fun StoryFeedItemLinkPreview() {
     AppTheme {
         StoryFeedItem(
             decoratedStory = DecoratedStory(
@@ -277,7 +277,7 @@ fun StoryFeedItemLinkPreview() {
 
 @Preview
 @Composable
-fun StoryFeedItemLoadingPreview() {
+private fun StoryFeedItemLoadingPreview() {
     AppTheme {
         StoryFeedItem(
             decoratedStory = DecoratedStory(

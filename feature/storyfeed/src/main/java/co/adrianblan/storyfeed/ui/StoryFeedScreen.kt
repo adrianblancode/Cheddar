@@ -10,11 +10,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -74,13 +72,13 @@ internal fun StoryType.titleStringResource(): Int =
 private var initialScrollPosition = 0
 
 @Composable
-fun StoryFeedViewWrapper(
-    viewModel: StoryFeedViewModel = hiltViewModel(),
+internal fun StoryFeedRoute(
     onStoryClick: (StoryId) -> Unit,
-    onStoryContentClick: (StoryUrl) -> Unit
+    onStoryContentClick: (StoryUrl) -> Unit,
+    viewModel: StoryFeedViewModel = hiltViewModel(),
 ) {
     val viewState by viewModel.viewState.collectAsStateWithLifecycle()
-    StoryFeedView(
+    StoryFeedScreen(
         viewState,
         onStoryTypeClick = { storyType -> viewModel.onStoryTypeChanged(storyType) },
         onStoryClick = onStoryClick,
@@ -90,7 +88,7 @@ fun StoryFeedViewWrapper(
 }
 
 @Composable
-fun StoryFeedView(
+internal fun StoryFeedScreen(
     viewState: StoryFeedViewState,
     onStoryTypeClick: (StoryType) -> Unit,
     onStoryClick: (StoryId) -> Unit,
@@ -284,7 +282,7 @@ private fun StoryFeedPreview() {
             )
         )
 
-        StoryFeedView(
+        StoryFeedScreen(
             viewState,
             onStoryTypeClick = {},
             onStoryClick = {},

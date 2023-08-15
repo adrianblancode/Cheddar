@@ -233,7 +233,7 @@ private fun LoadingToolbarPreview() {
 
 @Preview("Toolbar expanded")
 @Composable
-fun SuccessToolbarExpandedPreview() {
+private fun SuccessToolbarExpandedPreview() {
     AppTheme {
         Box(modifier = Modifier.height(140.dp)) {
             SuccessToolbar(
@@ -248,7 +248,7 @@ fun SuccessToolbarExpandedPreview() {
 
 @Preview("Toolbar collapsed")
 @Composable
-fun SuccessToolbarCollapsedPreview() {
+private fun SuccessToolbarCollapsedPreview() {
     AppTheme {
         Box(modifier = Modifier.height(56.dp)) {
             SuccessToolbar(
@@ -263,7 +263,7 @@ fun SuccessToolbarCollapsedPreview() {
 
 @Preview("Toolbar collapsed")
 @Composable
-fun SuccessToolbarCollapsedPostPreview() {
+private fun SuccessToolbarCollapsedPostPreview() {
     AppTheme {
         Box(modifier = Modifier.height(56.dp)) {
             SuccessToolbar(

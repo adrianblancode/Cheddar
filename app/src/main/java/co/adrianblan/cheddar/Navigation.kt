@@ -1,14 +1,13 @@
 package co.adrianblan.cheddar
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import co.adrianblan.domain.CustomTabsLauncher
-import co.adrianblan.storydetail.ui.StoryDetailViewWrapper
-import co.adrianblan.storyfeed.ui.StoryFeedViewWrapper
+import co.adrianblan.storydetail.navigateToTopic
+import co.adrianblan.storydetail.storyDetailScreen
+import co.adrianblan.storyfeed.storyFeedRoute
+import co.adrianblan.storyfeed.storyFeedScreen
 
 @Composable
 fun Navigation(
@@ -17,31 +16,23 @@ fun Navigation(
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = "stories"
+        startDestination = storyFeedRoute
     ) {
-        composable("stories") {
-            StoryFeedViewWrapper(
-                onStoryClick = { storyId ->
-                    navController.navigate("story/${storyId.id}")
-                },
-                onStoryContentClick = { storyUrl ->
-                    customTabsLauncher.launchUrl(storyUrl.url)
-                }
-            )
-        }
-        composable(
-            "story/{storyId}",
-            arguments = listOf(navArgument("storyId") { type = NavType.LongType })
-        ) {
-            StoryDetailViewWrapper(
-                onStoryContentClick = { storyUrl ->
-                    customTabsLauncher.launchUrl(storyUrl.url)
-                },
-                onCommentUrlClick = { url ->
-                    customTabsLauncher.launchUrl(url.toString())
-                },
-                onBackPressed = { navController.popBackStack() }
-            )
-        }
+
+        storyFeedScreen(
+            onStoryClick = navController::navigateToTopic,
+            onStoryContentClick = { storyUrl ->
+                customTabsLauncher.launchUrl(storyUrl.url)
+            }
+        )
+        storyDetailScreen(
+            onStoryContentClick = { storyUrl ->
+                customTabsLauncher.launchUrl(storyUrl.url)
+            },
+            onCommentUrlClick = { uri ->
+                customTabsLauncher.launchUrl(uri.toString())
+            },
+            onBackPressed = navController::popBackStack
+        )
     }
 }

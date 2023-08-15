@@ -110,7 +110,7 @@ val themeTypography: Typography =
 
 @Preview
 @Composable
-fun TypographyPreview() {
+private fun TypographyPreview() {
     AppTheme {
         Column {
             Text(text = "Display Large", style = MaterialTheme.typography.displayLarge)
