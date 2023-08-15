@@ -68,9 +68,6 @@ internal fun StoryType.titleStringResource(): Int =
         StoryType.JOB -> UiR.string.stories_job_title
     }
 
-// TODO fixme
-private var initialScrollPosition = 0
-
 @Composable
 internal fun StoryFeedRoute(
     onStoryClick: (StoryId) -> Unit,
@@ -96,31 +93,26 @@ internal fun StoryFeedScreen(
     onPageEndReached: () -> Unit
 ) {
 
-    val scrollState = rememberScrollState(initialScrollPosition)
     val localDensity = LocalDensity.current
+    val scrollState = rememberScrollState()
 
-    // Prevent resetting scroll state on first commit
-    var lastStoryType by remember { mutableStateOf(viewState.storyType) }
+    var lastStoryType: StoryType by remember { mutableStateOf(viewState.storyType) }
 
-    val scope = rememberCoroutineScope()
+    // Scroll to top on story type change
+    LaunchedEffect(viewState.storyType) {
 
-    DisposableEffect(viewState.storyType) {
-
-        if (viewState.storyType == lastStoryType) return@DisposableEffect onDispose {}
+        // If navigating back, skip
+        if (lastStoryType == viewState.storyType) return@LaunchedEffect
+        lastStoryType = viewState.storyType
 
         val collapseDistance = (toolbarMaxHeightDp - toolbarMinHeightDp).dp
 
-        // If story type is changed, reset scroll but retain toolbar collapse state
-        val scrollReset: Int =
-            with(localDensity) {
-                min(scrollState.value, collapseDistance.roundToPx())
-            }
+        // Scroll to top, but retain toolbar collapse state
+        val scrollReset: Int = with(localDensity) {
+            min(scrollState.value, collapseDistance.roundToPx())
+        }
 
-        scope.launch { scrollState.scrollTo(scrollReset) }
-
-        lastStoryType = viewState.storyType
-
-        onDispose { initialScrollPosition = scrollState.value }
+        scrollState.scrollTo(scrollReset)
     }
 
     CollapsingScaffold(
@@ -196,7 +188,7 @@ private fun SuccessBody(
         }
     }
 
-    // TODO change to LazyColumn
+    // TODO change to LazyColumn once scroll state is fixed
     Column(modifier = Modifier.verticalScroll(scrollState)) {
 
         Spacer(

@@ -101,6 +101,7 @@ private fun CommentsSuccessBody(
 
     when (viewState.commentsState) {
         is StoryDetailCommentsState.Success ->
+            // TODO change to LazyColumn once scroll state is fixed
             Column(modifier = Modifier.verticalScroll(scrollState)) {
 
                 Spacer(
