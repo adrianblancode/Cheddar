@@ -18,9 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -109,49 +111,6 @@ fun StoryFeedItem(
     }
 }
 
-// Concatenates a subtitle string from the site name and description
-@Composable
-internal fun rememberStoryDescriptionAnnotatedString(
-    siteName: String?,
-    description: String?
-): AnnotatedString {
-
-    val typography = MaterialTheme.typography
-    val colors = MaterialTheme.colorScheme
-
-    val annotatedString = remember(siteName, description) {
-
-        val stringBuilder = AnnotatedString.Builder()
-
-        if (siteName != null) {
-            val emphStyle = typography.labelLarge
-
-            stringBuilder.pushStyle(
-                SpanStyle(
-                    fontWeight = emphStyle.fontWeight,
-                    fontFamily = emphStyle.fontFamily,
-                    fontStyle = emphStyle.fontStyle,
-                    fontSize = emphStyle.fontSize,
-                    color = colors.onPrimary
-                )
-            )
-
-            stringBuilder.append(siteName)
-            if (description != null) stringBuilder.append(" - ")
-
-            stringBuilder.pop()
-        }
-
-        if (description != null) {
-            stringBuilder.append(description)
-        }
-
-        stringBuilder.toAnnotatedString()
-    }
-
-    return annotatedString
-}
-
 @Composable
 fun StoryFeedItemDescription(
     story: Story,
@@ -210,7 +169,7 @@ fun StoryFeedItemDescription(
             val subtitle = rememberStoryDescriptionAnnotatedString(siteName, description)
 
             if (subtitle.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(3.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyMedium.copy(
@@ -222,6 +181,47 @@ fun StoryFeedItemDescription(
             }
         }
     }
+}
+
+
+// Concatenates a subtitle string from the site name and description
+@Composable
+internal fun rememberStoryDescriptionAnnotatedString(
+    siteName: String?,
+    description: String?,
+    emphTextStyle: TextStyle = MaterialTheme.typography.labelLarge,
+    emphTextColor: Color = MaterialTheme.colorScheme.onPrimary
+): AnnotatedString {
+
+    val annotatedString = remember(siteName, description) {
+
+        val stringBuilder = AnnotatedString.Builder()
+
+        if (siteName != null) {
+            stringBuilder.pushStyle(
+                SpanStyle(
+                    fontWeight = emphTextStyle.fontWeight,
+                    fontFamily = emphTextStyle.fontFamily,
+                    fontStyle = emphTextStyle.fontStyle,
+                    fontSize = emphTextStyle.fontSize,
+                    color = emphTextColor
+                )
+            )
+
+            stringBuilder.append(siteName)
+            if (description != null) stringBuilder.append(" - ")
+
+            stringBuilder.pop()
+        }
+
+        if (description != null) {
+            stringBuilder.append(description)
+        }
+
+        stringBuilder.toAnnotatedString()
+    }
+
+    return annotatedString
 }
 
 @Preview

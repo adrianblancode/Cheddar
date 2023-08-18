@@ -19,14 +19,14 @@ sealed class Result<T : Any?> {
         override val successData: T get() = data
     }
 
-    data class Error<T>(val exception: Throwable, override val lastData: T? = null) : Result<T>()
+    data class Error<T>(val t: Throwable, override val lastData: T? = null) : Result<T>()
 
     @SuppressWarnings("UNCHECKED_CAST")
     fun <R> map(mapper: (T) -> R): Result<R> {
         return when (this) {
             is Success -> Success(mapper(data))
             is Loading -> Loading(lastData?.let(mapper))
-            is Error -> Error(exception, lastData?.let(mapper))
+            is Error -> Error(t, lastData?.let(mapper))
         }
     }
 
@@ -34,7 +34,7 @@ sealed class Result<T : Any?> {
         return when (this) {
             is Success<*> -> "Success[data=$data"
             is Loading -> "Loading[lastData=$lastData]"
-            is Error -> "Error[exception=$exception, lastData=$lastData]"
+            is Error -> "Error[exception=$t, lastData=$lastData]"
         }
     }
 }

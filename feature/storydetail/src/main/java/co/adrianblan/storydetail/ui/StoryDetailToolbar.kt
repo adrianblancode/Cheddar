@@ -38,7 +38,6 @@ import co.adrianblan.storydetail.StoryDetailViewState
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.ShimmerView
 import co.adrianblan.ui.StoryImage
-import co.adrianblan.ui.textSecondaryAlpha
 import co.adrianblan.ui.utils.lerp
 import kotlin.math.roundToInt
 
@@ -118,7 +117,7 @@ private fun SuccessToolbar(
             defaultTransition(
                 from = constraintSet {
                     createVerticalChain(
-                        titleRef.withChainParams(topMargin = 56.dp),
+                        titleRef.withChainParams(topMargin = 56.dp, bottomMargin = 4.dp),
                         subtitleRef.withChainParams(bottomMargin = 8.dp),
                         chainStyle = ChainStyle.Packed(0.5f)
                     )
@@ -194,9 +193,7 @@ private fun SuccessToolbar(
         if (siteName != null) {
             Text(
                 text = siteName,
-                style = MaterialTheme.typography.labelLarge.copy(
-                    color = MaterialTheme.colorScheme.onPrimary.copy(alpha = textSecondaryAlpha)
-                ),
+                style = MaterialTheme.typography.labelLarge.copy(color = MaterialTheme.colorScheme.onPrimary),
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 modifier = Modifier.layoutId("subtitle")

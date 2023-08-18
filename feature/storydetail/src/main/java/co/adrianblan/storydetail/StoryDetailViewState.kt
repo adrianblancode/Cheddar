@@ -15,7 +15,7 @@ sealed class StoryDetailViewState {
     ) : StoryDetailViewState()
 
     object Loading : StoryDetailViewState()
-    data class Error(val throwable: Throwable) : StoryDetailViewState()
+    data class Error(val t: Throwable) : StoryDetailViewState()
 }
 
 // A comment in the comment tree that has been flattened into a list

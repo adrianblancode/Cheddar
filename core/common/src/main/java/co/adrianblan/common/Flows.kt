@@ -4,13 +4,11 @@ import kotlinx.coroutines.CancellationException
 import kotlin.Result
 
 
-fun <R> runCatchingCooperative(block: () -> R): Result<R> {
-    return try {
+suspend fun <R> suspendRunCatching(block: suspend () -> R): Result<R> =
+    try {
         Result.success(block())
-    } catch (t: Throwable) {
-        if (t is CancellationException) {
-            throw t
-        }
+    } catch (e: CancellationException) {
+        throw e
+    } catch (t: Exception) {
         Result.failure(t)
     }
-}

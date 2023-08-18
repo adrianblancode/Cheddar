@@ -29,5 +29,5 @@ val WebPreviewData.Companion.placeholder
 sealed class WebPreviewState {
     data class Success(val webPreview: WebPreviewData) : WebPreviewState()
     object Loading : WebPreviewState()
-    data class Error(val throwable: Throwable) : WebPreviewState()
+    data class Error(val t: Throwable) : WebPreviewState()
 }

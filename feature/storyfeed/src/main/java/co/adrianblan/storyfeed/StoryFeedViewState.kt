@@ -15,5 +15,5 @@ data class StoryFeedViewState(
 sealed class StoryFeedState {
     data class Success(val stories: ImmutableList<DecoratedStory>, val hasLoadedAllPages: Boolean) : StoryFeedState()
     object Loading : StoryFeedState()
-    data class Error(val throwable: Throwable) : StoryFeedState()
+    data class Error(val t: Throwable) : StoryFeedState()
 }
