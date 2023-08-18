@@ -12,8 +12,8 @@ android {
 
     defaultConfig {
         applicationId = "co.adrianblan.cheddar"
-        versionCode = 1
-        versionName = "0.1"
+        versionCode = 5
+        versionName = "2.0"
     }
 
     signingConfigs {
@@ -23,34 +23,19 @@ android {
             keyAlias = "debugkey"
             keyPassword = "debugkey"
         }
-        create("release") {
-            val propsFile = rootProject.file("keystore.properties")
-            if (propsFile.exists()) {
-                val props = Properties()
-                props.load(FileInputStream(propsFile))
-                storeFile = file(props.getProperty("storeFile"))
-                storePassword = props.getProperty("storePassword")
-                keyAlias = props.getProperty("keyAlias")
-                keyPassword = props.getProperty("keyPassword")
-            } else {
-                println("File keystore.properties not found.")
-            }
-        }
     }
 
     buildTypes {
         named("debug") {
-            signingConfig = signingConfigs.getByName("debug")
             applicationIdSuffix = ".debug"
-            isMinifyEnabled = false
+            signingConfig = signingConfigs.getByName("debug")
         }
         named("release") {
-            signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "../proguard-rules.pro"
+                "proguard-rules.pro"
             )
         }
     }
