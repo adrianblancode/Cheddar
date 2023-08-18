@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "co.adrianblan.cheddar"
-        versionCode = 5
+        versionCode = 7
         versionName = "2.0"
     }
 
