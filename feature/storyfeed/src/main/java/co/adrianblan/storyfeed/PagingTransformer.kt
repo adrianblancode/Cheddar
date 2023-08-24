@@ -5,16 +5,17 @@ import co.adrianblan.domain.DecoratedStory
 import co.adrianblan.model.StoryId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.drop
-import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.launch
 import kotlin.math.min
 
 typealias PageIndex = Int
-typealias KeyedPage = Pair<Int, List<DecoratedStory>>
+typealias PageStories = Pair<Int, List<DecoratedStory>>
 
 /**
  * Takes a source of page index to story ids,
@@ -27,12 +28,12 @@ internal fun StateFlow<PageIndex>.observePages(
 ): Flow<List<DecoratedStory>> {
     return transformPaginationChunks()
         .loadPageChunkContent { pageIndex ->
-        val pageStories: List<Flow<DecoratedStory>> =
-            pageStoryIdsSource(pageIndex)
-                .map { storyId -> storyFlowSource(storyId) }
+            val pageStories: List<Flow<DecoratedStory>> =
+                pageStoryIdsSource(pageIndex)
+                    .map { storyId -> storyFlowSource(storyId) }
 
-        combine(pageStories) { it.toList() }
-    }
+            combine(pageStories) { it.toList() }
+        }
 }
 
 /**
@@ -51,7 +52,7 @@ internal fun StateFlow<PageIndex>.transformPaginationChunks(): Flow<List<PageInd
 
         // StateFlow can skip values, so emit intermediate pages
         pageIndexFlow.collect { pageIndex ->
-            emit((numLoadedPages ..pageIndex).toList())
+            emit((numLoadedPages..pageIndex).toList())
             numLoadedPages = pageIndex + 1
         }
     }
@@ -60,28 +61,44 @@ internal fun StateFlow<PageIndex>.transformPaginationChunks(): Flow<List<PageInd
 private fun Flow<List<PageIndex>>.loadPageChunkContent(
     pageFlowSource: (PageIndex) -> Flow<List<DecoratedStory>>
 ): Flow<List<DecoratedStory>> {
-    return flatMapConcat { pageIndexes: List<PageIndex> ->
+    val pageChunkFlow = this
 
-        // List of flows for each page
-        val keyedPageFlows: List<Flow<KeyedPage>> =
-            pageIndexes.map { pageIndex ->
-                pageFlowSource(pageIndex)
-                    .map { pageStories ->
-                        pageIndex to pageStories
+    val unmergedPagesFlow: Flow<Pair<PageIndex, List<DecoratedStory>>> = channelFlow {
+        val channelScope = this
+        pageChunkFlow.collect { pagesInChunk: List<Int> ->
+            // For each page chunk, launch a new coroutine to collect the content
+            // This is so that we immediately start loading new chunks,
+            // without having to wait for previous ones to finish
+            launch {
+
+                // Flow of stories with key to their page
+                val storiesInChunkFlow: List<Flow<PageStories>> =
+                    pagesInChunk.map { pageIndex ->
+                        pageFlowSource(pageIndex)
+                            .map { pageStories ->
+                                pageIndex to pageStories
+                            }
+                    }
+
+                // Combine loading of all pages
+                combine(storiesInChunkFlow) { arr ->
+                    arr.toMap()
+                        .toSortedMap()
+                        .values
+                        .flatten()
+                }
+                    .map { stories: List<DecoratedStory> ->
+                        // Key the stories to the first page in the chunk, to allow for merging different chunks
+                        pagesInChunk.first() to stories
+                    }
+                    .collect {
+                        channelScope.trySend(it)
                     }
             }
-
-        // Merge the list of flows into one chunk
-        combine(keyedPageFlows) { arr ->
-            arr.toMap()
-                .toSortedMap()
-                .values
-                .flatten()
-        }.map { stories: List<DecoratedStory> ->
-            // Key the values to the first page, to allow for merging different chunks
-            pageIndexes.first() to stories
         }
-    }.mergePages()
+    }
+
+    return unmergedPagesFlow.mergePages()
 }
 
 /** Takes a list of values, and returns a page as a subList */

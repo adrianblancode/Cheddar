@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
 import javax.inject.Inject
@@ -61,15 +62,14 @@ class StoryFeedViewModel @Inject constructor(
                                 }
                             }
                     }
+                    .onStart {
+                        // Don't emit loading state on resubscribe to existing flow
+                        if (pageIndexFlow.value == 0) emit(StoryFeedState.Loading)
+                    }
                     .catch { t ->
                         Timber.e(t)
                         emit(StoryFeedState.Error(t))
                     }
-                    .stateIn(
-                        viewModelScope,
-                        WhileSubscribed,
-                        StoryFeedState.Loading
-                    )
                     .map { storyFeedState ->
                         StoryFeedViewState(
                             storyType = storyType,
@@ -88,8 +88,8 @@ class StoryFeedViewModel @Inject constructor(
             )
 
     internal fun onStoryTypeChanged(storyType: StoryType) {
-        savedStateHandle[KEY_STORY_TYPE] = storyType
         pageIndexFlow.tryEmit(0)
+        savedStateHandle[KEY_STORY_TYPE] = storyType
     }
 
     internal fun onPageEndReached() {

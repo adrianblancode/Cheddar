@@ -8,7 +8,9 @@ import co.adrianblan.model.WebPreviewData
 import kotlinx.coroutines.runInterruptible
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
+import org.jsoup.UnsupportedMimeTypeException
 import timber.log.Timber
+import java.net.SocketTimeoutException
 import javax.inject.Inject
 import javax.inject.Singleton
 import javax.net.ssl.SSLHandshakeException
@@ -33,12 +35,20 @@ class WebPreviewRepository
             createEmptyWebPreviewData(url)
         } else {
             try {
+                // Try to interrupt thread if coroutine is cancelled
                 runInterruptible(dispatcherProvider.IO) {
-                    Jsoup.connect(url).get()
+                    Jsoup.connect(url)
+                        // Blocking Java api, so put timeout to play nice with cooperative cancellation
+                        .timeout(5000)
+                        .get()
                 }.toWebPreviewData(url)
             } catch (e: Exception) {
                 Timber.e(e, "Webpreview error for $url ")
-                if (e is HttpStatusException || e is SSLHandshakeException) {
+                if (e is HttpStatusException
+                    || e is SSLHandshakeException
+                    || e is SocketTimeoutException
+                    || e is UnsupportedMimeTypeException
+                ) {
                     createEmptyWebPreviewData(url)
                 } else throw e
             }
