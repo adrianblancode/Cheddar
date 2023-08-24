@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import timber.log.Timber
 import javax.inject.Inject
@@ -40,11 +39,8 @@ class StoryFeedViewModel @Inject constructor(
         storyTypeFlow
             .flatMapLatest { storyType ->
 
-                val storyIdsResource = hackerNewsRepository.storyIdsResource(storyType)
-                val cachedStoryIds: List<StoryId>? = storyIdsResource.cached
-
                 flow {
-                    emit(cachedStoryIds ?: storyIdsResource.fetch())
+                    emit(hackerNewsRepository.fetchStoryIds(storyType))
                 }
                     .flatMapLatest { storyIds: List<StoryId> ->
                         pageIndexFlow.observePages(
@@ -65,14 +61,15 @@ class StoryFeedViewModel @Inject constructor(
                                 }
                             }
                     }
-                    .onStart {
-                        // If the flow restarts, don't emit loading state
-                        if (cachedStoryIds == null) emit(StoryFeedState.Loading)
-                    }
                     .catch { t ->
                         Timber.e(t)
                         emit(StoryFeedState.Error(t))
                     }
+                    .stateIn(
+                        viewModelScope,
+                        WhileSubscribed,
+                        StoryFeedState.Loading
+                    )
                     .map { storyFeedState ->
                         StoryFeedViewState(
                             storyType = storyType,

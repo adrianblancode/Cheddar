@@ -83,11 +83,6 @@ class StoryFeedViewModelTest {
             override suspend fun fetchStory(storyId: StoryId): Story =
                 delayAndThrow(evilDelay)
 
-            override fun storyIdsResource(storyType: StoryType): AsyncResource<List<StoryId>> =
-                AsyncResource(null) {
-                    delayAndThrow(evilDelay)
-                }
-
             override suspend fun fetchStoryIds(storyType: StoryType): List<StoryId> =
                 delayAndThrow(evilDelay)
 

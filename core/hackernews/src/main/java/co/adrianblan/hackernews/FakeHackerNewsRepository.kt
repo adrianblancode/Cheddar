@@ -1,6 +1,5 @@
 package co.adrianblan.hackernews
 
-import co.adrianblan.common.AsyncResource
 import co.adrianblan.model.Comment
 import co.adrianblan.model.CommentId
 import co.adrianblan.model.Story
@@ -22,11 +21,6 @@ class FakeHackerNewsRepository(
         coroutineScope {
             delay(responseDelay)
             story.copy(id = storyId)
-        }
-
-    override fun storyIdsResource(storyType: StoryType): AsyncResource<List<StoryId>> =
-        AsyncResource(List(100) { StoryId(it.toLong()) }) {
-            fetchStoryIds(storyType)
         }
 
     override suspend fun fetchStoryIds(storyType: StoryType): List<StoryId> =

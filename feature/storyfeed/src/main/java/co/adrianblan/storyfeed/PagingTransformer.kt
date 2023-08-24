@@ -25,7 +25,8 @@ internal fun StateFlow<PageIndex>.observePages(
     pageStoryIdsSource: (PageIndex) -> List<StoryId>,
     storyFlowSource: (StoryId) -> Flow<DecoratedStory>
 ): Flow<List<DecoratedStory>> {
-    return observePages { pageIndex ->
+    return transformPaginationChunks()
+        .loadPageChunkContent { pageIndex ->
         val pageStories: List<Flow<DecoratedStory>> =
             pageStoryIdsSource(pageIndex)
                 .map { storyId -> storyFlowSource(storyId) }
@@ -38,25 +39,28 @@ internal fun StateFlow<PageIndex>.observePages(
  * Takes a source of page index to flow of content for the page,
  * and returns a flow of content for all pages.
  */
-private fun StateFlow<PageIndex>.observePages(
-    pageFlowSource: (PageIndex) -> Flow<List<DecoratedStory>>
-): Flow<List<DecoratedStory>> {
+@VisibleForTesting
+internal fun StateFlow<PageIndex>.transformPaginationChunks(): Flow<List<PageIndex>> {
 
     val pageIndexFlow = this
 
     // Flow of indexes to a chunk of pages to load
     // Since we don't have to start at zero, we emit chunks of pages
-    val chunkedPageIndexesFlow: Flow<List<PageIndex>> = flow {
-        var lastPageIndex = 0
+    return flow {
+        var numLoadedPages = 0
 
         // StateFlow can skip values, so emit intermediate pages
         pageIndexFlow.collect { pageIndex ->
-            emit((lastPageIndex..pageIndex).toList())
-            lastPageIndex = pageIndex
+            emit((numLoadedPages ..pageIndex).toList())
+            numLoadedPages = pageIndex + 1
         }
     }
+}
 
-    return chunkedPageIndexesFlow.flatMapConcat { pageIndexes: List<PageIndex> ->
+private fun Flow<List<PageIndex>>.loadPageChunkContent(
+    pageFlowSource: (PageIndex) -> Flow<List<DecoratedStory>>
+): Flow<List<DecoratedStory>> {
+    return flatMapConcat { pageIndexes: List<PageIndex> ->
 
         // List of flows for each page
         val keyedPageFlows: List<Flow<KeyedPage>> =
