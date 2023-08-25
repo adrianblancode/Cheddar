@@ -12,8 +12,8 @@ android {
 
     defaultConfig {
         applicationId = "co.adrianblan.cheddar"
-        versionCode = 7
-        versionName = "2.0"
+        versionCode = 8
+        versionName = "2.0.1"
     }
 
     signingConfigs {

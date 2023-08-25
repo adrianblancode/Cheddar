@@ -1,6 +1,6 @@
 ![Cheddar logo](https://github.com/adrianblancode/Cheddar/blob/master/media/cheddar-icon.png)
 
-# [WIP] Cheddar for Hacker News
+# Cheddar for Hacker News
 ![Build status](https://github.com/adrianblancode/Cheddar/workflows/Build/badge.svg) ![Test status](https://github.com/adrianblancode/Cheddar/workflows/Tests/badge.svg)
  
 Cheddar is a social news reader for Hacker News. Currently it's being entirely rewritten with: 
@@ -13,16 +13,13 @@ Cheddar is a social news reader for Hacker News. Currently it's being entirely r
 *   Tests and CI pipeline.
 *   Fancy animations, Day/Night mode, edge-to-edge content, and more.
 
+[Get it on Google Play](https://play.google.com/store/apps/details?id=co.adrianblan.cheddar)
 
 ## Media
 
 ![Cheddar showcase](https://github.com/adrianblancode/Cheddar/blob/master/media/screen-showcase.gif)
 
-
-## App (old v1)
-
 Featured on [XDA-Developers](http://www.xda-developers.com/apps-of-the-week-material-facebook-hacker-news-web-making-and-pac-man/), "Well-designed social news readers of this caliber do not come very often"
 
 
 
-[Get it on Google Play](https://play.google.com/store/apps/details?id=co.adrianblan.cheddar)
