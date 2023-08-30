@@ -12,6 +12,6 @@ import dagger.hilt.components.SingletonComponent
 interface UseCaseModule {
 
     @Binds
-    fun StoryPreviewUseCaseImpl.bindStoryPreview(): StoryPreviewUseCase
+    fun bindStoryPreview(impl: StoryPreviewUseCaseImpl): StoryPreviewUseCase
 
 }

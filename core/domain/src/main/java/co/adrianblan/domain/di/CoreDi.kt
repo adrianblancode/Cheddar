@@ -15,7 +15,7 @@ interface CoreModule {
 
     @Singleton
     @Binds
-    fun CustomTabsLauncherImpl.bindCustomTabsLauncher(): CustomTabsLauncher
+    fun bindCustomTabsLauncher(impl: CustomTabsLauncherImpl): CustomTabsLauncher
 
     companion object {
         @Singleton

@@ -22,7 +22,7 @@ interface HackerNewsModule {
 
     @Singleton
     @Binds
-    fun HackerNewsRepositoryImpl.bindHackerNewsRepository(): HackerNewsRepository
+    fun bindHackerNewsRepository(impl: HackerNewsRepositoryImpl): HackerNewsRepository
 
     companion object {
 

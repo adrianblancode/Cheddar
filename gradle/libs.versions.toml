@@ -18,14 +18,14 @@ androidxSplashscreen = "1.0.0-beta02"
 
 coil = "2.4.0"
 desugar = "2.0.3"
-hilt = "2.46.1"
+hilt = "2.48"
 hiltExt = "1.0.0"
 jsoup = "1.16.1"
 kotlin = "1.9.0"
 kotlinxCoroutines = "1.7.1"
 kotlinxImmutable = "0.3.5"
 kotlinxSerializationJson = "1.5.1"
-ksp = "1.8.20-1.0.11"
+ksp = "1.9.0-1.0.12"
 okhttp = "5.0.0-alpha.10"
 retrofit = "2.9.0"
 retrofitSerialization = "0.8.0"
@@ -100,5 +100,4 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

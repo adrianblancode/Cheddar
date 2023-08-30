@@ -17,6 +17,6 @@ fun DependencyHandlerScope.implementation(dependencyNotation: Any) {
     "implementation"(dependencyNotation)
 }
 
-fun DependencyHandlerScope.kapt(dependencyNotation: Any) {
-    "kapt"(dependencyNotation)
+fun DependencyHandlerScope.ksp(dependencyNotation: Any) {
+    "ksp"(dependencyNotation)
 }
