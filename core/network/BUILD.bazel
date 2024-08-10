@@ -1,0 +1,14 @@
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "lib",
+    srcs = glob(["**/*.kt"]),
+    deps = [
+        "@maven//:com_google_dagger_dagger",
+        "@maven//:com_jakewharton_retrofit_retrofit2_kotlinx_serialization_converter",
+        "@maven//:com_squareup_retrofit2_retrofit",
+        "@maven//:com_squareup_okhttp3_okhttp",
+        "@maven//:com_squareup_okhttp3_logging_interceptor",
+    ],
+    visibility = ["//visibility:public"],
+)

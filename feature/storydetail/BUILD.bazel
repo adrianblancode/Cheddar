@@ -1,0 +1,14 @@
+load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
+
+kt_android_library(
+    name = "lib",
+    custom_package = "co.adrianblan.storydetail",
+    srcs = glob(["**/*.kt"]),
+    manifest = "src/main/AndroidManifest.xml",
+    resource_files = glob(["res/**"]),
+    deps = [
+        "//core/webprevieew:lib",
+        "//core/hackernews:lib",
+    ],
+    visibility = ["//visibility:public"],
+ )
