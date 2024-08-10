@@ -1,16 +1,47 @@
-load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
+load("@rules_kotlin//kotlin:core.bzl", "kt_compiler_plugin", "kt_ksp_plugin")
 
-kt_jvm_library(
-    name = "lib",
-    srcs = glob(["**/*.kt"]),
+kt_ksp_plugin(
+    name = "moshi-kotlin-codegen",
+    processor_class = "com.squareup.moshi.kotlin.codegen.ksp.JsonClassSymbolProcessorProvider",
     deps = [
+        "@maven//:com_squareup_moshi_moshi",
+        "@maven//:com_squareup_moshi_moshi_kotlin",
+        "@maven//:com_squareup_moshi_moshi_kotlin_codegen",
+    ],
+)
+
+kt_compiler_plugin(
+    name = "serialization_plugin",
+    compile_phase = True,
+    id = "org.jetbrains.kotlin.serialization",
+    stubs_phase = True,
+    deps = [
+        "@rules_kotlin//kotlin/compiler:kotlinx-serialization-compiler-plugin",
+    ],
+)
+
+kt_android_library(
+    name = "lib",
+    srcs = glob(["src/main/java/**/*.kt"]),
+    manifest = "src/main/AndroidManifest.xml",
+    plugins = [
+        ":serialization_plugin"
+    ],
+    tags = ["trace"],
+    custom_package = "co.adrianblan.hackernews",
+    deps = [
+        "//core/model:lib",
+        "//core/network:lib",
+        "//core/common:lib",
         "@maven//:androidx_compose_runtime_runtime",
         "@maven//:org_jetbrains_kotlinx_kotlinx_collections_immutable_jvm",
-         "@maven//:com_google_dagger_dagger",
-        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_core",
-        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_core_jvm",
-        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_json",
-        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_json_jvm",
+        "@maven//:com_google_dagger_dagger",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_android",
+        "@maven//:com_squareup_retrofit2_retrofit",
+        "@maven//:com_jakewharton_retrofit_retrofit2_kotlinx_serialization_converter",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_json_1_5_1",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_core_1_5_1",
     ],
     visibility = ["//visibility:public"],
 )

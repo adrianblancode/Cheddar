@@ -1,7 +1,9 @@
+@file:OptIn(ExperimentalSerializationApi::class)
 @file:UseSerializers(InstantSerializer::class)
 
 package co.adrianblan.hackernews.api
 
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializer
@@ -27,6 +29,7 @@ object ApiCommentSerializer
  * Sometimes the api just returns null literal for certain comments,
  * we must then convert it to null comment.
  */
+@ExperimentalSerializationApi
 object NullableApiCommentSerializer : KSerializer<ApiComment?> {
 
     override val descriptor: SerialDescriptor

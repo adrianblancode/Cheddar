@@ -9,6 +9,9 @@ kt_jvm_library(
         "@maven//:com_squareup_retrofit2_retrofit",
         "@maven//:com_squareup_okhttp3_okhttp",
         "@maven//:com_squareup_okhttp3_logging_interceptor",
+        "@maven//:com_google_dagger_hilt_core",
+        "@maven//:com_google_dagger_hilt_android",
+        "@maven//:com_jakewharton_timber_timber",
     ],
     visibility = ["//visibility:public"],
 )
