@@ -16,6 +16,7 @@ kt_android_library(
     name = "lib",
     #    srcs = glob(["**/*.kt"]),
     srcs = glob(["src/**/*.kt"]),
+    custom_package = "co.adrianblan.domain",
     manifest = "src/main/AndroidManifest.xml",
     plugins = [
         ":serialization_plugin",
