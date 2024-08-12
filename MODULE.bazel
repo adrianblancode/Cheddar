@@ -47,6 +47,7 @@ maven.install(
         "com.squareup.moshi:moshi:jar:1.15.1",
         "com.squareup.moshi:moshi-kotlin:jar:1.15.1",
         "com.squareup.moshi:moshi-kotlin-codegen:jar:1.15.1",
+        "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1"
     ],
     repositories = [
         "https://maven.google.com",

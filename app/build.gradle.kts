@@ -56,6 +56,9 @@ dependencies {
     implementation(project(":core:network"))
     testImplementation(project(":core:testing"))
 
+    implementation (libs.airin.gradle)
+    implementation (libs.airin.gradle.android)
+
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.splashscreen)
     implementation(libs.timber)

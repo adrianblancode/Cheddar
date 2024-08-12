@@ -1,4 +1,5 @@
 [versions]
+airinGradle = "0.5.2"
 minSdk = "23"
 compileSdk = "34"
 targetSdk = "34"
@@ -41,6 +42,8 @@ mockitoKotlin = "2.2.0"
 dependencyUpdatesPlugin = "0.43.0"
 
 [libraries]
+airin-gradle = { module = "org.morfly.airin:airin-gradle", version.ref = "airinGradle" }
+airin-gradle-android = { module = "org.morfly.airin:airin-gradle-android", version.ref = "airinGradle" }
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "androidxActivity" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "androidxBrowser" }
 androidx-core = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }
