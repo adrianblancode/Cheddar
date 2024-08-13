@@ -1,14 +1,51 @@
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
+load("@rules_kotlin//kotlin:core.bzl", "kt_compiler_plugin")
+
+kt_compiler_plugin(
+    name = "jetpack_compose_compiler_plugin",
+    id = "androidx.compose.compiler",
+    target_embedded_compiler = True,
+    visibility = ["//visibility:public"],
+    deps = [
+        "@maven//:androidx_compose_compiler_compiler",
+    ],
+)
 
 kt_android_library(
     name = "lib",
-    srcs = glob(["**/*.kt"]),
+    srcs = glob(["src/main/**/*.kt"]),
     custom_package = "co.adrianblan.storydetail",
     manifest = "src/main/AndroidManifest.xml",
-    resource_files = glob(["res/**"]),
+    plugins = [":jetpack_compose_compiler_plugin"],
+    resource_files = glob(["src/main/res/**"]),
     visibility = ["//visibility:public"],
     deps = [
+        "//core/domain:lib",
         "//core/hackernews:lib",
+        "//core/ui:lib",
         "//core/webpreview:lib",
+        "@maven//:androidx_activity_activity_compose",
+        "@maven//:androidx_compose_animation_animation_core",
+        "@maven//:androidx_compose_animation_animation_core_android",
+        "@maven//:androidx_compose_foundation_foundation",
+        "@maven//:androidx_compose_foundation_foundation_android",
+        "@maven//:androidx_compose_foundation_foundation_layout",
+        "@maven//:androidx_compose_material3_material3",
+        "@maven//:androidx_compose_material3_material3_android",
+        "@maven//:androidx_compose_material_material_icons_extended",
+        "@maven//:androidx_compose_ui_ui",
+        "@maven//:androidx_compose_ui_ui_android",
+        "@maven//:androidx_compose_ui_ui_geometry",
+        "@maven//:androidx_compose_ui_ui_graphics_android",
+        "@maven//:androidx_compose_ui_ui_text_android",
+        "@maven//:androidx_compose_ui_ui_tooling_preview",
+        "@maven//:androidx_compose_ui_ui_tooling_preview_android",
+        "@maven//:androidx_constraintlayout_constraintlayout",
+        "@maven//:androidx_constraintlayout_constraintlayout_compose",
+        "@maven//:androidx_hilt_hilt_lifecycle_viewmodel",
+        "@maven//:androidx_hilt_hilt_navigation_compose",
+        "@maven//:androidx_lifecycle_lifecycle_runtime_compose",
+        "@maven//:androidx_lifecycle_lifecycle_viewmodel_ktx",
+        "@maven//:androidx_navigation_navigation_compose",
     ],
 )

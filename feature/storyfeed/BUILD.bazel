@@ -1,4 +1,15 @@
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
+load("@rules_kotlin//kotlin:core.bzl", "kt_compiler_plugin")
+
+kt_compiler_plugin(
+    name = "jetpack_compose_compiler_plugin",
+    id = "androidx.compose.compiler",
+    target_embedded_compiler = True,
+    visibility = ["//visibility:public"],
+    deps = [
+        "@maven//:androidx_compose_compiler_compiler",
+    ],
+)
 
 kt_android_library(
     name = "lib",
@@ -11,4 +22,6 @@ kt_android_library(
         "//core/hackernews:lib",
         "//core/webpreview:lib",
     ],
+)
+],
 )
