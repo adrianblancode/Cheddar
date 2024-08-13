@@ -1,5 +1,6 @@
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("@rules_kotlin//kotlin:core.bzl", "kt_compiler_plugin")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_test")
 
 kt_compiler_plugin(
     name = "jetpack_compose_compiler_plugin",
@@ -48,5 +49,21 @@ kt_android_library(
         "@maven//:androidx_lifecycle_lifecycle_viewmodel_ktx",
         "@maven//:androidx_navigation_navigation_common",
         "@maven//:androidx_navigation_navigation_compose",
+    ],
+)
+
+kt_jvm_test(
+    name = "test",
+    srcs = glob(["src/test/**/java/**/*.kt"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        ":lib",
+        "//core/common:lib",
+        "//core/domain:lib",
+        "//core/hackernews:lib",
+        "//core/testing:lib",
+        "@maven//:app_cash_turbine_turbine_jvm",
+        "@maven//:org_jetbrains_kotlin_kotlin_test",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test_jvm",
     ],
 )

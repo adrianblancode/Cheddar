@@ -87,7 +87,7 @@ class StoryFeedViewModel @Inject constructor(
                 )
             )
 
-    fun onStoryTypeChanged(storyType: StoryType) {
+    internal fun onStoryTypeChanged(storyType: StoryType) {
         pageIndexFlow.tryEmit(0)
         savedStateHandle[KEY_STORY_TYPE] = storyType
     }

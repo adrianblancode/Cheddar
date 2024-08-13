@@ -41,7 +41,7 @@ kt_android_library(
 # TODO figure out how to expose internal values to test target. Friends is not an option for kt_android_library target type
 kt_jvm_test(
     name = "test",
-    srcs = glob(["src/test/**/*.kt"]),
+    srcs = glob(["src/test/**/java/**/*.kt"]),
     visibility = ["//visibility:public"],
     deps = [
         ":lib",
