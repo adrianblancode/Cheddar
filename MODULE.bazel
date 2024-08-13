@@ -58,7 +58,7 @@ maven.install(
         "com.squareup.moshi:moshi-kotlin-codegen:jar:1.15.1",
         "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1",
         "androidx.browser:browser:jar:1.5.0",
-        "androidx.activity:activity:1.5.1",
+        "androidx.activity:activity:1.8.0-alpha06",
         "androidx.activity:activity-compose:1.5.1",
         "androidx.activity:activity-ktx:1.5.1",
         "androidx.fragment:fragment:1.5.1",
@@ -98,6 +98,7 @@ maven.install(
         "androidx.constraintlayout:constraintlayout-compose:jar:1.1.0-alpha11",
         "androidx.lifecycle:lifecycle-viewmodel-compose:jar:2.6.1",
         "androidx.lifecycle:lifecycle-runtime-compose:jar:2.6.1",
+        "androidx.core:core-splashscreen:jar:1.2.0-alpha01",
     ],
     repositories = [
         "https://maven.google.com",

@@ -1,4 +1,6 @@
 package co.adrianblan.cheddar
 
-class BuildConfig {
+object BuildConfig {
+
+    const val DEBUG: Boolean = true
 }

@@ -1,0 +1,28 @@
+load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
+load("@rules_kotlin//kotlin:core.bzl", "kt_compiler_plugin")
+
+kt_compiler_plugin(
+    name = "jetpack_compose_compiler_plugin",
+    id = "androidx.compose.compiler",
+    target_embedded_compiler = True,
+    visibility = ["//visibility:public"],
+    deps = [
+        "@maven//:androidx_compose_compiler_compiler",
+    ],
+)
+
+kt_android_library(
+    name = "lib",
+    srcs = glob(["**/*.kt"]),
+    custom_package = "co.adrianblan.webpreview",
+    manifest = "src/main/AndroidManifest.xml",
+    plugins = [":jetpack_compose_compiler_plugin"],
+    resource_files = glob(["res/**"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//feature/storydetail:lib",
+        "//feature/storyfeed:lib",
+        "@maven//:androidx_activity_activity",
+        "@maven//:androidx_core_core_splashscreen",
+    ],
+)
