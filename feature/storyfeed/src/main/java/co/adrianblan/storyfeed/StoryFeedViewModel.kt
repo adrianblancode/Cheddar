@@ -87,12 +87,12 @@ class StoryFeedViewModel @Inject constructor(
                 )
             )
 
-    internal fun onStoryTypeChanged(storyType: StoryType) {
+    fun onStoryTypeChanged(storyType: StoryType) {
         pageIndexFlow.tryEmit(0)
         savedStateHandle[KEY_STORY_TYPE] = storyType
     }
 
-    internal fun onPageEndReached() {
+    fun onPageEndReached() {
         val state = viewState.value.storyFeedState
         if (state is StoryFeedState.Success) {
             val newPageIndex = state.stories.size / PAGE_SIZE

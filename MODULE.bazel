@@ -99,6 +99,8 @@ maven.install(
         "androidx.lifecycle:lifecycle-viewmodel-compose:jar:2.6.1",
         "androidx.lifecycle:lifecycle-runtime-compose:jar:2.6.1",
         "androidx.core:core-splashscreen:jar:1.2.0-alpha01",
+        "app.cash.turbine:turbine-jvm:jar:1.1.0",
+        "org.jetbrains.kotlin:kotlin-test:jar:2.0.0",
     ],
     repositories = [
         "https://maven.google.com",
