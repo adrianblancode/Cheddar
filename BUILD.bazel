@@ -1,4 +1,5 @@
 load("@rules_kotlin//kotlin:core.bzl", "kt_compiler_plugin")
+load("@rules_kotlin//kotlin:lint.bzl", "ktlint_config", "ktlint_fix", "ktlint_test")
 
 kt_compiler_plugin(
     name = "jetpack_compose_compiler_plugin",
@@ -8,4 +9,17 @@ kt_compiler_plugin(
     deps = [
         "@maven//:androidx_compose_compiler_compiler",
     ],
+)
+
+filegroup(
+    name = "editorconfig",
+    srcs = [".editorconfig"],
+)
+
+ktlint_config(
+    name = "ktlint_editorconfig",
+    android_rules_enabled = False,
+    editorconfig = ":editorconfig",
+    experimental_rules_enabled = False,
+    visibility = ["//visibility:public"],
 )

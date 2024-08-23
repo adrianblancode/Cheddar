@@ -3,8 +3,10 @@ load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
 kt_jvm_library(
     name = "lib",
     srcs = glob(["**/*.kt"]),
+    visibility = ["//visibility:public"],
     deps = [
         "//core/common:lib",
+        "@maven//:androidx_lifecycle_lifecycle_viewmodel_savedstate",
         "@maven//:junit_junit",
         "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_android",
         "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_core",
@@ -12,5 +14,4 @@ kt_jvm_library(
         "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test",
         "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test_jvm",
     ],
-    visibility = ["//visibility:public"],
 )

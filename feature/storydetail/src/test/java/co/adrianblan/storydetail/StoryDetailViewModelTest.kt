@@ -1,7 +1,7 @@
 package co.adrianblan.storydetail
 
+import android.util.SparseArray
 import app.cash.turbine.test
-import co.adrianblan.common.AsyncResource
 import co.adrianblan.domain.DecoratedStory
 import co.adrianblan.domain.StoryPreviewUseCase
 import co.adrianblan.hackernews.FakeHackerNewsRepository
@@ -14,6 +14,7 @@ import co.adrianblan.model.StoryType
 import co.adrianblan.model.placeholderLink
 import co.adrianblan.testing.CoroutineTestRule
 import co.adrianblan.testing.delayAndThrow
+import junit.framework.TestCase.assertEquals
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.Flow
@@ -23,117 +24,120 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import kotlin.test.assertEquals
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import kotlin.test.assertIs
 import kotlin.time.Duration.Companion.seconds
 
-
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [Config.ALL_SDKS])
 class StoryDetailViewModelTest {
 
-    @get:Rule
-    val coroutineRule = CoroutineTestRule()
+  @get:Rule
+  val coroutineRule = CoroutineTestRule()
 
-    private lateinit var storyDetailViewModel: StoryDetailViewModel
+  private lateinit var storyDetailViewModel: StoryDetailViewModel
 
-    object TestStoryPreviewUseCase : StoryPreviewUseCase {
-        override fun observeDecoratedStory(storyId: StoryId): Flow<DecoratedStory> =
-            flowOf(DecoratedStory(story = Story.placeholderLink, webPreviewState = null))
+  object TestStoryPreviewUseCase : StoryPreviewUseCase {
+    override fun observeDecoratedStory(storyId: StoryId): Flow<DecoratedStory> =
+      flowOf(DecoratedStory(story = Story.placeholderLink, webPreviewState = null))
+  }
+
+  @Before
+  fun setUp() {
+    buildViewModel()
+  }
+
+  private fun buildViewModel(
+    hackerNewsRepository: HackerNewsRepository = FakeHackerNewsRepository(responseDelay = 1.seconds),
+  ) {
+    storyDetailViewModel = StoryDetailViewModel(
+      StoryDetailArgs(StoryId(1)).toSavedStateHandle(),
+      dispatcherProvider = coroutineRule.testDispatcherProvider,
+      hackerNewsRepository = hackerNewsRepository,
+      storyPreviewUseCase = TestStoryPreviewUseCase,
+    )
+  }
+
+  @Test
+  fun testInitialState() = runTest {
+    assertIs<StoryDetailViewState.Loading>(storyDetailViewModel.viewState.value)
+  }
+
+  @Test
+  fun testEmptySuccessStory() = runTest {
+    buildViewModel(
+      FakeHackerNewsRepository(
+        story = Story.placeholderLink.copy(kids = persistentListOf()),
+        responseDelay = 1.seconds,
+      ),
+    )
+    storyDetailViewModel.viewState
+      .test {
+        assertIs<StoryDetailViewState.Loading>(this.awaitItem())
+        var item = this.awaitItem()
+        assertIs<StoryDetailViewState.Success>(item)
+        assertIs<StoryDetailCommentsState.Loading>(item.commentsState)
+        item = this.awaitItem()
+        assertIs<StoryDetailViewState.Success>(item)
+        assertIs<StoryDetailCommentsState.Empty>(item.commentsState)
+        cancelAndIgnoreRemainingEvents()
+      }
+  }
+
+  @Test
+  fun testSuccessStory() = runTest {
+
+    val numComments = 10
+
+    buildViewModel(
+      FakeHackerNewsRepository(
+        story = Story.placeholderLink.copy(kids = List(numComments) { CommentId(it.toLong()) }.toImmutableList()),
+        responseDelay = 1.seconds,
+      ),
+    )
+    storyDetailViewModel.viewState
+      .test {
+        assertIs<StoryDetailViewState.Loading>(this.awaitItem())
+
+        var item = this.awaitItem()
+        assertIs<StoryDetailViewState.Success>(item)
+        assertIs<StoryDetailCommentsState.Loading>(item.commentsState)
+        item = this.awaitItem()
+        assertIs<StoryDetailViewState.Success>(item)
+        val commentsState = item.commentsState
+        assertIs<StoryDetailCommentsState.Success>(commentsState)
+        assertEquals(numComments, commentsState.comments.size)
+        cancelAndIgnoreRemainingEvents()
+      }
+  }
+
+  @Test
+  fun testStoriesError() {
+
+    val evilDelay = 1.seconds
+
+    val evilHackerNewsRepository = object : HackerNewsRepository {
+      override suspend fun fetchStory(storyId: StoryId): Story =
+        delayAndThrow(evilDelay)
+
+      override suspend fun fetchStoryIds(storyType: StoryType): List<StoryId> =
+        delayAndThrow(evilDelay)
+
+      override suspend fun fetchComment(commentId: CommentId): Comment =
+        delayAndThrow(evilDelay)
     }
 
-    @Before
-    fun setUp() {
-        buildViewModel()
-    }
+    buildViewModel(evilHackerNewsRepository)
 
-    private fun buildViewModel(
-        hackerNewsRepository: HackerNewsRepository = FakeHackerNewsRepository(responseDelay = 1.seconds)
-    ) {
-        storyDetailViewModel = StoryDetailViewModel(
-            StoryDetailArgs(StoryId(1)).toSavedStateHandle(),
-            dispatcherProvider = coroutineRule.testDispatcherProvider,
-            hackerNewsRepository = hackerNewsRepository,
-            storyPreviewUseCase = TestStoryPreviewUseCase
-        )
-    }
-
-    @Test
-    fun testInitialState() = runTest {
-        assertIs<StoryDetailViewState.Loading>(storyDetailViewModel.viewState.value)
-    }
-
-    @Test
-    fun testEmptySuccessStory() = runTest {
-        buildViewModel(
-            FakeHackerNewsRepository(
-                story = Story.placeholderLink.copy(kids = persistentListOf()),
-                responseDelay = 1.seconds
-            )
-        )
-        storyDetailViewModel.viewState
-            .test {
-                assertIs<StoryDetailViewState.Loading>(this.awaitItem())
-                var item = this.awaitItem()
-                assertIs<StoryDetailViewState.Success>(item)
-                assertIs<StoryDetailCommentsState.Loading>(item.commentsState)
-                item = this.awaitItem()
-                assertIs<StoryDetailViewState.Success>(item)
-                assertIs<StoryDetailCommentsState.Empty>(item.commentsState)
-                cancelAndIgnoreRemainingEvents()
-            }
-    }
-
-    @Test
-    fun testSuccessStory() = runTest {
-
-        val numComments = 10
-
-        buildViewModel(
-            FakeHackerNewsRepository(
-                story = Story.placeholderLink.copy(kids = List(numComments) { CommentId(it.toLong()) }.toImmutableList()),
-                responseDelay = 1.seconds
-            )
-        )
-        storyDetailViewModel.viewState
-            .test {
-                assertIs<StoryDetailViewState.Loading>(this.awaitItem())
-
-                var item = this.awaitItem()
-                assertIs<StoryDetailViewState.Success>(item)
-                assertIs<StoryDetailCommentsState.Loading>(item.commentsState)
-                item = this.awaitItem()
-                assertIs<StoryDetailViewState.Success>(item)
-                val commentsState = item.commentsState
-                assertIs<StoryDetailCommentsState.Success>(commentsState)
-                assertEquals(numComments, commentsState.comments.size)
-                cancelAndIgnoreRemainingEvents()
-            }
-    }
-
-    @Test
-    fun testStoriesError() {
-
-        val evilDelay = 1.seconds
-
-        val evilHackerNewsRepository = object : HackerNewsRepository {
-            override suspend fun fetchStory(storyId: StoryId): Story =
-                delayAndThrow(evilDelay)
-
-            override suspend fun fetchStoryIds(storyType: StoryType): List<StoryId> =
-                delayAndThrow(evilDelay)
-
-            override suspend fun fetchComment(commentId: CommentId): Comment =
-                delayAndThrow(evilDelay)
+    runTest {
+      storyDetailViewModel.viewState
+        .test {
+          assertIs<StoryDetailViewState.Loading>(awaitItem())
+          assertIs<StoryDetailViewState.Error>(awaitItem())
         }
-
-        buildViewModel(evilHackerNewsRepository)
-
-        runTest {
-            storyDetailViewModel.viewState
-                .test {
-                    assertIs<StoryDetailViewState.Loading>(awaitItem())
-                    assertIs<StoryDetailViewState.Error>(awaitItem())
-                }
-            assert(this.isActive)
-        }
+      assert(this.isActive)
     }
+  }
 }

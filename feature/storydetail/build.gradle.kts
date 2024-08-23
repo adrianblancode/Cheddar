@@ -10,4 +10,5 @@ android {
 dependencies {
     implementation(project(":core:hackernews"))
     implementation(project(":core:webpreview"))
+    api(libs.robo)
 }

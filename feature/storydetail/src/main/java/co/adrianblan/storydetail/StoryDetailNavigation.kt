@@ -14,13 +14,13 @@ import co.adrianblan.storydetail.ui.StoryDetailRoute
 
 internal const val storyIdArg = "storyId"
 
-class StoryDetailArgs(val storyId: StoryId) {
+internal class StoryDetailArgs(val storyId: StoryId) {
     constructor(savedStateHandle: SavedStateHandle) :
             this(StoryId(savedStateHandle[storyIdArg]!!))
 }
 
 @VisibleForTesting
-fun StoryDetailArgs.toSavedStateHandle() =
+internal fun StoryDetailArgs.toSavedStateHandle() =
     SavedStateHandle(mapOf(storyIdArg to this.storyId.id))
 
 fun NavController.navigateToTopic(storyId: StoryId) {

@@ -86,6 +86,7 @@ turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine
 
 androidx-core-test = { group = "androidx.arch.core", name = "core-testing", version.ref = "androidxCoreTesting" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
+robo = { group = 'org.robolectric', name = 'robolectric', version = '4.13' }
 
 android-gradleplugin = { group = "com.android.tools.build", name = "gradle", version.ref = "androidGradlePlugin" }
 kotlin-gradleplugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }

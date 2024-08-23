@@ -1,4 +1,4 @@
-load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
+load("@rules_kotlin//kotlin:android.bzl", "kt_android_library", "kt_android_local_test")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_test")
 
 kt_android_library(
@@ -17,7 +17,6 @@ kt_android_library(
         "@maven//:androidx_activity_activity_compose",
         "@maven//:androidx_compose_material3_material3",
         "@maven//:androidx_compose_material3_material3_android",
-        "@maven//:androidx_compose_ui_ui",
         "@maven//:androidx_compose_ui_ui_android",
         "@maven//:androidx_compose_ui_ui_tooling_preview",
         "@maven//:androidx_compose_ui_ui_tooling_preview_android",
@@ -27,10 +26,11 @@ kt_android_library(
     ],
 )
 
-# TODO figure out how to expose internal values to test target. Friends is not an option for kt_android_library target type
-kt_jvm_test(
+kt_android_local_test(
     name = "test",
     srcs = glob(["src/test/**/java/**/*.kt"]),
+    associates = [":lib_kt"],
+    test_class = "co.adrianblan.storydetail.StoryDetailViewModelTest",
     visibility = ["//visibility:public"],
     deps = [
         ":lib",
@@ -40,6 +40,6 @@ kt_jvm_test(
         "//core/testing:lib",
         "@maven//:app_cash_turbine_turbine_jvm",
         "@maven//:org_jetbrains_kotlin_kotlin_test",
-        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test_jvm",
+        "@rules_robolectric//bazel:android-all",
     ],
 )

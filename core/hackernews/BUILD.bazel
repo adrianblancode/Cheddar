@@ -1,16 +1,6 @@
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
 load("@rules_kotlin//kotlin:core.bzl", "kt_compiler_plugin", "kt_ksp_plugin")
 
-kt_ksp_plugin(
-    name = "moshi-kotlin-codegen",
-    processor_class = "com.squareup.moshi.kotlin.codegen.ksp.JsonClassSymbolProcessorProvider",
-    deps = [
-        "@maven//:com_squareup_moshi_moshi",
-        "@maven//:com_squareup_moshi_moshi_kotlin",
-        "@maven//:com_squareup_moshi_moshi_kotlin_codegen",
-    ],
-)
-
 kt_compiler_plugin(
     name = "serialization_plugin",
     compile_phase = True,
@@ -40,7 +30,7 @@ kt_android_library(
         "@maven//:com_squareup_retrofit2_retrofit",
         "@maven//:org_jetbrains_kotlinx_kotlinx_collections_immutable_jvm",
         "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_android",
-        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_core_1_5_1",
-        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_json_1_5_1",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_core",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_json",
     ],
 )

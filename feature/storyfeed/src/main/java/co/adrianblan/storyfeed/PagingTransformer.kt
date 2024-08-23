@@ -41,7 +41,7 @@ internal fun StateFlow<PageIndex>.observePages(
  * and returns a flow of content for all pages.
  */
 @VisibleForTesting
-fun StateFlow<PageIndex>.transformPaginationChunks(): Flow<List<PageIndex>> {
+internal fun StateFlow<PageIndex>.transformPaginationChunks(): Flow<List<PageIndex>> {
 
     val pageIndexFlow = this
 
@@ -111,7 +111,7 @@ internal fun <T> List<T>.takePage(pageIndex: PageIndex, pageSize: Int): List<T> 
  * Eg [1, [A]], [2, [B]], [1, [AA]] emits [A], [A, B], [AA, B]
  */
 @VisibleForTesting
-fun <T> Flow<Pair<PageIndex, List<T>>>.mergePages(): Flow<List<T>> =
+internal fun <T> Flow<Pair<PageIndex, List<T>>>.mergePages(): Flow<List<T>> =
     this.scan(sortedMapOf<PageIndex, List<T>>()) { map, (pageIndex: PageIndex, value: List<T>) ->
         map[pageIndex] = value
         map

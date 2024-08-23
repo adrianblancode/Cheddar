@@ -1,23 +1,13 @@
-load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
-load("@rules_kotlin//kotlin:core.bzl", "kt_compiler_plugin")
+load("@rules_android//android:rules.bzl", "android_local_test")
+load("@rules_kotlin//kotlin:android.bzl", "kt_android_library", "kt_android_local_test")
 load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_test")
-
-kt_compiler_plugin(
-    name = "jetpack_compose_compiler_plugin",
-    id = "androidx.compose.compiler",
-    target_embedded_compiler = True,
-    visibility = ["//visibility:public"],
-    deps = [
-        "@maven//:androidx_compose_compiler_compiler",
-    ],
-)
 
 kt_android_library(
     name = "lib",
     srcs = glob(["src/main/**/*.kt"]),
     custom_package = "co.adrianblan.storydetail",
     manifest = "src/main/AndroidManifest.xml",
-    plugins = [":jetpack_compose_compiler_plugin"],
+    plugins = ["//:jetpack_compose_compiler_plugin"],
     resource_files = glob(["src/main/res/**"]),
     visibility = ["//visibility:public"],
     deps = [
@@ -34,7 +24,6 @@ kt_android_library(
         "@maven//:androidx_compose_material3_material3",
         "@maven//:androidx_compose_material3_material3_android",
         "@maven//:androidx_compose_material_material_icons_extended",
-        "@maven//:androidx_compose_ui_ui",
         "@maven//:androidx_compose_ui_ui_android",
         "@maven//:androidx_compose_ui_ui_geometry",
         "@maven//:androidx_compose_ui_ui_graphics_android",
@@ -49,12 +38,25 @@ kt_android_library(
         "@maven//:androidx_lifecycle_lifecycle_viewmodel_ktx",
         "@maven//:androidx_navigation_navigation_common",
         "@maven//:androidx_navigation_navigation_compose",
+        "@maven//:org_robolectric_annotations",
+        "@maven//:org_robolectric_junit",
+        "@maven//:org_robolectric_nativeruntime",
+        "@maven//:org_robolectric_nativeruntime_dist_compat",
+        "@maven//:org_robolectric_pluginapi",
+        "@maven//:org_robolectric_robolectric",
+        "@maven//:org_robolectric_utils",
+        "@maven//:org_robolectric_utils_reflector",
     ],
 )
 
-kt_jvm_test(
+kt_android_local_test(
     name = "test",
-    srcs = glob(["src/test/**/java/**/*.kt"]),
+    srcs = glob([
+        "src/test/java/**/*.kt",
+    ]),
+    associates = [":lib_kt"],
+    manifest = "src/main/AndroidManifest.xml",
+    test_class = "co.adrianblan.storydetail.StoryDetailViewModelTest",
     visibility = ["//visibility:public"],
     deps = [
         ":lib",
@@ -63,7 +65,9 @@ kt_jvm_test(
         "//core/hackernews:lib",
         "//core/testing:lib",
         "@maven//:app_cash_turbine_turbine_jvm",
+        "@maven//:com_google_truth_truth",
+        "@maven//:junit_junit",
         "@maven//:org_jetbrains_kotlin_kotlin_test",
-        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_test_jvm",
+        "@rules_robolectric//bazel:android-all",
     ],
 )
