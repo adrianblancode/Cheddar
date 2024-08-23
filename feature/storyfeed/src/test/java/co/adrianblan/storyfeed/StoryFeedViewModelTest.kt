@@ -2,7 +2,6 @@ package co.adrianblan.storyfeed
 
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
-import co.adrianblan.common.AsyncResource
 import co.adrianblan.domain.DecoratedStory
 import co.adrianblan.domain.StoryPreviewUseCase
 import co.adrianblan.hackernews.FakeHackerNewsRepository
@@ -24,11 +23,13 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
 import kotlin.time.Duration.Companion.seconds
 
-
+@RunWith(JUnit4::class)
 class StoryFeedViewModelTest {
 
     @get:Rule

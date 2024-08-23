@@ -1,0 +1,14 @@
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_library")
+
+kt_jvm_library(
+    name = "lib",
+    srcs = glob(["**/*.kt"]),
+    deps = [
+        "//core/common:lib",
+        "//core/model:lib",
+        "@maven//:org_jsoup_jsoup",
+        "@maven//:com_google_dagger_dagger",
+        "@maven//:com_jakewharton_timber_timber",
+    ],
+    visibility = ["//visibility:public"],
+ )

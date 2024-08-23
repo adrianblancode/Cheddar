@@ -1,0 +1,36 @@
+load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
+load("@rules_kotlin//kotlin:core.bzl", "kt_compiler_plugin", "kt_ksp_plugin")
+
+kt_compiler_plugin(
+    name = "serialization_plugin",
+    compile_phase = True,
+    id = "org.jetbrains.kotlin.serialization",
+    stubs_phase = True,
+    deps = [
+        "@rules_kotlin//kotlin/compiler:kotlinx-serialization-compiler-plugin",
+    ],
+)
+
+kt_android_library(
+    name = "lib",
+    srcs = glob(["src/main/java/**/*.kt"]),
+    custom_package = "co.adrianblan.hackernews",
+    manifest = "src/main/AndroidManifest.xml",
+    plugins = [
+        ":serialization_plugin",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//core/common:lib",
+        "//core/model:lib",
+        "//core/network:lib",
+        "@maven//:androidx_compose_runtime_runtime",
+        "@maven//:com_google_dagger_dagger",
+        "@maven//:com_jakewharton_retrofit_retrofit2_kotlinx_serialization_converter",
+        "@maven//:com_squareup_retrofit2_retrofit",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_collections_immutable_jvm",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_android",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_core",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_serialization_json",
+    ],
+)

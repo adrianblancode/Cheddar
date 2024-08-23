@@ -1,0 +1,29 @@
+load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
+
+kt_android_library(
+    name = "lib",
+    srcs = glob(["src/main/java/**/*.kt"]),
+    custom_package = "co.adrianblan.ui",
+    manifest = "src/main/AndroidManifest.xml",
+    plugins = ["//:jetpack_compose_compiler_plugin"],
+    resource_files = glob(["src/main/res/**"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//core/model:lib",
+        "@maven//:androidx_activity_activity_compose",
+        "@maven//:androidx_compose_foundation_foundation_android",
+        "@maven//:androidx_compose_foundation_foundation_layout",
+        "@maven//:androidx_compose_material3_material3_android",
+        "@maven//:androidx_compose_material_material_icons_extended",
+        "@maven//:androidx_compose_runtime_runtime_android",
+        "@maven//:androidx_compose_ui_ui_android",
+        "@maven//:androidx_compose_ui_ui_graphics_android",
+        "@maven//:androidx_compose_ui_ui_text_android",
+        "@maven//:androidx_compose_ui_ui_tooling_preview_android",
+        "@maven//:androidx_core_core_splashscreen",
+        "@maven//:io_coil_kt_coil",
+        "@maven//:io_coil_kt_coil_base",
+        "@maven//:io_coil_kt_coil_compose",
+        "@maven//:io_coil_kt_coil_svg",
+    ],
+)

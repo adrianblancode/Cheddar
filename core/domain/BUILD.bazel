@@ -1,0 +1,20 @@
+load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
+
+kt_android_library(
+    name = "lib",
+    srcs = glob(["src/main/java/**/*.kt"]),
+    custom_package = "co.adrianblan.domain",
+    manifest = "src/main/AndroidManifest.xml",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//core/common:lib",
+        "//core/hackernews:lib",
+        "//core/webpreview:lib",
+        "@maven//:androidx_browser_browser",
+        "@maven//:com_google_dagger_dagger",
+        "@maven//:com_google_dagger_hilt_android",
+        "@maven//:com_jakewharton_timber_timber",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_android",
+        "@maven//:org_jetbrains_kotlinx_kotlinx_coroutines_core_jvm",
+    ],
+)

@@ -1,0 +1,51 @@
+load("@rules_android//android:rules.bzl", "android_binary")
+load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
+load("@rules_kotlin//kotlin:lint.bzl", "ktlint_fix", "ktlint_test")
+
+kt_android_library(
+    name = "lib",
+    srcs = glob(["**/*.kt"]),
+    custom_package = "co.adrianblan.cheddar",
+    manifest = "src/main/AndroidManifest.xml",
+    plugins = ["//:jetpack_compose_compiler_plugin"],
+    resource_files = glob(["src/main/res/**/*"]),
+    visibility = ["//visibility:public"],
+    exports = [
+        "//core/ui:lib",
+        "@maven//:androidx_core_core_splashscreen",
+    ],
+    deps = [
+        "//feature/storydetail:lib",
+        "//feature/storyfeed:lib",
+        "@maven//:androidx_activity_activity",
+    ],
+)
+
+android_binary(
+    name = "app2",
+    custom_package = "co.adrianblan.cheddar",
+    manifest = "src/main/AndroidManifest.xml",
+    manifest_values = {
+        "lib_name": "lib_base",
+    },
+    deps = [
+        ":lib_base",
+        ":lib_kt",
+        "//feature/storydetail:lib",
+        "//feature/storyfeed:lib",
+        "@maven//:androidx_activity_activity",
+        "@maven//:androidx_core_core_splashscreen",
+    ],
+)
+
+ktlint_fix(
+    name = "lint_fix",
+    srcs = glob(["**/*.kt"]),
+    config = "//:ktlint_editorconfig",
+)
+
+ktlint_test(
+    name = "lint_test",
+    srcs = glob(["**/*.kt"]),
+    config = "//:ktlint_editorconfig",
+)

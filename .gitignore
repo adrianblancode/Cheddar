@@ -59,3 +59,9 @@ fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
+*.lock
+bazel-out/
+bazel-bin/
+bazel-testlogs/
+bazel-Cheddar/
+.gitignore

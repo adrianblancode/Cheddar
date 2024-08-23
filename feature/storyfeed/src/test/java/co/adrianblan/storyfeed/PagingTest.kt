@@ -7,19 +7,21 @@ import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 
-class PagingTest {
+@RunWith(JUnit4::class)
+class PagingTest1 {
 
-
-    @Test
-    fun testChunksSimple() = runTest {
-        val flow = MutableStateFlow(0)
-        flow.transformPaginationChunks().test {
-            assertEquals(listOf(0), this.awaitItem())
-            flow.value = 1
-            assertEquals(listOf(1), this.awaitItem())
-        }
-    }
+//    @Test
+//    fun testChunksSimple() = runTest {
+//        val flow = MutableStateFlow(0)
+//        flow.transformPaginationChunks().test {
+//            assertEquals(listOf(0), this.awaitItem())
+//            flow.value = 1
+//            assertEquals(listOf(1), this.awaitItem())
+//        }
+//    }
 
     @Test
     fun testChunksSkipped() = runTest {

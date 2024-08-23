@@ -1,0 +1,45 @@
+load("@rules_kotlin//kotlin:android.bzl", "kt_android_library", "kt_android_local_test")
+load("@rules_kotlin//kotlin:jvm.bzl", "kt_jvm_test")
+
+kt_android_library(
+    name = "lib",
+    srcs = glob(["src/main/**/*.kt"]),
+    custom_package = "co.adrianblan.storyfeed",
+    manifest = "src/main/AndroidManifest.xml",
+    plugins = ["//:jetpack_compose_compiler_plugin"],
+    resource_files = glob(["src/main/res/**"]),
+    visibility = ["//visibility:public"],
+    deps = [
+        "//core/domain:lib",
+        "//core/hackernews:lib",
+        "//core/ui:lib",
+        "//core/webpreview:lib",
+        "@maven//:androidx_activity_activity_compose",
+        "@maven//:androidx_compose_material3_material3",
+        "@maven//:androidx_compose_material3_material3_android",
+        "@maven//:androidx_compose_ui_ui_android",
+        "@maven//:androidx_compose_ui_ui_tooling_preview",
+        "@maven//:androidx_compose_ui_ui_tooling_preview_android",
+        "@maven//:androidx_hilt_hilt_lifecycle_viewmodel",
+        "@maven//:androidx_hilt_hilt_navigation_compose",
+        "@maven//:androidx_lifecycle_lifecycle_runtime_compose",
+    ],
+)
+
+kt_android_local_test(
+    name = "test",
+    srcs = glob(["src/test/**/java/**/*.kt"]),
+    associates = [":lib_kt"],
+    test_class = "co.adrianblan.storydetail.StoryDetailViewModelTest",
+    visibility = ["//visibility:public"],
+    deps = [
+        ":lib",
+        "//core/common:lib",
+        "//core/domain:lib",
+        "//core/hackernews:lib",
+        "//core/testing:lib",
+        "@maven//:app_cash_turbine_turbine_jvm",
+        "@maven//:org_jetbrains_kotlin_kotlin_test",
+        "@rules_robolectric//bazel:android-all",
+    ],
+)
