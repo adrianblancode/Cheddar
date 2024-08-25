@@ -1,6 +1,3 @@
-import java.io.FileInputStream
-import java.util.Properties
-
 plugins {
     id("cheddar.android.application")
     id("cheddar.android.dagger")

@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.Dimension
+import androidx.constraintlayout.compose.ExperimentalMotionApi
 import androidx.constraintlayout.compose.MotionLayout
 import androidx.constraintlayout.compose.MotionScene
 import co.adrianblan.common.urlSiteName
@@ -97,6 +98,7 @@ private fun LoadingToolbar(modifier: Modifier = Modifier) {
     }
 }
 
+@OptIn(ExperimentalMotionApi::class)
 @Composable
 private fun SuccessToolbar(
     story: Story,
@@ -262,6 +264,21 @@ private fun SuccessToolbarCollapsedPostPreview() {
                 story = Story.placeholderPost,
                 webPreviewState = null,
                 collapsedFraction = { 1.0f },
+                onStoryContentClick = {},
+            )
+        }
+    }
+}
+
+@Preview("Toolbar collapsed")
+@Composable
+private fun SuccessToolbarSliderPreview() {
+    AppTheme {
+        Box(modifier = Modifier.height(140.dp)) {
+            SuccessToolbar(
+                story = Story.placeholderLink,
+                webPreviewState = WebPreviewState.Success(WebPreviewData.placeholder),
+                collapsedFraction = { 0.0f },
                 onStoryContentClick = {},
             )
         }

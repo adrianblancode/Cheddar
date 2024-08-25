@@ -2,6 +2,7 @@
 *.apk
 *.ap_
 app/release/
+.kotlin
 
 # Files for the ART/Dalvik VM
 *.dex

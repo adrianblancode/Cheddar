@@ -1,31 +1,30 @@
 [versions]
 minSdk = "23"
-compileSdk = "34"
+compileSdk = "35"
 targetSdk = "34"
 
-androidGradlePlugin = "8.2.0-alpha14"
-androidxActivity = "1.8.0-alpha06"
-androidxBrowser = "1.5.0"
-androidxComposeBom = "2023.08.00"
-androidxComposeCompiler = "1.5.1"
-androidxConstraintlayout = "1.1.0-alpha11"
-androidxCore = "1.10.1"
+androidGradlePlugin = "8.5.2"
+androidxActivity = "1.9.1"
+androidxBrowser = "1.8.0"
+androidxComposeBom = "2024.08.00"
+androidxConstraintlayout = "1.1.0-alpha14"
+androidxCore = "1.13.1"
 androidxCoreTesting = "2.2.0"
-androidxLifecycle = "2.6.1"
-androidxNavigation = "2.6.0"
-androidxHiltNavigationCompose = "1.0.0"
-androidxSplashscreen = "1.0.0-beta02"
+androidxLifecycle = "2.8.4"
+androidxNavigation = "2.7.7"
+androidxHiltNavigationCompose = "1.2.0"
+androidxSplashscreen = "1.0.1"
 
 coil = "2.4.0"
-desugar = "2.0.3"
-hilt = "2.48"
-hiltExt = "1.0.0"
+desugar = "2.0.4"
+hilt = "2.49"
+hiltExt = "1.2.0"
 jsoup = "1.16.1"
-kotlin = "1.9.0"
-kotlinxCoroutines = "1.7.1"
-kotlinxImmutable = "0.3.5"
-kotlinxSerializationJson = "1.5.1"
-ksp = "1.9.0-1.0.12"
+kotlin = "2.0.20"
+kotlinxCoroutines = "1.8.1"
+kotlinxImmutable = "0.3.7"
+kotlinxSerializationJson = "1.6.3"
+ksp = "2.0.20-1.0.24"
 okhttp = "5.0.0-alpha.10"
 retrofit = "2.9.0"
 retrofitSerialization = "0.8.0"
@@ -37,8 +36,6 @@ junit = "4.13.2"
 androidTestJunit = "1.1.1"
 mockito = "4.8.1"
 mockitoKotlin = "2.2.0"
-
-dependencyUpdatesPlugin = "0.43.0"
 
 [libraries]
 androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "androidxActivity" }
@@ -53,7 +50,6 @@ androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", v
 
 androidx-compose-animation = { group = "androidx.compose.animation", name = "animation" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidxComposeBom" }
-androidx-compose-compiler = { group = "androidx.compose.compiler", name = "compiler", version.ref = "androidxComposeCompiler" }
 androidx-compose-foundation-core = { group = "androidx.compose.foundation", name = "foundation" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout" }
 androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
@@ -95,7 +91,7 @@ ksp-gradleplugin = { group = "com.google.devtools.ksp", name = "com.google.devto
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
-dependency-updates-plugin = { id = "com.github.ben-manes.versions", version.ref = "dependencyUpdatesPlugin"}
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
