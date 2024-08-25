@@ -14,21 +14,27 @@ sealed class StoryDetailViewState {
         val commentsState: StoryDetailCommentsState
     ) : StoryDetailViewState()
 
-    object Loading : StoryDetailViewState()
+    data object Loading : StoryDetailViewState()
     data class Error(val t: Throwable) : StoryDetailViewState()
+}
+
+enum class CommentCollapsedState {
+    COLLAPSED, PARENT_COLLAPSED;
 }
 
 // A comment in the comment tree that has been flattened into a list
 @Immutable
 data class FlatComment(
     val comment: Comment,
-    val depthIndex: Int
+    val numChildren: Int,
+    val depthIndex: Int,
+    val collapsedState: CommentCollapsedState?
 )
 
 @Immutable
 sealed class StoryDetailCommentsState {
     data class Success(val comments: ImmutableList<FlatComment>) : StoryDetailCommentsState()
-    object Empty : StoryDetailCommentsState()
-    object Loading : StoryDetailCommentsState()
-    object Error : StoryDetailCommentsState()
+    data object Empty : StoryDetailCommentsState()
+    data object Loading : StoryDetailCommentsState()
+    data object Error : StoryDetailCommentsState()
 }

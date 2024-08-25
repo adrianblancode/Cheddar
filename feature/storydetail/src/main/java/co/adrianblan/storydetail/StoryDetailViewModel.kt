@@ -1,6 +1,5 @@
 package co.adrianblan.storydetail
 
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,6 +18,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -42,21 +42,58 @@ class StoryDetailViewModel
     private val storyDetailArgs = StoryDetailArgs(savedStateHandle)
     private val storyId: StoryId = storyDetailArgs.storyId
 
+    private val commentsState: StateFlow<StoryDetailCommentsState> =
+        flow { emit(hackerNewsRepository.fetchStory(storyId)) }
+            .flatMapLatest { story ->
+                observeCommentsViewState(story)
+            }
+            .stateIn(viewModelScope, WhileSubscribed, StoryDetailCommentsState.Loading)
+
+    private val collapsedCommentsFlow = MutableStateFlow(listOf<CommentId>())
+    private val commentParents = mutableMapOf<CommentId, CommentId?>()
+
     val viewState: StateFlow<StoryDetailViewState> =
-        combine<DecoratedStory, StoryDetailCommentsState, StoryDetailViewState>(
+        combine(
             storyPreviewUseCase.observeDecoratedStory(storyId),
-            flow { emit(hackerNewsRepository.fetchStory(storyId)) }
-                .flatMapLatest { story ->
-                    observeCommentsViewState(story)
-                }
+            commentsState,
+            collapsedCommentsFlow,
         ) { decoratedStory: DecoratedStory,
-            storyDetailCommentsState: StoryDetailCommentsState ->
+            storyDetailCommentsState: StoryDetailCommentsState,
+            collapsedComments: List<CommentId> ->
+
+            val commentsState = storyDetailCommentsState.let { state ->
+                if (state is StoryDetailCommentsState.Success) {
+                    val comments = state.comments.map { comment ->
+
+                        val isCollapsed = comment.comment.id in collapsedComments
+
+                        var parent: CommentId? = commentParents[comment.comment.id]
+                        var hasCollapsedParent = false
+                        while (parent != null) {
+                            if (parent in collapsedComments) {
+                                hasCollapsedParent = true
+                                break
+                            }
+                            parent = commentParents[parent]
+                        }
+
+                        val collapsedState = when {
+                            hasCollapsedParent -> CommentCollapsedState.PARENT_COLLAPSED
+                            isCollapsed -> CommentCollapsedState.COLLAPSED
+                            else -> null
+                        }
+
+                        comment.copy(collapsedState = collapsedState)
+                    }
+                    state.copy(comments = comments.toImmutableList())
+                } else state
+            }
 
             StoryDetailViewState.Success(
                 story = decoratedStory.story,
                 webPreviewState = decoratedStory.webPreviewState,
-                commentsState = storyDetailCommentsState
-            )
+                commentsState = commentsState
+            ) as StoryDetailViewState
         }
             .flowOn(dispatcherProvider.IO)
             .catch {
@@ -69,7 +106,13 @@ class StoryDetailViewModel
         coroutineScope {
             commentIds
                 .map { commentId ->
-                    async { fetchFlattenedComments(commentId, 0) }
+
+                    commentParents[commentId] = null
+
+                    async { fetchFlattenedComments(
+                        commentId = commentId,
+                        depthIndex = 0
+                    ) }
                 }
                 .awaitAll()
                 .flatten()
@@ -78,7 +121,7 @@ class StoryDetailViewModel
     // Recursively fetches the comment tree and flattens it into a list
     private suspend fun fetchFlattenedComments(
         commentId: CommentId,
-        depthIndex: Int
+        depthIndex: Int,
     ): List<FlatComment> =
         coroutineScope {
 
@@ -89,12 +132,23 @@ class StoryDetailViewModel
                 val children: List<FlatComment> =
                     comment.kids
                         .map { childCommentId ->
-                            async { fetchFlattenedComments(childCommentId, depthIndex + 1) }
+
+                            commentParents[childCommentId] = commentId
+
+                            async { fetchFlattenedComments(
+                                commentId = childCommentId,
+                                depthIndex + 1
+                            ) }
                         }
                         .awaitAll()
                         .flatten()
 
-                listOf(FlatComment(comment = comment, depthIndex = depthIndex)) + children
+                listOf(FlatComment(
+                    comment = comment,
+                    numChildren = children.size,
+                    depthIndex = depthIndex,
+                    collapsedState = null
+                )) + children
             } else emptyList()
         }
 
@@ -110,4 +164,13 @@ class StoryDetailViewModel
                 Timber.e(it)
                 emit(StoryDetailCommentsState.Error)
             }
+
+    fun onCommentClick(id: CommentId) {
+        val collapsedComments = collapsedCommentsFlow.value
+        collapsedCommentsFlow.value = if (id in collapsedComments) {
+            collapsedComments - id
+        } else {
+            collapsedComments + id
+        }
+    }
 }

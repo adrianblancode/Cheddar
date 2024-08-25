@@ -124,7 +124,7 @@ fun StoryFeedItemDescription(
         Column {
             // Only show shimmer if we are loading preview for an url
             if (isLoading) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(4.dp))
 
                 Column {
                     Row(modifier = Modifier.padding(top = 1.dp)) {
@@ -143,7 +143,7 @@ fun StoryFeedItemDescription(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
                     ShimmerView(
                         Modifier

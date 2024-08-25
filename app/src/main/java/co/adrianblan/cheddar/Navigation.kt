@@ -1,5 +1,6 @@
 package co.adrianblan.cheddar
 
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
@@ -16,7 +17,31 @@ fun Navigation(
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = storyFeedRoute
+        startDestination = storyFeedRoute,
+        enterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                initialOffset = { it }
+            )
+        },
+        exitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                targetOffset = { -it / 2 }
+            )
+        },
+        popEnterTransition = {
+            slideIntoContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                initialOffset = { -it / 2 }
+            )
+        },
+        popExitTransition = {
+            slideOutOfContainer(
+                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                targetOffset = { it }
+            )
+        },
     ) {
 
         storyFeedScreen(

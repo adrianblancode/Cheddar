@@ -64,7 +64,7 @@ val DarkColorScheme = darkColorScheme(
     onSurfaceVariant = Dark30,
     inverseSurface = Light90,
     inverseOnSurface = Color.Black,
-    outline = Dark10,
+    outline = Dark20,
     scrim = Color.Black.copy(alpha = 0.8f)
 )
 

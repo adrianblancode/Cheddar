@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-val WhileSubscribed = SharingStarted.WhileSubscribed(500)
+val WhileSubscribed = SharingStarted.WhileSubscribed(5000)
 
 fun <T, M> StateFlow<T>.map(
     coroutineScope: CoroutineScope,

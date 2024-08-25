@@ -25,9 +25,10 @@ class WebPreviewRepository
     private val cache = WeakCache<String, WebPreviewData>()
 
     suspend fun webPreviewResource(url: String): AsyncResource<WebPreviewData> =
-        AsyncResource(cache.get(url)) {
-            fetchWebPreview(url)
-        }
+        AsyncResource(
+            cached = cache.get(url),
+            fetch = { fetchWebPreview(url) }
+        )
 
     private suspend fun fetchWebPreview(url: String): WebPreviewData {
 

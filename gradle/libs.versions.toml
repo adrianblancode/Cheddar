@@ -11,7 +11,7 @@ androidxConstraintlayout = "1.1.0-alpha14"
 androidxCore = "1.13.1"
 androidxCoreTesting = "2.2.0"
 androidxLifecycle = "2.8.4"
-androidxNavigation = "2.7.7"
+androidxNavigation = "2.8.0-beta07"
 androidxHiltNavigationCompose = "1.2.0"
 androidxSplashscreen = "1.0.1"
 

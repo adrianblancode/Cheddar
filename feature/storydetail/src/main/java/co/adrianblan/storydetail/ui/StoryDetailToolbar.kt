@@ -69,7 +69,10 @@ internal fun StoryDetailToolbar(
         }
 
         when (viewState) {
-            is StoryDetailViewState.Loading -> LoadingToolbar(modifier = Modifier.padding(start = 56.dp))
+            is StoryDetailViewState.Loading ->
+                LoadingToolbar(
+                    modifier = Modifier.padding(start = 16.dp, top = 64.dp)
+                )
             is StoryDetailViewState.Success -> {
                 SuccessToolbar(
                     story = viewState.story,
