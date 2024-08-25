@@ -1,6 +1,7 @@
 package co.adrianblan.storyfeed.ui
 
 import android.text.Html
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -119,65 +120,67 @@ fun StoryFeedItemDescription(
 
     val storyUrl: StoryUrl? = story.url
 
-    Box {
-        // Only show shimmer if we are loading preview for an url
-        if (storyUrl != null && webPreviewState is WebPreviewState.Loading) {
-            Spacer(modifier = Modifier.height(8.dp))
+    AnimatedContent(targetState = storyUrl != null && webPreviewState is WebPreviewState.Loading) { isLoading ->
+        Column {
+            // Only show shimmer if we are loading preview for an url
+            if (isLoading) {
+                Spacer(modifier = Modifier.height(8.dp))
 
-            Column {
-                Row(modifier = Modifier.padding(top = 1.dp)) {
-                    Text(
-                        text = storyUrl.urlSiteName(),
-                        style = MaterialTheme.typography.labelLarge,
-                        modifier = Modifier
-                            // Shorter spacer
-                            .padding(end = 6.dp)
-                            .align(Alignment.CenterVertically)
-                    )
+                Column {
+                    Row(modifier = Modifier.padding(top = 1.dp)) {
+                        Text(
+                            text = storyUrl?.urlSiteName().orEmpty(),
+                            style = MaterialTheme.typography.labelLarge,
+                            modifier = Modifier
+                                // Shorter spacer
+                                .padding(end = 6.dp)
+                                .align(Alignment.CenterVertically)
+                        )
+                        ShimmerView(
+                            Modifier
+                                .fillMaxWidth()
+                                .height(16.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
                     ShimmerView(
                         Modifier
                             .fillMaxWidth()
+                            .padding(top = 1.dp)
                             .height(16.dp)
                     )
                 }
+            } else {
+                val webPreview =
+                    (webPreviewState as? WebPreviewState.Success)?.webPreview
 
-                Spacer(modifier = Modifier.height(6.dp))
+                val siteName: String? =
+                    webPreview?.siteName ?: story.url?.urlSiteName()
 
-                ShimmerView(
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = 1.dp)
-                        .height(16.dp)
-                )
-            }
-        } else {
-            val webPreview =
-                (webPreviewState as? WebPreviewState.Success)?.webPreview
+                val description: String? =
+                    story.text
+                        .takeIf { !it.isNullOrEmpty() }
+                        ?.let {
+                            Html.fromHtml(it).toString()
+                                .replace("\n\n", " ")
+                        }
+                        ?: webPreview?.description
 
-            val siteName: String? =
-                webPreview?.siteName ?: story.url?.urlSiteName()
+                val subtitle = rememberStoryDescriptionAnnotatedString(siteName, description)
 
-            val description: String? =
-                story.text
-                    .takeIf { !it.isNullOrEmpty() }
-                    ?.let {
-                        Html.fromHtml(it).toString()
-                            .replace("\n\n", " ")
-                    }
-                    ?: webPreview?.description
-
-            val subtitle = rememberStoryDescriptionAnnotatedString(siteName, description)
-
-            if (subtitle.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = subtitle,
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        color = MaterialTheme.colorScheme.onPrimary.copy(alpha = textSecondaryAlpha)
-                    ),
-                    maxLines = 3,
-                    overflow = TextOverflow.Ellipsis
-                )
+                if (subtitle.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(3.dp))
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = textSecondaryAlpha)
+                        ),
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                }
             }
         }
     }
