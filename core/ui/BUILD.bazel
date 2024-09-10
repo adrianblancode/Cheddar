@@ -7,6 +7,7 @@ kt_android_library(
     manifest = "src/main/AndroidManifest.xml",
     plugins = ["//:jetpack_compose_compiler_plugin"],
     resource_files = glob(["src/main/res/**"]),
+    tags = ["trace"],
     visibility = ["//visibility:public"],
     deps = [
         "//core/model:lib",
@@ -26,4 +27,11 @@ kt_android_library(
         "@maven//:io_coil_kt_coil_compose",
         "@maven//:io_coil_kt_coil_svg",
     ],
+)
+
+android_library(
+    name = "res2",
+    custom_package = "co.adrianblan.ui",
+    manifest = "src/main/AndroidManifest.xml",
+    resource_files = glob(["src/main/res/**"]),
 )
