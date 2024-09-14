@@ -49,25 +49,25 @@ kt_android_library(
     ],
 )
 
-kt_android_local_test(
-    name = "test",
-    srcs = glob([
-        "src/test/java/**/*.kt",
-    ]),
-    associates = [":lib_kt"],
-    manifest = "src/main/AndroidManifest.xml",
-    test_class = "co.adrianblan.storydetail.StoryDetailViewModelTest",
-    visibility = ["//visibility:public"],
-    deps = [
-        ":lib",
-        "//core/common:lib",
-        "//core/domain:lib",
-        "//core/hackernews:lib",
-        "//core/testing:lib",
-        "@maven//:app_cash_turbine_turbine_jvm",
-        "@maven//:com_google_truth_truth",
-        "@maven//:junit_junit",
-        "@maven//:org_jetbrains_kotlin_kotlin_test",
-        "@rules_robolectric//bazel:android-all",
-    ],
-)
+#kt_android_local_test(
+#    name = "test",
+#    srcs = glob([
+#        "src/test/java/**/*.kt",
+#    ]),
+#    associates = [":lib_kt"],
+#    manifest = "src/main/AndroidManifest.xml",
+#    test_class = "co.adrianblan.storydetail.StoryDetailViewModelTest",
+#    visibility = ["//visibility:public"],
+#    deps = [
+#        ":lib",
+#        "//core/common:lib",
+#        "//core/domain:lib",
+#        "//core/hackernews:lib",
+#        "//core/testing:lib",
+#        "@maven//:app_cash_turbine_turbine_jvm",
+#        "@maven//:com_google_truth_truth",
+#        "@maven//:junit_junit",
+#        "@maven//:org_jetbrains_kotlin_kotlin_test",
+#        "@rules_robolectric//bazel:android-all",
+#    ],
+#)

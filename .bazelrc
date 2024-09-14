@@ -3,6 +3,7 @@ common --experimental_google_legacy_api
 common --experimental_enable_android_migration_apis
 common --android_sdk=@androidsdk//:sdk
 common:core_library_desugaring --desugar_java8_libs
+common --incompatible_disable_native_android_rules=true
 
 # Flags to enable mobile-install v3
 mobile-install --mode=skylark --mobile_install_aspect=@rules_android//mobile_install:mi.bzl --mobile_install_supported_rules=android_binary
