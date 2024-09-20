@@ -1,5 +1,6 @@
 load("@rules_android//android:rules.bzl", "android_binary")
 load("@rules_kotlin//kotlin:android.bzl", "kt_android_library")
+load("@rules_kotlin//kotlin:lint.bzl", "ktlint_fix", "ktlint_test")
 
 kt_android_library(
     name = "lib",
@@ -33,4 +34,16 @@ android_binary(
         "@maven//:androidx_activity_activity",
         "@maven//:androidx_core_core_splashscreen",
     ],
+)
+
+ktlint_fix(
+    name = "lint_fix",
+    srcs = glob(["**/*.kt"]),
+    config = "//:ktlint_editorconfig",
+)
+
+ktlint_test(
+    name = "lint_test",
+    srcs = glob(["**/*.kt"]),
+    config = "//:ktlint_editorconfig",
 )

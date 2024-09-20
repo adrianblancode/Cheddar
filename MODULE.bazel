@@ -31,16 +31,8 @@ bazel_dep(
 
 bazel_dep(
     name = "rules_kotlin",
-    version = "1.9.6",
+    version = "2.0.0",
 )
-
-#
-#register_toolchains("@androidsdk//:sdk-toolchain", "@androidsdk//:all")
-
-#bazel_dep(
-#    name = "rules_jvm_external",
-#    version = "6.2",
-#)
 
 bazel_dep(
     name = "rules_jvm_external",
@@ -66,7 +58,6 @@ use_repo(android_sdk_repository_extension, "androidsdk")
 maven = use_extension("@rules_jvm_external//:extensions.bzl", "maven")
 
 maven.install(
-    #    aar_import_bzl_label = "@rules_android//rules:rules.bzl",
     artifacts = [
         "org.jetbrains.kotlinx:kotlinx-collections-immutable-jvm:0.3.4",
         "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3",
@@ -117,7 +108,7 @@ maven.install(
         "androidx.compose.material:material-icons-extended:jar:1.5.0",
         "androidx.compose.material:material-icons-core:jar:1.6.8",
         "io.coil-kt:coil-compose:jar:2.7.0",
-        "androidx.compose.compiler:compiler:jar:1.5.12",
+        "org.jetbrains.kotlin:kotlin-compose-compiler-plugin-embeddable:jar:2.0.0",
         "androidx.constraintlayout:constraintlayout:jar:2.1.4",
         "androidx.navigation:navigation-compose:jar:2.5.3",
         "androidx.lifecycle:lifecycle-common-java8:2.5.1",
@@ -138,8 +129,8 @@ maven.install(
     repositories = [
         "https://maven.google.com",
         "https://repo1.maven.org/maven2",
+        "https://androidx.dev/storage/compose-compiler/repository/",
     ],
-    #    use_starlark_android_rules = True,
     version_conflict_policy = "pinned",
 )
 
