@@ -10,20 +10,17 @@ import co.adrianblan.storyfeed.storyFeedRoute
 import co.adrianblan.storyfeed.storyFeedScreen
 
 @Composable
-fun Navigation(
-    customTabsLauncher: CustomTabsLauncher
-) {
+fun Navigation(customTabsLauncher: CustomTabsLauncher) {
     val navController = rememberNavController()
     NavHost(
         navController = navController,
-        startDestination = storyFeedRoute
+        startDestination = storyFeedRoute,
     ) {
-
         storyFeedScreen(
             onStoryClick = navController::navigateToTopic,
             onStoryContentClick = { storyUrl ->
                 customTabsLauncher.launchUrl(storyUrl.url)
-            }
+            },
         )
         storyDetailScreen(
             onStoryContentClick = { storyUrl ->
@@ -32,7 +29,7 @@ fun Navigation(
             onCommentUrlClick = { uri ->
                 customTabsLauncher.launchUrl(uri.toString())
             },
-            onBackPressed = navController::popBackStack
+            onBackPressed = navController::popBackStack,
         )
     }
 }

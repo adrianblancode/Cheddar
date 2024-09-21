@@ -8,7 +8,6 @@ import timber.log.Timber
 
 @HiltAndroidApp
 class CheddarApplication : Application() {
-
     override fun onCreate() {
         super.onCreate()
 
