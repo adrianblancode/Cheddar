@@ -9,4 +9,5 @@ common --incompatible_disable_native_android_rules=true
 mobile-install --mode=skylark --mobile_install_aspect=@rules_android//mobile_install:mi.bzl --mobile_install_supported_rules=android_binary
 # Required to invoke the Studio deployer jar
 mobile-install --tool_java_runtime_version=17
+mobile-install –tool_java_tools_version=17
 --javacopt="-J-Xms8G -J-Xmx8G"

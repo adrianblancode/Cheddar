@@ -1,13 +1,16 @@
 package co.adrianblan.cheddar
 
-import android.app.Application
 import co.adrianblan.ui.coil.CoilImageLoaderFactory
 import coil.Coil
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
+//import androidx.multidex.MultiDexApplication
+//@HiltAndroidApp(MultiDexApplication::class)
+//class CheddarApplication : Hilt_CheddarApplication() {
+//class CheddarApplication : Hilt_CheddarApplication() {
 @HiltAndroidApp
-class CheddarApplication : Application() {
+class CheddarApplication : Hilt_CheddarApplication() {
     override fun onCreate() {
         super.onCreate()
 

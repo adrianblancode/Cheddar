@@ -125,6 +125,8 @@ maven.install(
         "com.google.truth:truth:1.1.2",
         "com.google.auto.value:auto-value:jar:1.11.0",
         "androidx.compose.ui:ui-tooling-preview:1.7.0",
+        "androidx.multidex:multidex:2.0.1",
+        "com.google.dagger:hilt-android-compiler:2.52",
     ],
     repositories = [
         "https://maven.google.com",

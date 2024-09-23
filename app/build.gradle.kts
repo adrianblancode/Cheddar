@@ -61,4 +61,5 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.coil)
     debugImplementation(libs.leakcanary)
+//    runtimeOnly(libs.androidx.multidex)
 }

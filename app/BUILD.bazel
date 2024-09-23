@@ -18,6 +18,8 @@ kt_android_library(
         "//feature/storydetail:lib",
         "//feature/storyfeed:lib",
         "@maven//:androidx_activity_activity",
+        "@maven//:androidx_multidex_multidex_2_0_1",
+        "@maven//:javax_inject_javax_inject",
     ],
 )
 
@@ -25,6 +27,7 @@ android_binary(
     name = "app",
     custom_package = "co.adrianblan.cheddar.app",
     manifest = "src/main/AndroidManifest.xml",
+    #    mulltidex = "native",
     deps = [
         ":lib",
         ":lib_kt",

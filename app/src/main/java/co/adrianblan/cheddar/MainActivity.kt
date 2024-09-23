@@ -23,8 +23,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             AppTheme {
-                Box {
-                    Navigation(customTabsLauncher)
+                if (::customTabsLauncher.isInitialized) {
+                    Box {
+                        Navigation(customTabsLauncher)
+                    }
                 }
             }
         }
