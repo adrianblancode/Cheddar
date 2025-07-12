@@ -2,34 +2,34 @@ package co.adrianblan.storydetail.ui
 
 import android.net.Uri
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import co.adrianblan.model.CommentId
+import co.adrianblan.model.Story
 import co.adrianblan.model.StoryUrl
 import co.adrianblan.storydetail.CommentCollapsedState
 import co.adrianblan.storydetail.R
@@ -37,9 +37,8 @@ import co.adrianblan.storydetail.StoryDetailCommentsState
 import co.adrianblan.storydetail.StoryDetailViewModel
 import co.adrianblan.storydetail.StoryDetailViewState
 import co.adrianblan.ui.AppTheme
-import co.adrianblan.ui.CollapsingScaffold
 import co.adrianblan.ui.ErrorView
-import co.adrianblan.ui.LoadingVisual
+import co.adrianblan.ui.LoadingSpinner
 
 private val toolbarMinHeight = 56.dp
 private val toolbarMaxHeight = 156.dp
@@ -71,103 +70,126 @@ internal fun StoryDetailScreen(
     onBackPressed: () -> Unit
 ) {
 
-    val scrollState = rememberScrollState()
+    val density = LocalDensity.current
+    val toolbarMaxHeightPx = with(density) { toolbarMaxHeight.toPx() }
+    val nestedScrollConnection = remember {
+        StoryDetailNestedScrollConnection(toolbarMaxHeightPx)
+    }
 
-    CollapsingScaffold(
-        scrollState = scrollState,
-        minHeight = toolbarMinHeight,
-        maxHeight = toolbarMaxHeight,
-        toolbarContent = { collapsedFraction ->
-            StoryDetailToolbar(
-                viewState = viewState,
-                collapsedFraction = collapsedFraction,
-                onStoryContentClick = onStoryContentClick,
-                onBackPressed = onBackPressed
-            )
-        },
-        bodyContent = {
+    val toolbar: @Composable () -> Unit = {
+        StoryDetailToolbar(
+            viewState = viewState,
+            collapseProgress = { nestedScrollConnection.progress() },
+            onStoryContentClick = onStoryContentClick,
+            onBackPressed = onBackPressed
+        )
+    }
 
-            when (viewState) {
-                is StoryDetailViewState.Success -> CommentsSuccessBody(
-                    viewState = viewState,
-                    scrollState = scrollState,
-                    onCommentClick = onCommentClick,
-                    onCommentUrlClick = onCommentUrlClick
-                )
+    val commentsLoaded = (viewState as? StoryDetailViewState.Success)
+        ?.commentsState is StoryDetailCommentsState.Success
 
-                is StoryDetailViewState.Loading -> LoadingVisual(modifier = Modifier.fillMaxSize())
-                is StoryDetailViewState.Error -> ErrorView(modifier = Modifier.fillMaxSize())
+    Box(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .fillMaxSize()
+    ) {
+
+        when (viewState) {
+            is StoryDetailViewState.Success -> {
+                when (viewState.commentsState) {
+                    is StoryDetailCommentsState.Success -> {
+                        CommentsSuccessBody(
+                            story = viewState.story,
+                            commentsState = viewState.commentsState,
+                            header = {
+                                stickyHeader {
+                                    toolbar()
+                                }
+                            },
+                            onCommentClick = onCommentClick,
+                            onCommentUrlClick = onCommentUrlClick,
+                            modifier = Modifier.nestedScroll(nestedScrollConnection)
+                        )
+                    }
+
+                    is StoryDetailCommentsState.Empty -> CommentsEmptyView()
+                    is StoryDetailCommentsState.Loading -> LoadingSpinner(modifier = Modifier.fillMaxSize())
+                    is StoryDetailCommentsState.Error -> ErrorView(modifier = Modifier.fillMaxSize())
+                }
             }
+
+            is StoryDetailViewState.Loading -> LoadingSpinner(modifier = Modifier.fillMaxSize())
+
+            is StoryDetailViewState.Error -> ErrorView(modifier = Modifier.fillMaxSize())
         }
-    )
+
+        if (!commentsLoaded) {
+            toolbar()
+        }
+    }
+
 }
 
 @Composable
 private fun CommentsSuccessBody(
-    viewState: StoryDetailViewState.Success,
-    scrollState: ScrollState,
+    story: Story,
+    commentsState: StoryDetailCommentsState.Success,
+    header: LazyListScope.() -> Unit,
     onCommentClick: (CommentId) -> Unit,
-    onCommentUrlClick: (Uri) -> Unit
+    onCommentUrlClick: (Uri) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val story = viewState.story
 
-    when (viewState.commentsState) {
-        is StoryDetailCommentsState.Success ->
-            // TODO change to LazyColumn once scroll state is fixed
-            Column(modifier = Modifier.verticalScroll(scrollState)) {
+    LazyColumn(modifier = modifier.fillMaxSize()) {
 
-                Spacer(
-                    modifier = Modifier
-                        .statusBarsPadding()
-                        .height(toolbarMaxHeight)
-                )
+        header()
 
-                if (viewState.story.text != null) {
-                    CommentItem(
-                        text = story.text,
-                        by = story.by,
-                        storyAuthor = story.by,
-                        onCommentUrlClick = onCommentUrlClick
-                    )
-                }
-
-                viewState.commentsState.comments
-                    .forEach { comment ->
-                        key(comment.comment.id) {
-
-                            AnimatedContent(
-                                targetState = comment.collapsedState,
-                                label = "comment_collapsed_state",
-                                modifier = Modifier
-                                    .clickable { onCommentClick(comment.comment.id)  }
-                                    .commentDepthIndicator(comment.depthIndex)
-                            ) { collapsedState ->
-                                when (collapsedState) {
-                                    CommentCollapsedState.COLLAPSED ->
-                                        CollapsedCommentItem(numChildren = comment.numChildren)
-                                    CommentCollapsedState.PARENT_COLLAPSED -> {}
-                                    else -> {
-                                        CommentItem(
-                                            comment = comment,
-                                            storyAuthor = story.by,
-                                            onCommentUrlClick = onCommentUrlClick
-                                        )
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                Spacer(
-                    modifier = Modifier
-                        .navigationBarsPadding()
-                        .height(8.dp)
+        if (story.text != null) {
+            item {
+                CommentItem(
+                    text = story.text,
+                    by = story.by,
+                    storyAuthor = story.by,
+                    onCommentUrlClick = onCommentUrlClick
                 )
             }
+        }
 
-        is StoryDetailCommentsState.Empty -> CommentsEmptyView()
-        is StoryDetailCommentsState.Loading -> LoadingVisual(modifier = Modifier.fillMaxSize())
-        is StoryDetailCommentsState.Error -> ErrorView(modifier = Modifier.fillMaxSize())
+        items(
+            items = commentsState.comments,
+            key = { it.comment.id.id },
+            itemContent = { comment ->
+                AnimatedContent(
+                    targetState = comment.collapsedState,
+                    label = "comment_collapsed_state",
+                    modifier = Modifier
+                        .clickable { onCommentClick(comment.comment.id) }
+                        .commentDepthIndicator(comment.depthIndex)
+                ) { collapsedState ->
+                    when (collapsedState) {
+                        CommentCollapsedState.COLLAPSED ->
+                            CollapsedCommentItem(numChildren = comment.numChildren)
+
+                        CommentCollapsedState.PARENT_COLLAPSED -> {}
+                        else -> {
+                            CommentItem(
+                                comment = comment,
+                                storyAuthor = story.by,
+                                onCommentUrlClick = onCommentUrlClick
+                            )
+                        }
+                    }
+                }
+            }
+        )
+
+        item {
+            Spacer(
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .height(8.dp)
+            )
+        }
     }
 }
 

@@ -1,5 +1,6 @@
 package co.adrianblan.storydetail.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,9 +8,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,11 +24,14 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.datasource.LoremIpsum
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.lerp
 import androidx.constraintlayout.compose.ChainStyle
 import androidx.constraintlayout.compose.Dimension
 import androidx.constraintlayout.compose.ExperimentalMotionApi
@@ -45,19 +49,30 @@ import co.adrianblan.storydetail.StoryDetailViewState
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.ShimmerView
 import co.adrianblan.ui.StoryImage
-import co.adrianblan.ui.utils.lerp
 import kotlin.math.roundToInt
 
 
 @Composable
 internal fun StoryDetailToolbar(
     viewState: StoryDetailViewState,
-    collapsedFraction: () -> Float,
+    collapseProgress: () -> Float,
     onStoryContentClick: (StoryUrl) -> Unit,
-    onBackPressed: () -> Unit
+    onBackPressed: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
 
-    Box {
+    val elevation: () -> Dp = {
+        androidx.compose.ui.unit.lerp(0.dp, 0.5.dp, collapseProgress())
+    }
+
+    Box(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.scrim)
+            .graphicsLayer {
+                shadowElevation = elevation().toPx()
+            }
+            .statusBarsPadding()
+    ) {
         IconButton(
             onClick = onBackPressed,
             modifier = Modifier.padding(8.dp)
@@ -78,7 +93,7 @@ internal fun StoryDetailToolbar(
                 SuccessToolbar(
                     story = viewState.story,
                     webPreviewState = viewState.webPreviewState,
-                    collapsedFraction = collapsedFraction,
+                    collapsedFraction = collapseProgress,
                     onStoryContentClick = onStoryContentClick
                 )
             }
@@ -211,7 +226,7 @@ private fun SuccessToolbar(
             }
         },
         progress = collapsedFraction(),
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxWidth()
     ) {
 
         val titleMaxLines: Int by remember {

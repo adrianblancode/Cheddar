@@ -46,7 +46,7 @@ import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.CollapsingScaffold
 import co.adrianblan.ui.ErrorView
 import co.adrianblan.ui.LoadingText
-import co.adrianblan.ui.LoadingVisual
+import co.adrianblan.ui.LoadingSpinner
 import co.adrianblan.ui.textSecondaryAlpha
 import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.min
@@ -151,7 +151,7 @@ private fun BodyContent(
 ) {
 
     when (viewState.storyFeedState) {
-        is StoryFeedState.Loading -> LoadingVisual(modifier = Modifier.fillMaxSize())
+        is StoryFeedState.Loading -> LoadingSpinner(modifier = Modifier.fillMaxSize())
         is StoryFeedState.Success -> {
             SuccessBody(
                 scrollState = scrollState,

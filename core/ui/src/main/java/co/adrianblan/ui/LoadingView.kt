@@ -46,9 +46,8 @@ fun LoadingText(
 }
 
 @Composable
-fun LoadingVisual(
-    modifier: Modifier = Modifier,
-    textStyle: TextStyle = MaterialTheme.typography.titleLarge,
+fun LoadingSpinner(
+    modifier: Modifier = Modifier
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -145,6 +144,6 @@ private fun LoadingTextPreview() {
 @Composable
 private fun LoadingVisualPreview() {
     AppTheme {
-        LoadingVisual()
+        LoadingSpinner()
     }
 }
