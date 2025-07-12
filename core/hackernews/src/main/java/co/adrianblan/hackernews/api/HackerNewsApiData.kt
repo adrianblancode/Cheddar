@@ -33,7 +33,7 @@ fun ApiStory.toDomain() =
         kids = kids.map { CommentId(it) }.toImmutableList()
     )
 
-@Serializable(with = NullableApiCommentSerializer::class)
+@Serializable
 data class ApiComment(
     val id: Long,
     // Comments can be deleted
