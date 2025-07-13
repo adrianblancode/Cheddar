@@ -11,6 +11,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.unit.Velocity
 
+/** Coordinates scroll between toolbar and LazyColumn */
 class StoryDetailNestedScrollConnection(
     private val maxNestedScrollHeightPx: Float
 ) : NestedScrollConnection {
