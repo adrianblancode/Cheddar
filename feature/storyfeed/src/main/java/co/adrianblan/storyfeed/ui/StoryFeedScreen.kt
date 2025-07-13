@@ -1,29 +1,30 @@
 package co.adrianblan.storyfeed.ui
 
-import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -43,13 +44,12 @@ import co.adrianblan.storyfeed.StoryFeedState
 import co.adrianblan.storyfeed.StoryFeedViewModel
 import co.adrianblan.storyfeed.StoryFeedViewState
 import co.adrianblan.ui.AppTheme
-import co.adrianblan.ui.CollapsingScaffold
 import co.adrianblan.ui.ErrorView
-import co.adrianblan.ui.LoadingText
 import co.adrianblan.ui.LoadingSpinner
+import co.adrianblan.ui.LoadingText
+import co.adrianblan.ui.ToolbarNestedScrollConnection
 import co.adrianblan.ui.textSecondaryAlpha
 import kotlinx.collections.immutable.toImmutableList
-import kotlin.math.min
 import co.adrianblan.ui.R as UiR
 
 private val toolbarMinHeight = 60.dp
@@ -91,7 +91,6 @@ internal fun StoryFeedScreen(
 ) {
 
     val localDensity = LocalDensity.current
-    val scrollState = rememberScrollState()
 
     val collapseDistance = with(localDensity) {
         remember(localDensity) {
@@ -99,11 +98,13 @@ internal fun StoryFeedScreen(
         }
     }
 
-    // Scroll to top, but retain toolbar collapse state
-    val scrollReset: Int by remember {
-        derivedStateOf {
-            min(scrollState.value, collapseDistance)
-        }
+    val lazyListState = rememberLazyListState()
+
+    val nestedScrollHeightPx = with(LocalDensity.current) {
+        (toolbarMaxHeight - toolbarMinHeight).toPx()
+    }
+    val nestedScrollConnection = remember(nestedScrollHeightPx) {
+        ToolbarNestedScrollConnection(nestedScrollHeightPx)
     }
 
     var lastStoryType: StoryType by remember { mutableStateOf(viewState.storyType) }
@@ -115,73 +116,65 @@ internal fun StoryFeedScreen(
         if (lastStoryType == viewState.storyType) return@LaunchedEffect
         lastStoryType = viewState.storyType
 
-        scrollState.scrollTo(scrollReset)
+        lazyListState.scrollToItem(0)
     }
 
-    CollapsingScaffold(
-        scrollState = scrollState,
-        minHeight = toolbarMinHeight,
-        maxHeight = toolbarMaxHeight,
-        toolbarContent = { collapseFraction ->
-            StoryFeedToolbar(
-                collapsedFraction = collapseFraction,
-                storyType = viewState.storyType,
-                onStoryTypeClick = onStoryTypeClick
-            )
-        },
-        bodyContent = {
-            BodyContent(
-                scrollState = scrollState,
-                viewState = viewState,
-                onStoryClick = onStoryClick,
-                onStoryContentClick = onStoryContentClick,
-                onPageEndReached = onPageEndReached
-            )
-        }
-    )
-}
+    val toolbar: @Composable () -> Unit = {
+        StoryFeedToolbar(
+            collapseProgress = { nestedScrollConnection.progress() },
+            storyType = viewState.storyType,
+            onStoryTypeClick = onStoryTypeClick
+        )
+    }
 
-@Composable
-private fun BodyContent(
-    scrollState: ScrollState,
-    viewState: StoryFeedViewState,
-    onStoryClick: (StoryId) -> Unit,
-    onStoryContentClick: (StoryUrl) -> Unit,
-    onPageEndReached: () -> Unit
-) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+    ) {
+        when (viewState.storyFeedState) {
+            is StoryFeedState.Loading -> LoadingSpinner(modifier = Modifier.fillMaxSize())
+            is StoryFeedState.Success -> {
+                SuccessBody(
+                    storyFeedState = viewState.storyFeedState,
+                    lazyListState = lazyListState,
+                    toolbar = {
+                        stickyHeader {
+                            toolbar()
+                        }
+                    },
+                    onStoryClick = onStoryClick,
+                    onStoryContentClick = onStoryContentClick,
+                    onPageEndReached = onPageEndReached,
+                    modifier = Modifier.nestedScroll(nestedScrollConnection)
+                )
+            }
 
-    when (viewState.storyFeedState) {
-        is StoryFeedState.Loading -> LoadingSpinner(modifier = Modifier.fillMaxSize())
-        is StoryFeedState.Success -> {
-            SuccessBody(
-                scrollState = scrollState,
-                storyFeedState = viewState.storyFeedState,
-                onStoryClick = onStoryClick,
-                onStoryContentClick = onStoryContentClick,
-                onPageEndReached = onPageEndReached
-            )
+            is StoryFeedState.Error -> ErrorView(modifier = Modifier.fillMaxSize())
         }
 
-        is StoryFeedState.Error -> ErrorView(modifier = Modifier.fillMaxSize())
+        if (viewState.storyFeedState !is StoryFeedState.Success) {
+            toolbar()
+        }
     }
 }
 
 @Composable
 private fun SuccessBody(
-    scrollState: ScrollState,
     storyFeedState: StoryFeedState.Success,
+    lazyListState: LazyListState,
+    toolbar: LazyListScope.() -> Unit,
     onStoryClick: (StoryId) -> Unit,
     onStoryContentClick: (StoryUrl) -> Unit,
-    onPageEndReached: () -> Unit
+    onPageEndReached: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
 
-    val scrollEndZone = with(LocalDensity.current) {
-        400.dp.toPx()
-    }
-
+    val scrolledToEndKey = "scrolledToEnd"
     val isScrolledToEnd: Boolean by remember {
         derivedStateOf {
-            scrollState.value > (scrollState.maxValue - scrollEndZone)
+            lazyListState.layoutInfo.visibleItemsInfo
+                .any { it.key == scrolledToEndKey }
         }
     }
 
@@ -191,33 +184,37 @@ private fun SuccessBody(
         }
     }
 
-    // TODO change to LazyColumn once scroll state is fixed
-    Column(modifier = Modifier.verticalScroll(scrollState)) {
+    LazyColumn(
+        state = lazyListState,
+        modifier = modifier
+    ) {
+        toolbar()
 
-        Spacer(
-            modifier = Modifier
-                .statusBarsPadding()
-                .height(toolbarMaxHeight)
-        )
-
-        storyFeedState.stories.forEach { story ->
-            key(story.story.id) {
+        items(
+            items = storyFeedState.stories,
+            key = { it.story.id.id },
+            contentType = { "story" },
+            itemContent = { story ->
                 StoryFeedItem(
                     decoratedStory = story,
                     onStoryClick = onStoryClick,
                     onStoryContentClick = onStoryContentClick
                 )
             }
+        )
+
+        item(key = scrolledToEndKey) {
+            if (storyFeedState.hasLoadedAllPages) NoMoreStoriesView()
+            else LoadingMoreStoriesView()
         }
 
-        if (storyFeedState.hasLoadedAllPages) NoMoreStoriesView()
-        else LoadingMoreStoriesView()
-
-        Spacer(
-            modifier = Modifier
-                .navigationBarsPadding()
-                .height(8.dp)
-        )
+        item {
+            Spacer(
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .height(8.dp)
+            )
+        }
     }
 }
 

@@ -39,6 +39,7 @@ import co.adrianblan.storydetail.StoryDetailViewState
 import co.adrianblan.ui.AppTheme
 import co.adrianblan.ui.ErrorView
 import co.adrianblan.ui.LoadingSpinner
+import co.adrianblan.ui.ToolbarNestedScrollConnection
 
 private val toolbarMinHeight = 56.dp
 private val toolbarMaxHeight = 156.dp
@@ -70,10 +71,11 @@ internal fun StoryDetailScreen(
     onBackPressed: () -> Unit
 ) {
 
-    val density = LocalDensity.current
-    val toolbarMaxHeightPx = with(density) { toolbarMaxHeight.toPx() }
+    val nestedScrollHeightPx = with(LocalDensity.current) {
+        (toolbarMaxHeight - toolbarMinHeight).toPx()
+    }
     val nestedScrollConnection = remember {
-        StoryDetailNestedScrollConnection(toolbarMaxHeightPx)
+        ToolbarNestedScrollConnection(nestedScrollHeightPx)
     }
 
     val toolbar: @Composable () -> Unit = {
@@ -158,6 +160,7 @@ private fun CommentsSuccessBody(
         items(
             items = commentsState.comments,
             key = { it.comment.id.id },
+            contentType = { "comment" },
             itemContent = { comment ->
                 AnimatedContent(
                     targetState = comment.collapsedState,

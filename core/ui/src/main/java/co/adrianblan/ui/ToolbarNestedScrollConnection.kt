@@ -1,4 +1,4 @@
-package co.adrianblan.storydetail.ui
+package co.adrianblan.ui
 
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.animateDecay
@@ -12,7 +12,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.unit.Velocity
 
 /** Coordinates scroll between toolbar and LazyColumn */
-class StoryDetailNestedScrollConnection(
+class ToolbarNestedScrollConnection(
     private val maxNestedScrollHeightPx: Float
 ) : NestedScrollConnection {
 
@@ -35,7 +35,7 @@ class StoryDetailNestedScrollConnection(
         return if (delta < 0 && currentOffset > -maxNestedScrollHeightPx) {
             val consumed = consumeScroll(delta)
             Offset(x = 0f, y = consumed)
-        } else Offset.Zero
+        } else Offset.Companion.Zero
     }
 
     override fun onPostScroll(
@@ -50,17 +50,18 @@ class StoryDetailNestedScrollConnection(
         return if (delta > 0 && currentOffset < 0) {
             val consumed = consumeScroll(delta)
             Offset(x = 0f, y = consumed)
-        } else Offset.Zero
+        } else Offset.Companion.Zero
     }
 
     override suspend fun onPreFling(available: Velocity): Velocity {
         val velocity = available.y
 
         // When flinging content down, transfer fling to content
-        return if (velocity < 0 && currentOffset > -maxNestedScrollHeightPx) {
-            val consumed = fling(velocity)
-            Velocity(x = 0f, y = consumed)
-        } else Velocity.Zero
+        if (velocity < 0 && currentOffset > -maxNestedScrollHeightPx) {
+            fling(velocity)
+        }
+        // Don't slow down current fling
+        return Velocity.Companion.Zero
     }
 
     override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
@@ -70,7 +71,7 @@ class StoryDetailNestedScrollConnection(
         return if (velocity > 0 && currentOffset < 0) {
             val consumed = fling(velocity)
             Velocity(x = 0f, y = consumed)
-        } else Velocity.Zero
+        } else Velocity.Companion.Zero
     }
 
     // Tries to consume scroll delta, returns amount consumed
@@ -83,7 +84,7 @@ class StoryDetailNestedScrollConnection(
     // Tries to consume fling velocity, returns amount consumed
     private suspend fun fling(initialVelocity: Float): Float {
         val fling = AnimationState(
-            initialValue = -currentOffset,
+            initialValue = currentOffset,
             initialVelocity = initialVelocity
         )
         currentFling = fling
@@ -95,14 +96,14 @@ class StoryDetailNestedScrollConnection(
         ) {
             if (
                 currentOffset == 0f
-                || (currentOffset - maxNestedScrollHeightPx) < 0.001f
+                || currentOffset <= -maxNestedScrollHeightPx
                 || fling != currentFling
             ) {
                 cancelAnimation()
             }
 
             val delta = value - currentOffset
-            consumeScroll(delta)
+            val consumed = consumeScroll(delta)
             consumedVelocity = initialVelocity - velocity
         }
 
