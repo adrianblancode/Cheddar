@@ -90,14 +90,6 @@ internal fun StoryFeedScreen(
     onPageEndReached: () -> Unit
 ) {
 
-    val localDensity = LocalDensity.current
-
-    val collapseDistance = with(localDensity) {
-        remember(localDensity) {
-            (toolbarMaxHeight - toolbarMinHeight).roundToPx()
-        }
-    }
-
     val lazyListState = rememberLazyListState()
 
     val nestedScrollHeightPx = with(LocalDensity.current) {
@@ -264,9 +256,9 @@ private fun StoryFeedPreview() {
         val viewState = StoryFeedViewState(
             StoryType.TOP,
             StoryFeedState.Success(
-                List(10) {
+                List(10) { i ->
                     DecoratedStory(
-                        Story.placeholderLink,
+                        Story.placeholderLink.copy(id = StoryId(i.toLong())),
                         WebPreviewState.Loading
                     )
                 }.toImmutableList(),
