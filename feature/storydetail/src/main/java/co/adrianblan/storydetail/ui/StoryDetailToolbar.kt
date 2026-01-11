@@ -78,7 +78,7 @@ internal fun StoryDetailToolbar(
             modifier = Modifier.padding(8.dp)
         ) {
             Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                imageVector = Icons.AutoMirrored.Default.ArrowBack,
                 tint = MaterialTheme.colorScheme.onBackground,
                 contentDescription = null
             )

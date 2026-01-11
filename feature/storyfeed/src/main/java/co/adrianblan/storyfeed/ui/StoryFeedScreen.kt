@@ -15,6 +15,10 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults.Indicator
+import androidx.compose.material3.pulltorefresh.pullToRefresh
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -77,7 +81,8 @@ internal fun StoryFeedRoute(
         onStoryTypeClick = { storyType -> viewModel.onStoryTypeChanged(storyType) },
         onStoryClick = onStoryClick,
         onStoryContentClick = onStoryContentClick,
-        onPageEndReached = { viewModel.onPageEndReached() }
+        onPageEndReached = { viewModel.onPageEndReached() },
+        onRefresh = { viewModel.refresh() }
     )
 }
 
@@ -87,6 +92,7 @@ internal fun StoryFeedScreen(
     onStoryTypeClick: (StoryType) -> Unit,
     onStoryClick: (StoryId) -> Unit,
     onStoryContentClick: (StoryUrl) -> Unit,
+    onRefresh: () -> Unit,
     onPageEndReached: () -> Unit
 ) {
 
@@ -119,10 +125,24 @@ internal fun StoryFeedScreen(
         )
     }
 
-    Box(
+    val state = rememberPullToRefreshState()
+
+    PullToRefreshBox(
+        isRefreshing = viewState.isRefreshing,
+        onRefresh = onRefresh,
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.background),
+        state = state,
+        indicator = {
+            Indicator(
+                modifier = Modifier.align(Alignment.TopCenter),
+                isRefreshing = viewState.isRefreshing,
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                state = state
+            )
+        },
     ) {
         when (viewState.storyFeedState) {
             is StoryFeedState.Loading -> LoadingSpinner(modifier = Modifier.fillMaxSize())
@@ -263,7 +283,8 @@ private fun StoryFeedPreview() {
                     )
                 }.toImmutableList(),
                 hasLoadedAllPages = false
-            )
+            ),
+            isRefreshing = false
         )
 
         StoryFeedScreen(
@@ -271,7 +292,8 @@ private fun StoryFeedPreview() {
             onStoryTypeClick = {},
             onStoryClick = {},
             onStoryContentClick = {},
-            onPageEndReached = {}
+            onPageEndReached = {},
+            onRefresh = {}
         )
     }
 }

@@ -11,11 +11,15 @@ import co.adrianblan.model.StoryId
 import co.adrianblan.model.StoryType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -24,7 +28,7 @@ import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
-class StoryFeedViewModel @Inject constructor(
+internal class StoryFeedViewModel @Inject constructor(
     private val savedStateHandle: SavedStateHandle,
     private val hackerNewsRepository: HackerNewsRepository,
     private val storyPreviewUseCase: StoryPreviewUseCase,
@@ -36,68 +40,88 @@ class StoryFeedViewModel @Inject constructor(
 
     private val pageIndexFlow = MutableStateFlow<Int>(0)
 
-    val viewState: StateFlow<StoryFeedViewState> =
-        storyTypeFlow
-            .flatMapLatest { storyType ->
+    private val refreshFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+    private val isRefreshingFlow = MutableStateFlow(false)
 
-                flow {
-                    emit(hackerNewsRepository.fetchStoryIds(storyType))
-                }
-                    .flatMapLatest { storyIds: List<StoryId> ->
-                        pageIndexFlow.observePages(
-                            pageStoryIdsSource = { pageIndex: Int ->
-                                storyIds.takePage(pageIndex, PAGE_SIZE)
-                            },
-                            storyFlowSource = { storyId: StoryId ->
-                                storyPreviewUseCase.observeDecoratedStory(storyId)
-                            }
-                        )
-                            .map { stories ->
-                                if (stories.isEmpty()) StoryFeedState.Loading
-                                else {
-                                    StoryFeedState.Success(
-                                        stories.toImmutableList(),
-                                        hasLoadedAllPages = stories.size == storyIds.size
-                                    )
-                                }
-                            }
+    private val storyFeedStateFlow: Flow<StoryFeedState> =
+        combine(
+            storyTypeFlow,
+            refreshFlow.onStart { emit(Unit) }
+        ) { storyType, _ -> storyType }
+            .flatMapLatest { storyType ->
+                flowOf(hackerNewsRepository.fetchStoryIds(storyType))
+            }.flatMapLatest { storyIds: List<StoryId> ->
+                pageIndexFlow.value = 0
+                pageIndexFlow.observePages(
+                    pageStoryIdsSource = { pageIndex: Int ->
+                        storyIds.takePage(pageIndex, PAGE_SIZE)
+                    },
+                    storyFlowSource = { storyId: StoryId ->
+                        storyPreviewUseCase.observeDecoratedStory(storyId)
                     }
-                    .onStart {
-                        // Don't emit loading state on resubscribe to existing flow
-                        if (pageIndexFlow.value == 0) emit(StoryFeedState.Loading)
-                    }
-                    .catch { t ->
-                        Timber.e(t)
-                        emit(StoryFeedState.Error(t))
-                    }
-                    .map { storyFeedState ->
-                        StoryFeedViewState(
-                            storyType = storyType,
-                            storyFeedState = storyFeedState
-                        )
+                )
+                    .onStart { isRefreshingFlow.value = false }
+                    .map { stories ->
+                        if (stories.isEmpty()) StoryFeedState.Loading
+                        else {
+                            StoryFeedState.Success(
+                                stories.toImmutableList(),
+                                hasLoadedAllPages = stories.size == storyIds.size
+                            )
+                        }
                     }
             }
+            .catch { t ->
+                Timber.e(t)
+                emit(StoryFeedState.Error(t))
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.Lazily,
+                StoryFeedState.Loading
+            )
+
+    val viewState: StateFlow<StoryFeedViewState> =
+        combine(
+            storyTypeFlow,
+            storyFeedStateFlow,
+            isRefreshingFlow
+        ) { storyType: StoryType,
+            storyFeedState: StoryFeedState,
+            isRefreshing: Boolean ->
+
+            StoryFeedViewState(
+                storyType = storyType,
+                storyFeedState = storyFeedState,
+                isRefreshing = isRefreshing
+            )
+        }
             .flowOn(dispatcherProvider.IO)
             .stateIn(
                 viewModelScope,
                 WhileSubscribed,
                 StoryFeedViewState(
                     storyType = storyTypeFlow.value,
-                    storyFeedState = StoryFeedState.Loading
+                    storyFeedState = StoryFeedState.Loading,
+                    isRefreshing = false
                 )
             )
 
-    internal fun onStoryTypeChanged(storyType: StoryType) {
-        pageIndexFlow.tryEmit(0)
+    fun onStoryTypeChanged(storyType: StoryType) {
         savedStateHandle[KEY_STORY_TYPE] = storyType
     }
 
-    internal fun onPageEndReached() {
+    fun onPageEndReached() {
         val state = viewState.value.storyFeedState
         if (state is StoryFeedState.Success) {
             val newPageIndex = state.stories.size / PAGE_SIZE
             pageIndexFlow.tryEmit(newPageIndex)
         }
+    }
+
+    fun refresh() {
+        isRefreshingFlow.value = true
+        refreshFlow.tryEmit(Unit)
     }
 
     companion object {

@@ -8,7 +8,8 @@ import kotlinx.collections.immutable.ImmutableList
 @Immutable
 data class StoryFeedViewState(
     val storyType: StoryType,
-    val storyFeedState: StoryFeedState
+    val storyFeedState: StoryFeedState,
+    val isRefreshing: Boolean
 )
 
 @Immutable

@@ -40,6 +40,12 @@ android {
     buildFeatures {
         buildConfig = true
     }
+
+    packaging {
+        resources {
+            excludes += "META-INF/versions/**"
+        }
+    }
 }
 
 dependencies {
@@ -58,4 +64,5 @@ dependencies {
     implementation(libs.timber)
     implementation(libs.coil)
     debugImplementation(libs.leakcanary)
+    ksp(libs.kotlin.metadata.jvm)
 }
